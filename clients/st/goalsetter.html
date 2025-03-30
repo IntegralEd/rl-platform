@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<!-- Deploy: 2024-03-29 -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StriveTogether Goal Setter</title>
+    
+    <!-- Platform level assets -->
+    <script src="/01_platform/assets/js/chat.js"></script>
+    <script src="/01_platform/assets/js/auth.js"></script>
+    
+    <!-- Client level assets -->
+    <script src="assets/js/st-auth.js"></script>
+    <link rel="stylesheet" href="assets/css/st-variables.css">
+    <link rel="stylesheet" href="assets/css/st-custom.css">
+
+    <style>
+        :root {
+            /* Core Layout Dimensions */
+            --nav-width: 20%;
+            --content-width: 80%;
+            --embed-width: 1200px;
+            --embed-height: 85vh;
+            --header-height: 50px;
+            --footer-height: 100px;
+            --border-color: #eee;
+            --page-margin: 20px;
+            --chat-button-size: 60px;
+            --play-button-size: 60px;
+
+            /* Branding Colors */
+            --primary-color: #425563; /* ST Primary */
+            --secondary-color: #E87722; /* ST Orange */
+            --tertiary-color: #4fa997; /* ST Teal */
+            --background-color: #f9f9f9;
+            --text-color: #2b2b2b;
+            --cta-text-color: #ffffff;
+
+            /* Typography */
+            --client-font-h1: 'Arial, sans-serif';
+            --client-font-h2: 'Arial, sans-serif';
+            --client-font-body: 'Arial, sans-serif';
+            --client-font-size-h1: 28px;
+            --client-font-size-h2: 24px;
+            --client-font-size-body: 16px;
+        }
+
+        body {
+            margin: 0;
+            padding: var(--page-margin);
+            font-family: var(--client-font-body);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background: #f4f4f4;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: var(--embed-width);
+            height: var(--embed-height);
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .app-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+
+        .header-logo {
+            height: 35px;
+            margin: 7.5px 0;
+            content: url('assets/images/ST TH Powered By White Logo.png');
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100% - var(--header-height) - var(--footer-height));
+            min-height: 0; /* Allow flex shrinking */
+        }
+
+        /* Left Navigation */
+        .left-nav {
+            width: var(--nav-width);
+            border-right: 2px solid var(--primary-color);
+            padding: 16px 0;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 12px 16px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-color);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            font-weight: bold;
+            color: #E87722;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 3px;
+            background: #E87722;
+        }
+
+        /* Content Area */
+        .content-area {
+            width: var(--content-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Allow flex shrinking */
+        }
+
+        /* Welcome Form */
+        .welcome-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: normal;
+            font-family: Arial, sans-serif;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 72px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .standards-link {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        /* Form title styling */
+        .welcome-form h1 {
+            color: #2b2b2b;
+            font-size: 28px;
+            margin-bottom: 32px;
+            font-family: var(--client-font-h1);
+        }
+
+        /* Standards detail section */
+        .context-section {
+            display: none;
+            margin-top: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .context-section.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Button base styles */
+        .next-button, .send-button {
+            width: 60px;
+            height: 60px;
+            background: #ccc;  /* Start with gray when disabled */
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .next-button.enabled {
+            background: #E87722;  /* ST Orange when enabled */
+        }
+
+        .next-button img,
+        .send-button img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);  /* Make icons white */
+        }
+
+        /* Chat input styling */
+        .chatbar, .playbar {
+            display: none;  /* Hidden by default */
+            align-items: center;
+            gap: 20px;
+            width: calc(100% - var(--nav-width));
+            max-width: 800px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            padding: 20px 40px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .chatbar.active, .playbar.active {
+            display: flex;
+        }
+
+        .send-button {
+            width: var(--chat-button-size);
+            height: var(--chat-button-size);
+            min-width: var(--chat-button-size);
+            min-height: var(--chat-button-size);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #E87722;  /* ST Orange for send button */
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .send-button:hover {
+            background: #d66a1c;  /* Darker orange on hover */
+            transform: scale(1.05);
+        }
+
+        .send-button img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);  /* Make icon white */
+        }
+
+        .chat-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 24px;
+            font-size: 16px;
+            font-family: var(--client-font-body);
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #E87722;
+            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
+        }
+
+        /* Footer */
+        .app-footer {
+            height: var(--footer-height);
+            background: white;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+
+        /* Chat container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px;
+            overflow-y: auto;
+            min-height: 0; /* Allow flex shrinking */
+        }
+
+        /* Chat bubbles */
+        .message {
+            max-width: 80%;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #FFFFFF;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: #425563;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #E87722;
+        }
+
+        /* Chat and Play buttons */
+        .chat-button, .play-button {
+            width: var(--chat-button-size);
+            height: var(--chat-button-size);
+            min-width: var(--chat-button-size);
+            min-height: var(--chat-button-size);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-button img, .play-button img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        @media (max-width: 1220px) {
+            body {
+                padding: 0;
+            }
+            
+            .app-container {
+                height: 100vh;
+                margin: 0;
+            }
+        }
+
+        .completion-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .completion-modal button {
+            margin: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .completion-modal button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Add hover state for next-button */
+        .next-button.enabled:hover {
+            background: #d66a1c;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <img src="assets/images/ST TH Powered By White Logo.png" 
+                 alt="StriveTogether" 
+                 class="header-logo">
+        </header>
+        
+        <div class="main-container">
+            <!-- Left Navigation -->
+            <nav class="left-nav">
+                <button class="nav-tab active" onclick="switchTab('welcome')">Welcome</button>
+                <button class="nav-tab" onclick="switchTab('interview')" disabled>Interview</button>
+                <button class="nav-tab" onclick="switchTab('tools')" disabled>Tools</button>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Welcome Form -->
+                <div id="welcome-section" class="welcome-form">
+                    <h1>Continuous Improvement Goals</h1>
+                    
+                    <div class="form-group">
+                        <label>Would you like to consider any academic standards when setting goals for this cycle?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="standards" value="yes" onclick="STAuth.handleStandardsChoice('yes')">
+                                <label>Yes</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="standards" value="no" onclick="STAuth.handleStandardsChoice('no')">
+                                <label>No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="standards-detail" class="context-section form-group">
+                        <label>Please provide a link to or description of the relevant academic standards:</label>
+                        <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
+                        <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="reflection" value="yes" onclick="STAuth.handleReflectionChoice('yes')">
+                                <label>Yes</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="reflection" value="no" onclick="STAuth.handleReflectionChoice('no')">
+                                <label>No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="reflection-detail" class="context-section form-group">
+                        <label>Tell me about the last PDSA cycle:</label>
+                        <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
+                    </div>
+                </div>
+
+                <!-- Interview Section -->
+                <div id="interview-section" style="display: none;">
+                    <div class="chat-container">
+                        <div class="message assistant">
+                            Hi! I'm here to help you set meaningful goals. I see you've shared some context about standards and previous work. What specific area would you like to focus on for this improvement cycle?
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Section (hidden initially) -->
+                <div id="tools-section" style="display: none;">
+                    <!-- Export tools will go here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer">
+            <div class="playbar">
+                <button class="next-button" disabled>
+                    <img src="assets/images/noun-next-5654311-FFFFFF.png" alt="Next">
+                </button>
+            </div>
+            <div class="chatbar" style="display: none;">
+                <input type="text" 
+                       class="chat-input" 
+                       placeholder="Type your message..."
+                       onkeydown="handleChatKeypress(event)">
+                <button class="send-button" onclick="sendMessage()">
+                    <img src="assets/images/noun-send-7149925-FFFFFF.png" alt="Send">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track form state
+        let formState = {
+            standardsChoice: null,
+            standardsLink: '',
+            standardsDetail: '',
+            reflectionChoice: null,
+            reflectionDetail: ''
+        };
+
+        // Track interview variables
+        let interviewState = {
+            teachingContext: '',
+            learningTarget: '',
+            successCriteria: '',
+            teacherGoalStatement: '',
+            studentGoalStatement: '',
+            messageCount: 0,
+            isComplete: false
+        };
+
+        function handleStandardsChoice() {
+            const radios = document.getElementsByName('academic-standards');
+            const standardsDetail = document.getElementById('standards-detail');
+            
+            for (const radio of radios) {
+                if (radio.checked) {
+                    formState.standardsChoice = radio.value;
+                    
+                    if (radio.value === 'yes') {
+                        standardsDetail.classList.add('visible');
+                        // Add listeners for both inputs
+                        document.getElementById('standards-link').addEventListener('input', checkFormCompletion);
+                        document.getElementById('standards-detail-input').addEventListener('input', checkFormCompletion);
+                    } else {
+                        standardsDetail.classList.remove('visible');
+                        checkFormCompletion();
+                    }
+                    break;
+                }
+            }
+        }
+
+        function handleReflectionChoice() {
+            const radios = document.getElementsByName('reflect-previous');
+            const reflectionDetail = document.getElementById('reflection-detail');
+            
+            for (const radio of radios) {
+                if (radio.checked) {
+                    formState.reflectionChoice = radio.value;
+                    
+                    if (radio.value === 'yes') {
+                        reflectionDetail.classList.add('visible');
+                        document.getElementById('reflection-input').addEventListener('input', checkFormCompletion);
+                    } else {
+                        reflectionDetail.classList.remove('visible');
+                        checkFormCompletion();
+                    }
+                    break;
+                }
+            }
+        }
+
+        function checkFormCompletion() {
+            const nextButton = document.querySelector('.next-button');
+            // Allow proceeding if ANY radio is selected
+            const isComplete = formState.standardsChoice || formState.reflectionChoice;
+            
+            nextButton.classList.toggle('enabled', isComplete);
+            nextButton.disabled = !isComplete;
+
+            if (isComplete) {
+                nextButton.style.background = '#E87722';
+                nextButton.style.cursor = 'pointer';
+            } else {
+                nextButton.style.background = '#ccc';
+                nextButton.style.cursor = 'not-allowed';
+            }
+        }
+
+        function sendToWebhook() {
+            const payload = {
+                user_data: {
+                    name: formState.name || 'anonymous',
+                    email: formState.email || 'anonymous@public.test',
+                    user_id: formState.userId || '',
+                    thread_id: window.threadId || '',
+                    assistant_id: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
+                    org_id: 'recsK5zK0CouK5ebW',
+                    intake_token: 'goalsetter_chat',
+                    source: 'url',
+                    url: window.location.href,
+                    is_anonymous: !formState.name || !formState.email
+                },
+                document_data: {
+                    subject_and_grade: interviewState.teachingContext || '',
+                    learning_target: interviewState.learningTarget || '',
+                    measure_of_success: interviewState.successCriteria || '',
+                    classroom_goal_statement: interviewState.teacherGoalStatement || ''
+                }
+            };
+
+            fetch('https://hook.us1.make.com/f6no146taqm5cdss37za7siawjy8fnut', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Webhook response:', data);
+                // Enable tools tab after successful submission
+                document.querySelector('.nav-tab[onclick="switchTab(\'tools\')"]').disabled = false;
+            })
+            .catch(error => console.error('Webhook error:', error));
+        }
+
+        function startInterview() {
+            // Construct initial context message
+            const contextMessage = {
+                user_data: {
+                    assistant_id: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
+                    org_id: 'recsK5zK0CouK5ebW',
+                    intake_token: 'goalsetter_chat'
+                },
+                form_data: {
+                    standards: {
+                        consider: formState.standardsChoice === 'yes',
+                        link: formState.standardsLink,
+                        details: formState.standardsDetail
+                    },
+                    reflection: {
+                        include: formState.reflectionChoice === 'yes',
+                        previousCycle: formState.reflectionDetail
+                    }
+                }
+            };
+
+            // Call Lambda endpoint to initialize chat
+            fetch('https://[YOUR_LAMBDA_ENDPOINT]/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contextMessage)
+            })
+            .then(response => response.json())
+            .then(data => {
+                window.threadId = data.thread_id;
+                // Enable interview tab and switch to it
+                document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]').disabled = false;
+                switchTab('interview');
+                
+                // Display initial assistant message
+                const chatContainer = document.querySelector('.chat-container');
+                chatContainer.innerHTML = '';
+                const assistantBubble = document.createElement('div');
+                assistantBubble.className = 'message assistant';
+                assistantBubble.textContent = data.message;
+                chatContainer.appendChild(assistantBubble);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function sendMessage() {
+            const input = document.querySelector('.chat-input');
+            const message = input.value.trim();
+            const chatContainer = document.querySelector('.chat-container');
+            
+            if (!message) return;
+            
+            interviewState.messageCount++;
+            
+            // Add user message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'message user';
+            userBubble.textContent = message;
+            chatContainer.appendChild(userBubble);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            if (window.chatCore) {
+                chatCore.send(message).then(response => {
+                    interviewState.messageCount++;
+                    
+                    // Add assistant message
+                    const assistantBubble = document.createElement('div');
+                    assistantBubble.className = 'message assistant';
+                    assistantBubble.textContent = response;
+                    chatContainer.appendChild(assistantBubble);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    // Check for completion phrase
+                    if (response.includes("Here's a summary of your goals:")) {
+                        showCompletionModal();
+                        sendToWebhook();
+                    }
+                });
+            }
+            
+            input.value = '';
+        }
+
+        function showCompletionModal() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div class="completion-modal">
+                    <h2>Great progress today!</h2>
+                    <p>Would you like to:</p>
+                    <button onclick="switchTab('tools'); closeModal()">
+                        Export as PDF
+                    </button>
+                    <button onclick="closeModal()">
+                        Continue Chatting
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function switchTab(tabName) {
+            // Update tab styling
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+
+            // Show correct section
+            document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
+            document.getElementById('interview-section').style.display = tabName === 'interview' ? 'block' : 'none';
+            document.getElementById('tools-section').style.display = tabName === 'tools' ? 'block' : 'none';
+
+            // Toggle chatbar/playbar based on section
+            const playbar = document.querySelector('.playbar');
+            const chatbar = document.querySelector('.chatbar');
+            
+            playbar.classList.toggle('active', tabName === 'welcome');
+            chatbar.classList.toggle('active', tabName === 'interview');
+
+            // Focus chat input when switching to interview
+            if (tabName === 'interview') {
+                const chatInput = document.querySelector('.chat-input');
+                chatInput.focus();
+            }
+        }
+
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const nextButton = document.querySelector('.next-button');
+            nextButton.addEventListener('click', startInterview);
+        });
+    </script>
+</body>
+</html> 
