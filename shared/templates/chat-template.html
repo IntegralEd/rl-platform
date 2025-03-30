@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context-Aware Chat</title>
+    <style>
+        :root {
+            /* Colors - will be overridden per client */
+            --primary-color: #6A6DB3;
+            --secondary-color: #2B2D42;
+            --background: #ffffff;
+            --text: #2B2D42;
+            --input-bg: #f5f5f5;
+            
+            /* Layout */
+            --max-width: 1200px;
+            --min-width: 320px;
+            --header-height: 50px;
+            --nav-padding: 10px;
+            --section-padding: 20px;
+            --welcome-width: 600px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background: var(--background);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: var(--max-width);
+            min-width: var(--min-width);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--background);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .app-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            width: 100%;
+            padding: 0 var(--nav-padding);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-logo {
+            height: calc(var(--header-height) - 20px);
+            padding: 5px 0;
+        }
+
+        /* Welcome & Context */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            padding: var(--section-padding);
+            gap: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: var(--section-padding) auto;
+            max-width: var(--welcome-width);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .welcome-container h2 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 0;
+            text-align: center;
+        }
+
+        .context-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .context-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .context-option {
+            padding: 1rem;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+            color: var(--secondary-color);
+        }
+
+        .context-option:hover,
+        .context-option.selected {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .next-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: all 0.2s;
+            width: 100%;
+            max-width: 200px;
+            align-self: center;
+        }
+
+        .next-button.enabled {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-button.enabled:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: var(--section-padding);
+            overflow: hidden;
+        }
+
+        .chat-container.active {
+            display: flex;
+        }
+
+        .chat-tabs {
+            display: flex;
+            background: var(--input-bg);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 0 var(--nav-padding);
+        }
+
+        .chat-tab {
+            padding: 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text);
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+
+        .chat-tab:hover,
+        .chat-tab.active {
+            opacity: 1;
+            color: var(--primary-color);
+            box-shadow: inset 0 -2px var(--primary-color);
+        }
+
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: var(--section-padding);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .message.assistant {
+            background: var(--secondary-color);
+            color: white;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .input-area {
+            padding: var(--nav-padding);
+            background: var(--input-bg);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .input-area input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 15px;
+            min-width: 0;
+        }
+
+        .input-area input:focus {
+            outline: none;
+        }
+
+        .send-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        /* Resources Panel */
+        .resources-panel {
+            display: none;
+            flex: 1;
+            padding: var(--section-padding);
+            overflow-y: auto;
+        }
+
+        .resources-panel.active {
+            display: block;
+        }
+
+        .resource-card {
+            padding: 1rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        /* History Panel */
+        .history-panel {
+            display: none;
+            flex: 1;
+            padding: var(--section-padding);
+            overflow-y: auto;
+        }
+
+        .history-panel.active {
+            display: block;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background: var(--input-bg);
+        }
+
+        @media (max-width: 768px) {
+            .context-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chat-container {
+                margin: var(--nav-padding);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <img src="" alt="Logo" class="header-logo" id="client-logo">
+            </div>
+        </header>
+
+        <div class="welcome-container" id="welcomeContainer">
+            <h2>Welcome! Let's get started.</h2>
+            <div class="context-form">
+                <div class="form-group">
+                    <label>Who are you?</label>
+                    <input type="text" id="user-role" placeholder="Your role or context">
+                </div>
+                
+                <div class="form-group">
+                    <label>Select your focus area:</label>
+                    <div class="context-options" id="contextOptions">
+                        <!-- Options injected by client JS -->
+                    </div>
+                </div>
+
+                <button class="next-button" id="nextButton" onclick="startChat()">
+                    Start Chat
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="chat-tabs">
+                <button class="chat-tab active" onclick="switchTab('chat')">Chat</button>
+                <button class="chat-tab" onclick="switchTab('resources')">Resources</button>
+                <button class="chat-tab" onclick="switchTab('history')">History</button>
+            </div>
+
+            <div class="chat-window" id="chatWindow">
+                <div class="message assistant">
+                    Welcome! How can I help you today?
+                </div>
+            </div>
+
+            <div class="resources-panel" id="resourcesPanel">
+                <!-- Resources populated by client -->
+            </div>
+
+            <div class="history-panel" id="historyPanel">
+                <!-- History populated by client -->
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="chatInput" 
+                       placeholder="Type your message here...">
+                <button class="send-button" onclick="sendMessage()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" 
+                              fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userContext = {
+            role: '',
+            focus: '',
+            history: []
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChat();
+            
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Context form validation
+            const roleInput = document.getElementById('user-role');
+            roleInput.addEventListener('input', validateForm);
+        });
+
+        function initializeChat() {
+            chatCore.init();
+        }
+
+        function validateForm() {
+            const role = document.getElementById('user-role').value.trim();
+            const focus = document.querySelector('.context-option.selected');
+            
+            const isValid = role.length > 0 && focus;
+            document.getElementById('nextButton').classList.toggle('enabled', isValid);
+        }
+
+        function selectContext(element, value) {
+            document.querySelectorAll('.context-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            userContext.focus = value;
+            validateForm();
+        }
+
+        function startChat() {
+            if (!document.getElementById('nextButton').classList.contains('enabled')) {
+                return;
+            }
+            
+            userContext.role = document.getElementById('user-role').value.trim();
+            
+            document.getElementById('welcomeContainer').style.display = 'none';
+            document.getElementById('chatContainer').classList.add('active');
+            
+            // Initialize chat with context
+            chatCore.setContext(userContext);
+        }
+
+        function switchTab(tab) {
+            // Hide all panels
+            document.querySelectorAll('.chat-window, .resources-panel, .history-panel')
+                .forEach(panel => panel.style.display = 'none');
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.chat-tab')
+                .forEach(t => t.classList.remove('active'));
+            
+            // Show selected panel
+            switch(tab) {
+                case 'chat':
+                    document.getElementById('chatWindow').style.display = 'flex';
+                    break;
+                case 'resources':
+                    document.getElementById('resourcesPanel').style.display = 'block';
+                    break;
+                case 'history':
+                    document.getElementById('historyPanel').style.display = 'block';
+                    break;
+            }
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const chatWindow = document.getElementById('chatWindow');
+            
+            if (!input.value.trim()) return;
+            
+            // Add user message
+            const message = document.createElement('div');
+            message.classList.add('message', 'user');
+            message.textContent = input.value;
+            chatWindow.appendChild(message);
+            
+            // Show typing indicator
+            const indicator = document.createElement('div');
+            indicator.classList.add('message', 'assistant');
+            indicator.textContent = '...';
+            chatWindow.appendChild(indicator);
+            
+            // Send to chat core with context
+            chatCore.send(input.value, userContext)
+                .then(response => {
+                    indicator.remove();
+                    const responseMsg = document.createElement('div');
+                    responseMsg.classList.add('message', 'assistant');
+                    responseMsg.textContent = response.message;
+                    chatWindow.appendChild(responseMsg);
+                    
+                    // Update history
+                    userContext.history.push({
+                        user: input.value,
+                        assistant: response.message,
+                        timestamp: new Date()
+                    });
+                    
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    indicator.textContent = 'Failed to send message. Please try again.';
+                });
+            
+            input.value = '';
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    </script>
+</body>
+</html> 

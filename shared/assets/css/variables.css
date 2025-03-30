@@ -1,0 +1,29 @@
+:root {
+    /* Branding Colors */
+    --primary-color: #c6123f; /* EL Education Crimson */
+    --secondary-color: #211651; /* Dark Navy */
+    --tertiary-color: #ffa409; /* CTA Orange */
+    --background-color: #f9f9f9; /* Light Background */
+    --text-color: #2b2b2b; /* Dark Gray Text */
+    --cta-text-color: #ffffff; /* CTA Button Text */
+
+    /* Typography */
+    --client-font-h1: 'Lora, serif';
+    --client-font-h2: 'Montserrat, sans-serif';
+    --client-font-body: 'Source Sans Pro, sans-serif';
+    --client-font-size-h1: 36px;
+    --client-font-size-h2: 28px;
+    --client-font-size-body: 18px;
+
+    /* Layout */
+    --client-button-radius: 12px;
+    --client-button-padding: 14px 28px;
+    --client-card-border-radius: 16px;
+    --client-spacing-large: 40px;
+    --client-spacing-medium: 28px;
+    --client-spacing-small: 18px;
+
+    /* Accessibility */
+    --client-font-scale: 1.2;
+    --client-high-contrast-mode: true;
+} 
