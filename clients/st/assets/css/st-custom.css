@@ -144,95 +144,75 @@ h4, h5, h6 {
     display: flex;
 }
 
-.chat-input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 24px;
-    font-size: 16px;
-    line-height: 1.5;
-    resize: none;
-    min-height: 24px;
-    max-height: 120px;
-    transition: border-color 0.2s;
+/* Interaction Container */
+.interaction-container {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-shrink: 0;
+    background: var(--primary-color);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
 }
 
-.chat-input:focus {
+.interaction-bar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
+.interaction-left, .interaction-right {
+    width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.interaction-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.chat-input-group {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.interaction-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    background: white;
+    min-height: 24px;
+    max-height: 120px;
+    resize: none;
+    line-height: 1.4;
+    transition: all 0.2s ease;
+}
+
+.interaction-input:focus {
     outline: none;
     border-color: var(--secondary-color);
     box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
 }
 
-/* Next Button */
-.next-button {
-    background: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: var(--client-button-radius);
-    padding: var(--client-button-padding);
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+/* Interaction Icons */
+.interaction-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
 }
 
-.next-button:hover {
+.interaction-button:hover .interaction-icon {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.next-button:active {
-    transform: scale(0.95);
-}
-
-.next-button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.next-button.enabled {
-    background: var(--secondary-color);
-    cursor: pointer;
-}
-
-/* Send Button */
-.send-button {
-    background: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.send-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.send-button:active {
-    transform: scale(0.95);
-}
-
-.send-button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }
 
 /* Loading Animation */
@@ -265,4 +245,50 @@ h4, h5, h6 {
     .chat-input {
         font-size: 14px;
     }
+}
+
+/* Interaction Buttons */
+.interaction-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    background: var(--secondary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.interaction-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.interaction-button:active {
+    transform: scale(0.95);
+}
+
+.interaction-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.interaction-button.enabled {
+    background: var(--secondary-color);
+}
+
+.interaction-button.next-button {
+    background: var(--secondary-color);
+}
+
+.interaction-button.send-button {
+    background: var(--secondary-color);
 }
