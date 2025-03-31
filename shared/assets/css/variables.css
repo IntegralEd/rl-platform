@@ -26,4 +26,9 @@
     /* Accessibility */
     --client-font-scale: 1.2;
     --client-high-contrast-mode: true;
+
+    /* Configuration Fallbacks */
+    --assistant-id: 'asst_9GkHpGa5t50Yw74uzonh6FAz';
+    --org-id: 'recsK5zK0CouK5ebW';
+    --intake-token: 'goalsetter_chat';
 } 

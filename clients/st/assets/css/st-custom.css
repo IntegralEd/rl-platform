@@ -136,11 +136,12 @@ h4, h5, h6 {
     background: white;
     border-top: 1px solid var(--border-color);
     position: relative;
+    align-items: center;
+    gap: 16px;
 }
 
 .chatbar.active {
     display: flex;
-    gap: 12px;
 }
 
 .chat-input {
@@ -162,27 +163,76 @@ h4, h5, h6 {
     box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
 }
 
+/* Next Button */
+.next-button {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: var(--client-button-radius);
+    padding: var(--client-button-padding);
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.next-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.next-button:active {
+    transform: scale(0.95);
+}
+
+.next-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.next-button.enabled {
+    background: var(--secondary-color);
+    cursor: pointer;
+}
+
+/* Send Button */
 .send-button {
     background: var(--secondary-color);
     color: white;
     border: none;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .send-button:hover {
-    background: #d66a1a;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.send-button:active {
+    transform: scale(0.95);
 }
 
 .send-button:disabled {
     background: #ccc;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* Loading Animation */

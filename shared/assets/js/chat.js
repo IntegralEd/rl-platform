@@ -7,8 +7,8 @@ const Chat = {
         userId: window.USER_ID || 'anonymous',
         chatState: {
             threadId: window.THREAD_ID || localStorage.getItem(`chat_thread_${window.USER_ID || 'anonymous'}`) || '',
-            orgId: window.ORG_ID || 'recsK5zK0CouK5ebW',
-            assistantId: window.ASSISTANT_ID || 'asst_9GkHpGa5t50Yw74uzonh6FAz'
+            orgId: window.ORG_ID || getComputedStyle(document.documentElement).getPropertyValue('--org-id').trim().replace(/['"]/g, ''),
+            assistantId: window.ASSISTANT_ID || getComputedStyle(document.documentElement).getPropertyValue('--assistant-id').trim().replace(/['"]/g, '')
         },
         isTyping: false,
         error: null
