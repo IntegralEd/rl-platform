@@ -7,7 +7,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StriveTogether Goal Setter</title>
+    <title>ST GoalSetter</title>
+    <script>
+        // Production sprint flag - toggle this to switch versions
+        const IN_PRODUCTION_SPRINT = true;
+        
+        // Redirect based on sprint status
+        window.location.replace(
+            IN_PRODUCTION_SPRINT 
+                ? 'goalsetter_temp.html'  // During sprints
+                : 'goalsetter.html'       // When ready
+        );
+    </script>
     <style>
         body, html {
             margin: 0;
@@ -23,10 +34,6 @@
     </style>
 </head>
 <body>
-    <iframe 
-        class="chat-frame"
-        src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
-        title="Chat Interface"
-    ></iframe>
+    <!-- This page intentionally left blank - serves as production router -->
 </body>
 </html> 
