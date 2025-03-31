@@ -6,4 +6,9 @@
     --background-color: #f9f9f9;
     --text-color: #2b2b2b;
     --cta-text-color: #ffffff;
+
+    /* Configuration */
+    --assistant-id: 'asst_9GkHpGa5t50Yw74uzonh6FAz';
+    --org-id: 'recsK5zK0CouK5ebW';
+    --intake-token: 'goalsetter_chat';
 } 

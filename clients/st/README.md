@@ -37,7 +37,7 @@ Interactive goal-setting tool that guides educators through a structured process
    ```javascript
    // Required in chat.js
    - Assistant ID: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma'
-   - Base endpoint: '/01_platform/assets/js/chat.js'
+   - Base endpoint: '/shared/assets/js/chat.js'
    ```
 
 2. **Fix Form Transition**
@@ -75,7 +75,7 @@ Interactive goal-setting tool that guides educators through a structured process
 ### Platform Assets
 ```html
 <!-- Required Platform Scripts -->
-<script src="/01_platform/assets/js/chat.js"></script>
+<script src="/shared/assets/js/chat.js"></script>
 
 <!-- Client Assets -->
 <script src="assets/js/st-auth.js"></script>
