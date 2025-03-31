@@ -208,9 +208,11 @@ const STAuth = {
         document.getElementById('interview-section').style.display = 'block';
 
         // Enable interview tab
-        const interviewTab = document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]');
-        interviewTab.disabled = false;
-        this.switchTab('interview');
+        const interviewTab = document.querySelector('.nav-tab[onclick*="interview"]');
+        if (interviewTab) {
+            interviewTab.disabled = false;
+            this.switchTab('interview');
+        }
 
         // For no/no case, just show a simple welcome
         if (standardsChoice === 'no' && reflectionChoice === 'no') {
