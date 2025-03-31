@@ -1,0 +1,216 @@
+# LMS Admin Build Checklist
+
+## 🎯 Admin Panel Core Features
+
+### 1. Page State Management
+- [ ] Status radio controls for each page
+  - Production (live.html → core)
+  - Review (review mode active)
+  - Temporary (live.html → temp)
+- [ ] Visual status indicators
+  - Color-coded badges
+  - Clear state labels
+  - Last updated timestamp
+
+### 2. Temporary Page Configuration
+- [ ] URL input for temp content
+  - Chatbase URL field
+  - YouTube embed field
+  - Custom iframe URL
+- [ ] Iframe display settings
+  - Width/height controls
+  - Responsive toggle
+  - Margin/padding adjustments
+
+### 3. Review Process Tools
+- [ ] Comment tracking
+  - Active Qipu threads
+  - Unresolved comments
+  - Review progress
+- [ ] Sprint management
+  - Start/end dates
+  - Team assignments
+  - Status updates
+
+## 🔧 Implementation Pattern
+
+### Admin Panel Structure
+```javascript
+// State management in index.html
+const AdminPanel = {
+    state: {
+        pages: {
+            'goalsetter': {
+                status: 'prod|review|temp',
+                tempUrl: '',
+                displaySettings: {
+                    width: '100%',
+                    height: '100vh',
+                    responsive: true
+                },
+                reviewState: {
+                    activeThreads: 0,
+                    lastUpdate: timestamp
+                }
+            }
+        }
+    }
+};
+```
+
+### URL Flow Control
+```javascript
+// Dynamic routing in _live.html
+const routeToVersion = () => {
+    const config = await fetchPageConfig();
+    switch(config.status) {
+        case 'prod':
+            return 'goalsetter.html';
+        case 'temp':
+            return `goalsetter_temp.html?url=${config.tempUrl}`;
+        default:
+            return 'goalsetter.html';
+    }
+};
+```
+
+## 📋 Feature Implementation Steps
+
+### Phase 1: Basic Controls
+1. Add status radio buttons to index.html
+2. Implement state persistence
+3. Update _live.html routing
+4. Add visual indicators
+
+### Phase 2: Temp Page Builder
+1. Add URL input field
+2. Create iframe preview
+3. Add display controls
+4. Implement responsive options
+
+### Phase 3: Review Integration
+1. Connect to Qipu API
+2. Show comment counts
+3. Add progress tracking
+4. Implement sprint tools
+
+## 🎨 UI Components
+
+### Status Controls
+```html
+<div class="page-controls">
+    <div class="status-group">
+        <input type="radio" name="status" value="prod">
+        <label>Production</label>
+        
+        <input type="radio" name="status" value="review">
+        <label>Review Mode</label>
+        
+        <input type="radio" name="status" value="temp">
+        <label>Temporary</label>
+    </div>
+</div>
+```
+
+### Temp URL Configuration
+```html
+<div class="temp-config" data-active="status === 'temp'">
+    <input type="url" 
+           placeholder="Chatbase/YouTube URL"
+           class="temp-url-input">
+    
+    <div class="display-controls">
+        <input type="text" placeholder="Width">
+        <input type="text" placeholder="Height">
+        <label>
+            <input type="checkbox">
+            Responsive
+        </label>
+    </div>
+</div>
+```
+
+## 🔐 Security Considerations
+
+1. URL Validation
+   - Whitelist allowed domains
+   - Sanitize inputs
+   - Verify SSL
+
+2. Access Control
+   - Admin-only routes
+   - Session validation
+   - Action logging
+
+## 📊 State Management
+
+### Local Storage Schema
+```javascript
+{
+    "pages": {
+        "goalsetter": {
+            "status": "prod",
+            "tempUrl": "",
+            "settings": {},
+            "reviewData": {}
+        }
+    },
+    "sprints": {
+        "current": {
+            "startDate": "",
+            "endDate": "",
+            "pages": []
+        }
+    }
+}
+```
+
+## 🚀 Development Process
+
+1. Setup Phase
+   - [ ] Create admin panel component
+   - [ ] Add state management
+   - [ ] Implement storage
+
+2. Feature Implementation
+   - [ ] Status controls
+   - [ ] Temp page builder
+   - [ ] Review tools
+   - [ ] Sprint management
+
+3. Testing
+   - [ ] State persistence
+   - [ ] URL routing
+   - [ ] Security checks
+   - [ ] UI/UX review
+
+## 📝 Documentation Requirements
+
+1. Admin Guide
+   - Status management
+   - Temp page setup
+   - Review process
+   - Sprint coordination
+
+2. Technical Docs
+   - State schema
+   - URL patterns
+   - Security model
+   - API endpoints
+
+## 🎯 Success Metrics
+
+1. Usability
+   - Clear status visibility
+   - Easy temp page setup
+   - Intuitive controls
+
+2. Reliability
+   - State persistence
+   - Secure routing
+   - Error handling
+
+3. Efficiency
+   - Quick status changes
+   - Fast temp deployment
+   - Streamlined review 

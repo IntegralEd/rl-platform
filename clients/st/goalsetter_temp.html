@@ -3,42 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ST GoalSetter (Preview)</title>
+    <title>ST GoalSetter - Temporary Version</title>
     <style>
-        body, html {
+        body {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .chat-frame {
-            width: 100%;
-            height: 100vh;
-            border: none;
-        }
-        .sprint-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #E87722;
-            color: white;
-            text-align: center;
-            padding: 8px;
+            min-height: 100vh;
             font-family: system-ui, -apple-system, sans-serif;
-            font-size: 14px;
-            z-index: 1000;
+            background: #f5f5f5;
+        }
+
+        .temp-banner {
+            background: #FFC107;
+            color: black;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 500;
+        }
+
+        .temp-container {
+            padding: 1rem;
+        }
+
+        .temp-frame {
+            border: none;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .temp-frame.responsive {
+            width: 100%;
+            height: 100%;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #d32f2f;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 600px;
         }
     </style>
 </head>
 <body>
-    <div class="sprint-banner">
-        Preview Version - Production Sprint in Progress
+    <div class="temp-banner">
+        Temporary Version - Under Development
     </div>
-    <iframe 
-        class="chat-frame"
-        src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
-        title="Chat Interface"
-    ></iframe>
+    
+    <div class="temp-container" id="container">
+        <!-- Frame will be inserted here -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Parse URL parameters
+            const params = new URLSearchParams(window.location.search);
+            const url = params.get('url');
+            const width = params.get('width') || '100%';
+            const height = params.get('height') || '100vh';
+            const responsive = params.get('responsive') !== 'false';
+
+            const container = document.getElementById('container');
+
+            if (url) {
+                // Create iframe with settings
+                const frame = document.createElement('iframe');
+                frame.className = 'temp-frame' + (responsive ? ' responsive' : '');
+                frame.src = url;
+                
+                // Apply display settings
+                frame.style.width = width;
+                frame.style.height = height;
+
+                // Add to page
+                container.appendChild(frame);
+            } else {
+                // Show error if no URL provided
+                const error = document.createElement('div');
+                error.className = 'error-message';
+                error.innerHTML = `
+                    <h2>Configuration Required</h2>
+                    <p>Please set a temporary URL in the admin panel.</p>
+                `;
+                container.appendChild(error);
+            }
+        });
+    </script>
 </body>
 </html> 
