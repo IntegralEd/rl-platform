@@ -1,314 +1,185 @@
-# LMS Admin System Build Phases
+# Autonomous Build Checklist - Admin System
 
-## 📱 Phase 1: MVP Directory Panel
-Current implementation in index.html providing core page management.
+## 🎯 Build Parameters
+- Max autonomous steps: 25
+- Tech constraints: Use existing stack only
+- Tree respect: Follow current /shared/admin structure
+- Testing: Unit-first approach
+- Reporting: Generate standup notes at key points
 
-### Features
-- [x] Page state management (prod/review/temp)
-- [x] Temp URL configuration
-- [x] Display settings control
-- [x] State persistence (localStorage)
-
-### Limitations
-- Single admin view for all clients
-- Basic URL/display controls only
-- No role-based access
-- Limited to index.html context
-
-## 🎯 Phase 2: Dedicated Admin Portal
-
-### Core Structure
+## 📊 Current State
 ```
-/admin/
-├── index.html           # Admin dashboard
-├── clients/            # Client-specific admin
-│   ├── {client}/      # Per-client settings
-│   │   ├── pages/     # Page management
-│   │   ├── forms/     # Form configuration
-│   │   └── auth/      # Access rules
-└── shared/            # Common components
+/shared/admin/
+├── pages/goalsetter.html  # Admin dashboard
+├── css/admin.css         # Styles
+└── js/
+    └── monitor.js       # Health checks
 ```
 
-### Features
-- [ ] Dedicated admin interface
-- [ ] Client-specific sections
-- [ ] Enhanced state management
-- [ ] Review process tools
-- [ ] Form builder interface
-
-### State Schema
+## 🔄 Phase 1: Test Infrastructure (Steps 1-8)
 ```javascript
-{
-    clients: {
-        [clientId]: {
-            pages: {
-                [pageId]: {
-                    status: 'prod|review|temp',
-                    tempUrl: string,
-                    display: {
-                        width: string,
-                        height: string,
-                        responsive: boolean
-                    },
-                    forms: {
-                        [formId]: {
-                            fields: [{
-                                id: string,
-                                label: string,
-                                type: string,
-                                mapping: string // e.g. "Intake_Context_01"
-                            }]
-                        }
-                    }
-                }
-            },
-            auth: {
-                rules: [{
-                    pattern: string,
-                    role: string,
-                    access: 'view|edit|admin'
-                }]
-            }
-        }
+// Expected test structure
+/shared/admin/tests/
+├── unit/
+│   ├── monitor.test.js
+│   └── state.test.js
+└── integration/
+    └── health.test.js
+```
+
+### Unit Tests (Steps 1-4)
+- [ ] Test state persistence
+- [ ] Test health check methods
+- [ ] Test Qipu reporting
+- [ ] Test dashboard updates
+
+### Integration Tests (Steps 5-8)
+- [ ] Test page state transitions
+- [ ] Test monitoring cycle
+- [ ] Test alert triggers
+- [ ] Test report generation
+
+🛑 DECISION POINT 1: Test coverage report
+Options:
+1. Continue to Phase 2 if coverage > 80%
+2. Add more unit tests if critical paths uncovered
+3. Request human review if blockers found
+
+## 🔍 Phase 2: Monitoring Enhancement (Steps 9-16)
+```javascript
+// Enhanced monitor.js structure
+const Monitor = {
+    core: {}, // existing
+    capture: {}, // new screenshot
+    diff: {}, // new visual diff
+    alert: {} // new alerting
+}
+```
+
+### Screenshot System (Steps 9-12)
+- [ ] Implement html2canvas wrapper
+- [ ] Add element targeting
+- [ ] Create storage handler
+- [ ] Add diff preparation
+
+### Alert System (Steps 13-16)
+- [ ] Define alert thresholds
+- [ ] Create alert queue
+- [ ] Implement batching
+- [ ] Add priority levels
+
+🛑 DECISION POINT 2: System stability check
+Options:
+1. Proceed if all tests pass
+2. Rollback if memory usage high
+3. Request human review if new patterns needed
+
+## 🎨 Phase 3: Visual Regression (Steps 17-20)
+```javascript
+// Diff engine approach
+const DiffEngine = {
+    compare: async (base, current) => {
+        const diff = await pixelmatch(base, current);
+        return {
+            changes: diff.changes,
+            regions: diff.regions,
+            score: diff.score
+        };
     }
 }
 ```
 
-## 🚀 Phase 3: Softr Integration
+### Core Features
+- [ ] Implement pixel comparison
+- [ ] Add region detection
+- [ ] Create diff visualization
+- [ ] Store baseline images
 
-### Authentication
-- [ ] Role-based access control
-- [ ] Client domain validation
-- [ ] Admin role hierarchy
-- [ ] Session management
+🛑 DECISION POINT 3: Performance check
+Options:
+1. Continue if diff time < 2s
+2. Optimize if slow
+3. Fallback to simple diff
 
-### Integration Points
+## 📈 Phase 4: Reporting System (Steps 21-25)
 ```javascript
-// Softr auth integration
-const AdminAuth = {
-    validateAccess: async (clientId, pageId) => {
-        const user = await Softr.getCurrentUser();
-        const roles = await Softr.getUserRoles();
-        return AdminRules.checkAccess(user, roles, clientId, pageId);
+// Report structure
+{
+    timestamp: ISO8601,
+    health: {
+        score: 0-100,
+        issues: []
+    },
+    visuals: {
+        diffs: [],
+        score: 0-100
+    },
+    alerts: {
+        active: [],
+        resolved: []
     }
-};
+}
 ```
 
-## 🎨 Phase 4: Visual Builder
+### Implementation
+- [ ] Create report builder
+- [ ] Add trend detection
+- [ ] Implement alert summary
+- [ ] Add action suggestions
+- [ ] Create standup format
 
-### Form Builder
-- [ ] Drag-and-drop interface
-- [ ] Field mapping system
-- [ ] Template library
-- [ ] Preview mode
+🛑 FINAL DECISION POINT
+Options:
+1. Deploy if all tests pass
+2. Run extended tests
+3. Request human review
 
-### Auth Rule Builder
-- [ ] Visual rule creator
-- [ ] Role assignment
-- [ ] Access pattern testing
-- [ ] Validation preview
-
-### Template System
+## 🧪 Test Scenarios
 ```javascript
-// Dynamic form mapping
-const FormBuilder = {
-    mapField: (clientField, genericField) => ({
-        source: clientField.id,
-        target: genericField, // e.g. "Intake_Context_01"
-        transform: (value) => ({
-            // Transform client-specific data to generic format
-            value,
-            metadata: {
-                originalField: clientField.id,
-                mappedTo: genericField,
-                clientId: clientField.clientId
-            }
-        })
+describe('Monitor System', () => {
+    test('should detect page state changes', async () => {
+        const monitor = new Monitor();
+        const state = await monitor.checkState();
+        expect(state.health.score).toBeGreaterThan(80);
+    });
+});
+```
+
+## 📝 Success Criteria
+- Unit test coverage > 80%
+- Alert response < 30s
+- Diff accuracy > 95%
+- Memory usage < 100MB
+- Zero new dependencies
+
+## 🚨 Abort Conditions
+1. Test coverage drops below 70%
+2. Memory usage exceeds 150MB
+3. Alert latency > 1min
+4. New security vulnerabilities
+5. Tree structure violations
+
+## 📊 Metrics Collection
+```javascript
+const metrics = {
+    collect: async () => ({
+        coverage: await TestRunner.getCoverage(),
+        memory: process.memoryUsage(),
+        timing: Monitor.getLatencyStats(),
+        alerts: Alert.getResponseTimes()
     })
-};
-```
-
-## 📊 Phase 5: Analytics & Monitoring
-
-### Review Process
-- [ ] Comment tracking
-- [ ] Review status dashboard
-- [ ] Change history
-- [ ] Approval workflow
-
-### Usage Metrics
-- [ ] Page performance
-- [ ] Form completion rates
-- [ ] Error tracking
-- [ ] User engagement
-
-## 🔧 Implementation Strategy
-
-### 1. MVP Enhancement (Current)
-- [ ] Add client section headers
-- [ ] Improve state management
-- [ ] Add basic role checks
-- [ ] Enhance temp page controls
-
-### 2. Admin Portal Migration
-- [ ] Create admin/ directory
-- [ ] Move state management
-- [ ] Add client isolation
-- [ ] Implement basic form tools
-
-### 3. Softr Integration
-- [ ] Add auth wrapper
-- [ ] Implement role system
-- [ ] Create admin dashboard
-- [ ] Add client domains
-
-### 4. Builder Tools
-- [ ] Form builder UI
-- [ ] Auth rule editor
-- [ ] Template system
-- [ ] Preview system
-
-## 📝 Data Architecture
-
-### Form Field Mapping
-```javascript
-{
-    "fieldMappings": {
-        "st_standards_link": "Intake_Context_01",
-        "st_reflection_text": "Intake_Context_02",
-        "elpl_prior_learning": "Intake_Context_01"
-    }
 }
 ```
 
-### Client Configuration
-```javascript
-{
-    "clientConfig": {
-        "st": {
-            "forms": {
-                "goalsetter": {
-                    "requiredFields": ["standards", "reflection"],
-                    "conditionalLogic": {
-                        "standardsChoice": {
-                            "yes": ["standardsLink", "standardsDetail"],
-                            "no": []
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-```
+## 🔄 Rollback Plan
+1. Store state pre-changes
+2. Keep baseline screenshots
+3. Version test results
+4. Maintain metric history
 
-## 🔐 Security Considerations
-
-### Role Hierarchy
-```
-SuperAdmin
-  └─ ClientAdmin
-      └─ PageAdmin
-          └─ FormAdmin
-              └─ Reviewer
-```
-
-### Access Patterns
-- Domain-based validation
-- Role-based permissions
-- Action auditing
-- State validation
-
-## 📈 Success Metrics
-
-### Short Term (MVP)
-- Page state reliability
-- Temp page usability
-- State persistence
-- Error handling
-
-### Long Term
-- Client adoption rate
-- Form completion rate
-- Review efficiency
-- Builder tool usage
-
-## 🎯 Next Steps
-
-1. Current MVP
-   - [ ] Enhance state management
-   - [ ] Add basic role checks
-   - [ ] Improve temp controls
-
-2. Portal Preparation
-   - [ ] Design admin structure
-   - [ ] Plan state migration
-   - [ ] Create base templates
-
-3. Documentation
-   - [ ] Admin guide
-   - [ ] Builder documentation
-   - [ ] Integration guide
-   - [ ] Security protocols
-
-## Current Structure
-```
-/shared
-  ├── admin/
-  │   ├── pages/
-  │   │   └── goalsetter.html  # Admin dashboard
-  │   ├── css/
-  │   │   └── admin.css       # Admin styles
-  │   └── js/
-  │       └── monitor.js      # Page monitoring
-  └── ... (existing shared files)
-```
-
-## Phase 1: Admin Dashboard & Monitoring
-- [x] Move admin panel from index.html to dedicated location
-- [x] Create monitoring system for page states
-- [x] Integrate with Qipu for reporting
-- [ ] Implement screenshot capture and OCR comparison
-- [ ] Add automated testing endpoints
-
-## Phase 2: Enhanced Monitoring
-- [ ] Add visual regression testing
-- [ ] Implement real-time alerts
-- [ ] Create historical data views
-- [ ] Add performance metrics tracking
-
-## Phase 3: Multi-tenant Management
-- [ ] Add client configuration management
-- [ ] Implement role-based access control
-- [ ] Create client-specific dashboards
-- [ ] Add audit logging
-
-## Success Metrics
-- Page state accuracy: 99.9%
-- Alert response time: < 5 minutes
-- Visual regression accuracy: 95%
-- Client satisfaction score: > 4.5/5
-
-## Testing Requirements
-1. State Management
-   - Verify state persistence
-   - Test state transitions
-   - Validate config updates
-
-2. Monitoring
-   - Health check accuracy
-   - Screenshot comparison
-   - Alert triggering
-   - Report generation
-
-3. Integration
-   - Qipu ticket creation
-   - OCR analysis
-   - Visual diff generation
-   - Alert delivery
-
-## Security Considerations
-- Admin access control
-- Client data isolation
-- Audit trail maintenance
-- Secure state storage 
+## 👥 Human Review Triggers
+1. New pattern detection
+2. Coverage gaps
+3. Performance anomalies
+4. Security concerns
+5. Tree conflicts 
