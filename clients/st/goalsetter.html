@@ -10,19 +10,14 @@
     <title>StriveTogether Goal Setter</title>
     
     <!-- Platform level assets -->
-    <script src="/01_platform/assets/js/chat.js"></script>
+    <script src="/shared/assets/js/chat.js"></script>
     
     <!-- Client level assets -->
     <script src="assets/js/st-auth.js"></script>
     <link rel="stylesheet" href="assets/css/st-variables.css">
     <link rel="stylesheet" href="assets/css/st-custom.css">
 
-    <!-- Qipu Integration -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-
     <style>
-        /* Inherit all styles from goalsetter.html */
         :root {
             --nav-width: 20%;
             --content-width: 80%;
@@ -48,99 +43,6 @@
             --client-font-size-body: 16px;
         }
 
-        /* Review-specific styles */
-        .review-banner {
-            background: var(--secondary-color);
-            color: white;
-            padding: 8px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        /* Qipu styles */
-        #paintbrush {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: var(--secondary-color);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            user-select: none;
-            z-index: 1000;
-            color: white;
-        }
-
-        #annotation-tray {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background-color: #f7f7f7;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
-            transform: translateY(100%);
-            transition: transform 0.5s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
-            z-index: 999;
-        }
-
-        .tool {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-            user-select: none;
-        }
-
-        .tool:hover {
-            transform: scale(1.3);
-        }
-
-        #annotationCanvasContainer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 998;
-        }
-
-        #annotationCanvas {
-            border: 2px solid #333;
-        }
-
-        #submitComment {
-            position: absolute;
-            bottom: 90px;
-            right: 30px;
-            padding: 8px 16px;
-            cursor: pointer;
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-
-        /* Inherit remaining styles from goalsetter.html */
         body {
             margin: 0;
             padding: var(--page-margin);
@@ -238,12 +140,329 @@
             background: var(--background-color);
         }
 
-        /* Chat iframe container */
-        .chat-container {
+        /* Form Container */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .form-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-family: var(--client-font-body);
+        }
+
+        /* Form Inputs */
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Form Title */
+        .form-title {
+            color: var(--text-color);
+            font-size: var(--client-font-size-h1);
+            margin-bottom: 32px;
+            font-family: var(--client-font-h1);
+        }
+
+        /* Context Sections */
+        .context-section {
+            display: none;
+            margin-top: 24px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .context-section.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Radio Groups */
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .radio-option:hover {
+            background: rgba(232, 119, 34, 0.05);
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: var(--secondary-color);
+        }
+
+        /* Interaction Container */
+        .interaction-container {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            flex-shrink: 0;
+            background: var(--primary-color);
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+        }
+
+        .interaction-bar {
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .interaction-left, .interaction-right {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .interaction-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+        }
+
+        .chat-input-group {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .interaction-input {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 6px;
             border: none;
             background: white;
+            min-height: 40px;
+            box-sizing: border-box;
+            resize: none;
+            line-height: 1.4;
+        }
+
+        .interaction-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+        }
+
+        /* Interaction Buttons */
+        .interaction-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .interaction-button:disabled {
+            cursor: not-allowed;
+        }
+
+        .interaction-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(128, 128, 128, 0.6);
+            border-radius: 50%;
+            transition: opacity 0.3s ease;
+        }
+
+        .interaction-button.enabled::before {
+            opacity: 0;
+        }
+
+        .interaction-button.next-button {
+            background: var(--tertiary-color);
+        }
+
+        .interaction-button.send-button {
+            background: var(--secondary-color);
+        }
+
+        .interaction-icon {
+            width: 30px;
+            height: 30px;
+            transition: transform 0.2s ease;
+        }
+
+        .interaction-button.enabled:hover .interaction-icon {
+            transform: scale(1.1);
+        }
+
+        /* Footer */
+        .app-footer {
+            height: var(--footer-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px;
+            box-sizing: border-box;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .footer-logo {
+            height: 30px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Chat container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        /* Chat bubbles */
+        .message {
+            max-width: 80%;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #FFFFFF;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: var(--primary-color);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--secondary-color);
+        }
+
+        /* Chat and Play buttons */
+        .chat-button, .play-button {
+            width: var(--chat-button-size);
+            height: var(--chat-button-size);
+            min-width: var(--chat-button-size);
+            min-height: var(--chat-button-size);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-button img, .play-button img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        /* Validation Message */
+        .validation-message {
+            display: none;
+            background: rgba(221, 87, 87, 0.1);
+            border-left: 4px solid #DD5757;
+            color: #DD5757;
+            padding: 12px 16px;
+            margin-top: 8px;
+            font-size: 14px;
+            border-radius: 0 4px 4px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .validation-message.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Hide header in embedded mode */
@@ -263,104 +482,126 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="review-banner">Review Version - For Testing Only</div>
         <div class="app-header">
             <img class="header-logo" alt="StriveTogether Logo">
         </div>
         <div class="main-container">
             <div class="left-nav">
-                <button class="nav-tab active">Chat</button>
+                <button class="nav-tab active" onclick="STAuth.switchTab('welcome')">Welcome</button>
+                <button class="nav-tab" onclick="STAuth.switchTab('interview')" disabled>Interview</button>
+                <button class="nav-tab" onclick="STAuth.switchTab('tools')" disabled>Tools</button>
             </div>
             <div class="content-area">
-                <iframe 
-                    class="chat-container"
-                    src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
-                    title="Chat Interface"
-                ></iframe>
+                <!-- Welcome Section -->
+                <div id="welcome-section" class="section active">
+                    <div class="form-container">
+                        <h1 class="form-title">Welcome to the Goal Setter</h1>
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label>Do you have specific standards you'd like to reference?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="standards" value="yes" onchange="STAuth.handleStandardsChoice(this.value)">
+                                        Yes
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="standards" value="no" onchange="STAuth.handleStandardsChoice(this.value)">
+                                        No
+                                    </label>
+                                </div>
+                                <div id="standards-detail" class="context-section">
+                                    <div class="form-group">
+                                        <label>Standards Link (optional)</label>
+                                        <input type="text" id="standards-link" placeholder="Paste standards URL here">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Standards Description</label>
+                                        <textarea id="standards-detail-input" placeholder="Describe the relevant standards"></textarea>
+                                    </div>
+                                    <div id="standards-validation" class="validation-message">
+                                        Please provide either a link or description
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Would you like to share reflections from a previous cycle?</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="reflection" value="yes" onchange="STAuth.handleReflectionChoice(this.value)">
+                                        Yes
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="reflection" value="no" onchange="STAuth.handleReflectionChoice(this.value)">
+                                        No
+                                    </label>
+                                </div>
+                                <div id="reflection-detail" class="context-section">
+                                    <div class="form-group">
+                                        <label>Previous Cycle Reflection</label>
+                                        <textarea id="reflection-input" placeholder="Share your reflections"></textarea>
+                                    </div>
+                                    <div id="reflection-validation" class="validation-message">
+                                        Please provide your reflection
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="interaction-container">
+                            <div class="interaction-bar">
+                                <div class="interaction-left">
+                                    <button class="interaction-button next-button" disabled>
+                                        <span class="sr-only">Next</span>
+                                        <img class="interaction-icon" src="assets/images/arrow-right.svg" alt="Next">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interview Section -->
+                <div id="interview-section" class="section">
+                    <div class="chat-container"></div>
+                    <div class="interaction-container">
+                        <div class="interaction-bar">
+                            <div class="interaction-left">
+                                <button class="interaction-button send-button">
+                                    <span class="sr-only">Send</span>
+                                    <img class="interaction-icon" src="assets/images/send.svg" alt="Send">
+                                </button>
+                            </div>
+                            <div class="interaction-center">
+                                <div class="chat-input-group">
+                                    <textarea 
+                                        class="interaction-input" 
+                                        id="chat-input" 
+                                        placeholder="Type your message..."
+                                        rows="3"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools Section -->
+                <div id="tools-section" class="section">
+                    <div class="form-container">
+                        <h1 class="form-title">Tools</h1>
+                        <p>Tools section coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-footer">
+            <div class="footer-content">
+                <img class="footer-logo" src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo">
+                <span class="footer-text">Powered by Recursive Learning</span>
             </div>
         </div>
     </div>
 
-    <!-- Qipu Integration -->
-    <div id="paintbrush">🖌️</div>
-    <div id="annotation-tray">
-        <div class="tool" id="drawTool">✏️</div>
-        <div class="tool" id="textTool">🔤</div>
-        <div class="tool" id="eraseTool">🧽</div>
-        <div class="tool" id="commentTool">💬</div>
-    </div>
-    <div id="annotationCanvasContainer">
-        <canvas id="annotationCanvas"></canvas>
-        <button id="submitComment">Submit Comment</button>
-    </div>
-
     <script>
-        const paintbrush = document.getElementById('paintbrush');
-        const tray = document.getElementById('annotation-tray');
-        const canvasContainer = document.getElementById('annotationCanvasContainer');
-        const canvasElem = document.getElementById('annotationCanvas');
-        const submitBtn = document.getElementById('submitComment');
-
-        let canvas;
-
-        paintbrush.onclick = () => {
-            tray.style.transform = 'translateY(0)';
-        };
-
-        document.getElementById('drawTool').onclick = startAnnotation;
-        document.getElementById('textTool').onclick = startAnnotation;
-        document.getElementById('eraseTool').onclick = () => canvas.clear();
-        document.getElementById('commentTool').onclick = () => {
-            const comment = prompt('Enter your comment:');
-            if (comment) {
-                canvas.add(new fabric.Textbox(comment, {
-                    left: 50, top: 50, width: 200, fontSize:16
-                }));
-            }
-        };
-
-        async function startAnnotation() {
-            tray.style.transform = 'translateY(100%)';
-            canvasContainer.style.display = 'flex';
-
-            const screenshot = await html2canvas(document.body);
-            canvasElem.width = screenshot.width / 2;
-            canvasElem.height = screenshot.height / 2;
-
-            canvas = new fabric.Canvas('annotationCanvas', { isDrawingMode: true });
-            fabric.Image.fromURL(screenshot.toDataURL(), img => {
-                img.scale(0.5);
-                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
-            });
-        }
-
-        submitBtn.onclick = () => {
-            const data = {
-                thread_id: window.location.href + '#' + Date.now(),
-                url: window.location.href,
-                timestamp: Date.now(),
-                user_id: 'user_uuid',
-                annotations: canvas.getObjects().map(obj => ({
-                    type: obj.type,
-                    content: obj.toDataURL ? obj.toDataURL() : obj.text,
-                    xy_position: { x: obj.left, y: obj.top }
-                })),
-                created_at: new Date().toISOString()
-            };
-
-            fetch('https://your-ticketing-system.com/api/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(() => {
-                canvasContainer.style.display = 'none';
-                canvas.clear();
-                alert('Comment submitted!');
-            });
-        };
-
         // Check if we're embedded
         function isEmbedded() {
             return window !== window.parent || window.location.href.includes('embed=true');
