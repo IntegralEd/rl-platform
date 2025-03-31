@@ -1,23 +1,26 @@
 <!DOCTYPE html>
-<!-- Deploy: 2024-03-29 -->
+<!-- Review Version: 2024-03-31 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StriveTogether Goal Setter</title>
-    <meta http-equiv="refresh" content="0;url=goalsetter_review.html">
+    <title>StriveTogether Goal Setter - Review Version</title>
     
     <!-- Platform level assets -->
-    <script src="/shared/assets/js/chat.js"></script>
+    <script src="/01_platform/assets/js/chat.js"></script>
     
     <!-- Client level assets -->
     <script src="assets/js/st-auth.js"></script>
     <link rel="stylesheet" href="assets/css/st-variables.css">
     <link rel="stylesheet" href="assets/css/st-custom.css">
 
+    <!-- Qipu Integration -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
     <style>
+        /* Inherit all styles from goalsetter.html */
         :root {
-            /* Core Layout Dimensions */
             --nav-width: 20%;
             --content-width: 80%;
             --embed-width: 1200px;
@@ -28,16 +31,12 @@
             --page-margin: 20px;
             --chat-button-size: 60px;
             --play-button-size: 60px;
-
-            /* Branding Colors */
-            --primary-color: #425563; /* ST Primary */
-            --secondary-color: #E87722; /* ST Orange */
-            --tertiary-color: #4fa997; /* ST Teal */
+            --primary-color: #425563;
+            --secondary-color: #E87722;
+            --tertiary-color: #4fa997;
             --background-color: #f9f9f9;
             --text-color: #2b2b2b;
             --cta-text-color: #ffffff;
-
-            /* Typography */
             --client-font-h1: 'Arial, sans-serif';
             --client-font-h2: 'Arial, sans-serif';
             --client-font-body: 'Arial, sans-serif';
@@ -46,6 +45,99 @@
             --client-font-size-body: 16px;
         }
 
+        /* Review-specific styles */
+        .review-banner {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Qipu styles */
+        #paintbrush {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            user-select: none;
+            z-index: 1000;
+            color: white;
+        }
+
+        #annotation-tray {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #f7f7f7;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            z-index: 999;
+        }
+
+        .tool {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .tool:hover {
+            transform: scale(1.3);
+        }
+
+        #annotationCanvasContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 998;
+        }
+
+        #annotationCanvas {
+            border: 2px solid #333;
+        }
+
+        #submitComment {
+            position: absolute;
+            bottom: 90px;
+            right: 30px;
+            padding: 8px 16px;
+            cursor: pointer;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        /* Inherit remaining styles from goalsetter.html */
         body {
             margin: 0;
             padding: var(--page-margin);
@@ -90,7 +182,7 @@
         .main-container {
             display: flex;
             height: calc(100% - var(--header-height) - var(--footer-height));
-            min-height: 0; /* Allow flex shrinking */
+            min-height: 0;
         }
 
         /* Left Navigation */
@@ -120,7 +212,7 @@
 
         .nav-tab.active {
             font-weight: bold;
-            color: #E87722;
+            color: var(--secondary-color);
         }
 
         .nav-tab.active::after {
@@ -130,7 +222,7 @@
             left: 16px;
             right: 16px;
             height: 3px;
-            background: #E87722;
+            background: var(--secondary-color);
         }
 
         /* Content Area */
@@ -140,646 +232,117 @@
             flex-direction: column;
             min-height: 0;
             padding: 40px;
-            background: var(--background-color, #f9f9f9);
+            background: var(--background-color);
         }
 
-        /* Form Container */
-        .form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            width: 100%;
-        }
-
-        /* Form Section */
-        .form-section {
-            margin-bottom: 30px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-        }
-
-        .form-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 500;
-            color: var(--text-color, #2b2b2b);
-            font-family: var(--client-font-body, Arial, sans-serif);
-        }
-
-        /* Form Inputs */
-        input[type="text"],
-        input[type="email"],
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color, #ddd);
-            border-radius: 6px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--secondary-color, #E87722);
-            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Form Title */
-        .form-title {
-            color: var(--text-color, #2b2b2b);
-            font-size: var(--client-font-size-h1, 28px);
-            margin-bottom: 32px;
-            font-family: var(--client-font-h1, Arial, sans-serif);
-        }
-
-        /* Context Sections */
-        .context-section {
-            display: none;
-            margin-top: 24px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-
-        .context-section.visible {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Radio Groups */
-        .radio-group {
-            display: flex;
-            gap: 24px;
-            margin-top: 12px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .radio-option:hover {
-            background: rgba(232, 119, 34, 0.05);
-        }
-
-        .radio-option input[type="radio"] {
-            accent-color: var(--secondary-color, #E87722);
-        }
-
-        /* Interaction Container */
-        .interaction-container {
-            width: 100%;
-            height: 80px;
-            display: flex;
-            flex-shrink: 0;
-            background: var(--primary-color);
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-        }
-
-        .interaction-bar {
+        /* Chat iframe container */
+        .chat-container {
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: stretch;
-        }
-
-        .interaction-left, .interaction-right {
-            width: 80px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .interaction-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-input-group {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .interaction-input {
-            width: 100%;
-            padding: 8px 12px;
-            font-size: 1rem;
-            border-radius: 6px;
             border: none;
             background: white;
-            min-height: 40px;
-            box-sizing: border-box;
-            resize: none;
-            line-height: 1.4;
-        }
-
-        .interaction-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
-        }
-
-        /* Interaction Buttons */
-        .interaction-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .interaction-button:disabled {
-            cursor: not-allowed;
-        }
-
-        .interaction-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(128, 128, 128, 0.6);
-            border-radius: 50%;
-            transition: opacity 0.3s ease;
-        }
-
-        .interaction-button.enabled::before {
-            opacity: 0;
-        }
-
-        .interaction-button.next-button {
-            background: var(--jade, #4FA997);
-        }
-
-        .interaction-button.send-button {
-            background: var(--orange, #E87722);
-        }
-
-        .interaction-icon {
-            width: 30px;
-            height: 30px;
-            transition: transform 0.2s ease;
-        }
-
-        .interaction-button.enabled:hover .interaction-icon {
-            transform: scale(1.1);
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0,0,0,0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* Footer */
-        .app-footer {
-            height: var(--footer-height);
-            background: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 24px;
-            box-sizing: border-box;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-
-        .footer-content {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .footer-logo {
-            height: 30px;
-        }
-
-        .footer-text {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        /* Chat container */
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 24px;
-            overflow-y: auto;
-            min-height: 0; /* Allow flex shrinking */
-        }
-
-        /* Chat bubbles */
-        .message {
-            max-width: 80%;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 16px;
-            line-height: 1.4;
-            color: #FFFFFF;
-        }
-
-        .message.assistant {
-            align-self: flex-start;
-            background: #425563;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: #E87722;
-        }
-
-        /* Chat and Play buttons */
-        .chat-button, .play-button {
-            width: var(--chat-button-size);
-            height: var(--chat-button-size);
-            min-width: var(--chat-button-size);
-            min-height: var(--chat-button-size);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--primary-color);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .chat-button img, .play-button img {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        @media (max-width: 1220px) {
-            body {
-                padding: 0;
-            }
-            
-            .app-container {
-                height: 100vh;
-                margin: 0;
-            }
-        }
-
-        .completion-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-
-        .completion-modal button {
-            margin: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            background: var(--secondary-color);
-            color: white;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .completion-modal button:hover {
-            transform: scale(1.05);
-        }
-
-        /* Add hover state for next-button */
-        .next-button.enabled:hover {
-            background: #d66a1c;
-            transform: scale(1.05);
-        }
-
-        /* Validation Message */
-        .validation-message {
-            display: none;
-            background: rgba(221, 87, 87, 0.1);
-            border-left: 4px solid var(--raspberry, #DD5757);
-            color: var(--raspberry, #DD5757);
-            padding: 12px 16px;
-            margin-top: 8px;
-            font-size: 14px;
-            border-radius: 0 4px 4px 0;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .validation-message.visible {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <div class="redirect-message">
-        <h1>Redirecting...</h1>
-        <p>You will be redirected to the Goal Setter interface.</p>
+    <div class="app-container">
+        <div class="review-banner">Review Version - For Testing Only</div>
+        <div class="app-header">
+            <img class="header-logo" alt="StriveTogether Logo">
+        </div>
+        <div class="main-container">
+            <div class="left-nav">
+                <button class="nav-tab active">Chat</button>
+            </div>
+            <div class="content-area">
+                <iframe 
+                    class="chat-container"
+                    src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
+                    title="Chat Interface"
+                ></iframe>
+            </div>
+        </div>
     </div>
-<<<<<<< HEAD
-=======
 
-    <!-- Platform level assets -->
-    <script src="/shared/assets/js/chat.js"></script>
-    
-    <!-- Client level assets -->
-    <script src="assets/js/st-auth.js"></script>
-    <link rel="stylesheet" href="assets/css/st-variables.css">
-    <link rel="stylesheet" href="assets/css/st-custom.css">
+    <!-- Qipu Integration -->
+    <div id="paintbrush">🖌️</div>
+    <div id="annotation-tray">
+        <div class="tool" id="drawTool">✏️</div>
+        <div class="tool" id="textTool">🔤</div>
+        <div class="tool" id="eraseTool">🧽</div>
+        <div class="tool" id="commentTool">💬</div>
+    </div>
+    <div id="annotationCanvasContainer">
+        <canvas id="annotationCanvas"></canvas>
+        <button id="submitComment">Submit Comment</button>
+    </div>
 
     <script>
-        // Track form state
-        let formState = {
-            standardsChoice: null,
-            standardsLink: '',
-            standardsDetail: '',
-            reflectionChoice: null,
-            reflectionDetail: ''
+        const paintbrush = document.getElementById('paintbrush');
+        const tray = document.getElementById('annotation-tray');
+        const canvasContainer = document.getElementById('annotationCanvasContainer');
+        const canvasElem = document.getElementById('annotationCanvas');
+        const submitBtn = document.getElementById('submitComment');
+
+        let canvas;
+
+        paintbrush.onclick = () => {
+            tray.style.transform = 'translateY(0)';
         };
 
-        // Track interview variables
-        let interviewState = {
-            teachingContext: '',
-            learningTarget: '',
-            successCriteria: '',
-            teacherGoalStatement: '',
-            studentGoalStatement: '',
-            messageCount: 0,
-            isComplete: false
+        document.getElementById('drawTool').onclick = startAnnotation;
+        document.getElementById('textTool').onclick = startAnnotation;
+        document.getElementById('eraseTool').onclick = () => canvas.clear();
+        document.getElementById('commentTool').onclick = () => {
+            const comment = prompt('Enter your comment:');
+            if (comment) {
+                canvas.add(new fabric.Textbox(comment, {
+                    left: 50, top: 50, width: 200, fontSize:16
+                }));
+            }
         };
 
-        function handleStandardsChoice(choice) {
-            const standardsDetail = document.getElementById('standards-detail');
-            const nextButton = document.querySelector('.next-button');
-            
-            if (choice === 'yes') {
-                standardsDetail.classList.add('visible');
-                // Add listeners for both inputs
-                document.getElementById('standards-link').addEventListener('input', checkFormCompletion);
-                document.getElementById('standards-detail-input').addEventListener('input', checkFormCompletion);
-            } else {
-                standardsDetail.classList.remove('visible');
-                checkFormCompletion();
-            }
+        async function startAnnotation() {
+            tray.style.transform = 'translateY(100%)';
+            canvasContainer.style.display = 'flex';
+
+            const screenshot = await html2canvas(document.body);
+            canvasElem.width = screenshot.width / 2;
+            canvasElem.height = screenshot.height / 2;
+
+            canvas = new fabric.Canvas('annotationCanvas', { isDrawingMode: true });
+            fabric.Image.fromURL(screenshot.toDataURL(), img => {
+                img.scale(0.5);
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            });
         }
 
-        function handleReflectionChoice(choice) {
-            const reflectionDetail = document.getElementById('reflection-detail');
-            
-            if (choice === 'yes') {
-                reflectionDetail.classList.add('visible');
-                document.getElementById('reflection-input').addEventListener('input', checkFormCompletion);
-            } else {
-                reflectionDetail.classList.remove('visible');
-                checkFormCompletion();
-            }
-        }
-
-        function checkFormCompletion() {
-            const nextButton = document.querySelector('.next-button');
-            const standardsChoice = document.querySelector('input[name="standards"]:checked')?.value;
-            const reflectionChoice = document.querySelector('input[name="reflection"]:checked')?.value;
-            
-            // Check if required fields are filled based on choices
-            let isComplete = standardsChoice && reflectionChoice; // Base completion on having both choices made
-            
-            // Handle standards validation
-            if (standardsChoice === 'yes') {
-                const standardsLink = document.getElementById('standards-link').value.trim();
-                const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-                const hasStandardsInput = standardsLink || standardsDetail;
-                document.getElementById('standards-validation').classList.toggle('visible', !hasStandardsInput);
-                isComplete = isComplete && hasStandardsInput;
-            } else {
-                document.getElementById('standards-validation')?.classList.remove('visible');
-            }
-            
-            // Handle reflection validation
-            if (reflectionChoice === 'yes') {
-                const reflectionDetail = document.getElementById('reflection-input').value.trim();
-                const hasReflectionInput = reflectionDetail.length > 0;
-                document.getElementById('reflection-validation').classList.toggle('visible', !hasReflectionInput);
-                isComplete = isComplete && hasReflectionInput;
-            } else {
-                document.getElementById('reflection-validation')?.classList.remove('visible');
-            }
-            
-            // Enable/disable next button
-            nextButton.disabled = !isComplete;
-            nextButton.classList.toggle('enabled', isComplete);
-
-            // If both are "no", enable chat immediately
-            if (isComplete && standardsChoice === 'no' && reflectionChoice === 'no') {
-                startInterview();
-            }
-        }
-
-        function sendToWebhook() {
-            const payload = {
-                user_data: {
-                    name: formState.name || 'anonymous',
-                    email: formState.email || 'anonymous@public.test',
-                    user_id: formState.userId || '',
-                    thread_id: window.threadId || '',
-                    assistant_id: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
-                    org_id: 'recsK5zK0CouK5ebW',
-                    intake_token: 'goalsetter_chat',
-                    source: 'url',
-                    url: window.location.href,
-                    is_anonymous: !formState.name || !formState.email
-                },
-                document_data: {
-                    subject_and_grade: interviewState.teachingContext || '',
-                    learning_target: interviewState.learningTarget || '',
-                    measure_of_success: interviewState.successCriteria || '',
-                    classroom_goal_statement: interviewState.teacherGoalStatement || ''
-                }
+        submitBtn.onclick = () => {
+            const data = {
+                thread_id: window.location.href + '#' + Date.now(),
+                url: window.location.href,
+                timestamp: Date.now(),
+                user_id: 'user_uuid',
+                annotations: canvas.getObjects().map(obj => ({
+                    type: obj.type,
+                    content: obj.toDataURL ? obj.toDataURL() : obj.text,
+                    xy_position: { x: obj.left, y: obj.top }
+                })),
+                created_at: new Date().toISOString()
             };
 
-            fetch('https://hook.us1.make.com/f6no146taqm5cdss37za7siawjy8fnut', {
+            fetch('https://your-ticketing-system.com/api/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(data)
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Webhook response:', data);
-                // Enable tools tab after successful submission
-                document.querySelector('.nav-tab[onclick="STAuth.switchTab(\'tools\')"]').disabled = false;
-            })
-            .catch(error => console.error('Webhook error:', error));
-        }
-
-        function startInterview() {
-            const standardsChoice = document.querySelector('input[name="standards"]:checked').value;
-            const reflectionChoice = document.querySelector('input[name="reflection"]:checked').value;
-            
-            // Hide form container and show chat interface
-            document.querySelector('.form-container').style.display = 'none';
-            document.querySelector('.chatbar').style.display = 'flex';
-            document.querySelector('.playbar').style.display = 'none';
-            
-            // Show interview section and initialize chat
-            const interviewSection = document.getElementById('interview-section');
-            interviewSection.style.display = 'block';
-            
-            // Initialize chat after a short delay to ensure DOM is ready
-            setTimeout(() => {
-                Chat.init();
-            }, 100);
-        }
-
-        function handleChatKeypress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                const input = document.getElementById('chat-input');
-                const message = input.value.trim();
-                if (message) {
-                    Chat.addMessage('user', message);
-                    input.value = '';
-                }
-            }
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (message) {
-                Chat.addMessage('user', message);
-                input.value = '';
-            }
-        }
-
-        function showCompletionModal() {
-            const modal = document.createElement('div');
-            modal.innerHTML = `
-                <div class="completion-modal">
-                    <h2>Great progress today!</h2>
-                    <p>Would you like to:</p>
-                    <button onclick="STAuth.switchTab('tools'); closeModal()">
-                        Export as PDF
-                    </button>
-                    <button onclick="closeModal()">
-                        Continue Chatting
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function switchTab(tabName) {
-            // Update tab styling
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
+            .then(res => res.json())
+            .then(() => {
+                canvasContainer.style.display = 'none';
+                canvas.clear();
+                alert('Comment submitted!');
             });
-            document.querySelector(`.nav-tab[onclick="STAuth.switchTab('${tabName}')"]`).classList.add('active');
-
-            // Show correct section
-            document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
-            document.getElementById('interview-section').style.display = tabName === 'interview' ? 'block' : 'none';
-            document.getElementById('tools-section').style.display = tabName === 'tools' ? 'block' : 'none';
-
-            // Toggle chatbar/playbar based on section
-            const playbar = document.querySelector('.playbar');
-            const chatbar = document.querySelector('.chatbar');
-            
-            playbar.classList.toggle('active', tabName === 'welcome');
-            chatbar.classList.toggle('active', tabName === 'interview');
-
-            // Focus chat input when switching to interview
-            if (tabName === 'interview') {
-                const chatInput = document.querySelector('.chat-input');
-                chatInput.focus();
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize STAuth
-            STAuth.init();
-
-            // Set up event listeners
-            const nextButton = document.querySelector('.next-button');
-            nextButton.addEventListener('click', () => {
-                if (checkFormCompletion()) {
-                    STAuth.startInterview();
-                }
-            });
-
-            const sendButton = document.querySelector('.send-button');
-            sendButton.addEventListener('click', () => {
-                const input = document.getElementById('chat-input');
-                const message = input.value.trim();
-                if (message) {
-                    STAuth.addMessage('user', message);
-                    input.value = '';
-                }
-            });
-        });
-
-        // Update event listeners to use STAuth
-        document.querySelectorAll('input[name="standards"]').forEach(radio => {
-            radio.addEventListener('change', (e) => STAuth.handleStandardsChoice(e.target.value));
-        });
-
-        document.querySelectorAll('input[name="reflection"]').forEach(radio => {
-            radio.addEventListener('change', (e) => STAuth.handleReflectionChoice(e.target.value));
-        });
-
-        document.getElementById('chat-input').addEventListener('keypress', (e) => STAuth.handleChatKeypress(e));
+        };
     </script>
->>>>>>> c667aef71c95a7bfb263a58a5b92471a1196d2d4
 </body>
 </html> 
