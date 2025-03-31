@@ -487,6 +487,27 @@
             background: #d66a1c;
             transform: scale(1.05);
         }
+
+        /* Validation Message */
+        .validation-message {
+            display: none;
+            background: rgba(221, 87, 87, 0.1);
+            border-left: 4px solid var(--raspberry, #DD5757);
+            color: var(--raspberry, #DD5757);
+            padding: 12px 16px;
+            margin-top: 8px;
+            font-size: 14px;
+            border-radius: 0 4px 4px 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .validation-message.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -528,6 +549,9 @@
                                 <label>Please provide a link to or description of the relevant academic standards:</label>
                                 <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
                                 <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
+                                <div id="standards-validation" class="validation-message">
+                                    Please provide standards information or uncheck "Yes" to proceed without standards context
+                                </div>
                             </div>
                         </div>
 
@@ -549,6 +573,9 @@
                             <div class="form-group">
                                 <label>Tell me about the last PDSA cycle:</label>
                                 <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
+                                <div id="reflection-validation" class="validation-message">
+                                    Please provide reflection details or uncheck "Yes" to proceed without reflection
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -678,15 +705,25 @@
             // Check if required fields are filled based on choices
             let isComplete = standardsChoice && reflectionChoice; // Base completion on having both choices made
             
+            // Handle standards validation
             if (standardsChoice === 'yes') {
                 const standardsLink = document.getElementById('standards-link').value.trim();
                 const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-                isComplete = isComplete && (standardsLink || standardsDetail);
+                const hasStandardsInput = standardsLink || standardsDetail;
+                document.getElementById('standards-validation').classList.toggle('visible', !hasStandardsInput);
+                isComplete = isComplete && hasStandardsInput;
+            } else {
+                document.getElementById('standards-validation')?.classList.remove('visible');
             }
             
+            // Handle reflection validation
             if (reflectionChoice === 'yes') {
                 const reflectionDetail = document.getElementById('reflection-input').value.trim();
-                isComplete = isComplete && reflectionDetail;
+                const hasReflectionInput = reflectionDetail.length > 0;
+                document.getElementById('reflection-validation').classList.toggle('visible', !hasReflectionInput);
+                isComplete = isComplete && hasReflectionInput;
+            } else {
+                document.getElementById('reflection-validation')?.classList.remove('visible');
             }
             
             // Enable/disable next button
