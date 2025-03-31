@@ -8,32 +8,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ST GoalSetter</title>
-    <script>
-        // Production sprint flag - toggle this to switch versions
-        const IN_PRODUCTION_SPRINT = true;
-        
-        // Redirect based on sprint status
-        window.location.replace(
-            IN_PRODUCTION_SPRINT 
-                ? 'goalsetter_temp.html'  // During sprints
-                : 'goalsetter.html'       // When ready
-        );
-    </script>
     <style>
-        body, html {
+        body {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
         }
-        .chat-frame {
-            width: 100%;
-            height: 100vh;
-            border: none;
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- This page intentionally left blank - serves as production router -->
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading GoalSetter...</p>
+    </div>
+
+    <script>
+        // Load admin panel state
+        const getPageConfig = () => {
+            const state = localStorage.getItem('adminPanelState');
+            if (state) {
+                const config = JSON.parse(state);
+                return config.pages.goalsetter;
+            }
+            return { status: 'prod' };
+        };
+
+        // Route to appropriate version
+        const routeToVersion = () => {
+            const config = getPageConfig();
+            let targetUrl = 'goalsetter.html';
+
+            switch(config.status) {
+                case 'temp':
+                    if (config.tempUrl) {
+                        targetUrl = `goalsetter_temp.html?url=${encodeURIComponent(config.tempUrl)}`;
+                        if (config.displaySettings) {
+                            targetUrl += `&width=${encodeURIComponent(config.displaySettings.width)}`;
+                            targetUrl += `&height=${encodeURIComponent(config.displaySettings.height)}`;
+                            targetUrl += `&responsive=${config.displaySettings.responsive}`;
+                        }
+                    }
+                    break;
+                case 'review':
+                    targetUrl = 'goalsetter_review.html';
+                    break;
+            }
+
+            window.location.replace(targetUrl);
+        };
+
+        // Route on load
+        document.addEventListener('DOMContentLoaded', routeToVersion);
+    </script>
 </body>
 </html> 
