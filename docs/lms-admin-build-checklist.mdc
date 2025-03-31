@@ -1,216 +1,252 @@
-# LMS Admin Build Checklist
+# LMS Admin System Build Phases
 
-## 🎯 Admin Panel Core Features
+## 📱 Phase 1: MVP Directory Panel
+Current implementation in index.html providing core page management.
 
-### 1. Page State Management
-- [ ] Status radio controls for each page
-  - Production (live.html → core)
-  - Review (review mode active)
-  - Temporary (live.html → temp)
-- [ ] Visual status indicators
-  - Color-coded badges
-  - Clear state labels
-  - Last updated timestamp
+### Features
+- [x] Page state management (prod/review/temp)
+- [x] Temp URL configuration
+- [x] Display settings control
+- [x] State persistence (localStorage)
 
-### 2. Temporary Page Configuration
-- [ ] URL input for temp content
-  - Chatbase URL field
-  - YouTube embed field
-  - Custom iframe URL
-- [ ] Iframe display settings
-  - Width/height controls
-  - Responsive toggle
-  - Margin/padding adjustments
+### Limitations
+- Single admin view for all clients
+- Basic URL/display controls only
+- No role-based access
+- Limited to index.html context
 
-### 3. Review Process Tools
-- [ ] Comment tracking
-  - Active Qipu threads
-  - Unresolved comments
-  - Review progress
-- [ ] Sprint management
-  - Start/end dates
-  - Team assignments
-  - Status updates
+## 🎯 Phase 2: Dedicated Admin Portal
 
-## 🔧 Implementation Pattern
-
-### Admin Panel Structure
-```javascript
-// State management in index.html
-const AdminPanel = {
-    state: {
-        pages: {
-            'goalsetter': {
-                status: 'prod|review|temp',
-                tempUrl: '',
-                displaySettings: {
-                    width: '100%',
-                    height: '100vh',
-                    responsive: true
-                },
-                reviewState: {
-                    activeThreads: 0,
-                    lastUpdate: timestamp
-                }
-            }
-        }
-    }
-};
+### Core Structure
+```
+/admin/
+├── index.html           # Admin dashboard
+├── clients/            # Client-specific admin
+│   ├── {client}/      # Per-client settings
+│   │   ├── pages/     # Page management
+│   │   ├── forms/     # Form configuration
+│   │   └── auth/      # Access rules
+└── shared/            # Common components
 ```
 
-### URL Flow Control
-```javascript
-// Dynamic routing in _live.html
-const routeToVersion = () => {
-    const config = await fetchPageConfig();
-    switch(config.status) {
-        case 'prod':
-            return 'goalsetter.html';
-        case 'temp':
-            return `goalsetter_temp.html?url=${config.tempUrl}`;
-        default:
-            return 'goalsetter.html';
-    }
-};
-```
+### Features
+- [ ] Dedicated admin interface
+- [ ] Client-specific sections
+- [ ] Enhanced state management
+- [ ] Review process tools
+- [ ] Form builder interface
 
-## 📋 Feature Implementation Steps
-
-### Phase 1: Basic Controls
-1. Add status radio buttons to index.html
-2. Implement state persistence
-3. Update _live.html routing
-4. Add visual indicators
-
-### Phase 2: Temp Page Builder
-1. Add URL input field
-2. Create iframe preview
-3. Add display controls
-4. Implement responsive options
-
-### Phase 3: Review Integration
-1. Connect to Qipu API
-2. Show comment counts
-3. Add progress tracking
-4. Implement sprint tools
-
-## 🎨 UI Components
-
-### Status Controls
-```html
-<div class="page-controls">
-    <div class="status-group">
-        <input type="radio" name="status" value="prod">
-        <label>Production</label>
-        
-        <input type="radio" name="status" value="review">
-        <label>Review Mode</label>
-        
-        <input type="radio" name="status" value="temp">
-        <label>Temporary</label>
-    </div>
-</div>
-```
-
-### Temp URL Configuration
-```html
-<div class="temp-config" data-active="status === 'temp'">
-    <input type="url" 
-           placeholder="Chatbase/YouTube URL"
-           class="temp-url-input">
-    
-    <div class="display-controls">
-        <input type="text" placeholder="Width">
-        <input type="text" placeholder="Height">
-        <label>
-            <input type="checkbox">
-            Responsive
-        </label>
-    </div>
-</div>
-```
-
-## 🔐 Security Considerations
-
-1. URL Validation
-   - Whitelist allowed domains
-   - Sanitize inputs
-   - Verify SSL
-
-2. Access Control
-   - Admin-only routes
-   - Session validation
-   - Action logging
-
-## 📊 State Management
-
-### Local Storage Schema
+### State Schema
 ```javascript
 {
-    "pages": {
-        "goalsetter": {
-            "status": "prod",
-            "tempUrl": "",
-            "settings": {},
-            "reviewData": {}
-        }
-    },
-    "sprints": {
-        "current": {
-            "startDate": "",
-            "endDate": "",
-            "pages": []
+    clients: {
+        [clientId]: {
+            pages: {
+                [pageId]: {
+                    status: 'prod|review|temp',
+                    tempUrl: string,
+                    display: {
+                        width: string,
+                        height: string,
+                        responsive: boolean
+                    },
+                    forms: {
+                        [formId]: {
+                            fields: [{
+                                id: string,
+                                label: string,
+                                type: string,
+                                mapping: string // e.g. "Intake_Context_01"
+                            }]
+                        }
+                    }
+                }
+            },
+            auth: {
+                rules: [{
+                    pattern: string,
+                    role: string,
+                    access: 'view|edit|admin'
+                }]
+            }
         }
     }
 }
 ```
 
-## 🚀 Development Process
+## 🚀 Phase 3: Softr Integration
 
-1. Setup Phase
-   - [ ] Create admin panel component
-   - [ ] Add state management
-   - [ ] Implement storage
+### Authentication
+- [ ] Role-based access control
+- [ ] Client domain validation
+- [ ] Admin role hierarchy
+- [ ] Session management
 
-2. Feature Implementation
-   - [ ] Status controls
-   - [ ] Temp page builder
-   - [ ] Review tools
-   - [ ] Sprint management
+### Integration Points
+```javascript
+// Softr auth integration
+const AdminAuth = {
+    validateAccess: async (clientId, pageId) => {
+        const user = await Softr.getCurrentUser();
+        const roles = await Softr.getUserRoles();
+        return AdminRules.checkAccess(user, roles, clientId, pageId);
+    }
+};
+```
 
-3. Testing
-   - [ ] State persistence
-   - [ ] URL routing
-   - [ ] Security checks
-   - [ ] UI/UX review
+## 🎨 Phase 4: Visual Builder
 
-## 📝 Documentation Requirements
+### Form Builder
+- [ ] Drag-and-drop interface
+- [ ] Field mapping system
+- [ ] Template library
+- [ ] Preview mode
 
-1. Admin Guide
-   - Status management
-   - Temp page setup
-   - Review process
-   - Sprint coordination
+### Auth Rule Builder
+- [ ] Visual rule creator
+- [ ] Role assignment
+- [ ] Access pattern testing
+- [ ] Validation preview
 
-2. Technical Docs
-   - State schema
-   - URL patterns
-   - Security model
-   - API endpoints
+### Template System
+```javascript
+// Dynamic form mapping
+const FormBuilder = {
+    mapField: (clientField, genericField) => ({
+        source: clientField.id,
+        target: genericField, // e.g. "Intake_Context_01"
+        transform: (value) => ({
+            // Transform client-specific data to generic format
+            value,
+            metadata: {
+                originalField: clientField.id,
+                mappedTo: genericField,
+                clientId: clientField.clientId
+            }
+        })
+    })
+};
+```
 
-## 🎯 Success Metrics
+## 📊 Phase 5: Analytics & Monitoring
 
-1. Usability
-   - Clear status visibility
-   - Easy temp page setup
-   - Intuitive controls
+### Review Process
+- [ ] Comment tracking
+- [ ] Review status dashboard
+- [ ] Change history
+- [ ] Approval workflow
 
-2. Reliability
-   - State persistence
-   - Secure routing
-   - Error handling
+### Usage Metrics
+- [ ] Page performance
+- [ ] Form completion rates
+- [ ] Error tracking
+- [ ] User engagement
 
-3. Efficiency
-   - Quick status changes
-   - Fast temp deployment
-   - Streamlined review 
+## 🔧 Implementation Strategy
+
+### 1. MVP Enhancement (Current)
+- [ ] Add client section headers
+- [ ] Improve state management
+- [ ] Add basic role checks
+- [ ] Enhance temp page controls
+
+### 2. Admin Portal Migration
+- [ ] Create admin/ directory
+- [ ] Move state management
+- [ ] Add client isolation
+- [ ] Implement basic form tools
+
+### 3. Softr Integration
+- [ ] Add auth wrapper
+- [ ] Implement role system
+- [ ] Create admin dashboard
+- [ ] Add client domains
+
+### 4. Builder Tools
+- [ ] Form builder UI
+- [ ] Auth rule editor
+- [ ] Template system
+- [ ] Preview system
+
+## 📝 Data Architecture
+
+### Form Field Mapping
+```javascript
+{
+    "fieldMappings": {
+        "st_standards_link": "Intake_Context_01",
+        "st_reflection_text": "Intake_Context_02",
+        "elpl_prior_learning": "Intake_Context_01"
+    }
+}
+```
+
+### Client Configuration
+```javascript
+{
+    "clientConfig": {
+        "st": {
+            "forms": {
+                "goalsetter": {
+                    "requiredFields": ["standards", "reflection"],
+                    "conditionalLogic": {
+                        "standardsChoice": {
+                            "yes": ["standardsLink", "standardsDetail"],
+                            "no": []
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+## 🔐 Security Considerations
+
+### Role Hierarchy
+```
+SuperAdmin
+  └─ ClientAdmin
+      └─ PageAdmin
+          └─ FormAdmin
+              └─ Reviewer
+```
+
+### Access Patterns
+- Domain-based validation
+- Role-based permissions
+- Action auditing
+- State validation
+
+## 📈 Success Metrics
+
+### Short Term (MVP)
+- Page state reliability
+- Temp page usability
+- State persistence
+- Error handling
+
+### Long Term
+- Client adoption rate
+- Form completion rate
+- Review efficiency
+- Builder tool usage
+
+## 🎯 Next Steps
+
+1. Current MVP
+   - [ ] Enhance state management
+   - [ ] Add basic role checks
+   - [ ] Improve temp controls
+
+2. Portal Preparation
+   - [ ] Design admin structure
+   - [ ] Plan state migration
+   - [ ] Create base templates
+
+3. Documentation
+   - [ ] Admin guide
+   - [ ] Builder documentation
+   - [ ] Integration guide
+   - [ ] Security protocols 
