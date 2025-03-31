@@ -1,0 +1,46 @@
+:root {
+  /* Colors */
+  --primary-color: #425563;  /* Dark slate for user messages */
+  --secondary-color: #E87722; /* Orange for actions/CTAs */
+  --tertiary-color: #5DC1AE; /* Teal for AI responses */
+  --background-color: #ffffff;
+  --text-color: #2B3A47;
+  --cta-text-color: #ffffff;
+  --message-user-bg: #425563;
+  --message-ai-bg: #5DC1AE;
+  --button-hover: #F68B35;
+
+  /* Typography */
+  --client-font-h1: 'Open Sans', sans-serif;
+  --client-font-h2: 'Open Sans Extra Bold', sans-serif;
+  --client-font-body: 'Open Sans', sans-serif;
+  --client-font-size-h1: 36px;
+  --client-font-size-h2: 28px;
+  --client-font-size-body: 18px;
+  --client-font-scale: 1.2;
+
+  /* Layout */
+  --client-button-radius: 12px;
+  --client-button-padding: 14px 28px;
+  --client-card-border-radius: 16px;
+  --client-spacing-large: 40px;
+  --client-spacing-medium: 28px;
+  --client-spacing-small: 18px;
+  --message-border-radius: 20px;
+
+  /* Features */
+  --client-high-contrast-mode: true;
+
+  /* Assets */
+  --client-logo: url('assets/images/logo.png');
+  --client-avatar: url('assets/images/avatar.png');
+  --client-voice-tone: 'Optimistic, collaborative, systems-focused';
+
+  /* Image Paths */
+  --logo-path: 'assets/images/logo.png';
+  --logo-ico-path: 'assets/images/logo.ico';
+  --lockup-white-logo-path: 'assets/images/logo.png';
+
+  /* Assistant Config */
+  --ai-assistant-id: 'asst_9GkHpGa5t50Yw74uzonh6FAz';
+} 

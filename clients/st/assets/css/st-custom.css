@@ -1,0 +1,86 @@
+
+/* StriveTogether Brand Custom CSS */
+
+/* === Color Variables === */
+:root {
+  --white: #ffffff;
+  --navy: #425563;
+  --orange: #E87722;
+  --teal: #48A8B9;
+  --jade: #4FA997;
+  --orchid: #91679B;
+  --raspberry: #DD5757;
+  --gold: #F7B849;
+
+  /* Extended Variants */
+  --orange-tweaked: #E97414;
+  --teal-tweaked: #379FB1;
+  --jade-tweaked: #45A486;
+  --gold-tweaked: #CE8300;
+
+  --gray-900: #575F6D;
+  --gray-800: #6D7481;
+  --gray-600: #979BA6;
+
+  /* Font Families */
+  --font-base: 'Open Sans', sans-serif;
+  --font-bold: 'Open Sans Extra Bold', sans-serif;
+}
+
+/* === Base Typography === */
+body {
+  font-family: var(--font-base);
+  color: var(--navy);
+  background-color: var(--white);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-bold);
+  color: var(--orange);
+  text-transform: none; /* Title case for accessibility */
+}
+
+h4, h5, h6 {
+  font-family: var(--font-base);
+  text-transform: uppercase; /* Optional for smaller subheadings */
+  color: var(--navy);
+}
+
+/* === Utility Classes === */
+.text-orange { color: var(--orange); }
+.text-navy { color: var(--navy); }
+.text-teal { color: var(--teal); }
+.text-jade { color: var(--jade); }
+.text-gold { color: var(--gold); }
+.text-raspberry { color: var(--raspberry); }
+
+.bg-orange { background-color: var(--orange); color: var(--white); }
+.bg-navy { background-color: var(--navy); color: var(--white); }
+.bg-teal { background-color: var(--teal); color: var(--white); }
+.bg-jade { background-color: var(--jade); color: var(--white); }
+.bg-gold { background-color: var(--gold); color: var(--white); }
+
+/* === Component Styling === */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-800);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: var(--navy);
+}
+
+.header {
+  font-size: 1.25rem;
+  font-family: var(--font-bold);
+  color: var(--raspberry);
+}
+
+.status-tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  background: var(--orange-tweaked);
+  color: var(--white);
+  font-weight: bold;
+  font-size: 0.875rem;
+}
