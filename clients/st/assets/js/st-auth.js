@@ -1,6 +1,6 @@
 // Client-specific authentication and validation flow
 // This template can be adapted for different client instances by modifying the validation rules
-const ClientAuth = {
+const STAuth = {
     // State management
     state: {
         // Access control
@@ -343,4 +343,4 @@ const ClientAuth = {
 };
 
 // Initialize client auth
-ClientAuth.init(); 
+STAuth.init(); 
