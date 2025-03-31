@@ -1,0 +1,417 @@
+# URL Testing Checklist
+
+## Setup
+1. Add console logging utility to each page:
+```javascript
+const Logger = {
+    log: (msg, data = null) => {
+        console.log(`[${new Date().toISOString()}] ${msg}`, data || '');
+    },
+    error: (msg, error = null) => {
+        console.error(`[${new Date().toISOString()}] ERROR: ${msg}`, error || '');
+    }
+};
+```
+
+## goalsetter.html (Core)
+1. Load test:
+```bash
+curl -I http://localhost:3000/clients/st/goalsetter.html
+```
+- [ ] Returns 200
+- [ ] Content-Type is text/html
+- [ ] No redirects
+
+2. Console checks:
+```javascript
+// Add to page
+document.addEventListener('DOMContentLoaded', () => {
+    Logger.log('Page loaded');
+    Logger.log('DOM Structure:', {
+        hasWelcomeSection: !!document.getElementById('welcome-section'),
+        hasInterviewSection: !!document.getElementById('interview-section'),
+        hasToolsSection: !!document.getElementById('tools-section')
+    });
+});
+```
+
+3. Qipu integration:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    captureLayout: () => {
+        const layout = {
+            sections: {
+                welcome: document.getElementById('welcome-section')?.innerHTML,
+                interview: document.getElementById('interview-section')?.innerHTML,
+                tools: document.getElementById('tools-section')?.innerHTML
+            },
+            timestamp: new Date().toISOString()
+        };
+        Logger.log('Layout captured', layout);
+        return layout;
+    }
+};
+```
+
+## goalsetter_live.html (Production)
+1. Load test:
+```bash
+curl -I http://localhost:3000/clients/st/goalsetter_live.html
+```
+- [ ] Returns 200
+- [ ] No redirects
+- [ ] No review banner
+
+2. Console checks:
+```javascript
+// Add to page
+document.addEventListener('DOMContentLoaded', () => {
+    Logger.log('Live page loaded');
+    Logger.log('Chat interface:', {
+        hasChatContainer: !!document.querySelector('.chat-container'),
+        hasInput: !!document.getElementById('chat-input'),
+        hasSendButton: !!document.querySelector('.send-button')
+    });
+});
+```
+
+3. Qipu integration:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    captureChatLayout: () => {
+        const layout = {
+            chat: {
+                container: document.querySelector('.chat-container')?.innerHTML,
+                input: document.getElementById('chat-input')?.value,
+                messages: document.querySelectorAll('.message').length
+            },
+            timestamp: new Date().toISOString()
+        };
+        Logger.log('Chat layout captured', layout);
+        return layout;
+    }
+};
+```
+
+## goalsetter_temp.html (Temporary)
+1. Load test:
+```bash
+curl -I "http://localhost:3000/clients/st/goalsetter_temp.html?url=https://example.com"
+```
+- [ ] Returns 200
+- [ ] URL parameter accepted
+- [ ] Iframe created
+
+2. Console checks:
+```javascript
+// Add to page
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    Logger.log('Temp page loaded', {
+        url: urlParams.get('url'),
+        hasIframe: !!document.querySelector('iframe')
+    });
+});
+```
+
+3. Qipu integration:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    captureTempLayout: () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const layout = {
+            url: urlParams.get('url'),
+            iframe: document.querySelector('iframe')?.src,
+            timestamp: new Date().toISOString()
+        };
+        Logger.log('Temp layout captured', layout);
+        return layout;
+    }
+};
+```
+
+## goalsetter_review.html (Review)
+1. Load test:
+```bash
+curl -I http://localhost:3000/clients/st/goalsetter_review.html
+```
+- [ ] Returns 200
+- [ ] Review banner present
+- [ ] Qipu enabled
+
+2. Console checks:
+```javascript
+// Add to page
+document.addEventListener('DOMContentLoaded', () => {
+    Logger.log('Review page loaded');
+    Logger.log('Review features:', {
+        hasReviewBanner: !!document.querySelector('.review-banner'),
+        hasQipu: !!window.Qipu
+    });
+});
+```
+
+3. Qipu integration:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    captureReviewLayout: () => {
+        const layout = {
+            hasReviewBanner: !!document.querySelector('.review-banner'),
+            hasQipu: !!window.Qipu,
+            timestamp: new Date().toISOString()
+        };
+        Logger.log('Review layout captured', layout);
+        return layout;
+    }
+};
+```
+
+## Qipu Ticket Validation
+1. Add ticket validation to Qipu submission:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    validateTicket: (layout, ticket) => {
+        const validation = {
+            timestamp: new Date().toISOString(),
+            layout: layout,
+            ticket: ticket,
+            matches: false
+        };
+        
+        // Compare layout with ticket payload
+        if (ticket.payload && ticket.payload.layout) {
+            validation.matches = JSON.stringify(layout) === JSON.stringify(ticket.payload.layout);
+        }
+        
+        Logger.log('Ticket validation', validation);
+        return validation;
+    }
+};
+```
+
+2. Add screenshot validation:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    validateScreenshot: (screenshot, layout) => {
+        const validation = {
+            timestamp: new Date().toISOString(),
+            layout: layout,
+            screenshot: screenshot,
+            matches: false
+        };
+        
+        // Compare screenshot with expected layout
+        // This would need a more sophisticated image comparison
+        // For now, we'll just log the attempt
+        Logger.log('Screenshot validation attempted', validation);
+        return validation;
+    }
+};
+```
+
+## End-to-End Testing
+1. Add OpenAI test suite:
+```javascript
+// Add to st-auth.js
+const EndToEndTest = {
+    testChatFlow: async () => {
+        const testData = {
+            messages: [
+                { role: 'user', content: 'I want to improve student engagement in my math class' },
+                { role: 'assistant', content: 'Let\'s set a specific goal for improving student engagement. What grade level do you teach?' }
+            ],
+            timestamp: new Date().toISOString()
+        };
+
+        // Test OpenAI API
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: testData.messages[0].content })
+            });
+            
+            Logger.log('OpenAI API response:', {
+                status: response.status,
+                ok: response.ok
+            });
+
+            // Capture chat state for Qipu
+            const chatState = {
+                messages: document.querySelectorAll('.message'),
+                lastMessage: document.querySelector('.message:last-child')?.textContent,
+                timestamp: new Date().toISOString()
+            };
+
+            return {
+                success: response.ok,
+                chatState,
+                testData
+            };
+        } catch (error) {
+            Logger.error('OpenAI API test failed', error);
+            return { success: false, error };
+        }
+    }
+};
+```
+
+2. Add PDF generation webhook tests:
+```javascript
+// Add to st-auth.js
+const EndToEndTest = {
+    testPDFGeneration: async () => {
+        const testData = {
+            goalStatement: {
+                teacher: "Improve student engagement in math class",
+                student: "Students will actively participate in math activities"
+            },
+            timestamp: new Date().toISOString()
+        };
+
+        // Test PDF generation webhook
+        try {
+            const response = await fetch('/api/generate-pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            });
+
+            Logger.log('PDF generation webhook response:', {
+                status: response.status,
+                ok: response.ok
+            });
+
+            // Capture PDF state for Qipu
+            const pdfState = {
+                success: response.ok,
+                status: response.status,
+                timestamp: new Date().toISOString()
+            };
+
+            return {
+                success: response.ok,
+                pdfState,
+                testData
+            };
+        } catch (error) {
+            Logger.error('PDF generation test failed', error);
+            return { success: false, error };
+        }
+    }
+};
+```
+
+3. Add Qipu end-to-end validation:
+```javascript
+// Add to st-auth.js
+const QipuTest = {
+    validateEndToEnd: async (chatState, pdfState) => {
+        const validation = {
+            timestamp: new Date().toISOString(),
+            chat: chatState,
+            pdf: pdfState,
+            matches: false
+        };
+
+        // Validate chat flow
+        const chatValid = chatState.messages.length >= 2 &&
+                         chatState.lastMessage.includes('goal') &&
+                         chatState.success;
+
+        // Validate PDF generation
+        const pdfValid = pdfState.success && pdfState.status === 200;
+
+        validation.matches = chatValid && pdfValid;
+
+        Logger.log('End-to-end validation', validation);
+        return validation;
+    }
+};
+```
+
+## Running Tests
+1. Create test script:
+```bash
+#!/bin/bash
+# test-urls.sh
+
+echo "Testing goalsetter.html..."
+curl -s http://localhost:3000/clients/st/goalsetter.html | grep -q "Welcome to the Goal Setter" && echo "✓" || echo "✗"
+
+echo "Testing goalsetter_live.html..."
+curl -s http://localhost:3000/clients/st/goalsetter_live.html | grep -q "chat-container" && echo "✓" || echo "✗"
+
+echo "Testing goalsetter_temp.html..."
+curl -s "http://localhost:3000/clients/st/goalsetter_temp.html?url=https://example.com" | grep -q "iframe" && echo "✓" || echo "✗"
+
+echo "Testing goalsetter_review.html..."
+curl -s http://localhost:3000/clients/st/goalsetter_review.html | grep -q "review-banner" && echo "✓" || echo "✗"
+```
+
+2. Make script executable:
+```bash
+chmod +x test-urls.sh
+```
+
+3. Run tests:
+```bash
+./test-urls.sh
+```
+
+## Running End-to-End Tests
+1. Add curl test script for end-to-end:
+```bash
+#!/bin/bash
+# test-end-to-end.sh
+
+echo "Testing OpenAI chat..."
+curl -X POST http://localhost:3000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"I want to improve student engagement in my math class"}' \
+  | grep -q "goal" && echo "✓" || echo "✗"
+
+echo "Testing PDF generation..."
+curl -X POST http://localhost:3000/api/generate-pdf \
+  -H "Content-Type: application/json" \
+  -d '{"goalStatement":{"teacher":"Improve engagement","student":"Active participation"}}' \
+  | grep -q "success" && echo "✓" || echo "✗"
+
+echo "Testing Qipu ticket creation..."
+curl -X POST http://localhost:3000/api/qipu/ticket \
+  -H "Content-Type: application/json" \
+  -d '{"type":"end-to-end","data":{"chat":"success","pdf":"success"}}' \
+  | grep -q "ticket_id" && echo "✓" || echo "✗"
+```
+
+2. Run tests:
+```bash
+./test-end-to-end.sh
+```
+
+3. Check Qipu tickets:
+```bash
+curl http://localhost:3000/api/qipu/tickets | grep -q "end-to-end"
+```
+
+## Success Criteria
+1. All URLs return 200
+2. Console logs show expected DOM structure
+3. Qipu captures correct layout
+4. Ticket payload matches layout
+5. Screenshot matches expected layout
+6. No redirects in production
+7. Review features only in review version
+8. Temporary URL properly handled
+9. OpenAI chat flow completes successfully
+10. PDF generation webhook returns 200
+11. Qipu ticket captures end-to-end flow
+12. Chat messages contain expected content
+13. PDF generation completes within timeout
+14. All webhooks respond with correct status codes 
