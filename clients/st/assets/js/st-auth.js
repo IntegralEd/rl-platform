@@ -363,11 +363,16 @@ const STAuth = {
     // Feature detection
     isReviewMode: () => {
         return document.referrer.includes('_review') || 
-               window.location.search.includes('review=true');
+               window.location.hash === '#review';
     },
 
     // Initialize features based on mode
     init: () => {
+        // Set hash if coming from review path
+        if (document.referrer.includes('_review') && window.location.hash !== '#review') {
+            window.location.hash = '#review';
+        }
+        
         if (STAuth.isReviewMode()) {
             STAuth.enableReviewFeatures();
         }
