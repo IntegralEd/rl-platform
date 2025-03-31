@@ -66,6 +66,7 @@
             background: white;
             box-shadow: 0 2px 12px rgba(0,0,0,0.1);
             margin: 0 auto;
+            position: relative;
         }
 
         /* Header */
@@ -304,13 +305,32 @@
         /* Footer */
         .app-footer {
             height: var(--footer-height);
-            background: white;
-            border-top: 1px solid var(--border-color);
+            background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 24px;
             box-sizing: border-box;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .footer-logo {
+            height: 30px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
         }
 
         /* Chat container */
@@ -413,9 +433,7 @@
 <body>
     <div class="app-container">
         <header class="app-header">
-            <img src="assets/images/ST TH Powered By White Logo.png" 
-                 alt="StriveTogether" 
-                 class="header-logo">
+            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="header-logo">
         </header>
         
         <div class="main-container">
@@ -489,22 +507,12 @@
         </div>
 
         <!-- Footer -->
-        <div class="app-footer">
-            <div class="playbar">
-                <button class="next-button" disabled>
-                    <img src="assets/images/noun-next-5654311-FFFFFF.png" alt="Next">
-                </button>
+        <footer class="app-footer">
+            <div class="footer-content">
+                <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="footer-logo">
+                <span class="footer-text">© 2024 StriveTogether. All rights reserved.</span>
             </div>
-            <div class="chatbar" style="display: none;">
-                <input type="text" 
-                       class="chat-input" 
-                       placeholder="Type your message..."
-                       onkeydown="handleChatKeypress(event)">
-                <button class="send-button" onclick="sendMessage()">
-                    <img src="assets/images/noun-send-7149925-FFFFFF.png" alt="Send">
-                </button>
-            </div>
-        </div>
+        </footer>
     </div>
 
     <script>
