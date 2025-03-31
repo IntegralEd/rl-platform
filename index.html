@@ -169,6 +169,16 @@
             padding-bottom: 8px;
             border-bottom: 2px solid var(--primary-color);
         }
+
+        .directory-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .directory-item .disabled-link {
+            color: #999;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -199,13 +209,10 @@
             <a href="/clients/st/goalsetter.html">ST Goal Setter</a>
         </div>
         <div class="directory-item">
-            <a href="/clients/bhb/goalsetter.html">BHB Goal Setter</a>
-        </div>
-        <div class="directory-item">
             <a href="/clients/bhb/chat.html">BHB Chat</a>
         </div>
-        <div class="directory-item">
-            <a href="/clients/st/chat.html">ST Chat</a>
+        <div class="directory-item disabled">
+            <a href="#" class="disabled-link">EL Merit Chat</a>
         </div>
     </div>
 
