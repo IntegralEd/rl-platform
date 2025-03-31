@@ -180,26 +180,6 @@
             font-family: var(--client-font-body, Arial, sans-serif);
         }
 
-        /* Radio Groups */
-        .radio-group {
-            display: flex;
-            gap: 24px;
-            margin-top: 12px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-
-        .radio-option:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
         /* Form Inputs */
         input[type="text"],
         input[type="email"],
@@ -217,7 +197,7 @@
         input[type="email"]:focus,
         textarea:focus {
             outline: none;
-            border-color: var(--primary-color, #E87722);
+            border-color: var(--secondary-color, #E87722);
             box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
         }
 
@@ -249,50 +229,29 @@
             transform: translateY(0);
         }
 
-        /* Button base styles */
-        .next-button, .send-button {
-            width: 60px;
-            height: 60px;
-            background: #ccc;  /* Start with gray when disabled */
-            border: none;
-            border-radius: 50%;
+        /* Radio Groups */
+        .radio-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            padding: 0;
         }
 
-        .next-button.enabled {
-            background: #E87722;  /* ST Orange when enabled */
+        .radio-option:hover {
+            background: rgba(232, 119, 34, 0.05);
         }
 
-        .next-button img,
-        .send-button img {
-            width: 24px;
-            height: 24px;
-            filter: brightness(0) invert(1);  /* Make icons white */
-        }
-
-        /* Chat input styling */
-        .chatbar, .playbar {
-            display: none;  /* Hidden by default */
-            align-items: center;
-            gap: 20px;
-            width: calc(100% - var(--nav-width));
-            max-width: 800px;
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            padding: 20px 40px;
-            background: white;
-            border-top: 1px solid var(--border-color);
-            box-sizing: border-box;
-        }
-
-        .chatbar.active, .playbar.active {
-            display: flex;
+        .radio-option input[type="radio"] {
+            accent-color: var(--secondary-color, #E87722);
         }
 
         /* Interaction Container */
@@ -359,16 +318,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .interaction-button:not(:disabled):hover {
-            background: rgba(255,255,255,0.15);
+        .interaction-button.next-button {
+            background: #ccc;
         }
 
-        .interaction-button:disabled {
+        .interaction-button.next-button.enabled {
+            background: var(--secondary-color, #E87722);
+            cursor: pointer;
+        }
+
+        .interaction-button.next-button.enabled:hover {
+            transform: scale(1.05);
+            background: #d66a1c;
+        }
+
+        .interaction-button.next-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #ccc;
         }
 
         .interaction-icon {
@@ -704,7 +676,7 @@
             const reflectionChoice = document.querySelector('input[name="reflection"]:checked')?.value;
             
             // Check if required fields are filled based on choices
-            let isComplete = true;
+            let isComplete = standardsChoice && reflectionChoice; // Base completion on having both choices made
             
             if (standardsChoice === 'yes') {
                 const standardsLink = document.getElementById('standards-link').value.trim();
