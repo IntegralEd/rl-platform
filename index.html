@@ -4,13 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Platform</title>
-    <link rel="stylesheet" href="/shared/assets/css/main.css">
-    <link rel="stylesheet" href="/shared/assets/css/variables.css">
     <style>
         :root {
-            --primary-color: #007BFF;
-            --accent-color: #0056b3;
-            --dark-text-color: #111;
             --primary: #004080;
             --secondary: #E87722;
             --bg-light: #f5f5f5;
@@ -19,173 +14,13 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle at top, #f9f9f9, #e0e0e0);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            position: relative;
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, sans-serif;
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        #main-container {
-            max-width: 600px;
-            width: 100%;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
-        }
-
-        img.logo {
-            max-width: 150px;
-            transition: transform 0.3s ease;
-        }
-
-        .verb-container {
-            color: var(--primary-color);
-            font-weight: bold;
-            font-size: 1.5em;
-            margin: 20px 0;
-        }
-
-        /* Site Directory Panel - Right side */
-        #site-directory {
-            position: fixed;
-            right: 20px;
-            top: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            min-width: 250px;
-        }
-
-        .directory-header {
-            color: var(--primary-color);
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--primary-color);
-        }
-
-        .directory-item {
-            margin: 10px 0;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-
-        .directory-item:hover {
-            opacity: 1;
-        }
-
-        .directory-item a {
-            color: var(--dark-text-color);
-            text-decoration: none;
-            font-size: 0.9em;
-            display: block;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .directory-item a:hover {
-            background-color: rgba(0,0,0,0.05);
-        }
-
-        /* Subtle curious button */
-        #curious-trigger {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            opacity: 0.3;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #curious-trigger:hover {
-            opacity: 1;
-            transform: translateY(-2px);
-        }
-
-        .peek-icon {
-            font-size: 24px;
-            animation: peek 3s infinite;
-        }
-
-        @keyframes peek {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-
-        /* Comments for team */
-        .team-note {
-            color: #666;
-            font-style: italic;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-
-        .app-links {
-            margin: 2rem 0;
-            padding: 1rem;
-            background: #f5f5f5;
-            border-radius: 8px;
-        }
-
-        .link-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .app-link {
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.2s;
-        }
-
-        .app-link:hover {
-            border-color: #004080;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .app-link.review {
-            border-left: 4px solid #E87722;
-        }
-
-        .link-label {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        code {
-            font-family: monospace;
-            color: #666;
-            font-size: 0.9em;
         }
 
         .toc-trigger {
@@ -205,6 +40,7 @@
             color: white;
             transition: transform 0.3s ease;
             z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .toc-trigger:hover {
@@ -328,49 +164,26 @@
 
         main {
             padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .welcome-logo {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            display: block;
+        }
+
+        .welcome-title {
+            text-align: center;
+            color: var(--primary);
+            font-size: 2rem;
+            margin: 2rem 0;
         }
     </style>
 </head>
 <body>
-    <div id="main-container">
-        <h3>Welcome to Recursive Learning</h3>
-        <img class="logo" src="/shared/assets/images/logo.png" alt="Recursive Learning Logo">
-        <div class="verb-container">
-            Growing...
-        </div>
-    </div>
-
-    <!-- Site Directory Panel -->
-    <div id="site-directory">
-        <div class="directory-header">Site Directory</div>
-        <div class="directory-item">
-            <a href="/clients/st/goalsetter_live.html">ST Goal Setter (Live Chatbase)</a>
-        </div>
-        <div class="directory-item">
-            <a href="/clients/st/goalsetter_review.html">ST Goal Setter Review (RL Platform)</a>
-        </div>
-        <div class="team-note">Feel free to add comments - just for the team</div>
-    </div>
-
-    <!-- Subtle curious trigger -->
-    <button id="curious-trigger" title="Curious?">
-        <span class="peek-icon">👀</span>
-    </button>
-
-    <div class="app-links">
-        <h2>Goal Setter</h2>
-        <div class="link-group">
-            <a href="clients/st/goalsetter.html" class="app-link">
-                <span class="link-label">Live Version</span>
-                <code>clients/st/goalsetter.html</code>
-            </a>
-            <a href="clients/st/goalsetter_review.html" class="app-link review">
-                <span class="link-label">Review Version</span>
-                <code>clients/st/goalsetter_review.html → goalsetter.html#review</code>
-            </a>
-        </div>
-    </div>
-
     <button class="toc-trigger" id="tocTrigger">👀</button>
     
     <div class="toc-overlay" id="tocOverlay"></div>
@@ -407,14 +220,11 @@
     </nav>
 
     <main>
-        <!-- Main content here -->
+        <h1 class="welcome-title">Welcome to Recursive Learning</h1>
+        <img src="shared/assets/images/logo.png" alt="Recursive Learning Logo" class="welcome-logo">
     </main>
 
     <script>
-        document.getElementById('curious-trigger').addEventListener('click', () => {
-            window.location.href = '/shared/templates/form-template.html';
-        });
-
         // TOC Panel Toggle
         const tocTrigger = document.getElementById('tocTrigger');
         const tocPanel = document.getElementById('tocPanel');
