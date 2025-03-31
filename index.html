@@ -6,7 +6,6 @@
     <title>Recursive Learning Platform</title>
     <link rel="stylesheet" href="/shared/assets/css/main.css">
     <link rel="stylesheet" href="/shared/assets/css/variables.css">
-    <link rel="stylesheet" href="/shared/assets/css/custom.css">
     <style>
         :root {
             --primary-color: #007BFF;
@@ -22,6 +21,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            position: relative;
         }
 
         #main-container {
@@ -32,26 +32,67 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position: relative;
         }
 
-        img {
+        img.logo {
             max-width: 150px;
-            border-radius: 50%;
             transition: transform 0.3s ease;
-        }
-        img:hover {
-            transform: scale(1.05) rotate(5deg);
         }
 
         .verb-container {
             color: var(--primary-color);
             font-weight: bold;
             font-size: 1.5em;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
 
-        #curious-button {
-            cursor: pointer;
+        /* Site Directory Panel - Right side */
+        #site-directory {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 250px;
+        }
+
+        .directory-header {
+            color: var(--primary-color);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        .directory-item {
+            margin: 10px 0;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .directory-item:hover {
+            opacity: 1;
+        }
+
+        .directory-item a {
+            color: var(--dark-text-color);
+            text-decoration: none;
+            font-size: 0.9em;
+            display: block;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .directory-item a:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        /* Subtle curious button */
+        #curious-trigger {
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -59,124 +100,68 @@
             height: 40px;
             background: none;
             border: none;
+            cursor: pointer;
             opacity: 0.3;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        #curious-button:hover {
+
+        #curious-trigger:hover {
             opacity: 1;
             transform: translateY(-2px);
         }
+
         .peek-icon {
             font-size: 24px;
-            position: relative;
             animation: peek 3s infinite;
         }
+
         @keyframes peek {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-3px); }
         }
 
-        /* Form Panel Styles */
-        #form-panel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90vw;
-            height: 80vh;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        #form-panel iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        /* Site Index Styles */
-        #site-index-panel {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-        }
-        .directory-item {
-            margin: 10px 0;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .directory-item:hover {
-            opacity: 1;
-        }
-        .directory-item a {
-            color: var(--dark-text-color);
-            text-decoration: none;
+        /* Comments for team */
+        .team-note {
+            color: #666;
+            font-style: italic;
             font-size: 0.9em;
-        }
-        .directory-header {
-            color: var(--primary-color);
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--primary-color);
-            padding-bottom: 5px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div id="main-container">
         <h3>Welcome to Recursive Learning</h3>
-        <img src="/shared/assets/images/logo.png" alt="Recursive Learning Logo">
-        <div class="verb-container" id="verb-container">
+        <img class="logo" src="/shared/assets/images/logo.png" alt="Recursive Learning Logo">
+        <div class="verb-container">
             Growing...
         </div>
-        
-        <!-- Site Index Panel -->
-        <div id="site-index-panel">
-            <div class="directory-header">Site Directory</div>
-            <div class="directory-item">
-                <a href="/clients/st/goalsetter_live.html">ST Goal Setter (Live Chatbase)</a>
-            </div>
-            <div class="directory-item">
-                <a href="/clients/st/goalsetter_review.html">ST Goal Setter Review (RL Platform)</a>
-            </div>
-        </div>
-
-        <!-- Subtle curious trigger -->
-        <div id="curious-button" title="Curious?">
-            <span class="peek-icon">👀</span>
-        </div>
     </div>
 
-    <!-- Form Panel -->
-    <div class="overlay" id="form-overlay"></div>
-    <div id="form-panel">
-        <iframe src="/shared/templates/form-template.html"></iframe>
+    <!-- Site Directory Panel -->
+    <div id="site-directory">
+        <div class="directory-header">Site Directory</div>
+        <div class="directory-item">
+            <a href="/clients/st/goalsetter_live.html">ST Goal Setter (Live Chatbase)</a>
+        </div>
+        <div class="directory-item">
+            <a href="/clients/st/goalsetter_review.html">ST Goal Setter Review (RL Platform)</a>
+        </div>
+        <div class="team-note">Feel free to add comments - just for the team</div>
     </div>
+
+    <!-- Subtle curious trigger -->
+    <button id="curious-trigger" title="Curious?">
+        <span class="peek-icon">👀</span>
+    </button>
 
     <script>
-        document.getElementById('curious-button').addEventListener('click', () => {
-            const panel = document.getElementById('site-index-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        document.getElementById('curious-trigger').addEventListener('click', () => {
+            window.location.href = '/shared/templates/form-template.html';
         });
-        // Initially hide the panel
-        document.getElementById('site-index-panel').style.display = 'none';
     </script>
 </body>
 </html> 

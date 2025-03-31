@@ -1,0 +1,62 @@
+# Client Review Page Protocol
+
+## URL Flow Pattern
+```
+index.html (directory) -> goalsetter_review.html (loading) -> goalsetter.html (with review features)
+```
+
+## URL Paradigm
+- `*_review.html`: Entry point for review versions
+- `*.html`: Main template with conditional features
+- Review mode detection: `st-auth.js` checks referrer path for `_review`
+
+## Feature Toggling
+- Qipu commenting only shows in review mode
+- Base template always includes review code (safer than adding/removing)
+- CSS/JS dependencies stay consistent between versions
+- Feature flags controlled by URL pattern, not code changes
+
+## Implementation Notes
+1. Keep all review features in main template
+2. Use URL pattern for feature detection
+3. Maintain single source of truth
+4. Avoid code duplication
+
+## Review Process
+1. Client accesses review link (`*_review.html`)
+2. Loading screen provides orientation
+3. Redirects to main page with review features
+4. Auth detects review mode from path
+5. Features activate based on mode
+
+## Benefits
+- Consistent codebase
+- Easier maintenance
+- Clear feature separation
+- Safe production deploys
+- Simple rollback process
+
+## Template Structure
+```
+clients/
+  {client}/
+    index.html           # Client landing
+    {feature}.html       # Main template
+    {feature}_review.html # Review entry
+    assets/
+      js/
+        {client}-auth.js # Mode detection
+```
+
+## Review Mode Detection
+```javascript
+// Example auth.js pattern
+const isReviewMode = () => {
+    return document.referrer.includes('_review');
+};
+
+// Feature toggle example
+if (isReviewMode()) {
+    enableQipu();
+}
+``` 
