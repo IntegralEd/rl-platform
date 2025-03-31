@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<!-- Chatbase Wrapper Template - Temporary Live Version -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StriveTogether Goal Setter - Live Preview</title>
+    
+    <!-- Client level assets - minimal dependencies -->
+    <link rel="stylesheet" href="assets/css/st-variables.css">
+    <link rel="stylesheet" href="assets/css/st-custom.css">
+
+    <style>
+        :root {
+            --embed-width: 900px;
+            --header-height: 50px;
+            --primary-color: #425563;
+            --secondary-color: #E87722;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background: #f4f4f4;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: var(--embed-width);
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .app-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .header-logo {
+            height: 35px;
+            margin: 7.5px 0;
+            content: url('assets/images/ST TH Powered By White Logo.png');
+        }
+
+        .review-banner {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .tools-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .chatbase-container {
+            height: calc(100vh - var(--header-height) - 40px);
+            width: 100%;
+        }
+
+        /* Chatbase embed will go here */
+        #chatbase-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="review-banner">Live Preview - Chatbase Integration</div>
+        <header class="app-header">
+            <img class="header-logo" alt="StriveTogether Training Hub Logo">
+        </header>
+        <div class="chatbase-container">
+            <!-- Chatbase embed code goes here -->
+            <div id="chatbase-iframe"></div>
+        </div>
+    </div>
+</body>
+</html> 
