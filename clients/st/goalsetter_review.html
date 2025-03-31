@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<!-- Review Version: 2024-03-31 -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StriveTogether Goal Setter - Review Version</title>
+    
+    <!-- Platform level assets -->
+    <script src="/01_platform/assets/js/chat.js"></script>
+    
+    <!-- Client level assets -->
+    <script src="assets/js/st-auth.js"></script>
+    <link rel="stylesheet" href="assets/css/st-variables.css">
+    <link rel="stylesheet" href="assets/css/st-custom.css">
+
+    <!-- Qipu Integration -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+    <style>
+        /* Inherit all styles from goalsetter.html */
+        :root {
+            --nav-width: 20%;
+            --content-width: 80%;
+            --embed-width: 1200px;
+            --embed-height: 85vh;
+            --header-height: 50px;
+            --footer-height: 100px;
+            --border-color: #eee;
+            --page-margin: 20px;
+            --chat-button-size: 60px;
+            --play-button-size: 60px;
+            --primary-color: #425563;
+            --secondary-color: #E87722;
+            --tertiary-color: #4fa997;
+            --background-color: #f9f9f9;
+            --text-color: #2b2b2b;
+            --cta-text-color: #ffffff;
+            --client-font-h1: 'Arial, sans-serif';
+            --client-font-h2: 'Arial, sans-serif';
+            --client-font-body: 'Arial, sans-serif';
+            --client-font-size-h1: 28px;
+            --client-font-size-h2: 24px;
+            --client-font-size-body: 16px;
+        }
+
+        /* Review-specific styles */
+        .review-banner {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Qipu styles */
+        #paintbrush {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            user-select: none;
+            z-index: 1000;
+            color: white;
+        }
+
+        #annotation-tray {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #f7f7f7;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            z-index: 999;
+        }
+
+        .tool {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .tool:hover {
+            transform: scale(1.3);
+        }
+
+        #annotationCanvasContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 998;
+        }
+
+        #annotationCanvas {
+            border: 2px solid #333;
+        }
+
+        #submitComment {
+            position: absolute;
+            bottom: 90px;
+            right: 30px;
+            padding: 8px 16px;
+            cursor: pointer;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        /* Inherit remaining styles from goalsetter.html */
+        body {
+            margin: 0;
+            padding: var(--page-margin);
+            font-family: var(--client-font-body);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            background: #f4f4f4;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: var(--embed-width);
+            height: var(--embed-height);
+            display: flex;
+            flex-direction: column;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Header */
+        .app-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
+
+        .header-logo {
+            height: 35px;
+            margin: 7.5px 0;
+            content: url('assets/images/ST TH Powered By White Logo.png');
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100% - var(--header-height) - var(--footer-height));
+            min-height: 0;
+        }
+
+        /* Left Navigation */
+        .left-nav {
+            width: var(--nav-width);
+            border-right: 2px solid var(--primary-color);
+            padding: 16px 0;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 12px 16px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-color);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 3px;
+            background: var(--secondary-color);
+        }
+
+        /* Content Area */
+        .content-area {
+            width: var(--content-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 40px;
+            background: var(--background-color);
+        }
+
+        /* Chat iframe container */
+        .chat-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="review-banner">Review Version - For Testing Only</div>
+        <div class="app-header">
+            <img class="header-logo" alt="StriveTogether Logo">
+        </div>
+        <div class="main-container">
+            <div class="left-nav">
+                <button class="nav-tab active">Chat</button>
+            </div>
+            <div class="content-area">
+                <iframe 
+                    class="chat-container"
+                    src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
+                    title="Chat Interface"
+                ></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Qipu Integration -->
+    <div id="paintbrush">🖌️</div>
+    <div id="annotation-tray">
+        <div class="tool" id="drawTool">✏️</div>
+        <div class="tool" id="textTool">🔤</div>
+        <div class="tool" id="eraseTool">🧽</div>
+        <div class="tool" id="commentTool">💬</div>
+    </div>
+    <div id="annotationCanvasContainer">
+        <canvas id="annotationCanvas"></canvas>
+        <button id="submitComment">Submit Comment</button>
+    </div>
+
+    <script>
+        const paintbrush = document.getElementById('paintbrush');
+        const tray = document.getElementById('annotation-tray');
+        const canvasContainer = document.getElementById('annotationCanvasContainer');
+        const canvasElem = document.getElementById('annotationCanvas');
+        const submitBtn = document.getElementById('submitComment');
+
+        let canvas;
+
+        paintbrush.onclick = () => {
+            tray.style.transform = 'translateY(0)';
+        };
+
+        document.getElementById('drawTool').onclick = startAnnotation;
+        document.getElementById('textTool').onclick = startAnnotation;
+        document.getElementById('eraseTool').onclick = () => canvas.clear();
+        document.getElementById('commentTool').onclick = () => {
+            const comment = prompt('Enter your comment:');
+            if (comment) {
+                canvas.add(new fabric.Textbox(comment, {
+                    left: 50, top: 50, width: 200, fontSize:16
+                }));
+            }
+        };
+
+        async function startAnnotation() {
+            tray.style.transform = 'translateY(100%)';
+            canvasContainer.style.display = 'flex';
+
+            const screenshot = await html2canvas(document.body);
+            canvasElem.width = screenshot.width / 2;
+            canvasElem.height = screenshot.height / 2;
+
+            canvas = new fabric.Canvas('annotationCanvas', { isDrawingMode: true });
+            fabric.Image.fromURL(screenshot.toDataURL(), img => {
+                img.scale(0.5);
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+            });
+        }
+
+        submitBtn.onclick = () => {
+            const data = {
+                thread_id: window.location.href + '#' + Date.now(),
+                url: window.location.href,
+                timestamp: Date.now(),
+                user_id: 'user_uuid',
+                annotations: canvas.getObjects().map(obj => ({
+                    type: obj.type,
+                    content: obj.toDataURL ? obj.toDataURL() : obj.text,
+                    xy_position: { x: obj.left, y: obj.top }
+                })),
+                created_at: new Date().toISOString()
+            };
+
+            fetch('https://your-ticketing-system.com/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                canvasContainer.style.display = 'none';
+                canvas.clear();
+                alert('Comment submitted!');
+            });
+        };
+    </script>
+</body>
+</html> 
