@@ -1,0 +1,10 @@
+{
+  "Client_Name": "IE Central",
+  "Assets": {
+    "Client_Logo_URL": "assets/images/logo-iecentral.png"
+  },
+  "Accessibility": {
+    // Accessibility settings if any
+  },
+  "variablesTableID": "your_airtable_table_id"
+} 

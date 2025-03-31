@@ -1,0 +1,75 @@
+<!-- Version 1.0.1 - Last updated: 2023-06-15 -->
+
+<!-- Copy the code below into the site-wide preheader -->
+<!-- IntegralEd Central Styles and Scripts -->
+<link rel="stylesheet" href="https://integraled.github.io/recursive-learning/Assets/css/ie-core.css">
+<script src="https://integraled.github.io/recursive-learning/Assets/js/ie-core.js"></script>
+<!-- Copy above this line into the site-wide preheader -->
+
+<!-- Copy the code below into the custom code block on /chat -->
+<!-- Support Container -->
+<div id="ieSupportContainer"></div>
+
+<!-- Your JavaScript Code -->
+<script>
+  // Update the GITHUB_PAGES_URL constant
+  const GITHUB_PAGES_URL = 'https://integraled.github.io/recursive-learning/';
+  const CHAT_VERSION = '1.0.1'; // Update this when making changes to force cache refresh
+
+  function createIframe(userData) {
+    try {
+      // Extract user information with fallbacks
+      const userId = userData.userId || 'anonymous';
+
+      const config = {
+        userId: userId,
+        userName: userData.userName || 'there',
+        userEmail: userData.userEmail || '',
+        userOrg: userData.userOrg || 'Softr',
+        clientId: 'bmore', // This should be configured per installation
+        threadId: localStorage.getItem(`chat_thread_${userId}`)
+      };
+
+      // Import the URL builder
+      const { buildAppUrl } = window.RAGChat.utils;
+
+      // Build the iframe URL
+      const iframeUrl = buildAppUrl(config.clientId, {
+        User_ID: config.userId,
+        Organization: config.userOrg,
+        Name: config.userName,
+        thread_id: config.threadId,
+        ...(config.userEmail && { Email: config.userEmail })
+      });
+
+      // Create and configure iframe
+      const iframe = document.createElement('iframe');
+      iframe.src = iframeUrl;
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.frameBorder = '0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.id = `${config.clientId}-chat-iframe`;
+      iframe.title = 'Chat Assistant';
+
+      // Append iframe to the container
+      const iframeContainer = document.getElementById('ieSupportContainer');
+      iframeContainer.appendChild(iframe);
+
+      // Hide the loading message and show the iframe
+      const loadingMessage = document.getElementById('loading-message');
+      if (loadingMessage) {
+        loadingMessage.style.display = 'none';
+      }
+      iframeContainer.style.display = 'block';
+
+    } catch (error) {
+      console.error('Error creating iframe:', error);
+      throw error;
+    }
+  }
+
+  // Initialize the iframe (you may call this function when ready)
+  // createIframe(userData); // Uncomment and provide userData as needed
+</script>
+<!-- Copy above this line into the custom code block on /chat --> 
