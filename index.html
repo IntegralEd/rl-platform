@@ -52,29 +52,28 @@
 
         #curious-button {
             cursor: pointer;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: #fff;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: none;
             border: none;
-            border-radius: 4px;
+            opacity: 0.3;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
         #curious-button:hover {
-            background-color: var(--accent-color);
-            transform: scale(1.05);
+            opacity: 1;
+            transform: translateY(-2px);
         }
-        #curious-button .peek-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: transform 0.3s ease;
+        .peek-icon {
+            font-size: 24px;
+            position: relative;
+            animation: peek 3s infinite;
         }
-        #curious-button:hover .peek-icon {
-            transform: translateY(-50%) translateX(5px);
+        @keyframes peek {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
         }
 
         /* Form Panel Styles */
@@ -111,75 +110,32 @@
         }
 
         /* Site Index Styles */
-        #site-index-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
+        #site-index-panel {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
         }
-        #site-index-button:hover {
+        .directory-item {
+            margin: 10px 0;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .directory-item:hover {
             opacity: 1;
         }
-
-        #site-index-panel {
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 300px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .directory-item {
-            padding: 8px;
-            margin: 4px 0;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .directory-item:hover {
-            background: #f0f0f0;
-        }
-
         .directory-item a {
-            color: #333;
+            color: var(--dark-text-color);
             text-decoration: none;
-            display: block;
+            font-size: 0.9em;
         }
-
-        .directory-item a:hover {
-            color: var(--primary-color);
-        }
-
         .directory-header {
-            font-weight: bold;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .directory-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .directory-item .disabled-link {
-            color: #999;
-            pointer-events: none;
+            color: var(--primary-color);
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 5px;
         }
     </style>
 </head>
@@ -188,14 +144,23 @@
         <h3>Welcome to Recursive Learning</h3>
         <img src="/shared/assets/images/logo.png" alt="Recursive Learning Logo">
         <div class="verb-container" id="verb-container">
-            Learn • Reflect • Improve
+            Growing...
         </div>
-        <div style="margin: 20px 0;">
-            <a href="/clients/st/goalsetter.html" style="display: block; margin: 10px 0; padding: 10px; background: var(--primary-color); color: white; text-decoration: none; border-radius: 4px;">Goal Setter (Live Chatbase)</a>
-            <a href="/clients/st/goalsetter-review.html" style="display: block; margin: 10px 0; padding: 10px; background: var(--accent-color); color: white; text-decoration: none; border-radius: 4px;">Goal Setter Review (RL Platform)</a>
+        
+        <!-- Site Index Panel -->
+        <div id="site-index-panel">
+            <div class="directory-header">Site Directory</div>
+            <div class="directory-item">
+                <a href="/clients/st/goalsetter_live.html">ST Goal Setter (Live Chatbase)</a>
+            </div>
+            <div class="directory-item">
+                <a href="/clients/st/goalsetter_review.html">ST Goal Setter Review (RL Platform)</a>
+            </div>
         </div>
-        <div id="curious-button">
-            Get Started <span class="peek-icon">👀</span>
+
+        <!-- Subtle curious trigger -->
+        <div id="curious-button" title="Curious?">
+            <span class="peek-icon">👀</span>
         </div>
     </div>
 
@@ -205,60 +170,13 @@
         <iframe src="/shared/templates/form-template.html"></iframe>
     </div>
 
-    <!-- Site Index Button -->
-    <button id="site-index-button">Show Site Index</button>
-
-    <!-- Hidden Directory Panel -->
-    <div id="site-index-panel">
-        <div class="directory-header">Site Directory</div>
-        <div class="directory-item">
-            <a href="/clients/st/goalsetter.html">ST Goal Setter</a>
-        </div>
-        <div class="directory-item">
-            <a href="/clients/bhb/chat.html">BHB Chat</a>
-        </div>
-        <div class="directory-item disabled">
-            <a href="#" class="disabled-link">EL Merit Chat</a>
-        </div>
-    </div>
-
     <script>
-        // Verb animation
-        const verbs = ["Listening...", "Reflecting...", "Explaining...", "Teaching...", "Reaching...", "Growing...", "Evolving..."];
-        let currentIndex = 0;
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const verbContainer = document.getElementById("verb-container");
-            if (verbContainer) {
-                setInterval(() => {
-                    currentIndex = (currentIndex + 1) % verbs.length;
-                    verbContainer.innerText = verbs[currentIndex];
-                }, 2000);
-            }
-
-            // Site Index Toggle
-            const indexButton = document.getElementById('site-index-button');
-            const indexPanel = document.getElementById('site-index-panel');
-            
-            indexButton.addEventListener('click', () => {
-                indexPanel.style.display = indexPanel.style.display === 'none' ? 'block' : 'none';
-            });
-
-            // Form Panel Toggle
-            const curiousButton = document.getElementById('curious-button');
-            const formPanel = document.getElementById('form-panel');
-            const formOverlay = document.getElementById('form-overlay');
-
-            curiousButton.addEventListener('click', () => {
-                formPanel.style.display = 'block';
-                formOverlay.style.display = 'block';
-            });
-
-            formOverlay.addEventListener('click', () => {
-                formPanel.style.display = 'none';
-                formOverlay.style.display = 'none';
-            });
+        document.getElementById('curious-button').addEventListener('click', () => {
+            const panel = document.getElementById('site-index-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         });
+        // Initially hide the panel
+        document.getElementById('site-index-panel').style.display = 'none';
     </script>
 </body>
 </html> 
