@@ -8,7 +8,6 @@
     
     <!-- Platform level assets -->
     <script src="/01_platform/assets/js/chat.js"></script>
-    <script src="/01_platform/assets/js/auth.js"></script>
     
     <!-- Client level assets -->
     <script src="assets/js/st-auth.js"></script>
@@ -895,11 +894,22 @@
 
             // Set up event listeners
             const nextButton = document.querySelector('.next-button');
-            nextButton.addEventListener('click', startInterview);
+            nextButton.addEventListener('click', () => STAuth.startInterview());
 
             const sendButton = document.querySelector('.send-button');
-            sendButton.addEventListener('click', sendMessage);
+            sendButton.addEventListener('click', () => STAuth.sendMessage());
         });
+
+        // Update event listeners to use STAuth
+        document.querySelectorAll('input[name="standards"]').forEach(radio => {
+            radio.addEventListener('change', (e) => STAuth.handleStandardsChoice(e.target.value));
+        });
+
+        document.querySelectorAll('input[name="reflection"]').forEach(radio => {
+            radio.addEventListener('change', (e) => STAuth.handleReflectionChoice(e.target.value));
+        });
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => STAuth.handleChatKeypress(e));
     </script>
 </body>
 </html> 
