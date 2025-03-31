@@ -188,29 +188,24 @@ const ClientAuth = {
         interviewTab.disabled = false;
         this.switchTab('interview');
 
-        // Prepare context for the chat
-        let context = {
-            hasStandards: standardsChoice === 'yes',
-            hasReflection: reflectionChoice === 'yes',
-            standardsLink: '',
-            standardsDetail: '',
-            reflectionDetail: ''
-        };
-
-        if (context.hasStandards) {
-            context.standardsLink = document.getElementById('standards-link').value.trim();
-            context.standardsDetail = document.getElementById('standards-detail-input').value.trim();
-        }
-
-        if (context.hasReflection) {
-            context.reflectionDetail = document.getElementById('reflection-input').value.trim();
-        }
-
-        // Initialize chat with context
-        if (context.hasStandards || context.hasReflection) {
-            this.sendContextToAssistant(context);
+        // Prepare initial context message if any
+        if (standardsChoice === 'yes' || reflectionChoice === 'yes') {
+            let contextMessage = "Starting goal setting interview with context:\n";
+            if (standardsChoice === 'yes') {
+                const standardsLink = document.getElementById('standards-link').value.trim();
+                const standardsDetail = document.getElementById('standards-detail-input').value.trim();
+                contextMessage += `\nStandards Context:\n${standardsDetail}`;
+                if (standardsLink) {
+                    contextMessage += `\nStandards Link: ${standardsLink}`;
+                }
+            }
+            if (reflectionChoice === 'yes') {
+                const reflectionDetail = document.getElementById('reflection-input').value.trim();
+                contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
+            }
+            this.addMessage('user', contextMessage);
         } else {
-            this.startStandardInterview();
+            this.addMessage('user', "Let's start the goal setting interview.");
         }
     },
 
@@ -287,7 +282,7 @@ const ClientAuth = {
         const input = document.getElementById('chat-input');
         const message = input.value.trim();
         if (message) {
-            Chat.addMessage('user', message);
+            this.addMessage('user', message);
             this.state.chatState.messageCount++;
             input.value = '';
         }
@@ -315,7 +310,7 @@ const ClientAuth = {
         }
         
         // Show completion message
-        Chat.addMessage('assistant', 'Great! Your goal statements are complete. You can now access the tools section to download your goal-setting poster.');
+        this.addMessage('assistant', 'Great! Your goal statements are complete. You can now access the tools section to download your goal-setting poster.');
     },
 
     // Initialize
@@ -335,6 +330,15 @@ const ClientAuth = {
                 this.checkForGoalStatement(e.detail.content);
             }
         });
+    },
+
+    addMessage(type, content) {
+        const chatContainer = document.querySelector('.chat-container');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 };
 

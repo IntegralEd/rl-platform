@@ -536,55 +536,57 @@
 
             <!-- Content Area -->
             <main class="content-area">
-                <div class="form-container">
-                    <h1 class="form-title">Goal Setting</h1>
-                    
-                    <div class="form-section visible">
-                        <div class="form-group">
-                            <label>Would you like to consider academic standards in setting your goals?</label>
-                            <div class="radio-group">
-                                <div class="radio-option">
-                                    <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
-                                    <label>Yes</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
-                                    <label>No</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="standards-detail" class="context-section">
+                <div id="welcome-section">
+                    <div class="form-container">
+                        <h1 class="form-title">Goal Setting</h1>
+                        
+                        <div class="form-section visible">
                             <div class="form-group">
-                                <label>Please provide a link to or description of the relevant academic standards:</label>
-                                <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
-                                <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
-                                <div id="standards-validation" class="validation-message">
-                                    Please provide standards information or uncheck "Yes" to proceed without standards context
+                                <label>Would you like to consider academic standards in setting your goals?</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
+                                        <label>Yes</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
+                                        <label>No</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
-                            <div class="radio-group">
-                                <div class="radio-option">
-                                    <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
-                                    <label>Yes</label>
-                                </div>
-                                <div class="radio-option">
-                                    <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
-                                    <label>No</label>
+                            <div id="standards-detail" class="context-section">
+                                <div class="form-group">
+                                    <label>Please provide a link to or description of the relevant academic standards:</label>
+                                    <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
+                                    <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
+                                    <div id="standards-validation" class="validation-message">
+                                        Please provide standards information or uncheck "Yes" to proceed without standards context
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div id="reflection-detail" class="context-section">
                             <div class="form-group">
-                                <label>Tell me about the last PDSA cycle:</label>
-                                <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
-                                <div id="reflection-validation" class="validation-message">
-                                    Please provide reflection details or uncheck "Yes" to proceed without reflection
+                                <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
+                                <div class="radio-group">
+                                    <div class="radio-option">
+                                        <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
+                                        <label>Yes</label>
+                                    </div>
+                                    <div class="radio-option">
+                                        <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
+                                        <label>No</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="reflection-detail" class="context-section">
+                                <div class="form-group">
+                                    <label>Tell me about the last PDSA cycle:</label>
+                                    <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
+                                    <div id="reflection-validation" class="validation-message">
+                                        Please provide reflection details or uncheck "Yes" to proceed without reflection
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -600,9 +602,12 @@
                     </div>
                 </div>
 
-                <!-- Tools Section (hidden initially) -->
+                <!-- Tools Section -->
                 <div id="tools-section" style="display: none;">
-                    <!-- Export tools will go here -->
+                    <div class="form-container">
+                        <h1 class="form-title">Tools</h1>
+                        <p>Your goal-setting tools will appear here.</p>
+                    </div>
                 </div>
             </main>
         </div>
@@ -889,15 +894,26 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Chat module
-            Chat.init();
+            // Initialize STAuth
+            STAuth.init();
 
             // Set up event listeners
             const nextButton = document.querySelector('.next-button');
-            nextButton.addEventListener('click', () => STAuth.startInterview());
+            nextButton.addEventListener('click', () => {
+                if (checkFormCompletion()) {
+                    STAuth.startInterview();
+                }
+            });
 
             const sendButton = document.querySelector('.send-button');
-            sendButton.addEventListener('click', () => STAuth.sendMessage());
+            sendButton.addEventListener('click', () => {
+                const input = document.getElementById('chat-input');
+                const message = input.value.trim();
+                if (message) {
+                    STAuth.addMessage('user', message);
+                    input.value = '';
+                }
+            });
         });
 
         // Update event listeners to use STAuth
