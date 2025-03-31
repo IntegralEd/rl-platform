@@ -308,46 +308,57 @@
             box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
         }
 
+        /* Interaction Buttons */
         .interaction-button {
-            background: none;
-            border: none;
-            cursor: pointer;
             width: 60px;
             height: 60px;
             border-radius: 50%;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .interaction-button:disabled {
+            cursor: not-allowed;
+        }
+
+        .interaction-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(128, 128, 128, 0.6);
+            border-radius: 50%;
+            transition: opacity 0.3s ease;
+        }
+
+        .interaction-button.enabled::before {
+            opacity: 0;
         }
 
         .interaction-button.next-button {
-            background: #ccc;
+            background: var(--jade, #4FA997);
         }
 
-        .interaction-button.next-button.enabled {
-            background: var(--secondary-color, #E87722);
-            cursor: pointer;
-        }
-
-        .interaction-button.next-button.enabled:hover {
-            transform: scale(1.05);
-            background: #d66a1c;
-        }
-
-        .interaction-button.next-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background: #ccc;
+        .interaction-button.send-button {
+            background: var(--orange, #E87722);
         }
 
         .interaction-icon {
             width: 30px;
             height: 30px;
-            border-radius: 50%;
-            transition: background 0.2s;
+            transition: transform 0.2s ease;
+        }
+
+        .interaction-button.enabled:hover .interaction-icon {
+            transform: scale(1.1);
         }
 
         .sr-only {
@@ -729,6 +740,11 @@
             // Enable/disable next button
             nextButton.disabled = !isComplete;
             nextButton.classList.toggle('enabled', isComplete);
+
+            // If both are "no", enable chat immediately
+            if (isComplete && standardsChoice === 'no' && reflectionChoice === 'no') {
+                startInterview();
+            }
         }
 
         function sendToWebhook() {
@@ -768,55 +784,62 @@
         }
 
         function startInterview() {
-            // Construct initial context message
-            const contextMessage = {
-                user_data: {
-                    assistant_id: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
-                    org_id: 'recsK5zK0CouK5ebW',
-                    intake_token: 'goalsetter_chat'
-                },
-                form_data: {
-                    standards: {
-                        consider: formState.standardsChoice === 'yes',
-                        link: formState.standardsLink,
-                        details: formState.standardsDetail
-                    },
-                    reflection: {
-                        include: formState.reflectionChoice === 'yes',
-                        previousCycle: formState.reflectionDetail
-                    }
-                }
+            const standardsChoice = document.querySelector('input[name="standards"]:checked').value;
+            const reflectionChoice = document.querySelector('input[name="reflection"]:checked').value;
+            
+            // Prepare context for the chat
+            let context = {
+                hasStandards: standardsChoice === 'yes',
+                hasReflection: reflectionChoice === 'yes'
             };
 
-            // Call Lambda endpoint to initialize chat
-            fetch('https://[YOUR_LAMBDA_ENDPOINT]/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(contextMessage)
-            })
-            .then(response => response.json())
-            .then(data => {
-                window.threadId = data.thread_id;
-                // Enable interview tab and switch to it
-                document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]').disabled = false;
-                switchTab('interview');
-                
-                // Display initial assistant message
-                const chatContainer = document.querySelector('.chat-container');
-                chatContainer.innerHTML = '';
-                const assistantBubble = document.createElement('div');
-                assistantBubble.className = 'message assistant';
-                assistantBubble.textContent = data.message;
-                chatContainer.appendChild(assistantBubble);
-            })
-            .catch(error => console.error('Error:', error));
+            if (context.hasStandards) {
+                context.standardsLink = document.getElementById('standards-link').value.trim();
+                context.standardsDetail = document.getElementById('standards-detail-input').value.trim();
+            }
+
+            if (context.hasReflection) {
+                context.reflectionDetail = document.getElementById('reflection-input').value.trim();
+            }
+
+            // Hide form container and show chat
+            document.querySelector('.form-container').style.display = 'none';
+            document.querySelector('.chatbar').style.display = 'flex';
+            document.querySelector('.playbar').style.display = 'none';
+
+            // Initialize chat with context
+            if (context.hasStandards || context.hasReflection) {
+                // Send context to assistant for tailored interview
+                sendContextToAssistant(context);
+            } else {
+                // Start standard interview flow
+                startStandardInterview();
+            }
         }
 
-        function sendMessage() {
-            const input = document.querySelector('.chat-input');
-            const message = input.value.trim();
+        function sendContextToAssistant(context) {
+            // Format context message for the assistant
+            let contextMessage = "Starting goal setting interview with context:\n";
+            if (context.hasStandards) {
+                contextMessage += `\nStandards Context:\n${context.standardsDetail}`;
+                if (context.standardsLink) {
+                    contextMessage += `\nStandards Link: ${context.standardsLink}`;
+                }
+            }
+            if (context.hasReflection) {
+                contextMessage += `\nPrevious Cycle Reflection:\n${context.reflectionDetail}`;
+            }
+
+            // Send to chat endpoint
+            sendMessage(contextMessage, true);
+        }
+
+        function startStandardInterview() {
+            // Trigger standard interview flow without context
+            sendMessage("Let's start the goal setting interview.", true);
+        }
+
+        function sendMessage(message, isContextMessage = false) {
             const chatContainer = document.querySelector('.chat-container');
             
             if (!message) return;
@@ -851,7 +874,10 @@
                 });
             }
             
-            input.value = '';
+            if (isContextMessage) {
+                // Handle context message
+                // This is a placeholder and should be replaced with actual context handling logic
+            }
         }
 
         function showCompletionModal() {
