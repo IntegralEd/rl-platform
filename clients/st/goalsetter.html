@@ -138,76 +138,115 @@
             width: var(--content-width);
             display: flex;
             flex-direction: column;
-            min-height: 0; /* Allow flex shrinking */
+            min-height: 0;
+            padding: 40px;
+            background: var(--background-color, #f9f9f9);
         }
 
-        /* Welcome Form */
-        .welcome-form {
-            max-width: 600px;
+        /* Form Container */
+        .form-container {
+            max-width: 800px;
             margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
         }
 
+        /* Form Section */
+        .form-section {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .form-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Form Groups */
         .form-group {
             margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: normal;
-            font-family: Arial, sans-serif;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--text-color, #2b2b2b);
+            font-family: var(--client-font-body, Arial, sans-serif);
         }
 
+        /* Radio Groups */
         .radio-group {
             display: flex;
             gap: 24px;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .radio-option {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .radio-option:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        /* Form Inputs */
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color, #ddd);
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color, #E87722);
+            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
         }
 
         textarea {
-            width: 100%;
-            min-height: 72px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-family: inherit;
+            min-height: 100px;
             resize: vertical;
         }
 
-        .standards-link {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-family: inherit;
-            margin-bottom: 12px;
-        }
-
-        /* Form title styling */
-        .welcome-form h1 {
-            color: #2b2b2b;
-            font-size: 28px;
+        /* Form Title */
+        .form-title {
+            color: var(--text-color, #2b2b2b);
+            font-size: var(--client-font-size-h1, 28px);
             margin-bottom: 32px;
-            font-family: var(--client-font-h1);
+            font-family: var(--client-font-h1, Arial, sans-serif);
         }
 
-        /* Standards detail section */
+        /* Context Sections */
         .context-section {
             display: none;
             margin-top: 24px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
         }
 
         .context-section.visible {
             display: block;
             opacity: 1;
+            transform: translateY(0);
         }
 
         /* Button base styles */
@@ -494,47 +533,52 @@
 
             <!-- Content Area -->
             <main class="content-area">
-                <!-- Welcome Form -->
-                <div id="welcome-section" class="welcome-form">
-                    <h1>Continuous Improvement Goals</h1>
+                <div class="form-container">
+                    <h1 class="form-title">Goal Setting</h1>
                     
-                    <div class="form-group">
-                        <label>Would you like to consider any academic standards when setting goals for this cycle?</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
-                                <label>Yes</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
-                                <label>No</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="standards-detail" class="context-section form-group">
-                        <label>Please provide a link to or description of the relevant academic standards:</label>
-                        <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
-                        <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
-                                <label>Yes</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
-                                <label>No</label>
+                    <div class="form-section visible">
+                        <div class="form-group">
+                            <label>Would you like to consider academic standards in setting your goals?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
+                                    <label>Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
+                                    <label>No</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div id="reflection-detail" class="context-section form-group">
-                        <label>Tell me about the last PDSA cycle:</label>
-                        <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
+                        <div id="standards-detail" class="context-section">
+                            <div class="form-group">
+                                <label>Please provide a link to or description of the relevant academic standards:</label>
+                                <input type="text" id="standards-link" class="standards-link" placeholder="Paste standards URL here (optional)">
+                                <textarea id="standards-detail-input" placeholder="Describe the standards you'd like to focus on..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
+                                    <label>Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
+                                    <label>No</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="reflection-detail" class="context-section">
+                            <div class="form-group">
+                                <label>Tell me about the last PDSA cycle:</label>
+                                <textarea id="reflection-input" placeholder="What worked well? What could be improved? What did you learn?"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
