@@ -360,23 +360,49 @@ const STAuth = {
         this.addMessage('assistant', 'Great! Your goal statements are complete. You can now access the tools section to download your goal-setting poster.');
     },
 
-    // Initialize
-    init() {
-        // Check initial access
-        if (!this.validateAccess()) {
-            console.error('Access denied');
-            return;
+    // Feature detection
+    isReviewMode: () => {
+        return document.referrer.includes('_review') || 
+               window.location.search.includes('review=true');
+    },
+
+    // Initialize features based on mode
+    init: () => {
+        if (STAuth.isReviewMode()) {
+            STAuth.enableReviewFeatures();
         }
+        STAuth.setupCommonFeatures();
+    },
 
-        // Initialize form validation
-        this.initFormValidation();
+    // Enable review-specific features
+    enableReviewFeatures: () => {
+        // Enable Qipu
+        if (window.Qipu) {
+            Qipu.init();
+        }
+        
+        // Add review banner if not exists
+        if (!document.querySelector('.review-banner')) {
+            const banner = document.createElement('div');
+            banner.className = 'review-banner';
+            banner.textContent = 'Review Mode - Comments Enabled';
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
+    },
 
-        // Listen for chat messages
-        document.addEventListener('chat:message', (e) => {
-            if (e.detail.role === 'assistant') {
-                this.checkForGoalStatement(e.detail.content);
-            }
-        });
+    // Setup features common to all modes
+    setupCommonFeatures: () => {
+        // Common initialization code
+        STAuth.setupEventListeners();
+    },
+
+    // Event listeners
+    setupEventListeners: () => {
+        // Handle chat input
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.addEventListener('keypress', STAuth.handleChatKeypress);
+        }
     },
 
     addMessage(type, content) {
@@ -389,5 +415,5 @@ const STAuth = {
     }
 };
 
-// Initialize client auth
-STAuth.init(); 
+// Initialize on load
+document.addEventListener('DOMContentLoaded', STAuth.init); 
