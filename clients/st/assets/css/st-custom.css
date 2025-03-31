@@ -1,4 +1,3 @@
-
 /* StriveTogether Brand Custom CSS */
 
 /* === Color Variables === */
@@ -83,4 +82,213 @@ h4, h5, h6 {
   color: var(--white);
   font-weight: bold;
   font-size: 0.875rem;
+}
+
+/* Chat Container */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--background-color);
+}
+
+/* Chat Messages */
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    line-height: 1.5;
+    position: relative;
+}
+
+.message.user {
+    background: var(--primary-color);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.message.assistant {
+    background: white;
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message.typing {
+    background: white;
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    animation: typing 1s infinite;
+}
+
+/* Chat Input Area */
+.chatbar {
+    display: none;
+    padding: 16px;
+    background: white;
+    border-top: 1px solid var(--border-color);
+    position: relative;
+    align-items: center;
+    gap: 16px;
+}
+
+.chatbar.active {
+    display: flex;
+}
+
+/* Interaction Container */
+.interaction-container {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-shrink: 0;
+    background: var(--primary-color);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+.interaction-bar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
+.interaction-left, .interaction-right {
+    width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.interaction-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.chat-input-group {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.interaction-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    background: white;
+    min-height: 24px;
+    max-height: 120px;
+    resize: none;
+    line-height: 1.4;
+    transition: all 0.2s ease;
+}
+
+.interaction-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
+}
+
+/* Interaction Icons */
+.interaction-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.interaction-button:hover .interaction-icon {
+    transform: scale(1.1);
+}
+
+/* Loading Animation */
+@keyframes typing {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
+/* Error States */
+.error-message {
+    background: #fee;
+    color: #c00;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .message {
+        max-width: 90%;
+    }
+    
+    .chatbar {
+        padding: 12px;
+    }
+    
+    .chat-input {
+        font-size: 14px;
+    }
+}
+
+/* Interaction Buttons */
+.interaction-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    background: var(--secondary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.interaction-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.interaction-button:active {
+    transform: scale(0.95);
+}
+
+.interaction-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.interaction-button.enabled {
+    background: var(--secondary-color);
+}
+
+.interaction-button.next-button {
+    background: var(--secondary-color);
+}
+
+.interaction-button.send-button {
+    background: var(--secondary-color);
 }

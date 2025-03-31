@@ -42,8 +42,9 @@ Interactive goal-setting tool that guides educators through a structured process
 ## CRITICAL NEXT STEPS
 1. **Platform Integration**
    ```javascript
-   // Need to implement in platform chat.js
-   - Base endpoint: '/01_platform/assets/js/chat.js'
+   // Required in chat.js
+   - Assistant ID: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma'
+   - Base endpoint: '/shared/assets/js/chat.js'
    - Core message handling
    - Thread management
    ```
@@ -82,8 +83,8 @@ Interactive goal-setting tool that guides educators through a structured process
 
 ### Platform Assets
 ```html
-<!-- Critical Dependency -->
-<script src="/01_platform/assets/js/chat.js"></script>
+<!-- Required Platform Scripts -->
+<script src="/shared/assets/js/chat.js"></script>
 
 <!-- Client Assets (Complete) -->
 <script src="assets/js/st-auth.js"></script>
