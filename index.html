@@ -10,7 +10,7 @@
             --secondary: #E87722;
             --bg-light: #f5f5f5;
             --text: #2b2b2b;
-            --toc-width: 33vw;
+            --panel-width: 450px;
         }
 
         body {
@@ -23,10 +23,10 @@
             background: white;
         }
 
-        .toc-trigger {
+        .directory-trigger {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            right: 20px;
             width: 50px;
             height: 50px;
             border-radius: 25px;
@@ -43,18 +43,18 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .toc-trigger:hover {
+        .directory-trigger:hover {
             transform: scale(1.1);
         }
 
-        .toc-panel {
+        .directory-panel {
             position: fixed;
             top: 0;
-            left: calc(-1 * var(--toc-width));
-            width: var(--toc-width);
+            right: calc(-1 * var(--panel-width));
+            width: var(--panel-width);
             height: 100vh;
             background: white;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
             z-index: 999;
             padding: 2rem;
@@ -62,11 +62,11 @@
             overflow-y: auto;
         }
 
-        .toc-panel.visible {
-            transform: translateX(100%);
+        .directory-panel.visible {
+            transform: translateX(-100%);
         }
 
-        .toc-overlay {
+        .directory-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -79,28 +79,42 @@
             z-index: 998;
         }
 
-        .toc-overlay.visible {
+        .directory-overlay.visible {
             opacity: 1;
             visibility: visible;
         }
 
-        .toc-section {
-            margin-bottom: 2rem;
+        .client-section {
+            margin-bottom: 3rem;
         }
 
-        .toc-section h1 {
+        .client-name {
             color: var(--primary);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin: 0 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
         }
 
-        .toc-section h3 {
+        .page-group {
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #eee;
+        }
+
+        .page-name {
             color: var(--secondary);
             font-size: 1.2rem;
             margin: 1.5rem 0 1rem;
         }
 
-        .toc-entry {
+        .view-list {
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #eee;
+        }
+
+        .view-item {
             margin: 1rem 0;
             padding: 1rem;
             background: var(--bg-light);
@@ -108,58 +122,67 @@
             position: relative;
         }
 
-        .toc-entry-title {
+        .view-title {
             font-weight: 600;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .toc-entry-url {
+        .status-badge {
+            font-size: 0.8em;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: #ddd;
+        }
+
+        .status-badge.review { background: #E87722; color: white; }
+        .status-badge.prod { background: #4CAF50; color: white; }
+        .status-badge.temp { background: #FFC107; }
+
+        .view-url {
             font-family: monospace;
             color: #666;
             font-size: 0.9em;
-            margin-bottom: 0.5rem;
+            margin: 0.5rem 0;
             word-break: break-all;
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
         }
 
-        .toc-entry-description {
-            font-size: 0.9em;
-            color: #555;
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
             margin-top: 0.5rem;
         }
 
-        .copy-button {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: none;
+        .action-button {
+            padding: 0.4rem 0.8rem;
             border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-
-        .copy-button:hover {
-            opacity: 1;
-        }
-
-        .copy-feedback {
-            position: absolute;
-            top: 0.5rem;
-            right: 2.5rem;
-            background: var(--primary);
-            color: white;
-            padding: 0.3rem 0.6rem;
             border-radius: 4px;
-            font-size: 0.8em;
-            opacity: 0;
-            transform: translateY(-10px);
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
             transition: all 0.2s;
         }
 
-        .copy-feedback.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .copy-button {
+            background: var(--primary);
+            color: white;
+        }
+
+        .launch-button {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         main {
@@ -181,40 +204,100 @@
             font-size: 2rem;
             margin: 2rem 0;
         }
+
+        .coming-soon {
+            color: #999;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
-    <button class="toc-trigger" id="tocTrigger">👀</button>
+    <button class="directory-trigger" id="directoryTrigger">👀</button>
     
-    <div class="toc-overlay" id="tocOverlay"></div>
+    <div class="directory-overlay" id="directoryOverlay"></div>
     
-    <nav class="toc-panel" id="tocPanel">
-        <div class="toc-section">
-            <h1>Strive Together</h1>
-            <h3>Goal Setter Interview:</h3>
+    <nav class="directory-panel" id="directoryPanel">
+        <div class="client-section">
+            <h1 class="client-name">StriveTogether</h1>
             
-            <div class="toc-entry">
-                <button class="copy-button" data-url="clients/st/goalsetter.html">📋</button>
-                <div class="copy-feedback">URL copied!</div>
-                <div class="toc-entry-title">Base Template</div>
-                <div class="toc-entry-url">clients/st/goalsetter.html</div>
-                <div class="toc-entry-description">Core template with full features. Can be viewed directly or embedded. Contains all dependencies and Qipu support.</div>
-            </div>
+            <div class="page-group">
+                <h2 class="page-name">Goal Setter Interview</h2>
+                
+                <div class="view-list">
+                    <div class="view-item">
+                        <div class="view-title">
+                            Core Implementation
+                            <span class="status-badge prod">PROD</span>
+                        </div>
+                        <div class="view-url">https://recursivelearning.app/clients/st/goalsetter.html</div>
+                        <div class="action-buttons">
+                            <button class="action-button copy-button" data-url="https://recursivelearning.app/clients/st/goalsetter.html">
+                                📋 Copy URL
+                            </button>
+                            <button class="action-button launch-button" onclick="window.open('https://recursivelearning.app/clients/st/goalsetter.html')">
+                                🚀 Launch
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="toc-entry">
-                <button class="copy-button" data-url="clients/st/goalsetter_review.html">📋</button>
-                <div class="copy-feedback">URL copied!</div>
-                <div class="toc-entry-title">Review Interface</div>
-                <div class="toc-entry-url">clients/st/goalsetter_review.html</div>
-                <div class="toc-entry-description">Review version with embedded base template and Qipu commenting tools. For team feedback and annotations.</div>
-            </div>
+                    <div class="view-item">
+                        <div class="view-title">
+                            Review Interface
+                            <span class="status-badge review">REVIEW</span>
+                        </div>
+                        <div class="view-url">https://recursivelearning.app/clients/st/goalsetter_review.html</div>
+                        <div class="action-buttons">
+                            <button class="action-button copy-button" data-url="https://recursivelearning.app/clients/st/goalsetter_review.html">
+                                📋 Copy URL
+                            </button>
+                            <button class="action-button launch-button" onclick="window.open('https://recursivelearning.app/clients/st/goalsetter_review.html')">
+                                🚀 Launch
+                            </button>
+                        </div>
+                    </div>
 
-            <div class="toc-entry">
-                <button class="copy-button" data-url="clients/st/goalsetter_live.html">📋</button>
-                <div class="copy-feedback">URL copied!</div>
-                <div class="toc-entry-title">Public Interface</div>
-                <div class="toc-entry-url">clients/st/goalsetter_live.html</div>
-                <div class="toc-entry-description">Minimal Chatbase wrapper for public use. Clean, focused interface for end users.</div>
+                    <div class="view-item">
+                        <div class="view-title">
+                            Production Router
+                            <span class="status-badge prod">STABLE</span>
+                        </div>
+                        <div class="view-url">https://recursivelearning.app/clients/st/goalsetter_live.html</div>
+                        <div class="action-buttons">
+                            <button class="action-button copy-button" data-url="https://recursivelearning.app/clients/st/goalsetter_live.html">
+                                📋 Copy URL
+                            </button>
+                            <button class="action-button launch-button" onclick="window.open('https://recursivelearning.app/clients/st/goalsetter_live.html')">
+                                🚀 Launch
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="view-item">
+                        <div class="view-title">
+                            Sprint Placeholder
+                            <span class="status-badge temp">TEMP</span>
+                        </div>
+                        <div class="view-url">https://recursivelearning.app/clients/st/goalsetter_temp.html</div>
+                        <div class="action-buttons">
+                            <button class="action-button copy-button" data-url="https://recursivelearning.app/clients/st/goalsetter_temp.html">
+                                📋 Copy URL
+                            </button>
+                            <button class="action-button launch-button" onclick="window.open('https://recursivelearning.app/clients/st/goalsetter_temp.html')">
+                                🚀 Launch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="page-name">Policy Pal <span class="coming-soon">(Coming Soon)</span></h2>
+            </div>
+        </div>
+
+        <div class="client-section">
+            <h1 class="client-name">ELPL Professional Learning</h1>
+            
+            <div class="page-group">
+                <h2 class="page-name">Merit <span class="coming-soon">(Coming Soon)</span></h2>
             </div>
         </div>
     </nav>
@@ -225,18 +308,18 @@
     </main>
 
     <script>
-        // TOC Panel Toggle
-        const tocTrigger = document.getElementById('tocTrigger');
-        const tocPanel = document.getElementById('tocPanel');
-        const tocOverlay = document.getElementById('tocOverlay');
+        // Directory Panel Toggle
+        const directoryTrigger = document.getElementById('directoryTrigger');
+        const directoryPanel = document.getElementById('directoryPanel');
+        const directoryOverlay = document.getElementById('directoryOverlay');
         
-        function toggleTOC() {
-            tocPanel.classList.toggle('visible');
-            tocOverlay.classList.toggle('visible');
+        function toggleDirectory() {
+            directoryPanel.classList.toggle('visible');
+            directoryOverlay.classList.toggle('visible');
         }
         
-        tocTrigger.addEventListener('click', toggleTOC);
-        tocOverlay.addEventListener('click', toggleTOC);
+        directoryTrigger.addEventListener('click', toggleDirectory);
+        directoryOverlay.addEventListener('click', toggleDirectory);
 
         // Clipboard functionality
         document.querySelectorAll('.copy-button').forEach(button => {
@@ -244,11 +327,13 @@
                 const url = button.dataset.url;
                 navigator.clipboard.writeText(url);
                 
-                const feedback = button.nextElementSibling;
-                feedback.classList.add('visible');
+                const originalText = button.innerHTML;
+                button.innerHTML = '✅ Copied!';
+                button.style.background = '#4CAF50';
                 
                 setTimeout(() => {
-                    feedback.classList.remove('visible');
+                    button.innerHTML = originalText;
+                    button.style.background = '';
                 }, 2000);
             });
         });

@@ -59,4 +59,117 @@ const isReviewMode = () => {
 if (isReviewMode()) {
     enableQipu();
 }
+```
+
+# Client Review Pattern
+
+## URL Pattern
+
+Each client implementation follows a stable URL pattern:
+
+```
+[client-id]/
+├── example.html           # Core implementation
+├── example_live.html      # Production router
+├── example_review.html    # Review interface
+└── example_temp.html      # Sprint placeholder
+```
+
+### File Purposes
+
+1. `example.html` - Core Implementation
+   - Contains full feature set
+   - No redirects
+   - Pure implementation
+   - Source of truth
+
+2. `example_live.html` - Production Router
+   - Points to either core or temp version
+   - Controlled by `IN_PRODUCTION_SPRINT` flag
+   - Simple redirect mechanism
+   - No content, just routing logic
+
+3. `example_review.html` - Review Interface
+   - Iframes core implementation
+   - Adds Qipu commenting overlay
+   - Maintains stable review URL
+   - Team feedback and annotations
+
+4. `example_temp.html` - Sprint Placeholder
+   - Temporary content (e.g. Chatbase)
+   - Used during production sprints
+   - Independent implementation
+   - Clear "in progress" indicators
+
+## Sprint Management
+
+1. Development Phase:
+   - Work directly on core implementation
+   - Use review interface for team feedback
+   - Keep temp version ready
+
+2. Production Sprint:
+   - Set `IN_PRODUCTION_SPRINT = true` in live version
+   - Traffic routed to temp version
+   - Continue development on core
+   - Clear visual indicators for users
+
+3. Production Release:
+   - Set `IN_PRODUCTION_SPRINT = false`
+   - Traffic returns to core version
+   - No file renames needed
+   - Smooth transition
+
+## Benefits
+
+1. URL Stability
+   - All URLs remain constant
+   - No circular redirects
+   - Clear purpose for each file
+   - Easy to communicate to team
+
+2. Development Flow
+   - Parallel development possible
+   - Safe testing environment
+   - Clear separation of concerns
+   - Easy to toggle states
+
+3. Review Process
+   - Dedicated review interface
+   - Qipu integration for feedback
+   - No impact on production
+   - Team can comment freely
+
+## Implementation Notes
+
+1. File Naming
+   - Core: `name.html`
+   - Live: `name_live.html`
+   - Review: `name_review.html`
+   - Temp: `name_temp.html`
+
+2. Review Features
+   - Qipu commenting
+   - Visual indicators
+   - Iframe containment
+   - Team-only access
+
+3. Production Toggle
+   - Single flag in live version
+   - Instant switching
+   - No deployment needed
+   - Clear status indicators
+
+## Template Structure
+
+```html
+<!-- example_live.html -->
+<script>
+    const IN_PRODUCTION_SPRINT = true;
+    window.location.replace(
+        IN_PRODUCTION_SPRINT 
+            ? 'example_temp.html'
+            : 'example.html'
+    );
+</script>
 ``` 
