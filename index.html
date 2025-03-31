@@ -11,6 +11,11 @@
             --primary-color: #007BFF;
             --accent-color: #0056b3;
             --dark-text-color: #111;
+            --primary: #004080;
+            --secondary: #E87722;
+            --bg-light: #f5f5f5;
+            --text: #2b2b2b;
+            --toc-width: 33vw;
         }
 
         body {
@@ -22,6 +27,12 @@
             min-height: 100vh;
             margin: 0;
             position: relative;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         #main-container {
@@ -176,6 +187,148 @@
             color: #666;
             font-size: 0.9em;
         }
+
+        .toc-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toc-trigger:hover {
+            transform: scale(1.1);
+        }
+
+        .toc-panel {
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--toc-width));
+            width: var(--toc-width);
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            padding: 2rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .toc-panel.visible {
+            transform: translateX(100%);
+        }
+
+        .toc-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 998;
+        }
+
+        .toc-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toc-section {
+            margin-bottom: 2rem;
+        }
+
+        .toc-section h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 0 0 1rem;
+        }
+
+        .toc-section h3 {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .toc-entry {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .toc-entry-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-entry-url {
+            font-family: monospace;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+        }
+
+        .toc-entry-description {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 0.5rem;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .copy-button:hover {
+            opacity: 1;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            top: 0.5rem;
+            right: 2.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8em;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+        }
+
+        .copy-feedback.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        main {
+            padding: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -218,9 +371,76 @@
         </div>
     </div>
 
+    <button class="toc-trigger" id="tocTrigger">👀</button>
+    
+    <div class="toc-overlay" id="tocOverlay"></div>
+    
+    <nav class="toc-panel" id="tocPanel">
+        <div class="toc-section">
+            <h1>Strive Together</h1>
+            <h3>Goal Setter Interview:</h3>
+            
+            <div class="toc-entry">
+                <button class="copy-button" data-url="clients/st/goalsetter.html">📋</button>
+                <div class="copy-feedback">URL copied!</div>
+                <div class="toc-entry-title">Base Template</div>
+                <div class="toc-entry-url">clients/st/goalsetter.html</div>
+                <div class="toc-entry-description">Core template with full features. Can be viewed directly or embedded. Contains all dependencies and Qipu support.</div>
+            </div>
+
+            <div class="toc-entry">
+                <button class="copy-button" data-url="clients/st/goalsetter_review.html">📋</button>
+                <div class="copy-feedback">URL copied!</div>
+                <div class="toc-entry-title">Review Interface</div>
+                <div class="toc-entry-url">clients/st/goalsetter_review.html</div>
+                <div class="toc-entry-description">Review version with embedded base template and Qipu commenting tools. For team feedback and annotations.</div>
+            </div>
+
+            <div class="toc-entry">
+                <button class="copy-button" data-url="clients/st/goalsetter_live.html">📋</button>
+                <div class="copy-feedback">URL copied!</div>
+                <div class="toc-entry-title">Public Interface</div>
+                <div class="toc-entry-url">clients/st/goalsetter_live.html</div>
+                <div class="toc-entry-description">Minimal Chatbase wrapper for public use. Clean, focused interface for end users.</div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Main content here -->
+    </main>
+
     <script>
         document.getElementById('curious-trigger').addEventListener('click', () => {
             window.location.href = '/shared/templates/form-template.html';
+        });
+
+        // TOC Panel Toggle
+        const tocTrigger = document.getElementById('tocTrigger');
+        const tocPanel = document.getElementById('tocPanel');
+        const tocOverlay = document.getElementById('tocOverlay');
+        
+        function toggleTOC() {
+            tocPanel.classList.toggle('visible');
+            tocOverlay.classList.toggle('visible');
+        }
+        
+        tocTrigger.addEventListener('click', toggleTOC);
+        tocOverlay.addEventListener('click', toggleTOC);
+
+        // Clipboard functionality
+        document.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const url = button.dataset.url;
+                navigator.clipboard.writeText(url);
+                
+                const feedback = button.nextElementSibling;
+                feedback.classList.add('visible');
+                
+                setTimeout(() => {
+                    feedback.classList.remove('visible');
+                }, 2000);
+            });
         });
     </script>
 </body>
