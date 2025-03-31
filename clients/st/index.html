@@ -70,6 +70,15 @@
             background: #e8f5e9;
             display: none;
         }
+        #temp-config {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #temp-config.visible {
+            display: block;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -122,10 +131,18 @@
             }
         };
 
-        // Save to localStorage on load
+        // Initialize on first load
         if (!localStorage.getItem('adminPanelState')) {
             localStorage.setItem('adminPanelState', JSON.stringify(defaultState));
         }
+
+        // Handle radio button changes
+        document.querySelectorAll('input[name="status"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const tempConfig = document.getElementById('temp-config');
+                tempConfig.classList.toggle('visible', e.target.value === 'temp');
+            });
+        });
 
         function saveConfig() {
             const status = document.querySelector('input[name="status"]:checked').value;
@@ -161,7 +178,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             const state = JSON.parse(localStorage.getItem('adminPanelState'));
             if (state) {
-                document.querySelector(`input[value="${state.pages.goalsetter.status}"]`).checked = true;
+                // Set radio button
+                const radio = document.querySelector(`input[value="${state.pages.goalsetter.status}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    // Show/hide temp config
+                    const tempConfig = document.getElementById('temp-config');
+                    tempConfig.classList.toggle('visible', state.pages.goalsetter.status === 'temp');
+                }
+                
+                // Set temp values
                 document.getElementById('temp-url').value = state.pages.goalsetter.tempUrl || '';
                 document.getElementById('width').value = state.pages.goalsetter.displaySettings?.width || '100%';
                 document.getElementById('height').value = state.pages.goalsetter.displaySettings?.height || '100%';

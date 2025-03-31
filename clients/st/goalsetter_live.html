@@ -270,7 +270,16 @@
                 const config = JSON.parse(state);
                 return config.pages.goalsetter;
             }
-            return { status: 'prod' };
+            // Default to temp mode if no state
+            return {
+                status: 'temp',
+                tempUrl: 'https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p',
+                displaySettings: {
+                    width: '100%',
+                    height: '100%',
+                    responsive: true
+                }
+            };
         };
 
         // Initialize page based on config
@@ -282,26 +291,27 @@
             const loading = document.querySelector('.loading');
             if (loading) loading.remove();
 
+            // Default to temp mode unless explicitly set to prod or review
+            if (config.status !== 'prod' && config.status !== 'review') {
+                const iframeContainer = document.createElement('div');
+                iframeContainer.className = 'iframe-container';
+                iframeContainer.innerHTML = `
+                    <iframe
+                        src="${config.tempUrl || 'https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p'}"
+                        width="${config.displaySettings?.width || '100%'}"
+                        height="${config.displaySettings?.height || '100%'}"
+                        frameborder="0"
+                    ></iframe>
+                `;
+                contentArea.appendChild(iframeContainer);
+                return;
+            }
+
             switch(config.status) {
-                case 'temp':
-                    if (config.tempUrl) {
-                        const iframeContainer = document.createElement('div');
-                        iframeContainer.className = 'iframe-container';
-                        iframeContainer.innerHTML = `
-                            <iframe
-                                src="${config.tempUrl}"
-                                width="${config.displaySettings?.width || '100%'}"
-                                height="${config.displaySettings?.height || '100%'}"
-                                frameborder="0"
-                            ></iframe>
-                        `;
-                        contentArea.appendChild(iframeContainer);
-                    }
-                    break;
                 case 'review':
                     window.location.replace('goalsetter_review.html');
                     break;
-                default:
+                case 'prod':
                     // Production chat interface
                     const chatContainer = document.createElement('div');
                     chatContainer.className = 'chat-container';
@@ -312,6 +322,7 @@
                     welcomeMessage.className = 'message assistant';
                     welcomeMessage.textContent = "Hi! I'm here to help you set meaningful goals. What specific area would you like to focus on for this improvement cycle?";
                     chatContainer.appendChild(welcomeMessage);
+                    break;
             }
         };
 
