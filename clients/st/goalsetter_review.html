@@ -4,45 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading Review Mode - Goal Setter</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #f5f5f5;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .loader {
-            text-align: center;
-            color: #004080;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #004080;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <title>StriveTogether Goal Setter - Review Version</title>
+    
+    <!-- Platform level assets -->
+    <script src="/shared/assets/js/chat.js"></script>
+    
+    <!-- Client level assets -->
+    <script src="assets/js/st-auth.js"></script>
+    <link rel="stylesheet" href="assets/css/st-variables.css">
+    <link rel="stylesheet" href="assets/css/st-custom.css">
+
+    <!-- Qipu Integration -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="/shared/assets/js/qipu.js"></script>
+
+    <script>
+        // Force review mode
+        window.isReviewMode = true;
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            STAuth.enableReviewFeatures();
+            STAuth.setupCommonFeatures();
+        });
+    </script>
 </head>
 <body>
-    <div class="loader">
-        <div class="spinner"></div>
-        <h2>Preparing Review Mode</h2>
-        <p>Loading commenting tools...</p>
-    </div>
-    <script>
-        // Immediate redirect with hash
-        window.location.replace('goalsetter.html#review');
-    </script>
+    <!-- Include the main goalsetter content -->
+    <iframe src="goalsetter.html" style="border: none; width: 100%; height: 100vh;" id="goalsetterFrame"></iframe>
 </body>
 </html> 
