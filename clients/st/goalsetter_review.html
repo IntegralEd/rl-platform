@@ -40,18 +40,26 @@
     </style>
 
     <script>
-        // Force review mode
+        // Debug mode
+        console.log('Review mode entry point');
         window.isReviewMode = true;
         
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Loading review features...');
             STAuth.enableReviewFeatures();
             STAuth.setupCommonFeatures();
+            
+            // Monitor iframe load
+            const frame = document.getElementById('goalsetterFrame');
+            frame.addEventListener('load', () => {
+                console.log('Iframe loaded:', frame.contentWindow.location.href);
+            });
         });
     </script>
 </head>
 <body>
     <!-- Include the main goalsetter content -->
-    <iframe src="goalsetter.html" class="fullscreen-frame" id="goalsetterFrame"></iframe>
+    <iframe src="goalsetter.html" class="fullscreen-frame" id="goalsetterFrame" allow="fullscreen"></iframe>
 </body>
 </html> 
