@@ -6,6 +6,17 @@
     <title>ST GoalSetter</title>
     
     <style>
+        :root {
+            --st-gray: #425563;
+            --st-orange: #E87722;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -13,50 +24,77 @@
             justify-content: center;
             background: #fff;
             min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .chat-container {
             width: 100%;
-            max-width: 800px; /* Match Chatbase width */
+            max-width: 800px;
             height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
-        /* Minimal header to match Chatbase */
         .header {
             padding: 16px;
             display: flex;
             align-items: center;
             gap: 12px;
             border-bottom: 1px solid #f0f0f0;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .avatar {
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            background: #425563;
+            background: var(--st-gray);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #E87722;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--st-orange);
             font-weight: bold;
             font-size: 20px;
+            flex-shrink: 0;
         }
 
         .header-text {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 20px;
             color: #1a1a1a;
+            font-weight: normal;
+        }
+
+        .chat-frame-container {
+            flex: 1;
+            position: relative;
+            height: calc(100vh - 73px); /* Header height + border */
+            overflow: hidden;
         }
 
         .chat-frame {
-            flex: 1;
-            border: none;
             width: 100%;
-            min-height: 700px;
+            height: 100%;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        @media (max-width: 800px) {
+            .chat-container {
+                max-width: none;
+            }
+        }
+
+        /* Add passive touch handlers */
+        .chat-frame-container {
+            touch-action: pan-y pinch-zoom;
         }
     </style>
 </head>
@@ -66,11 +104,13 @@
             <div class="avatar">S</div>
             <span class="header-text">ST GoalSetter</span>
         </div>
-        <iframe
-            src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
-            class="chat-frame"
-            frameborder="0"
-        ></iframe>
+        <div class="chat-frame-container">
+            <iframe
+                src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
+                class="chat-frame"
+                frameborder="0"
+            ></iframe>
+        </div>
     </div>
 </body>
 </html> 
