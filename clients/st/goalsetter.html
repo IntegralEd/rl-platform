@@ -787,96 +787,61 @@
             const standardsChoice = document.querySelector('input[name="standards"]:checked').value;
             const reflectionChoice = document.querySelector('input[name="reflection"]:checked').value;
             
-            // Prepare context for the chat
-            let context = {
-                hasStandards: standardsChoice === 'yes',
-                hasReflection: reflectionChoice === 'yes'
-            };
-
-            if (context.hasStandards) {
-                context.standardsLink = document.getElementById('standards-link').value.trim();
-                context.standardsDetail = document.getElementById('standards-detail-input').value.trim();
-            }
-
-            if (context.hasReflection) {
-                context.reflectionDetail = document.getElementById('reflection-input').value.trim();
-            }
-
-            // Hide form container and show chat
+            // Hide form container and show chat interface
             document.querySelector('.form-container').style.display = 'none';
             document.querySelector('.chatbar').style.display = 'flex';
             document.querySelector('.playbar').style.display = 'none';
+            document.getElementById('interview-section').style.display = 'block';
 
-            // Initialize chat with context
-            if (context.hasStandards || context.hasReflection) {
-                // Send context to assistant for tailored interview
-                sendContextToAssistant(context);
+            // Enable interview tab
+            const interviewTab = document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]');
+            interviewTab.disabled = false;
+            switchTab('interview');
+
+            // Initialize chat if needed
+            if (!window.Chat) {
+                Chat.init();
+            }
+
+            // Prepare initial context message if any
+            if (standardsChoice === 'yes' || reflectionChoice === 'yes') {
+                let contextMessage = "Starting goal setting interview with context:\n";
+                if (standardsChoice === 'yes') {
+                    const standardsLink = document.getElementById('standards-link').value.trim();
+                    const standardsDetail = document.getElementById('standards-detail-input').value.trim();
+                    contextMessage += `\nStandards Context:\n${standardsDetail}`;
+                    if (standardsLink) {
+                        contextMessage += `\nStandards Link: ${standardsLink}`;
+                    }
+                }
+                if (reflectionChoice === 'yes') {
+                    const reflectionDetail = document.getElementById('reflection-input').value.trim();
+                    contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
+                }
+                Chat.addMessage('user', contextMessage);
             } else {
-                // Start standard interview flow
-                startStandardInterview();
+                Chat.addMessage('user', "Let's start the goal setting interview.");
             }
         }
 
-        function sendContextToAssistant(context) {
-            // Format context message for the assistant
-            let contextMessage = "Starting goal setting interview with context:\n";
-            if (context.hasStandards) {
-                contextMessage += `\nStandards Context:\n${context.standardsDetail}`;
-                if (context.standardsLink) {
-                    contextMessage += `\nStandards Link: ${context.standardsLink}`;
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                const input = document.getElementById('chat-input');
+                const message = input.value.trim();
+                if (message) {
+                    Chat.addMessage('user', message);
+                    input.value = '';
                 }
             }
-            if (context.hasReflection) {
-                contextMessage += `\nPrevious Cycle Reflection:\n${context.reflectionDetail}`;
-            }
-
-            // Send to chat endpoint
-            sendMessage(contextMessage, true);
         }
 
-        function startStandardInterview() {
-            // Trigger standard interview flow without context
-            sendMessage("Let's start the goal setting interview.", true);
-        }
-
-        function sendMessage(message, isContextMessage = false) {
-            const chatContainer = document.querySelector('.chat-container');
-            
-            if (!message) return;
-            
-            interviewState.messageCount++;
-            
-            // Add user message
-            const userBubble = document.createElement('div');
-            userBubble.className = 'message user';
-            userBubble.textContent = message;
-            chatContainer.appendChild(userBubble);
-            
-            // Scroll to bottom
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            if (window.chatCore) {
-                chatCore.send(message).then(response => {
-                    interviewState.messageCount++;
-                    
-                    // Add assistant message
-                    const assistantBubble = document.createElement('div');
-                    assistantBubble.className = 'message assistant';
-                    assistantBubble.textContent = response;
-                    chatContainer.appendChild(assistantBubble);
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                    // Check for completion phrase
-                    if (response.includes("Here's a summary of your goals:")) {
-                        showCompletionModal();
-                        sendToWebhook();
-                    }
-                });
-            }
-            
-            if (isContextMessage) {
-                // Handle context message
-                // This is a placeholder and should be replaced with actual context handling logic
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                Chat.addMessage('user', message);
+                input.value = '';
             }
         }
 
@@ -923,17 +888,17 @@
             }
         }
 
-        function handleChatKeypress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Chat module
+            Chat.init();
+
+            // Set up event listeners
             const nextButton = document.querySelector('.next-button');
             nextButton.addEventListener('click', startInterview);
+
+            const sendButton = document.querySelector('.send-button');
+            sendButton.addEventListener('click', sendMessage);
         });
     </script>
 </body>
