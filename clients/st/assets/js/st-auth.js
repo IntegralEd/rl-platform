@@ -362,12 +362,11 @@ const STAuth = {
 
     // Feature detection
     isReviewMode: () => {
-        return window.location.hash === '#review';
+        return window.location.hash === '#review' || window.isReviewMode === true;
     },
 
     // Initialize features based on mode
     init: () => {
-        // No redirects, just check hash
         if (STAuth.isReviewMode()) {
             STAuth.enableReviewFeatures();
         }
