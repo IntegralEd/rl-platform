@@ -256,50 +256,98 @@
             display: flex;
         }
 
-        .send-button {
-            width: var(--chat-button-size);
-            height: var(--chat-button-size);
-            min-width: var(--chat-button-size);
-            min-height: var(--chat-button-size);
+        /* Interaction Container */
+        .interaction-container {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            flex-shrink: 0;
+            background: var(--primary-color);
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+        }
+
+        .interaction-bar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .interaction-left, .interaction-right {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .interaction-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input-group {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .interaction-input {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: none;
+            background: white;
+            min-height: 36px;
+            box-sizing: border-box;
+        }
+
+        .interaction-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+        }
+
+        .interaction-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #E87722;  /* ST Orange for send button */
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 0;
+            transition: background 0.2s;
         }
 
-        .send-button:hover {
-            background: #d66a1c;  /* Darker orange on hover */
-            transform: scale(1.05);
+        .interaction-button:not(:disabled):hover {
+            background: rgba(255,255,255,0.15);
         }
 
-        .send-button img {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            filter: brightness(0) invert(1);  /* Make icon white */
+        .interaction-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .chat-input {
-            width: 100%;
-            height: 48px;
-            padding: 0 20px;
-            border: 2px solid var(--border-color);
-            border-radius: 24px;
-            font-size: 16px;
-            font-family: var(--client-font-body);
-            transition: all 0.2s ease;
-            background: white;
+        .interaction-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: background 0.2s;
         }
 
-        .chat-input:focus {
-            outline: none;
-            border-color: #E87722;
-            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
         }
 
         /* Footer */
@@ -454,11 +502,11 @@
                         <label>Would you like to consider any academic standards when setting goals for this cycle?</label>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" name="standards" value="yes" onclick="STAuth.handleStandardsChoice('yes')">
+                                <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
                                 <label>Yes</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" name="standards" value="no" onclick="STAuth.handleStandardsChoice('no')">
+                                <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
                                 <label>No</label>
                             </div>
                         </div>
@@ -474,11 +522,11 @@
                         <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
                         <div class="radio-group">
                             <div class="radio-option">
-                                <input type="radio" name="reflection" value="yes" onclick="STAuth.handleReflectionChoice('yes')">
+                                <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
                                 <label>Yes</label>
                             </div>
                             <div class="radio-option">
-                                <input type="radio" name="reflection" value="no" onclick="STAuth.handleReflectionChoice('no')">
+                                <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
                                 <label>No</label>
                             </div>
                         </div>
@@ -508,9 +556,52 @@
 
         <!-- Footer -->
         <footer class="app-footer">
-            <div class="footer-content">
-                <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="footer-logo">
-                <span class="footer-text">© 2024 StriveTogether. All rights reserved.</span>
+            <div class="interaction-container">
+                <!-- Chatbar -->
+                <div class="interaction-bar chatbar" role="region" aria-label="Chat compose bar" style="display: none;">
+                    <div class="interaction-left"></div>
+                    <div class="interaction-center">
+                        <div class="chat-input-group">
+                            <label for="chat-input" class="sr-only">Type your message</label>
+                            <input 
+                                type="text" 
+                                id="chat-input" 
+                                class="interaction-input" 
+                                placeholder="Type your message here…" 
+                                aria-label="Chat input field"
+                                onkeydown="handleChatKeypress(event)" 
+                            />
+                        </div>
+                    </div>
+                    <div class="interaction-right">
+                        <button class="interaction-button send-button" onclick="sendMessage()" aria-label="Send message">
+                            <img 
+                                src="assets/images/noun-send-7149925-FFFFFF.png" 
+                                class="interaction-icon" 
+                                alt="Send"
+                                onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Send'));" 
+                            />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Playbar -->
+                <div class="interaction-bar playbar" role="region" aria-label="Form navigation bar" style="display: flex;">
+                    <div class="interaction-left"></div>
+                    <div class="interaction-center">
+                        <!-- Could place instructions or next-step text here -->
+                    </div>
+                    <div class="interaction-right">
+                        <button class="interaction-button next-button" onclick="startInterview()" aria-label="Go to next step" disabled>
+                            <img 
+                                src="assets/images/noun-next-5654311-FFFFFF.png" 
+                                class="interaction-icon" 
+                                alt="Next"
+                                onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Next'));" 
+                            />
+                        </button>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
@@ -536,63 +627,55 @@
             isComplete: false
         };
 
-        function handleStandardsChoice() {
-            const radios = document.getElementsByName('academic-standards');
+        function handleStandardsChoice(choice) {
             const standardsDetail = document.getElementById('standards-detail');
+            const nextButton = document.querySelector('.next-button');
             
-            for (const radio of radios) {
-                if (radio.checked) {
-                    formState.standardsChoice = radio.value;
-                    
-                    if (radio.value === 'yes') {
-                        standardsDetail.classList.add('visible');
-                        // Add listeners for both inputs
-                        document.getElementById('standards-link').addEventListener('input', checkFormCompletion);
-                        document.getElementById('standards-detail-input').addEventListener('input', checkFormCompletion);
-                    } else {
-                        standardsDetail.classList.remove('visible');
-                        checkFormCompletion();
-                    }
-                    break;
-                }
+            if (choice === 'yes') {
+                standardsDetail.classList.add('visible');
+                // Add listeners for both inputs
+                document.getElementById('standards-link').addEventListener('input', checkFormCompletion);
+                document.getElementById('standards-detail-input').addEventListener('input', checkFormCompletion);
+            } else {
+                standardsDetail.classList.remove('visible');
+                checkFormCompletion();
             }
         }
 
-        function handleReflectionChoice() {
-            const radios = document.getElementsByName('reflect-previous');
+        function handleReflectionChoice(choice) {
             const reflectionDetail = document.getElementById('reflection-detail');
             
-            for (const radio of radios) {
-                if (radio.checked) {
-                    formState.reflectionChoice = radio.value;
-                    
-                    if (radio.value === 'yes') {
-                        reflectionDetail.classList.add('visible');
-                        document.getElementById('reflection-input').addEventListener('input', checkFormCompletion);
-                    } else {
-                        reflectionDetail.classList.remove('visible');
-                        checkFormCompletion();
-                    }
-                    break;
-                }
+            if (choice === 'yes') {
+                reflectionDetail.classList.add('visible');
+                document.getElementById('reflection-input').addEventListener('input', checkFormCompletion);
+            } else {
+                reflectionDetail.classList.remove('visible');
+                checkFormCompletion();
             }
         }
 
         function checkFormCompletion() {
             const nextButton = document.querySelector('.next-button');
-            // Allow proceeding if ANY radio is selected
-            const isComplete = formState.standardsChoice || formState.reflectionChoice;
+            const standardsChoice = document.querySelector('input[name="standards"]:checked')?.value;
+            const reflectionChoice = document.querySelector('input[name="reflection"]:checked')?.value;
             
-            nextButton.classList.toggle('enabled', isComplete);
-            nextButton.disabled = !isComplete;
-
-            if (isComplete) {
-                nextButton.style.background = '#E87722';
-                nextButton.style.cursor = 'pointer';
-            } else {
-                nextButton.style.background = '#ccc';
-                nextButton.style.cursor = 'not-allowed';
+            // Check if required fields are filled based on choices
+            let isComplete = true;
+            
+            if (standardsChoice === 'yes') {
+                const standardsLink = document.getElementById('standards-link').value.trim();
+                const standardsDetail = document.getElementById('standards-detail-input').value.trim();
+                isComplete = isComplete && (standardsLink || standardsDetail);
             }
+            
+            if (reflectionChoice === 'yes') {
+                const reflectionDetail = document.getElementById('reflection-input').value.trim();
+                isComplete = isComplete && reflectionDetail;
+            }
+            
+            // Enable/disable next button
+            nextButton.disabled = !isComplete;
+            nextButton.classList.toggle('enabled', isComplete);
         }
 
         function sendToWebhook() {
