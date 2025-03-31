@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "handshake": {
+    "user_id": "string",
+    "thread_id": "string",
+    "assistant_id": "string",
+    "org_id": "string",
+    "ts": "timestamp"
+  }
+} 

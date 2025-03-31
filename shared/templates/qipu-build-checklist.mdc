@@ -1,0 +1,182 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# QIPU Build Checklist
+🚀 Qipu Annotation MVP Roadmap
+✅ Core MVP Features
+1. Screenshot Capture & Markup Tools
+Screenshot Accuracy
+
+Capture full user viewport (html2canvas)
+
+Markup Tools (Fabric.js)
+
+Freehand drawing
+
+Typed text annotations
+
+Erase annotations
+
+Test Checklist:
+
+ Screenshot matches viewport exactly
+
+ Drawing tools intuitive and smooth
+
+ Text annotations editable and clear
+
+ Erase function clean and responsive
+
+2. XY Positioning for Annotations
+Store exact XY positions relative to screenshot canvas
+
+Test Checklist:
+
+ XY positions accurately captured on annotations
+
+ Consistent annotation positions across browsers/devices
+
+3. User Identification & Security
+Unique and secure user_id associated with each comment
+
+Test Checklist:
+
+ Reliable authentication integration
+
+ Accurate, secure user_id tagging
+
+4. Slack-Style Threaded Comments (URL:Timestamp)
+Threaded discussions organized by:
+
+Page URL
+
+Timestamp at moment of comment submission (URL:Ts)
+
+Test Checklist:
+
+ Threads reliably created via URL:Timestamp
+
+ Logical sorting/display of threaded comments
+
+🎨 UX & Styling Direction
+Incorporating your original UX sketches and "paintbrush" interaction metaphor:
+
+Paintbrush Interaction Model
+Activation:
+
+Click paintbrush icon to activate
+
+Quick horizontal drag expands tray across bottom of viewport
+
+Interactive Tray Dynamics:
+
+Compact (50px height) by default, expands dynamically upon activation
+
+Tray visually evokes a Mac launcher with "gem-like" tool icons
+
+Gems/tools expand in size clearly on hover for selection ease
+
+Palette-style icon cluster evokes artist paint mixer (round, intuitive icons)
+
+Color-Coded Annotation Types
+Positive (Green, default)
+"Good job," "Keep this," "Additions"
+
+Delta (Red)
+"Remove," "Change," "Adjust spacing"
+
+Suggestion (Yellow/Blue, TBD)
+"Ideas," "Improvements," "Explorations"
+
+Annotation UI Details
+Default colors clearly indicate intent
+
+Easy toggling between drawing/text tools
+
+Emoji options available for expressive annotations
+
+📦 JSON Payload Structure
+json
+Copy
+Edit
+{
+  "thread_id": "https://integraled.com/course/12345#1711759683",
+  "url": "https://integraled.com/course/12345",
+  "timestamp": 1711759683,
+  "user_id": "user_uuid",
+  "annotations": [
+    {
+      "type": "drawing",
+      "content": "base64-image-data",
+      "xy_position": {"x": 234, "y": 567}
+    },
+    {
+      "type": "text",
+      "content": "Example typed annotation",
+      "xy_position": {"x": 123, "y": 456}
+    }
+  ],
+  "created_at": "ISO8601 timestamp"
+}
+📌 DOM-Driven Metadata & Kipu Tracking
+Invisible Kipu tracking
+
+Track user's journey through multiple interactive formats:
+
+JSON interactions
+
+Storyline modules
+
+Videos
+
+Forms & Chats
+
+Store timestamps and context to sort comments by user journey sequence
+
+Test Checklist:
+
+ Reliable capturing of DOM events and journey data
+
+ Accurate comment sorting according to user path (Kipu)
+
+🔧 Universal DOM Event Ideas (Future Enhancements)
+Scroll depth visibility
+
+Focus duration on elements
+
+Interaction frequency heatmap
+
+🛠️ Development Steps & Checklist
+Phase 1: Initial Build
+
+ HTML structure for annotation tray
+
+ Screenshot capture functionality (html2canvas)
+
+ Basic annotation tools integration (Fabric.js)
+
+ User ID integration
+
+Phase 2: Threaded Comment System
+
+ JSON payload creation with metadata
+
+ URL:Timestamp threading implementation
+
+Phase 3: UX & Interaction Enhancements
+
+ Tray expansion animation
+
+ Gem-like icon styling and hover effects
+
+ Color-coding by annotation type
+
+Phase 4: DOM/Kipu Integration
+
+ DOM event tracking
+
+ Invisible Kipu data collection for user journeys
+
+Use this markdown roadmap for guidance, iterative development, testing, and collaborative tracking throughout your build process.
