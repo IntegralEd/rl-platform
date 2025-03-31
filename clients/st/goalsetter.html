@@ -666,6 +666,14 @@
         </footer>
     </div>
 
+    <!-- Platform level assets -->
+    <script src="/shared/assets/js/chat.js"></script>
+    
+    <!-- Client level assets -->
+    <script src="assets/js/st-auth.js"></script>
+    <link rel="stylesheet" href="assets/css/st-variables.css">
+    <link rel="stylesheet" href="assets/css/st-custom.css">
+
     <script>
         // Track form state
         let formState = {
@@ -797,37 +805,15 @@
             document.querySelector('.form-container').style.display = 'none';
             document.querySelector('.chatbar').style.display = 'flex';
             document.querySelector('.playbar').style.display = 'none';
-            document.getElementById('interview-section').style.display = 'block';
-
-            // Enable interview tab
-            const interviewTab = document.querySelector('.nav-tab[onclick="STAuth.switchTab(\'interview\')"]');
-            interviewTab.disabled = false;
-            STAuth.switchTab('interview');
-
-            // Initialize chat if needed
-            if (!window.Chat) {
+            
+            // Show interview section and initialize chat
+            const interviewSection = document.getElementById('interview-section');
+            interviewSection.style.display = 'block';
+            
+            // Initialize chat after a short delay to ensure DOM is ready
+            setTimeout(() => {
                 Chat.init();
-            }
-
-            // Prepare initial context message if any
-            if (standardsChoice === 'yes' || reflectionChoice === 'yes') {
-                let contextMessage = "Starting goal setting interview with context:\n";
-                if (standardsChoice === 'yes') {
-                    const standardsLink = document.getElementById('standards-link').value.trim();
-                    const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-                    contextMessage += `\nStandards Context:\n${standardsDetail}`;
-                    if (standardsLink) {
-                        contextMessage += `\nStandards Link: ${standardsLink}`;
-                    }
-                }
-                if (reflectionChoice === 'yes') {
-                    const reflectionDetail = document.getElementById('reflection-input').value.trim();
-                    contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
-                }
-                Chat.addMessage('user', contextMessage);
-            } else {
-                Chat.addMessage('user', "Let's start the goal setting interview.");
-            }
+            }, 100);
         }
 
         function handleChatKeypress(event) {

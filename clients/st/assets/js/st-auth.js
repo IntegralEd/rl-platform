@@ -148,6 +148,9 @@ const STAuth = {
         nextButton.disabled = !isComplete;
         nextButton.classList.toggle('enabled', isComplete);
 
+        // Update chat state
+        this.state.chatState.isComplete = isComplete;
+
         // If both are "no", enable chat immediately
         if (isComplete && standardsChoice === 'no' && reflectionChoice === 'no') {
             this.startInterview();
@@ -157,10 +160,31 @@ const STAuth = {
     // Chat Validation
     validateChatAccess() {
         // Check if user can access chat based on state
-        if (!this.state.chatState.isComplete) {
-            return false;
+        const standardsChoice = document.querySelector('input[name="standards"]:checked')?.value;
+        const reflectionChoice = document.querySelector('input[name="reflection"]:checked')?.value;
+        
+        // If both choices are made, allow access
+        if (standardsChoice && reflectionChoice) {
+            // If either is "yes", check if details are provided
+            if (standardsChoice === 'yes') {
+                const standardsLink = document.getElementById('standards-link').value.trim();
+                const standardsDetail = document.getElementById('standards-detail-input').value.trim();
+                if (!standardsLink && !standardsDetail) {
+                    return false;
+                }
+            }
+            
+            if (reflectionChoice === 'yes') {
+                const reflectionDetail = document.getElementById('reflection-input').value.trim();
+                if (!reflectionDetail) {
+                    return false;
+                }
+            }
+            
+            return true;
         }
-        return true;
+        
+        return false;
     },
 
     validateMessageLimit() {
@@ -188,25 +212,46 @@ const STAuth = {
         interviewTab.disabled = false;
         this.switchTab('interview');
 
-        // Prepare initial context message if any
-        if (standardsChoice === 'yes' || reflectionChoice === 'yes') {
-            let contextMessage = "Starting goal setting interview with context:\n";
-            if (standardsChoice === 'yes') {
-                const standardsLink = document.getElementById('standards-link').value.trim();
-                const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-                contextMessage += `\nStandards Context:\n${standardsDetail}`;
-                if (standardsLink) {
-                    contextMessage += `\nStandards Link: ${standardsLink}`;
-                }
-            }
-            if (reflectionChoice === 'yes') {
-                const reflectionDetail = document.getElementById('reflection-input').value.trim();
-                contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
-            }
-            this.addMessage('user', contextMessage);
-        } else {
-            this.addMessage('user', "Let's start the goal setting interview.");
+        // For no/no case, just show a simple welcome
+        if (standardsChoice === 'no' && reflectionChoice === 'no') {
+            this.addMessage('assistant', "Hi! I'm here to help you set meaningful goals. What specific area would you like to focus on for this improvement cycle?");
+            return;
         }
+
+        // For cases with context, show loading count
+        let count = 0;
+        const loadingMessage = this.addMessage('assistant', 'Preparing your context... 0%');
+        const loadingInterval = setInterval(() => {
+            count += 10;
+            if (count <= 90) {
+                loadingMessage.textContent = `Preparing your context... ${count}%`;
+            }
+        }, 500);
+
+        // Prepare context message
+        setTimeout(() => {
+            clearInterval(loadingInterval);
+            loadingMessage.textContent = 'Preparing your context... 100%';
+            
+            // Small delay before showing the actual context
+            setTimeout(() => {
+                loadingMessage.remove();
+                let contextMessage = "Starting goal setting interview with context:\n";
+                if (standardsChoice === 'yes') {
+                    const standardsLink = document.getElementById('standards-link').value.trim();
+                    const standardsDetail = document.getElementById('standards-detail-input').value.trim();
+                    contextMessage += `\nStandards Context:\n${standardsDetail}`;
+                    if (standardsLink) {
+                        contextMessage += `\nStandards Link: ${standardsLink}`;
+                    }
+                }
+                if (reflectionChoice === 'yes') {
+                    const reflectionDetail = document.getElementById('reflection-input').value.trim();
+                    contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
+                }
+                this.addMessage('user', contextMessage);
+            }, 500);
+        }, 3000);
     },
 
     // Tools Validation
