@@ -287,19 +287,21 @@
 
         .chat-input-group {
             width: 100%;
-            max-width: 500px;
+            max-width: 700px;
             margin: 0 auto;
         }
 
         .interaction-input {
             width: 100%;
-            padding: 0.5rem;
+            padding: 8px 12px;
             font-size: 1rem;
             border-radius: 6px;
             border: none;
             background: white;
-            min-height: 36px;
+            min-height: 40px;
             box-sizing: border-box;
+            resize: none;
+            line-height: 1.4;
         }
 
         .interaction-input:focus {
@@ -529,9 +531,9 @@
         <div class="main-container">
             <!-- Left Navigation -->
             <nav class="left-nav">
-                <button class="nav-tab active" onclick="switchTab('welcome')">Welcome</button>
-                <button class="nav-tab" onclick="switchTab('interview')" disabled>Interview</button>
-                <button class="nav-tab" onclick="switchTab('tools')" disabled>Tools</button>
+                <button class="nav-tab active" onclick="STAuth.switchTab('welcome')">Welcome</button>
+                <button class="nav-tab" onclick="STAuth.switchTab('interview')" disabled>Interview</button>
+                <button class="nav-tab" onclick="STAuth.switchTab('tools')" disabled>Tools</button>
             </nav>
 
             <!-- Content Area -->
@@ -545,11 +547,11 @@
                                 <label>Would you like to consider academic standards in setting your goals?</label>
                                 <div class="radio-group">
                                     <div class="radio-option">
-                                        <input type="radio" name="standards" value="yes" onclick="handleStandardsChoice('yes')">
+                                        <input type="radio" name="standards" value="yes" onclick="STAuth.handleStandardsChoice('yes')">
                                         <label>Yes</label>
                                     </div>
                                     <div class="radio-option">
-                                        <input type="radio" name="standards" value="no" onclick="handleStandardsChoice('no')">
+                                        <input type="radio" name="standards" value="no" onclick="STAuth.handleStandardsChoice('no')">
                                         <label>No</label>
                                     </div>
                                 </div>
@@ -570,11 +572,11 @@
                                 <label>Would you like to reflect on last week's goals before setting the next cycle?</label>
                                 <div class="radio-group">
                                     <div class="radio-option">
-                                        <input type="radio" name="reflection" value="yes" onclick="handleReflectionChoice('yes')">
+                                        <input type="radio" name="reflection" value="yes" onclick="STAuth.handleReflectionChoice('yes')">
                                         <label>Yes</label>
                                     </div>
                                     <div class="radio-option">
-                                        <input type="radio" name="reflection" value="no" onclick="handleReflectionChoice('no')">
+                                        <input type="radio" name="reflection" value="no" onclick="STAuth.handleReflectionChoice('no')">
                                         <label>No</label>
                                     </div>
                                 </div>
@@ -621,18 +623,18 @@
                     <div class="interaction-center">
                         <div class="chat-input-group">
                             <label for="chat-input" class="sr-only">Type your message</label>
-                            <input 
-                                type="text" 
+                            <textarea 
                                 id="chat-input" 
                                 class="interaction-input" 
                                 placeholder="Type your message here…" 
                                 aria-label="Chat input field"
-                                onkeydown="handleChatKeypress(event)" 
-                            />
+                                onkeydown="STAuth.handleChatKeypress(event)"
+                                rows="3"
+                            ></textarea>
                         </div>
                     </div>
                     <div class="interaction-right">
-                        <button class="interaction-button send-button" onclick="sendMessage()" aria-label="Send message">
+                        <button class="interaction-button send-button" onclick="STAuth.sendMessage()" aria-label="Send message">
                             <img 
                                 src="assets/images/noun-send-7149925-FFFFFF.png" 
                                 class="interaction-icon" 
@@ -650,7 +652,7 @@
                         <!-- Could place instructions or next-step text here -->
                     </div>
                     <div class="interaction-right">
-                        <button class="interaction-button next-button" onclick="startInterview()" aria-label="Go to next step" disabled>
+                        <button class="interaction-button next-button" onclick="STAuth.startInterview()" aria-label="Go to next step" disabled>
                             <img 
                                 src="assets/images/noun-next-5654311-FFFFFF.png" 
                                 class="interaction-icon" 
@@ -782,7 +784,7 @@
             .then(data => {
                 console.log('Webhook response:', data);
                 // Enable tools tab after successful submission
-                document.querySelector('.nav-tab[onclick="switchTab(\'tools\')"]').disabled = false;
+                document.querySelector('.nav-tab[onclick="STAuth.switchTab(\'tools\')"]').disabled = false;
             })
             .catch(error => console.error('Webhook error:', error));
         }
@@ -798,9 +800,9 @@
             document.getElementById('interview-section').style.display = 'block';
 
             // Enable interview tab
-            const interviewTab = document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]');
+            const interviewTab = document.querySelector('.nav-tab[onclick="STAuth.switchTab(\'interview\')"]');
             interviewTab.disabled = false;
-            switchTab('interview');
+            STAuth.switchTab('interview');
 
             // Initialize chat if needed
             if (!window.Chat) {
@@ -855,7 +857,7 @@
                 <div class="completion-modal">
                     <h2>Great progress today!</h2>
                     <p>Would you like to:</p>
-                    <button onclick="switchTab('tools'); closeModal()">
+                    <button onclick="STAuth.switchTab('tools'); closeModal()">
                         Export as PDF
                     </button>
                     <button onclick="closeModal()">
@@ -871,7 +873,7 @@
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.querySelector(`.nav-tab[onclick="STAuth.switchTab('${tabName}')"]`).classList.add('active');
 
             // Show correct section
             document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
