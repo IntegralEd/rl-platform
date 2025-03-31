@@ -247,6 +247,20 @@
             border: none;
             background: white;
         }
+
+        /* Hide header in embedded mode */
+        .embedded .app-header,
+        .embedded .top-banner {
+            display: none !important;
+        }
+        
+        /* Adjust container in embedded mode */
+        .embedded .app-container {
+            height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
@@ -348,6 +362,18 @@
                 alert('Comment submitted!');
             });
         };
+
+        // Check if we're embedded
+        function isEmbedded() {
+            return window !== window.parent || window.location.href.includes('embed=true');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isEmbedded()) {
+                document.body.classList.add('embedded');
+                console.log('Embedded mode activated');
+            }
+        });
     </script>
 </body>
 </html> 
