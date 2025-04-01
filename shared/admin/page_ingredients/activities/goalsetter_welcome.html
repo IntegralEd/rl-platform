@@ -1,0 +1,313 @@
+<!-- Goalsetter Welcome Activity Component -->
+<div class="activity-container goalsetter-welcome" role="form">
+  <div class="activity-header">
+    <h1>Welcome to the GoalSetter!</h1>
+    <p class="activity-description">
+      You will be guided through an interview to help set affirming student-friendly goals 
+      you can print and hang on your PDSA board.
+    </p>
+  </div>
+
+  <div class="form-section">
+    <div class="form-group">
+      <label>Before we get started, would you like to consider any standards in your goal setting?</label>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="standards" value="yes" onchange="handleStandardsChoice(this.value)">
+          <span class="radio-text">Yes</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="standards" value="no" onchange="handleStandardsChoice(this.value)">
+          <span class="radio-text">No</span>
+        </label>
+      </div>
+
+      <div id="standards-detail" class="context-section" style="display: none;">
+        <div class="form-group">
+          <label>Standards Link (optional)</label>
+          <input 
+            type="text" 
+            id="standards-link" 
+            class="form-input" 
+            placeholder="Paste standards URL here"
+            onchange="validateForm()"
+          >
+        </div>
+        <div class="form-group">
+          <label>Standards Description</label>
+          <textarea 
+            id="standards-detail-input" 
+            class="form-textarea" 
+            placeholder="Describe the relevant standards"
+            onchange="validateForm()"
+          ></textarea>
+        </div>
+        <div id="standards-validation" class="validation-message">
+          Please provide either a link or description
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="activity-footer">
+    <button class="action-button" id="continue-button" disabled>
+      Continue
+      <span class="button-icon">→</span>
+    </button>
+  </div>
+</div>
+
+<style>
+.goalsetter-welcome {
+  background: var(--background-color);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.activity-header {
+  margin-bottom: 2rem;
+}
+
+.activity-header h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.activity-description {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.form-section {
+  margin: 2rem 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.radio-option:hover {
+  background: var(--hover-color, #f5f5f5);
+}
+
+.radio-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary-color);
+}
+
+.radio-text {
+  font-size: 1rem;
+}
+
+.context-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.validation-message {
+  display: none;
+  color: var(--error-color, #dc3545);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.activity-footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-button {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.action-button:not([disabled]) {
+  opacity: 1;
+}
+
+.button-icon {
+  font-size: 1.25rem;
+}
+</style>
+
+<script>
+// State Management
+const state = {
+  form: {
+    standardsChoice: null,
+    standardsLink: '',
+    standardsDetail: '',
+    reflectionChoice: null,
+    reflectionDetail: ''
+  },
+  interview: {
+    teachingContext: '',
+    learningTarget: '',
+    successCriteria: '',
+    teacherGoalStatement: '',
+    studentGoalStatement: '',
+    messageCount: 0,
+    isComplete: false
+  }
+};
+
+function handleStandardsChoice(value) {
+  state.form.standardsChoice = value;
+  const detailSection = document.getElementById('standards-detail');
+  detailSection.style.display = value === 'yes' ? 'block' : 'none';
+  validateForm();
+}
+
+function validateForm() {
+  const standardsChoice = state.form.standardsChoice;
+  const standardsLink = document.getElementById('standards-link')?.value;
+  const standardsDetail = document.getElementById('standards-detail-input')?.value;
+  const continueButton = document.getElementById('continue-button');
+  const validationMessage = document.getElementById('standards-validation');
+  
+  let isValid = false;
+  
+  if (standardsChoice === 'no') {
+    isValid = true;
+    state.form.standardsLink = '';
+    state.form.standardsDetail = '';
+  } else if (standardsChoice === 'yes') {
+    state.form.standardsLink = standardsLink.trim();
+    state.form.standardsDetail = standardsDetail.trim();
+    isValid = state.form.standardsLink !== '' || state.form.standardsDetail !== '';
+    validationMessage.style.display = isValid ? 'none' : 'block';
+  }
+  
+  continueButton.disabled = !isValid;
+  
+  if (isValid) {
+    continueButton.addEventListener('click', () => {
+      sendToWebhook();
+      const event = new CustomEvent('activityComplete', {
+        detail: {
+          type: 'goalsetterWelcome',
+          data: {
+            considerStandards: state.form.standardsChoice === 'yes',
+            standardsLink: state.form.standardsLink,
+            standardsDescription: state.form.standardsDetail,
+            state: state // Include full state for parent component
+          }
+        }
+      });
+      document.dispatchEvent(event);
+    });
+  }
+}
+
+function sendToWebhook() {
+  const payload = {
+    user_data: {
+      name: state.form.name || 'anonymous',
+      email: state.form.email || 'anonymous@public.test',
+      user_id: state.form.userId || '',
+      thread_id: window.threadId || '',
+      assistant_id: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
+      org_id: 'recsK5zK0CouK5ebW',
+      intake_token: 'goalsetter_chat',
+      source: 'url',
+      url: window.location.href,
+      is_anonymous: !state.form.name || !state.form.email
+    },
+    document_data: {
+      subject_and_grade: state.interview.teachingContext || '',
+      learning_target: state.interview.learningTarget || '',
+      measure_of_success: state.interview.successCriteria || '',
+      classroom_goal_statement: state.interview.teacherGoalStatement || ''
+    },
+    form_data: {
+      standards: {
+        consider: state.form.standardsChoice === 'yes',
+        link: state.form.standardsLink,
+        details: state.form.standardsDetail
+      }
+    }
+  };
+
+  fetch('https://hook.us1.make.com/f6no146taqm5cdss37za7siawjy8fnut', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Webhook response:', data);
+    // Emit webhook completion event
+    document.dispatchEvent(new CustomEvent('webhookComplete', { 
+      detail: { success: true, data } 
+    }));
+  })
+  .catch(error => {
+    console.error('Webhook error:', error);
+    document.dispatchEvent(new CustomEvent('webhookComplete', { 
+      detail: { success: false, error } 
+    }));
+  });
+}
+</script> 
