@@ -91,12 +91,12 @@ const STAuth = {
 
     handleStandardsChoice(choice) {
         const standardsDetail = document.getElementById('standards-detail');
+        const nextButton = document.querySelector('.next-button');
         
         if (choice === 'yes') {
             standardsDetail.classList.add('visible');
-            // Add listeners for both inputs
-            document.getElementById('standards-link').addEventListener('input', () => this.checkFormCompletion());
-            document.getElementById('standards-detail-input').addEventListener('input', () => this.checkFormCompletion());
+            const inputs = standardsDetail.querySelectorAll('input');
+            inputs.forEach(input => input.addEventListener('input', () => this.checkFormCompletion()));
         } else {
             standardsDetail.classList.remove('visible');
             this.checkFormCompletion();
@@ -105,6 +105,7 @@ const STAuth = {
 
     handleReflectionChoice(choice) {
         const reflectionDetail = document.getElementById('reflection-detail');
+        const nextButton = document.querySelector('.next-button');
         
         if (choice === 'yes') {
             reflectionDetail.classList.add('visible');
@@ -120,40 +121,40 @@ const STAuth = {
         const standardsChoice = document.querySelector('input[name="standards"]:checked')?.value;
         const reflectionChoice = document.querySelector('input[name="reflection"]:checked')?.value;
         
-        // Check if required fields are filled based on choices
         let isComplete = standardsChoice && reflectionChoice;
         
-        // Handle standards validation
         if (standardsChoice === 'yes') {
-            const standardsLink = document.getElementById('standards-link').value.trim();
-            const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-            const hasStandardsInput = standardsLink || standardsDetail;
+            const standardsUrl = document.getElementById('standards-url')?.value.trim();
+            const standardsGrade = document.getElementById('standards-grade')?.value.trim();
+            const standardsSubject = document.getElementById('standards-subject')?.value.trim();
+            const standardsState = document.getElementById('standards-state')?.value.trim();
+            
+            const hasStandardsInput = standardsUrl && standardsGrade && standardsSubject && standardsState;
             document.getElementById('standards-validation').classList.toggle('visible', !hasStandardsInput);
             isComplete = isComplete && hasStandardsInput;
-        } else {
-            document.getElementById('standards-validation')?.classList.remove('visible');
         }
         
-        // Handle reflection validation
         if (reflectionChoice === 'yes') {
-            const reflectionDetail = document.getElementById('reflection-input').value.trim();
-            const hasReflectionInput = reflectionDetail.length > 0;
+            const reflectionText = document.getElementById('reflection-input')?.value.trim();
+            const hasReflectionInput = reflectionText.length > 0;
             document.getElementById('reflection-validation').classList.toggle('visible', !hasReflectionInput);
             isComplete = isComplete && hasReflectionInput;
-        } else {
-            document.getElementById('reflection-validation')?.classList.remove('visible');
         }
-        
-        // Enable/disable next button
+
         nextButton.disabled = !isComplete;
         nextButton.classList.toggle('enabled', isComplete);
 
-        // Update chat state
-        this.state.chatState.isComplete = isComplete;
-
-        // If both are "no", enable chat immediately
+        // Auto-enable interview for No/No case
         if (isComplete && standardsChoice === 'no' && reflectionChoice === 'no') {
-            this.startInterview();
+            this.enableInterviewTab();
+        }
+    },
+
+    enableInterviewTab() {
+        const interviewTab = document.querySelector('.nav-tab[onclick*="interview"]');
+        if (interviewTab) {
+            interviewTab.disabled = false;
+            this.switchTab('interview');
         }
     },
 

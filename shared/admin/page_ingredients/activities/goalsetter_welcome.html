@@ -1,100 +1,78 @@
 <!-- Goalsetter Welcome Activity Component -->
 <div class="activity-container goalsetter-welcome" role="form">
-  <div class="activity-header">
-    <h1>Welcome to the GoalSetter!</h1>
-    <p class="activity-description">
-      You will be guided through an interview to help set affirming student-friendly goals 
-      you can print and hang on your PDSA board.
-    </p>
-  </div>
+  <h1>Welcome to the GoalSetter!</h1>
+  <p>You will be guided through an interview to help set affirming student-friendly goals you can print and hang on your PDSA board.</p>
 
-  <div class="form-section">
-    <div class="form-group">
-      <label>Before we get started, would you like to consider any standards in your goal setting?</label>
-      <div class="radio-group">
-        <label class="radio-option">
-          <input type="radio" name="standards" value="yes" onchange="handleStandardsChoice(this.value)">
-          <span class="radio-text">Yes</span>
-        </label>
-        <label class="radio-option">
-          <input type="radio" name="standards" value="no" onchange="handleStandardsChoice(this.value)">
-          <span class="radio-text">No</span>
-        </label>
+  <div class="form-section standards-section">
+    <h2>Standards Alignment</h2>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="standards" value="yes" onchange="STAuth.handleStandardsChoice('yes')">
+        <span>Yes, I want to align with standards</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="standards" value="no" onchange="STAuth.handleStandardsChoice('no')">
+        <span>No, skip standards alignment</span>
+      </label>
+    </div>
+    
+    <div id="standards-detail" class="context-section">
+      <div class="form-group">
+        <label for="standards-url">Standards URL</label>
+        <input type="text" id="standards-url" placeholder="Enter standards reference URL">
       </div>
-
-      <div id="standards-detail" class="context-section" style="display: none;">
-        <div class="form-group">
-          <label>Standards Link (optional)</label>
-          <input 
-            type="text" 
-            id="standards-link" 
-            class="form-input" 
-            placeholder="Paste standards URL here"
-            onchange="validateForm()"
-          >
-        </div>
-        <div class="form-group">
-          <label>Standards Description</label>
-          <textarea 
-            id="standards-detail-input" 
-            class="form-textarea" 
-            placeholder="Describe the relevant standards"
-            onchange="validateForm()"
-          ></textarea>
-        </div>
-        <div id="standards-validation" class="validation-message">
-          Please provide either a link or description
-        </div>
+      <div class="form-group">
+        <label for="standards-grade">Grade Level</label>
+        <input type="text" id="standards-grade" placeholder="Enter grade level">
       </div>
+      <div class="form-group">
+        <label for="standards-subject">Subject Area</label>
+        <input type="text" id="standards-subject" placeholder="Enter subject area">
+      </div>
+      <div class="form-group">
+        <label for="standards-state">State/Jurisdiction</label>
+        <input type="text" id="standards-state" placeholder="Enter state or jurisdiction">
+      </div>
+      <div id="standards-validation" class="validation-message">Please fill in all standards details</div>
     </div>
   </div>
 
-  <div class="activity-footer">
-    <button class="action-button" id="continue-button" disabled>
-      Continue
-      <span class="button-icon">→</span>
-    </button>
+  <div class="form-section reflection-section">
+    <h2>Previous Goals Review</h2>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="reflection" value="yes" onchange="STAuth.handleReflectionChoice('yes')">
+        <span>Yes, I want to reflect on last week's goals</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="reflection" value="no" onchange="STAuth.handleReflectionChoice('no')">
+        <span>No, start fresh</span>
+      </label>
+    </div>
+    
+    <div id="reflection-detail" class="context-section">
+      <div class="form-group">
+        <label for="reflection-input">Your Reflection</label>
+        <textarea id="reflection-input" class="rich-text" rows="4" placeholder="Reflect on your previous goals..."></textarea>
+      </div>
+      <div id="reflection-validation" class="validation-message">Please enter your reflection</div>
+    </div>
   </div>
 </div>
 
 <style>
 .goalsetter-welcome {
-  background: var(--background-color);
-  padding: 2rem;
-  border-radius: 8px;
   max-width: 800px;
   margin: 0 auto;
-}
-
-.activity-header {
-  margin-bottom: 2rem;
-}
-
-.activity-header h1 {
-  color: var(--primary-color);
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.activity-description {
-  font-size: 1.1rem;
-  line-height: 1.5;
-  color: var(--text-color);
+  padding: 2rem;
 }
 
 .form-section {
-  margin: 2rem 0;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: var(--text-color);
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
 }
 
 .radio-group {
@@ -103,92 +81,36 @@
   margin: 1rem 0;
 }
 
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.radio-option:hover {
-  background: var(--hover-color, #f5f5f5);
-}
-
-.radio-option input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--primary-color);
-}
-
-.radio-text {
-  font-size: 1rem;
-}
-
 .context-section {
+  display: none;
   margin-top: 1rem;
   padding: 1rem;
-  background: white;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--secondary-color);
+  background: rgba(232, 119, 34, 0.05);
 }
 
-.form-input, .form-textarea {
+.context-section.visible {
+  display: block;
+}
+
+.rich-text {
   width: 100%;
-  padding: 0.75rem;
+  min-height: 120px;
+  padding: 1rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.form-textarea {
-  min-height: 100px;
   resize: vertical;
-}
-
-.form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
 }
 
 .validation-message {
   display: none;
-  color: var(--error-color, #dc3545);
-  font-size: 0.9rem;
+  color: var(--raspberry);
   margin-top: 0.5rem;
+  font-size: 0.875rem;
 }
 
-.activity-footer {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.action-button {
-  background: var(--primary-color);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
-
-.action-button:not([disabled]) {
-  opacity: 1;
-}
-
-.button-icon {
-  font-size: 1.25rem;
+.validation-message.visible {
+  display: block;
 }
 </style>
 
@@ -222,8 +144,10 @@ function handleStandardsChoice(value) {
 
 function validateForm() {
   const standardsChoice = state.form.standardsChoice;
-  const standardsLink = document.getElementById('standards-link')?.value;
-  const standardsDetail = document.getElementById('standards-detail-input')?.value;
+  const standardsLink = document.getElementById('standards-url')?.value;
+  const standardsGrade = document.getElementById('standards-grade')?.value;
+  const standardsSubject = document.getElementById('standards-subject')?.value;
+  const standardsState = document.getElementById('standards-state')?.value;
   const continueButton = document.getElementById('continue-button');
   const validationMessage = document.getElementById('standards-validation');
   
@@ -235,7 +159,7 @@ function validateForm() {
     state.form.standardsDetail = '';
   } else if (standardsChoice === 'yes') {
     state.form.standardsLink = standardsLink.trim();
-    state.form.standardsDetail = standardsDetail.trim();
+    state.form.standardsDetail = standardsGrade + ', ' + standardsSubject + ', ' + standardsState;
     isValid = state.form.standardsLink !== '' || state.form.standardsDetail !== '';
     validationMessage.style.display = isValid ? 'none' : 'block';
   }
