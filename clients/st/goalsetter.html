@@ -495,67 +495,20 @@
                 <!-- Welcome Section -->
                 <div id="welcome-section" class="section active">
                     <div class="form-container">
-                        <h1 class="form-title">Welcome to the Goal Setter</h1>
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label>Do you have specific standards you'd like to reference?</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="standards" value="yes" onchange="STAuth.handleStandardsChoice(this.value)">
-                                        Yes
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="standards" value="no" onchange="STAuth.handleStandardsChoice(this.value)">
-                                        No
-                                    </label>
-                                </div>
-                                <div id="standards-detail" class="context-section">
-                                    <div class="form-group">
-                                        <label>Standards Link (optional)</label>
-                                        <input type="text" id="standards-link" placeholder="Paste standards URL here">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Standards Description</label>
-                                        <textarea id="standards-detail-input" placeholder="Describe the relevant standards"></textarea>
-                                    </div>
-                                    <div id="standards-validation" class="validation-message">
-                                        Please provide either a link or description
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Would you like to share reflections from a previous cycle?</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="reflection" value="yes" onchange="STAuth.handleReflectionChoice(this.value)">
-                                        Yes
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="reflection" value="no" onchange="STAuth.handleReflectionChoice(this.value)">
-                                        No
-                                    </label>
-                                </div>
-                                <div id="reflection-detail" class="context-section">
-                                    <div class="form-group">
-                                        <label>Previous Cycle Reflection</label>
-                                        <textarea id="reflection-input" placeholder="Share your reflections"></textarea>
-                                    </div>
-                                    <div id="reflection-validation" class="validation-message">
-                                        Please provide your reflection
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="interaction-container">
-                            <div class="interaction-bar">
-                                <div class="interaction-left">
-                                    <button class="interaction-button next-button" disabled>
-                                        <span class="sr-only">Next</span>
-                                        <img class="interaction-icon" src="/shared/assets/images/arrow-right.svg" alt="Next">
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="goalsetter-welcome"></div>
+                        <script>
+                            fetch('/shared/admin/page_ingredients/activities/goalsetter_welcome.html')
+                                .then(response => response.text())
+                                .then(html => {
+                                    document.getElementById('goalsetter-welcome').innerHTML = html;
+                                    // Listen for activity completion
+                                    document.addEventListener('activityComplete', (e) => {
+                                        if (e.detail.type === 'goalsetterWelcome') {
+                                            STAuth.handleWelcomeComplete(e.detail.data);
+                                        }
+                                    });
+                                });
+                        </script>
                     </div>
                 </div>
 
@@ -565,9 +518,9 @@
                     <div class="interaction-container">
                         <div class="interaction-bar">
                             <div class="interaction-left">
-                                <button class="interaction-button send-button">
-                                    <span class="sr-only">Send</span>
-                                    <img class="interaction-icon" src="/shared/assets/images/send.svg" alt="Send">
+                                <button class="interaction-button next-button" disabled>
+                                    <span class="sr-only">Next</span>
+                                    <img class="interaction-icon" src="assets/images/noun-next-5654311-FFFFFF.png" alt="Next">
                                 </button>
                             </div>
                             <div class="interaction-center">
