@@ -1,0 +1,187 @@
+# Goalsetter Build Checklist
+
+## 🎯 Current State
+```
+/clients/st/
+├── goalsetter.html      # Core file (20KB)
+├── goalsetter_live.html # Live version (9.4KB) - READ ONLY
+├── goalsetter_temp.html # Temp version (2.8KB)
+└── goalsetter_review.html # Review version (2.8KB) - READ ONLY
+```
+
+## 🔄 Phase 1: Core Cleanup (Steps 1-6)
+```javascript
+// Expected structure
+const Goalsetter = {
+    welcome: {},    // Welcome section
+    interview: {},  // Interview flow
+    chat: {},      // Chat interface
+    tools: {}      // Tools section
+}
+```
+
+### Cleanup Tasks
+- [ ] Remove Chatbase iframe from center slide
+- [ ] Restore welcome message
+- [ ] Fix interview flow
+- [ ] Clean up unused code
+- [ ] Update state management
+- [ ] Add health checks
+
+🛑 DECISION POINT 1: Core functionality
+Options:
+1. Continue if all tests pass
+2. Fix any broken flows
+3. Request human review
+
+## 🔍 Phase 2: Read-Only Admin Features (Steps 7-12)
+```javascript
+// Admin Features (Read-Only)
+const AdminFeatures = {
+    copyUrl: {
+        description: 'Copy page URL to clipboard',
+        requiresAuth: false
+    },
+    launch: {
+        description: 'Open page in new tab',
+        requiresAuth: false
+    },
+    viewInfo: {
+        description: 'View page information',
+        requiresAuth: false
+    },
+    viewMetrics: {
+        description: 'View page metrics',
+        requiresAuth: false
+    }
+}
+```
+
+### Implementation
+- [ ] Add URL copy functionality
+- [ ] Implement page launch
+- [ ] Create info display
+- [ ] Add metrics view
+- [ ] Implement validation
+- [ ] Add warning messages
+
+🛑 DECISION POINT 2: Admin feature validation
+Options:
+1. Proceed if validation passes
+2. Fix any issues
+3. Request human review
+
+## 🎨 Phase 3: UI Enhancement (Steps 13-18)
+```javascript
+// UI components (Read-Only)
+const UI = {
+    welcome: {
+        show: () => {},
+        hide: () => {},
+        update: () => {}
+    },
+    chat: {
+        show: () => {},
+        hide: () => {},
+        update: () => {}
+    }
+}
+```
+
+### Features
+- [ ] Add loading states
+- [ ] Implement transitions
+- [ ] Add error handling
+- [ ] Create feedback system
+- [ ] Add accessibility
+- [ ] Implement responsive design
+
+🛑 DECISION POINT 3: UI stability
+Options:
+1. Continue if UI tests pass
+2. Fix any visual issues
+3. Request human review
+
+## 📈 Phase 4: Monitoring Integration (Steps 19-25)
+```javascript
+// Monitoring hooks (Read-Only)
+const Monitor = {
+    checkHealth: async () => {},
+    captureState: async () => {},
+    reportIssues: async () => {},
+    trackMetrics: async () => {}
+}
+```
+
+### Implementation
+- [ ] Add health checks
+- [ ] Implement state tracking
+- [ ] Create issue reporting
+- [ ] Add performance metrics
+- [ ] Implement alerts
+- [ ] Create reports
+- [ ] Add Qipu integration
+
+🛑 FINAL DECISION POINT
+Options:
+1. Deploy if all tests pass
+2. Run extended tests
+3. Request human review
+
+## 🧪 Test Scenarios
+```javascript
+describe('Goalsetter', () => {
+    test('should handle state transitions', async () => {
+        const goalsetter = new Goalsetter();
+        await goalsetter.setState('temp');
+        expect(goalsetter.getState()).toBe('temp');
+    });
+    
+    test('should prevent live page modifications', () => {
+        const page = 'goalsetter_live.html';
+        expect(VALIDATION_RULES.validateLivePage(page).constraints.adminFunctions).toBe(false);
+    });
+});
+```
+
+## 📝 Success Criteria
+- All pages load < 2s
+- State transitions < 100ms
+- Zero console errors
+- 100% accessibility score
+- All tests passing
+- No modifications to _live.html pages
+
+## 🚨 Abort Conditions
+1. State corruption
+2. UI breaking
+3. Performance degradation
+4. Accessibility issues
+5. Test failures
+6. Attempted live page modification
+
+## 📊 Metrics Collection
+```javascript
+const metrics = {
+    collect: async () => ({
+        loadTime: performance.now(),
+        stateTransitions: Goalsetter.getTransitionCount(),
+        errors: Goalsetter.getErrorCount(),
+        accessibility: await a11y.getScore()
+    })
+}
+```
+
+## 🔄 Rollback Plan
+1. Keep version history
+2. Store state snapshots
+3. Maintain UI backups
+4. Track changes
+
+## 👥 Human Review Triggers
+1. State inconsistencies
+2. UI regressions
+3. Performance issues
+4. Accessibility concerns
+5. Test failures
+6. Live page modification attempts 
