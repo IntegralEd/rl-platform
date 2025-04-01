@@ -55,26 +55,20 @@
         }
 
         .app-container {
-            width: 100%;
-            max-width: var(--embed-width);
-            height: var(--embed-height);
             display: flex;
             flex-direction: column;
-            background: white;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            margin: 0 auto;
-            position: relative;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Header */
         .app-header {
             height: var(--header-height);
             background: var(--primary-color);
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 0 24px;
-            box-sizing: border-box;
+            flex-shrink: 0;
+            z-index: 10;
         }
 
         .header-logo {
@@ -102,34 +96,47 @@
             fill: currentColor;
         }
 
-        /* Main Layout */
         .app-layout {
             display: flex;
             flex: 1;
-            overflow: hidden;
+            min-height: 0;
         }
 
         .nav-sidebar {
-            width: 240px;
+            width: var(--nav-width);
+            background: white;
             border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
         }
 
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
+        .nav-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 16px 8px;
         }
 
-        .content-section {
-            display: none;
-            max-width: 800px;
-            margin: 0 auto;
+        .nav-tab {
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-size: 16px;
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
 
-        .content-section.active {
-            display: block;
+        .nav-tab:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
+        .nav-tab.active {
+            background: var(--secondary-color-light);
         .interaction-container {
             position: relative;
         }
@@ -140,6 +147,130 @@
 
         .interaction-bar.active {
             display: flex;
+        }
+
+        /* Form Styling */
+        .goalsetter-welcome {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-title {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-title.compact {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-section h2 {
+            color: var(--text-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--secondary-color);
+        }
+
+        .context-section {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin-top: 0;
+            transition: all 0.3s ease;
+        }
+
+        .context-section.visible {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+            padding: 1rem;
+            border-left: 3px solid var(--secondary-color);
+            background: rgba(232, 119, 34, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
+        }
+
+        .form-group input.invalid,
+        .form-group textarea.invalid {
+            border-color: var(--raspberry);
+            box-shadow: 0 0 0 2px rgba(221, 87, 87, 0.1);
+        }
+
+        .validation-message {
+            display: none;
+            color: var(--raspberry);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: rgba(221, 87, 87, 0.1);
+        }
+
+        .validation-message.visible {
+            display: block;
+        }
+
+        /* Next Button Styling */
+        .next-button {
+            opacity: 0.5;
+            filter: grayscale(100%);
+            transition: all 0.3s ease;
+        }
+
+        .next-button.enabled {
+            opacity: 1;
+            filter: none;
         }
     </style>
 </head>
@@ -168,7 +299,7 @@
             <main class="main-content">
                 <div id="welcome-section" class="content-section active">
                     <div class="activity-container goalsetter-welcome" role="form">
-                        <h1>Welcome to the GoalSetter!</h1>
+                        <h1 class="welcome-title">Welcome to the GoalSetter!</h1>
                         <p>You will be guided through an interview to help set affirming student-friendly goals you can print and hang on your PDSA board.</p>
 
                         <div class="form-section standards-section">
@@ -186,22 +317,9 @@
                             
                             <div id="standards-detail" class="context-section">
                                 <div class="form-group">
-                                    <label for="standards-url">Standards URL</label>
                                     <input type="text" id="standards-url" placeholder="Enter standards reference URL">
                                 </div>
-                                <div class="form-group">
-                                    <label for="standards-grade">Grade Level</label>
-                                    <input type="text" id="standards-grade" placeholder="Enter grade level">
-                                </div>
-                                <div class="form-group">
-                                    <label for="standards-subject">Subject Area</label>
-                                    <input type="text" id="standards-subject" placeholder="Enter subject area">
-                                </div>
-                                <div class="form-group">
-                                    <label for="standards-state">State/Jurisdiction</label>
-                                    <input type="text" id="standards-state" placeholder="Enter state or jurisdiction">
-                                </div>
-                                <div id="standards-validation" class="validation-message">Please fill in all standards details</div>
+                                <div id="standards-validation" class="validation-message">Please provide a standards reference URL</div>
                             </div>
                         </div>
 
@@ -220,8 +338,7 @@
                             
                             <div id="reflection-detail" class="context-section">
                                 <div class="form-group">
-                                    <label for="reflection-input">Your Reflection</label>
-                                    <textarea id="reflection-input" class="rich-text" rows="4" placeholder="Reflect on your previous goals..."></textarea>
+                                    <textarea id="reflection-input" rows="4" placeholder="Reflect on your previous goals..."></textarea>
                                 </div>
                                 <div id="reflection-validation" class="validation-message">Please enter your reflection</div>
                             </div>
