@@ -91,27 +91,33 @@ const STAuth = {
 
     handleStandardsChoice(choice) {
         const standardsDetail = document.getElementById('standards-detail');
-        const nextButton = document.querySelector('.next-button');
+        const welcomeTitle = document.querySelector('.welcome-title');
         
         if (choice === 'yes') {
             standardsDetail.classList.add('visible');
-            const inputs = standardsDetail.querySelectorAll('input');
-            inputs.forEach(input => input.addEventListener('input', () => this.checkFormCompletion()));
+            welcomeTitle.classList.add('compact');
+            const input = standardsDetail.querySelector('input');
+            input.addEventListener('input', () => this.checkFormCompletion());
         } else {
             standardsDetail.classList.remove('visible');
+            welcomeTitle.classList.remove('compact');
             this.checkFormCompletion();
         }
     },
 
     handleReflectionChoice(choice) {
         const reflectionDetail = document.getElementById('reflection-detail');
-        const nextButton = document.querySelector('.next-button');
+        const welcomeTitle = document.querySelector('.welcome-title');
         
         if (choice === 'yes') {
             reflectionDetail.classList.add('visible');
+            welcomeTitle.classList.add('compact');
             document.getElementById('reflection-input').addEventListener('input', () => this.checkFormCompletion());
         } else {
             reflectionDetail.classList.remove('visible');
+            if (document.querySelector('input[name="standards"]:checked')?.value === 'no') {
+                welcomeTitle.classList.remove('compact');
+            }
             this.checkFormCompletion();
         }
     },
@@ -125,11 +131,8 @@ const STAuth = {
         
         if (standardsChoice === 'yes') {
             const standardsUrl = document.getElementById('standards-url')?.value.trim();
-            const standardsGrade = document.getElementById('standards-grade')?.value.trim();
-            const standardsSubject = document.getElementById('standards-subject')?.value.trim();
-            const standardsState = document.getElementById('standards-state')?.value.trim();
-            
-            const hasStandardsInput = standardsUrl && standardsGrade && standardsSubject && standardsState;
+            const hasStandardsInput = standardsUrl.length > 0;
+            document.getElementById('standards-url').classList.toggle('invalid', !hasStandardsInput);
             document.getElementById('standards-validation').classList.toggle('visible', !hasStandardsInput);
             isComplete = isComplete && hasStandardsInput;
         }
@@ -137,6 +140,7 @@ const STAuth = {
         if (reflectionChoice === 'yes') {
             const reflectionText = document.getElementById('reflection-input')?.value.trim();
             const hasReflectionInput = reflectionText.length > 0;
+            document.getElementById('reflection-input').classList.toggle('invalid', !hasReflectionInput);
             document.getElementById('reflection-validation').classList.toggle('visible', !hasReflectionInput);
             isComplete = isComplete && hasReflectionInput;
         }
