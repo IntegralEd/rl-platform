@@ -297,20 +297,24 @@ const STAuth = {
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.querySelector(`.nav-tab[onclick="STAuth.switchTab('${tabName}')"]`).classList.add('active');
+        document.querySelector(`.nav-tab[onclick*="${tabName}"]`).classList.add('active');
 
         // Show correct section
-        document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
-        document.getElementById('interview-section').style.display = tabName === 'interview' ? 'block' : 'none';
-        document.getElementById('tools-section').style.display = tabName === 'tools' ? 'block' : 'none';
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-section`).classList.add('active');
 
-        // Update footer based on tab type
-        this.updateFooter(tabName);
-
-        // Focus chat input when switching to interview
-        if (tabName === 'interview') {
-            const chatInput = document.querySelector('.chat-input');
-            chatInput.focus();
+        // Update interaction bars
+        document.querySelectorAll('.interaction-bar').forEach(bar => {
+            bar.classList.remove('active');
+        });
+        
+        if (tabName === 'welcome') {
+            document.querySelector('.playbar').classList.add('active');
+        } else if (tabName === 'interview') {
+            document.querySelector('.chatbar').classList.add('active');
+            document.querySelector('.chat-input').focus();
         }
     },
 
