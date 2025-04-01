@@ -440,6 +440,13 @@ const STAuth = {
             STAuth.enableReviewFeatures();
         }
         STAuth.setupCommonFeatures();
+        STAuth.switchTab('welcome'); // Ensure welcome tab is active
+        
+        // Initialize welcome section
+        const welcomeSection = document.getElementById('welcome-section');
+        if (welcomeSection) {
+            welcomeSection.classList.add('active');
+        }
     },
 
     // Enable review-specific features
