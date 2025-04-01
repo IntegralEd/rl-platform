@@ -1,0 +1,172 @@
+# Learning Layout Rules
+
+## 🎯 Core Layout Structure
+```css
+.app-container {
+    /* Core container */
+    max-width: var(--embed-width, 1200px);
+    height: var(--embed-height, 85vh);
+}
+```
+
+## 📐 Layout Variables
+```css
+:root {
+    /* Dimensions */
+    --nav-width: 20%;
+    --content-width: 80%;
+    --embed-width: 1200px;
+    --embed-height: 85vh;
+    --header-height: 50px;
+    --footer-height: 100px;
+    
+    /* Spacing */
+    --page-margin: 20px;
+    --chat-button-size: 60px;
+    --play-button-size: 60px;
+    
+    /* Colors */
+    --primary-color: #425563;
+    --secondary-color: #E87722;
+    --tertiary-color: #4fa997;
+    --background-color: #f9f9f9;
+    --text-color: #2b2b2b;
+    --cta-text-color: #ffffff;
+    --border-color: #eee;
+}
+```
+
+## 🏗️ Component Structure
+```
+app-container/
+├── app-header/
+│   └── header-logo
+├── main-container/
+│   ├── left-nav/
+│   │   ├── nav-tab[welcome]
+│   │   ├── nav-tab[interview]
+│   │   └── nav-tab[tools]
+│   └── content-area/
+│       ├── welcome-section/
+│       │   └── form-container
+│       ├── interview-section/
+│       │   ├── chat-container
+│       │   └── interaction-container
+│       └── tools-section/
+└── app-footer/
+```
+
+## 📱 Responsive Rules
+1. Default (Desktop):
+   ```css
+   .app-container {
+       width: 100%;
+       max-width: var(--embed-width);
+   }
+   .left-nav { width: var(--nav-width); }
+   .content-area { width: var(--content-width); }
+   ```
+
+2. Embedded Mode:
+   ```css
+   .embedded .app-header,
+   .embedded .top-banner {
+       display: none !important;
+   }
+   .embedded .app-container {
+       height: 100vh;
+       margin: 0;
+   }
+   ```
+
+3. Live Mode:
+   ```css
+   /* Collapsed navigation */
+   .live .left-nav {
+       width: 60px;
+   }
+   .live .content-area {
+       width: calc(100% - 60px);
+   }
+   ```
+
+## 🎨 Style Rules
+1. Typography:
+   ```css
+   :root {
+       --client-font-h1: 'Arial, sans-serif';
+       --client-font-h2: 'Arial, sans-serif';
+       --client-font-body: 'Arial, sans-serif';
+       --client-font-size-h1: 28px;
+       --client-font-size-h2: 24px;
+       --client-font-size-body: 16px;
+   }
+   ```
+
+2. Interactions:
+   ```css
+   .interaction-button {
+       width: var(--chat-button-size);
+       height: var(--chat-button-size);
+       border-radius: 50%;
+   }
+   ```
+
+## 🔒 Layout Constraints
+1. Navigation:
+   - Left nav must maintain consistent width
+   - Tabs must preserve order: Welcome → Interview → Tools
+   - Disabled states must be visually distinct
+
+2. Content Area:
+   - Must support both form and chat interfaces
+   - Chat container must scroll independently
+   - Footer must stay fixed at bottom
+
+3. Embedded Mode:
+   - Must adapt to container dimensions
+   - Must hide header/footer when embedded
+   - Must preserve functionality without branding
+
+## 📝 Implementation Notes
+1. File Structure:
+   ```
+   /shared/assets/
+   ├── css/
+   │   └── layout.css
+   └── js/
+       └── layout.js
+   ```
+
+2. State Management:
+   ```javascript
+   const LayoutState = {
+       mode: 'default|embedded|live',
+       activeSection: 'welcome|interview|tools',
+       navigationEnabled: boolean
+   }
+   ```
+
+3. Required Assets:
+   ```
+   /shared/assets/images/
+   ├── arrow-right.svg
+   ├── send.svg
+   └── logo.png
+   ```
+
+## ⚠️ Common Issues
+1. Height Calculation:
+   - Use `min-height: 0` on flex containers
+   - Account for header/footer in calculations
+   - Handle overflow properly in chat container
+
+2. Embedding:
+   - Test in various container sizes
+   - Ensure responsive behavior
+   - Verify state persistence
+
+3. Navigation:
+   - Maintain tab state during navigation
+   - Handle disabled states correctly
+   - Preserve order in all modes 
