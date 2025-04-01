@@ -563,6 +563,20 @@
             <main class="main-content">
                 <div id="welcome-section" class="content-section active">
                     <div id="goalsetter-welcome"></div>
+                    <script>
+                        fetch('/shared/admin/page_ingredients/activities/goalsetter_welcome.html')
+                            .then(response => response.text())
+                            .then(html => {
+                                document.getElementById('goalsetter-welcome').innerHTML = html;
+                                // Listen for activity completion
+                                document.addEventListener('activityComplete', (e) => {
+                                    if (e.detail.type === 'goalsetterWelcome') {
+                                        STAuth.handleWelcomeComplete(e.detail.data);
+                                    }
+                                });
+                            })
+                            .catch(error => console.error('Error loading welcome component:', error));
+                    </script>
                 </div>
                 
                 <div id="interview-section" class="content-section">
