@@ -1,0 +1,178 @@
+# Cursor Rules - URL Schema & Admin Constraints
+
+## 🔒 URL Schema Rules
+```javascript
+// URL Pattern Rules
+const URL_RULES = {
+    // Live pages - READ ONLY
+    live: {
+        pattern: '*_live.html',
+        constraints: {
+            noAdminFunctions: true,
+            noStateChanges: true,
+            noAuthModification: true,
+            noStyleChanges: true
+        }
+    },
+    
+    // Admin pages - LIMITED ACCESS
+    admin: {
+        pattern: '/shared/admin/*',
+        constraints: {
+            allowedActions: [
+                'copyUrl',
+                'launch',
+                'viewInfo',
+                'viewMetrics'
+            ],
+            forbiddenActions: [
+                'editAuth',
+                'modifyStyles',
+                'changeBehavior',
+                'updateState'
+            ]
+        }
+    },
+    
+    // Review pages - READ ONLY
+    review: {
+        pattern: '*_review.html',
+        constraints: {
+            noAdminFunctions: true,
+            noStateChanges: true,
+            noAuthModification: true,
+            noStyleChanges: true
+        }
+    }
+}
+```
+
+## 🚫 Admin Function Constraints
+```javascript
+// Admin Function Rules
+const ADMIN_RULES = {
+    // Allowed Functions
+    allowed: {
+        copyUrl: {
+            description: 'Copy page URL to clipboard',
+            requiresAuth: false
+        },
+        launch: {
+            description: 'Open page in new tab',
+            requiresAuth: false
+        },
+        viewInfo: {
+            description: 'View page information',
+            requiresAuth: false
+        },
+        viewMetrics: {
+            description: 'View page metrics',
+            requiresAuth: false
+        }
+    },
+    
+    // Forbidden Functions (commented out until Softr integration)
+    forbidden: {
+        editAuth: {
+            description: 'Modify authentication rules',
+            requiresAuth: true,
+            status: 'disabled'
+        },
+        modifyStyles: {
+            description: 'Change page styles',
+            requiresAuth: true,
+            status: 'disabled'
+        },
+        changeBehavior: {
+            description: 'Modify page behavior',
+            requiresAuth: true,
+            status: 'disabled'
+        },
+        updateState: {
+            description: 'Update page state',
+            requiresAuth: true,
+            status: 'disabled'
+        }
+    }
+}
+```
+
+## 🔍 Validation Rules
+```javascript
+// Page Validation Rules
+const VALIDATION_RULES = {
+    // Live Page Validation
+    validateLivePage: (page) => {
+        if (page.includes('_live.html')) {
+            return {
+                isValid: true,
+                constraints: {
+                    adminFunctions: false,
+                    stateChanges: false,
+                    authModification: false,
+                    styleChanges: false
+                }
+            };
+        }
+        return { isValid: false };
+    },
+    
+    // Admin Page Validation
+    validateAdminPage: (page) => {
+        if (page.startsWith('/shared/admin/')) {
+            return {
+                isValid: true,
+                constraints: {
+                    allowedActions: ADMIN_RULES.allowed,
+                    forbiddenActions: ADMIN_RULES.forbidden
+                }
+            };
+        }
+        return { isValid: false };
+    }
+}
+```
+
+## 📝 Implementation Notes
+1. All _live.html pages are read-only
+2. Admin functions are limited to:
+   - Copy URL
+   - Launch page
+   - View information
+   - View metrics
+3. Forbidden functions are:
+   - Edit authentication
+   - Modify styles
+   - Change behavior
+   - Update state
+4. These rules apply until Softr integration
+
+## 🎯 Usage Examples
+```javascript
+// Valid admin action
+const copyUrl = () => {
+    if (VALIDATION_RULES.validateAdminPage(currentPage).isValid) {
+        // Allowed action
+        navigator.clipboard.writeText(pageUrl);
+    }
+};
+
+// Invalid admin action (commented out)
+/*
+const modifyAuth = () => {
+    if (VALIDATION_RULES.validateAdminPage(currentPage).isValid) {
+        // Forbidden action - will be enabled after Softr integration
+        updateAuthRules();
+    }
+};
+*/
+```
+
+## ⚠️ Warning Messages
+```javascript
+const WARNINGS = {
+    forbiddenAction: 'This action requires Softr integration and is currently disabled.',
+    livePageModification: 'Live pages are read-only and cannot be modified.',
+    adminPrivileges: 'Admin privileges required. Will be available after Softr integration.'
+}
+``` 

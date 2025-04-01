@@ -296,24 +296,88 @@ const STAuth = {
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        document.querySelector(`.nav-tab[onclick="STAuth.switchTab('${tabName}')"]`).classList.add('active');
 
         // Show correct section
         document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
         document.getElementById('interview-section').style.display = tabName === 'interview' ? 'block' : 'none';
         document.getElementById('tools-section').style.display = tabName === 'tools' ? 'block' : 'none';
 
-        // Toggle chatbar/playbar based on section
-        const playbar = document.querySelector('.playbar');
-        const chatbar = document.querySelector('.chatbar');
-        
-        playbar.classList.toggle('active', tabName === 'welcome');
-        chatbar.classList.toggle('active', tabName === 'interview');
+        // Update footer based on tab type
+        this.updateFooter(tabName);
 
         // Focus chat input when switching to interview
         if (tabName === 'interview') {
             const chatInput = document.querySelector('.chat-input');
             chatInput.focus();
+        }
+    },
+
+    // Footer Management
+    updateFooter(tabName) {
+        const footer = document.querySelector('.app-footer');
+        const isChatTab = tabName === 'interview';
+
+        // Clear existing content
+        footer.innerHTML = '';
+        footer.className = 'app-footer ' + (isChatTab ? 'chat-mode' : 'standard-mode');
+
+        if (isChatTab) {
+            // Chat mode footer
+            footer.innerHTML = `
+                <div class="interaction-bar">
+                    <div class="interaction-left">
+                        <button class="interaction-button send-button">
+                            <span class="sr-only">Send</span>
+                            <img class="interaction-icon" src="/shared/assets/images/send.svg" alt="Send">
+                        </button>
+                    </div>
+                    <div class="interaction-center">
+                        <div class="chat-input-group">
+                            <textarea 
+                                class="interaction-input" 
+                                id="chat-input" 
+                                placeholder="Type your message..."
+                                rows="3"
+                                onkeypress="STAuth.handleChatKeypress(event)"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Standard footer with next/back based on tab
+            const showNext = tabName === 'welcome' && this.state.chatState.isComplete;
+            footer.innerHTML = `
+                <div class="interaction-bar">
+                    ${showNext ? `
+                        <div class="interaction-left">
+                            <button class="interaction-button next-button" onclick="STAuth.startInterview()">
+                                <span class="sr-only">Next</span>
+                                <img class="interaction-icon" src="/shared/assets/images/arrow-right.svg" alt="Next">
+                            </button>
+                        </div>
+                    ` : ''}
+                    <div class="footer-content">
+                        <img class="footer-logo" src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning Logo">
+                        <span class="footer-text">Powered by Recursive Learning</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update styles based on mode
+        this.updateFooterStyles(isChatTab);
+    },
+
+    updateFooterStyles(isChatMode) {
+        const footer = document.querySelector('.app-footer');
+        if (isChatMode) {
+            footer.style.height = '80px';
+            footer.style.padding = '0';
+        } else {
+            footer.style.height = 'var(--footer-height)';
+            footer.style.padding = '0 24px';
         }
     },
 

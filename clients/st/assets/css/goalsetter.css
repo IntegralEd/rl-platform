@@ -1,0 +1,81 @@
+/* Footer Styles */
+.app-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--primary-color);
+    color: white;
+    transition: height 0.3s ease;
+}
+
+.app-footer.chat-mode {
+    height: 80px;
+    padding: 0;
+}
+
+.app-footer.standard-mode {
+    height: var(--footer-height);
+    padding: 0 24px;
+}
+
+.interaction-bar {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 16px;
+    padding: 0 16px;
+}
+
+.interaction-left {
+    flex: 0 0 auto;
+}
+
+.interaction-center {
+    flex: 1;
+}
+
+.interaction-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.interaction-button:hover {
+    opacity: 0.8;
+}
+
+.interaction-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.chat-input-group {
+    width: 100%;
+}
+
+.interaction-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    resize: none;
+}
+
+.interaction-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.footer-logo {
+    height: 24px;
+} 
