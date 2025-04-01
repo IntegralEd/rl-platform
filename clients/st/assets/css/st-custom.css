@@ -159,10 +159,12 @@ h4, h5, h6 {
     height: 100%;
     display: flex;
     align-items: stretch;
+    justify-content: flex-end;
+    padding: 0 20px;
 }
 
 .interaction-left, .interaction-right {
-    width: 80px;
+    width: 60px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -175,6 +177,7 @@ h4, h5, h6 {
     align-items: center;
     justify-content: center;
     padding: 0 16px;
+    max-width: 700px;
 }
 
 .chat-input-group {
@@ -247,7 +250,15 @@ h4, h5, h6 {
     }
 }
 
-/* Interaction Buttons */
+/* Show/hide based on section */
+#welcome-section .chatbar,
+#interview-section .playbar,
+#tools-section .chatbar,
+#tools-section .playbar {
+    display: none !important;
+}
+
+/* Button styles */
 .interaction-button {
     width: 60px;
     height: 60px;
@@ -260,35 +271,11 @@ h4, h5, h6 {
     position: relative;
     cursor: pointer;
     padding: 0;
-    background: var(--secondary-color);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: transparent;
 }
 
-.interaction-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-.interaction-button:active {
-    transform: scale(0.95);
-}
-
-.interaction-button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.interaction-button.enabled {
-    background: var(--secondary-color);
-}
-
-.interaction-button.next-button {
-    background: var(--secondary-color);
-}
-
-.interaction-button.send-button {
-    background: var(--secondary-color);
+.interaction-button img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
 }
