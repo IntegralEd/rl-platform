@@ -3,9 +3,23 @@
 ## 🎯 Core Layout Structure
 ```css
 .app-container {
-    /* Core container */
+    /* Core container with viewport constraints */
+    width: 95vw;
+    height: 85vh;
     max-width: var(--embed-width, 1200px);
-    height: var(--embed-height, 85vh);
+    max-height: var(--embed-height, 800px);
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: 100;
+    background: var(--primary-color);
 }
 ```
 
@@ -16,14 +30,15 @@
     --nav-width: 20%;
     --content-width: 80%;
     --embed-width: 1200px;
-    --embed-height: 85vh;
-    --header-height: 50px;
-    --footer-height: 100px;
+    --embed-height: 800px;
+    --header-height: 40px;
+    --footer-height: 60px;
+    --chat-input-height: 60px;
     
     /* Spacing */
     --page-margin: 20px;
-    --chat-button-size: 60px;
-    --play-button-size: 60px;
+    --chat-button-size: 40px;
+    --play-button-size: 40px;
     
     /* Colors */
     --primary-color: #425563;
@@ -60,11 +75,21 @@ app-container/
 1. Default (Desktop):
    ```css
    .app-container {
-       width: 100%;
-       max-width: var(--embed-width);
+       width: 95vw;
+       height: 85vh;
    }
-   .left-nav { width: var(--nav-width); }
-   .content-area { width: var(--content-width); }
+   .chat-window {
+       max-height: calc(100vh - 140px);
+       height: calc(100% - var(--chat-input-height));
+       overflow-y: auto;
+   }
+   .input-area {
+       position: fixed;
+       bottom: 0;
+       width: 100%;
+       max-width: 700px;
+       height: var(--chat-input-height);
+   }
    ```
 
 2. Embedded Mode:
@@ -143,16 +168,24 @@ app-container/
    const LayoutState = {
        mode: 'default|embedded|live',
        activeSection: 'welcome|interview|tools',
-       navigationEnabled: boolean
+       navigationEnabled: boolean,
+       threadId: null
    }
    ```
 
-3. Required Assets:
-   ```
-   /shared/assets/images/
-   ├── arrow-right.svg
-   ├── send.svg
-   └── logo.png
+3. Logging Patterns:
+   ```javascript
+   // Session Initialization
+   console.log('Session initialized:', threadId ? `Using thread ${threadId}` : 'No existing thread');
+   
+   // Message Tracking
+   console.log(`Message ${messageCount}${threadId ? ` with threadId: ${threadId}` : ''}`);
+   
+   // Error Handling
+   console.error('Error with thread:', threadId, error);
+   
+   // State Changes
+   console.log('Full response:', data);
    ```
 
 ## ⚠️ Common Issues

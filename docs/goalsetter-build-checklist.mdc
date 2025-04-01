@@ -185,3 +185,48 @@ const metrics = {
 4. Accessibility concerns
 5. Test failures
 6. Live page modification attempts 
+
+## Layout Compliance
+- [ ] Viewport-based container (95vw/85vh)
+- [ ] Fixed header with z-index 100
+- [ ] Dynamic chat window height
+- [ ] Fixed input area positioning
+- [ ] Loading state animations
+- [ ] Responsive embedded mode
+
+## State Management
+- [ ] Thread ID tracking
+- [ ] Message count tracking
+- [ ] Tab state persistence
+- [ ] Navigation state validation
+
+## Logging Implementation
+- [ ] Session initialization logs
+- [ ] Message tracking logs
+- [ ] Error handling logs
+- [ ] State change logs
+
+## Testing Requirements
+- [ ] Viewport responsiveness
+- [ ] Embedded mode functionality
+- [ ] Chat persistence
+- [ ] Navigation state preservation
+- [ ] Loading state transitions
+
+## Performance Metrics
+- [ ] Layout render time < 100ms
+- [ ] Chat response time < 2s
+- [ ] Animation smoothness 60fps
+- [ ] No layout shifts during loading
+
+## Documentation
+- [x] Layout rules updated
+- [x] Logging patterns documented
+- [ ] State management flows
+- [ ] Error handling procedures
+
+## Migration Notes
+- [x] BHB layout patterns integrated
+- [x] Logging standards adopted
+- [ ] Navigation flow updated
+- [ ] Chat UI modernized 
