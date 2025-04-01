@@ -13,7 +13,7 @@
     <script src="/shared/assets/js/chat.js"></script>
     
     <!-- Client level assets -->
-    <script src="assets/js/st-auth.js"></script>
+    <script src="assets/js/st-goalsetter-auth.js"></script>
     <link rel="stylesheet" href="assets/css/st-variables.css">
     <link rel="stylesheet" href="assets/css/st-custom.css">
 
@@ -103,401 +103,6 @@
         }
 
         /* Main Layout */
-        .main-container {
-            display: flex;
-            height: calc(100% - var(--header-height) - var(--footer-height));
-            min-height: 0;
-        }
-
-        /* Left Navigation */
-        .left-nav {
-            width: var(--nav-width);
-            border-right: 2px solid var(--primary-color);
-            padding: 16px 0;
-            background: white;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-tab {
-            padding: 12px 16px;
-            width: 100%;
-            text-align: left;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 16px;
-            color: var(--text-color);
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .nav-tab.active {
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 16px;
-            right: 16px;
-            height: 3px;
-            background: var(--secondary-color);
-        }
-
-        /* Content Area */
-        .content-area {
-            width: var(--content-width);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            padding: 40px;
-            background: var(--background-color);
-        }
-
-        /* Form Container */
-        .form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            width: 100%;
-        }
-
-        /* Form Section */
-        .form-section {
-            margin-bottom: 30px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-        }
-
-        .form-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 500;
-            color: var(--text-color);
-            font-family: var(--client-font-body);
-        }
-
-        /* Form Inputs */
-        input[type="text"],
-        input[type="email"],
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Form Title */
-        .form-title {
-            color: var(--text-color);
-            font-size: var(--client-font-size-h1);
-            margin-bottom: 32px;
-            font-family: var(--client-font-h1);
-        }
-
-        /* Context Sections */
-        .context-section {
-            display: none;
-            margin-top: 24px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-        }
-
-        .context-section.visible {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Radio Groups */
-        .radio-group {
-            display: flex;
-            gap: 24px;
-            margin-top: 12px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .radio-option:hover {
-            background: rgba(232, 119, 34, 0.05);
-        }
-
-        .radio-option input[type="radio"] {
-            accent-color: var(--secondary-color);
-        }
-
-        /* Interaction Container */
-        .interaction-container {
-            width: 100%;
-            height: 80px;
-            display: flex;
-            flex-shrink: 0;
-            background: var(--primary-color);
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-        }
-
-        .interaction-bar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: stretch;
-        }
-
-        .interaction-left, .interaction-right {
-            width: 80px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .interaction-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 16px;
-        }
-
-        .chat-input-group {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .interaction-input {
-            width: 100%;
-            padding: 8px 12px;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: none;
-            background: white;
-            min-height: 40px;
-            box-sizing: border-box;
-            resize: none;
-            line-height: 1.4;
-        }
-
-        .interaction-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
-        }
-
-        /* Interaction Buttons */
-        .interaction-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .interaction-button:disabled {
-            cursor: not-allowed;
-        }
-
-        .interaction-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(128, 128, 128, 0.6);
-            border-radius: 50%;
-            transition: opacity 0.3s ease;
-        }
-
-        .interaction-button.enabled::before {
-            opacity: 0;
-        }
-
-        .interaction-button.next-button {
-            background: var(--tertiary-color);
-        }
-
-        .interaction-button.send-button {
-            background: var(--secondary-color);
-        }
-
-        .interaction-icon {
-            width: 30px;
-            height: 30px;
-            transition: transform 0.2s ease;
-        }
-
-        .interaction-button.enabled:hover .interaction-icon {
-            transform: scale(1.1);
-        }
-
-        /* Footer */
-        .app-footer {
-            height: var(--footer-height);
-            background: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 24px;
-            box-sizing: border-box;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-        }
-
-        .footer-content {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .footer-logo {
-            height: 30px;
-        }
-
-        .footer-text {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        /* Chat container */
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 24px;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
-        /* Chat bubbles */
-        .message {
-            max-width: 80%;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 16px;
-            line-height: 1.4;
-            color: #FFFFFF;
-        }
-
-        .message.assistant {
-            align-self: flex-start;
-            background: var(--primary-color);
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: var(--secondary-color);
-        }
-
-        /* Chat and Play buttons */
-        .chat-button, .play-button {
-            width: var(--chat-button-size);
-            height: var(--chat-button-size);
-            min-width: var(--chat-button-size);
-            min-height: var(--chat-button-size);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--primary-color);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .chat-button img, .play-button img {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        /* Validation Message */
-        .validation-message {
-            display: none;
-            background: rgba(221, 87, 87, 0.1);
-            border-left: 4px solid #DD5757;
-            color: #DD5757;
-            padding: 12px 16px;
-            margin-top: 8px;
-            font-size: 14px;
-            border-radius: 0 4px 4px 0;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .validation-message.visible {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Hide header in embedded mode */
-        .embedded .app-header,
-        .embedded .top-banner {
-            display: none !important;
-        }
-        
-        /* Adjust container in embedded mode */
-        .embedded .app-container {
-            height: 100vh;
-            margin: 0;
-            border-radius: 0;
-            box-shadow: none;
-        }
-
         .app-layout {
             display: flex;
             flex: 1;
@@ -562,21 +167,66 @@
 
             <main class="main-content">
                 <div id="welcome-section" class="content-section active">
-                    <div id="goalsetter-welcome"></div>
-                    <script>
-                        fetch('/shared/admin/page_ingredients/activities/goalsetter_welcome.html')
-                            .then(response => response.text())
-                            .then(html => {
-                                document.getElementById('goalsetter-welcome').innerHTML = html;
-                                // Listen for activity completion
-                                document.addEventListener('activityComplete', (e) => {
-                                    if (e.detail.type === 'goalsetterWelcome') {
-                                        STAuth.handleWelcomeComplete(e.detail.data);
-                                    }
-                                });
-                            })
-                            .catch(error => console.error('Error loading welcome component:', error));
-                    </script>
+                    <div class="activity-container goalsetter-welcome" role="form">
+                        <h1>Welcome to the GoalSetter!</h1>
+                        <p>You will be guided through an interview to help set affirming student-friendly goals you can print and hang on your PDSA board.</p>
+
+                        <div class="form-section standards-section">
+                            <h2>Standards Alignment</h2>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="standards" value="yes" onchange="STAuth.handleStandardsChoice('yes')">
+                                    <span>Yes, I want to align with standards</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="standards" value="no" onchange="STAuth.handleStandardsChoice('no')">
+                                    <span>No, skip standards alignment</span>
+                                </label>
+                            </div>
+                            
+                            <div id="standards-detail" class="context-section">
+                                <div class="form-group">
+                                    <label for="standards-url">Standards URL</label>
+                                    <input type="text" id="standards-url" placeholder="Enter standards reference URL">
+                                </div>
+                                <div class="form-group">
+                                    <label for="standards-grade">Grade Level</label>
+                                    <input type="text" id="standards-grade" placeholder="Enter grade level">
+                                </div>
+                                <div class="form-group">
+                                    <label for="standards-subject">Subject Area</label>
+                                    <input type="text" id="standards-subject" placeholder="Enter subject area">
+                                </div>
+                                <div class="form-group">
+                                    <label for="standards-state">State/Jurisdiction</label>
+                                    <input type="text" id="standards-state" placeholder="Enter state or jurisdiction">
+                                </div>
+                                <div id="standards-validation" class="validation-message">Please fill in all standards details</div>
+                            </div>
+                        </div>
+
+                        <div class="form-section reflection-section">
+                            <h2>Previous Goals Review</h2>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="reflection" value="yes" onchange="STAuth.handleReflectionChoice('yes')">
+                                    <span>Yes, I want to reflect on last week's goals</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="reflection" value="no" onchange="STAuth.handleReflectionChoice('no')">
+                                    <span>No, start fresh</span>
+                                </label>
+                            </div>
+                            
+                            <div id="reflection-detail" class="context-section">
+                                <div class="form-group">
+                                    <label for="reflection-input">Your Reflection</label>
+                                    <textarea id="reflection-input" class="rich-text" rows="4" placeholder="Reflect on your previous goals..."></textarea>
+                                </div>
+                                <div id="reflection-validation" class="validation-message">Please enter your reflection</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="interview-section" class="content-section">
