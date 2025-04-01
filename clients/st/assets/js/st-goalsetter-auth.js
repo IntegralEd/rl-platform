@@ -199,62 +199,79 @@ const STAuth = {
             return;
         }
 
+        // Get form data
         const standardsChoice = document.querySelector('input[name="standards"]:checked').value;
         const reflectionChoice = document.querySelector('input[name="reflection"]:checked').value;
         
-        // Hide form container and show chat interface
-        document.querySelector('.form-container').style.display = 'none';
-        document.querySelector('.chatbar').style.display = 'flex';
-        document.querySelector('.playbar').style.display = 'none';
-        document.getElementById('interview-section').style.display = 'block';
-
-        // Enable interview tab
-        const interviewTab = document.querySelector('.nav-tab[onclick*="interview"]');
-        if (interviewTab) {
-            interviewTab.disabled = false;
-            this.switchTab('interview');
+        // Build context message
+        let contextMessage = '';
+        if (standardsChoice === 'yes') {
+            const grade = document.getElementById('standards-grade').value.trim();
+            const subject = document.getElementById('standards-subject').value.trim();
+            const state = document.getElementById('standards-state').value.trim();
+            const url = document.getElementById('standards-url').value.trim();
+            contextMessage += `\nAcademic Standards Context:\nGrade: ${grade}\nSubject: ${subject}\nState/Jurisdiction: ${state}\nReference: ${url}`;
+        }
+        if (reflectionChoice === 'yes') {
+            const reflection = document.getElementById('reflection-input').value.trim();
+            contextMessage += `\nPrevious Goals Context:\n${reflection}`;
         }
 
-        // For no/no case, just show a simple welcome
-        if (standardsChoice === 'no' && reflectionChoice === 'no') {
+        // Initialize chat
+        this.initializeChat(contextMessage);
+        
+        // Switch to interview tab
+        this.switchTab('interview');
+    },
+
+    initializeChat(contextMessage = '') {
+        // Clear existing chat
+        const chatContainer = document.querySelector('.chat-container');
+        chatContainer.innerHTML = '';
+        
+        // Send initial message
+        if (contextMessage) {
+            this.addMessage('user', `New user here to set goals. ${contextMessage}`);
+        } else {
             this.addMessage('assistant', "Hi! I'm here to help you set meaningful goals. What specific area would you like to focus on for this improvement cycle?");
-            return;
         }
 
-        // For cases with context, show loading count
-        let count = 0;
-        const loadingMessage = this.addMessage('assistant', 'Preparing your context... 0%');
-        const loadingInterval = setInterval(() => {
-            count += 10;
-            if (count <= 90) {
-                loadingMessage.textContent = `Preparing your context... ${count}%`;
-            }
-        }, 500);
+        // Reset chat state
+        this.state.chatState = {
+            messageCount: contextMessage ? 1 : 0,
+            isComplete: false,
+            goalStatementReceived: false
+        };
+    },
 
-        // Prepare context message
-        setTimeout(() => {
-            clearInterval(loadingInterval);
-            loadingMessage.textContent = 'Preparing your context... 100%';
-            
-            // Small delay before showing the actual context
-            setTimeout(() => {
-                loadingMessage.remove();
-                let contextMessage = "Starting goal setting interview with context:\n";
-                if (standardsChoice === 'yes') {
-                    const standardsLink = document.getElementById('standards-link').value.trim();
-                    const standardsDetail = document.getElementById('standards-detail-input').value.trim();
-                    contextMessage += `\nStandards Context:\n${standardsDetail}`;
-                    if (standardsLink) {
-                        contextMessage += `\nStandards Link: ${standardsLink}`;
-                    }
-                }
-                if (reflectionChoice === 'yes') {
-                    const reflectionDetail = document.getElementById('reflection-input').value.trim();
-                    contextMessage += `\nPrevious Cycle Reflection:\n${reflectionDetail}`;
-                }
-                this.addMessage('user', contextMessage);
-            }, 500);
-        }, 3000);
+    handleChatComplete(goalSummary) {
+        this.state.chatState.isComplete = true;
+        this.state.chatState.goalStatementReceived = true;
+
+        // Store goal data for webhook
+        this.state.chatState.goalData = {
+            standards: {
+                choice: document.querySelector('input[name="standards"]:checked').value,
+                grade: document.getElementById('standards-grade')?.value.trim(),
+                subject: document.getElementById('standards-subject')?.value.trim(),
+                state: document.getElementById('standards-state')?.value.trim(),
+                url: document.getElementById('standards-url')?.value.trim()
+            },
+            reflection: {
+                choice: document.querySelector('input[name="reflection"]:checked').value,
+                text: document.getElementById('reflection-input')?.value.trim()
+            },
+            goalSummary
+        };
+
+        // Add completion message
+        this.addMessage('assistant', `Perfect! I've captured your goal statements:\n${goalSummary}\n\nWould you like to create a goal-setting poster with these statements?`);
+        
+        // Enable tools tab
+        const toolsTab = document.querySelector('.nav-tab[onclick*="tools"]');
+        if (toolsTab) {
+            toolsTab.disabled = false;
+        }
     },
 
     // Tools Validation
