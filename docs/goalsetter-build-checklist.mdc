@@ -230,3 +230,128 @@ const metrics = {
 - [x] Logging standards adopted
 - [ ] Navigation flow updated
 - [ ] Chat UI modernized 
+
+## Directory Structure
+```
+/clients/st/goalsetter/
+├── goalsetter.html           # Main template
+├── goalsetter_review.html    # Review version
+├── goalsetter_live.html      # Live version
+├── goalsetter_embed.html     # Embed version
+└── assets/
+    ├── css/
+    │   ├── st-variables.css  # ST brand variables
+    │   └── st-custom.css     # Custom styles
+    ├── js/
+    │   └── st-goalsetter-auth.js  # Auth logic
+    └── images/
+        └── ST TH Powered By White Logo.png
+```
+
+## Asset Setup
+
+1. **CSS Files**
+   - [ ] Create `/clients/st/goalsetter/assets/css/st-variables.css`
+     ```css
+     :root {
+         --st-primary: #425563;
+         --st-secondary: #E87722;
+         --st-background: #f9f9f9;
+         --st-text: #333;
+     }
+     ```
+   - [ ] Create `/clients/st/goalsetter/assets/css/st-custom.css`
+     ```css
+     /* Custom styles for GoalSetter */
+     .goalsetter-container {
+         background: var(--st-background);
+         color: var(--st-text);
+     }
+     ```
+
+2. **JavaScript**
+   - [ ] Create `/clients/st/goalsetter/assets/js/st-goalsetter-auth.js`
+     ```javascript
+     // Auth logic for GoalSetter
+     const auth = {
+         init: () => {
+             console.log('GoalSetter auth initialized');
+         }
+     };
+     ```
+
+3. **Images**
+   - [ ] Add logo to `/clients/st/goalsetter/assets/images/`
+   - [ ] Verify logo path in HTML: `assets/images/ST TH Powered By White Logo.png`
+
+## HTML Template Setup
+
+1. **Base Template**
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>GoalSetter</title>
+       <link rel="stylesheet" href="assets/css/st-variables.css">
+       <link rel="stylesheet" href="assets/css/st-custom.css">
+   </head>
+   <body>
+       <div class="goalsetter-container">
+           <!-- Content -->
+       </div>
+       <script src="assets/js/st-goalsetter-auth.js"></script>
+   </body>
+   </html>
+   ```
+
+2. **Version Files**
+   - [ ] Create goalsetter_review.html
+   - [ ] Create goalsetter_live.html
+   - [ ] Create goalsetter_embed.html
+
+## Admin Panel Setup
+
+1. **Admin Template**
+   - [ ] Create `/admin/pages/st/goalsetter/goalsetter_admin.html`
+   - [ ] Link to client pages
+   - [ ] Add version controls
+
+2. **Admin Assets**
+   - [ ] Add admin-specific styles
+   - [ ] Add admin-specific scripts
+
+## Testing Checklist
+
+1. **Asset Loading**
+   - [ ] CSS files load without 404s
+   - [ ] JavaScript files load without 404s
+   - [ ] Images load without 404s
+
+2. **Version Testing**
+   - [ ] Review version loads correctly
+   - [ ] Live version loads correctly
+   - [ ] Embed version loads correctly
+
+3. **Admin Testing**
+   - [ ] Admin panel loads correctly
+   - [ ] Version controls work
+   - [ ] Settings save correctly
+
+## Deployment Steps
+
+1. **Asset Deployment**
+   - [ ] Upload CSS files
+   - [ ] Upload JavaScript files
+   - [ ] Upload images
+
+2. **Template Deployment**
+   - [ ] Deploy main template
+   - [ ] Deploy version files
+   - [ ] Deploy admin panel
+
+3. **Post-Deployment**
+   - [ ] Verify all assets load
+   - [ ] Test all versions
+   - [ ] Test admin controls 
