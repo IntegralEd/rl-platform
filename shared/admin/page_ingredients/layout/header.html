@@ -1,0 +1,78 @@
+<!-- 
+  Header Template
+  Original source: recursive-learning/shared_jekyll/_includes/header.html
+  Converted from liquid to HTML comments
+  Usage: Include this file in your layout
+-->
+
+<header class="app-header">
+  <!-- 
+    Original liquid: {% include header-logo.html %}
+    Replaced with static logo implementation
+  -->
+  <div class="header-logo">
+    <img src="/assets/images/logo.svg" alt="Recursive Learning Logo">
+  </div>
+
+  <!-- 
+    Original liquid: {% if page.nav %}
+    Replaced with conditional rendering based on data-nav attribute
+  -->
+  <nav class="header-nav" data-nav="true">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/activities">Activities</a></li>
+      <li><a href="/admin">Admin</a></li>
+    </ul>
+  </nav>
+
+  <!-- 
+    Original liquid: {% if page.user %}
+    Replaced with conditional rendering based on data-user attribute
+  -->
+  <div class="header-user" data-user="true">
+    <span class="user-name">User Name</span>
+    <button class="user-menu">Menu</button>
+  </div>
+</header>
+
+<!-- 
+  Styles moved to shared/admin/css/layout/header.css
+  Original liquid styles converted to CSS variables
+-->
+<style>
+  .app-header {
+    --header-height: 60px;
+    --header-bg: var(--color-primary);
+    --header-text: var(--color-text-light);
+    
+    height: var(--header-height);
+    background: var(--header-bg);
+    color: var(--header-text);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .header-logo img {
+    height: 40px;
+    width: auto;
+  }
+
+  .header-nav ul {
+    display: flex;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .header-nav a {
+    color: var(--header-text);
+    text-decoration: none;
+  }
+
+  .header-user {
+    margin-left: auto;
+  }
+</style> 

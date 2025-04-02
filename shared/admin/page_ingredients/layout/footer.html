@@ -1,0 +1,45 @@
+<!-- 
+  Footer Template
+  Original source: recursive-learning/shared_jekyll/_includes/footer.html
+  Converted from liquid to HTML comments
+  Usage: Include this in layout templates
+-->
+
+<footer class="app-footer" role="contentinfo">
+  <div class="interaction-container">
+    <div class="interaction-bar" data-bar="play">
+      <div class="interaction-left">
+        <button class="interaction-button next-button" aria-label="Next">
+          <img class="interaction-icon" src="/shared/assets/images/arrow-right.svg" alt="Next">
+        </button>
+      </div>
+      <div class="footer-content">
+        <img class="footer-logo" src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning Logo">
+        <span class="footer-text">Powered by Recursive Learning</span>
+      </div>
+    </div>
+
+    <div class="interaction-bar" data-bar="chat">
+      <div class="chat-input-container">
+        <form class="chat-form" id="footer-chat-form">
+          <textarea 
+            class="chat-input" 
+            placeholder="Type your message..."
+            aria-label="Chat input"
+            rows="1"
+          ></textarea>
+          <button type="submit" class="send-button" aria-label="Send message">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- 
+  Styles moved to shared/admin/css/layout/footer.css
+  Original liquid styles converted to CSS variables
+--> 

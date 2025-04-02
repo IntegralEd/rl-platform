@@ -297,58 +297,73 @@
             </nav>
 
             <main class="main-content">
-                <div id="welcome-section" class="content-section active">
-                    <div class="activity-container goalsetter-welcome" role="form">
-                        <h1 class="welcome-title">Welcome to the GoalSetter!</h1>
-                        <p>You will be guided through an interview to help set affirming student-friendly goals you can print and hang on your PDSA board.</p>
-
-                        <div class="form-section standards-section">
-                            <h2>Standards Alignment</h2>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="standards" value="yes" onchange="STAuth.handleStandardsChoice('yes')">
-                                    <span>Yes, I want to align with standards</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="standards" value="no" onchange="STAuth.handleStandardsChoice('no')">
-                                    <span>No, skip standards alignment</span>
-                                </label>
-                        </div>
-
-                        <div id="standards-detail" class="context-section">
-                            <div class="form-group">
-                                    <input type="text" id="standards-url" placeholder="Enter standards reference URL">
+                <div class="welcome-section" id="welcome-section">
+                    <div class="goalsetter-welcome" data-form="goalsetter">
+                        <h2>Welcome to GoalSetter</h2>
+                        <p class="welcome-text">Let's set some meaningful goals for your classroom.</p>
+                        
+                        <form id="goalsetter-form" class="goalsetter-form">
+                            <div class="form-section">
+                                <h3>Standards Alignment</h3>
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="standards" value="yes" required>
+                                        Yes, I want to align with standards
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="standards" value="no">
+                                        No, I'll set goals independently
+                                    </label>
                                 </div>
-                                <div id="standards-validation" class="validation-message">Please provide a standards reference URL</div>
-                            </div>
-                        </div>
 
-                        <div class="form-section reflection-section">
-                            <h2>Previous Goals Review</h2>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="reflection" value="yes" onchange="STAuth.handleReflectionChoice('yes')">
-                                    <span>Yes, I want to reflect on last week's goals</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="reflection" value="no" onchange="STAuth.handleReflectionChoice('no')">
-                                    <span>No, start fresh</span>
-                                </label>
-                        </div>
-
-                        <div id="reflection-detail" class="context-section">
-                            <div class="form-group">
-                                    <textarea id="reflection-input" rows="4" placeholder="Reflect on your previous goals..."></textarea>
+                                <div class="standards-details" data-show-when="standards" data-value="yes">
+                                    <div class="form-field">
+                                        <label for="standards-url">Standards URL</label>
+                                        <input type="url" id="standards-url" name="standardsUrl" 
+                                               placeholder="https://example.com/standards">
+                                    </div>
+                                    <div class="form-field">
+                                        <label for="standards-detail">Additional Context</label>
+                                        <textarea id="standards-detail" name="standardsDetail" 
+                                                  placeholder="Any additional context about these standards..."></textarea>
+                                    </div>
                                 </div>
-                                <div id="reflection-validation" class="validation-message">Please enter your reflection</div>
                             </div>
-                        </div>
+
+                            <div class="form-section">
+                                <h3>Previous Goals Review</h3>
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="reflection" value="yes" required>
+                                        Yes, I want to reflect on previous goals
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="reflection" value="no">
+                                        No, I'm starting fresh
+                                    </label>
+                                </div>
+
+                                <div class="reflection-details" data-show-when="reflection" data-value="yes">
+                                    <div class="form-field">
+                                        <label for="reflection-input">Your Reflection</label>
+                                        <textarea id="reflection-input" name="reflection" 
+                                                  placeholder="What worked well? What would you change?"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="submit-button" disabled>
+                                    Start Goal Setting
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
                 <div id="interview-section" class="content-section">
                     <div class="chat-container"></div>
-                        </div>
+                </div>
                 
                 <div id="tools-section" class="content-section">
                     <div class="tools-container">
