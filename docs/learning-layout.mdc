@@ -54,21 +54,21 @@
 ## 🏗️ Component Structure
 ```
 app-container/
-├── app-header/
+├── app-header/ (from page_ingredients/layout/header.html)
 │   └── header-logo
 ├── main-container/
-│   ├── left-nav/
+│   ├── left-nav/ (from page_ingredients/layout/sidebar.html)
 │   │   ├── nav-tab[welcome]
 │   │   ├── nav-tab[interview]
 │   │   └── nav-tab[tools]
 │   └── content-area/
 │       ├── welcome-section/
-│       │   └── form-container
+│       │   └── form-container (from page_ingredients/forms/*.html)
 │       ├── interview-section/
-│       │   ├── chat-container
+│       │   ├── chat-container (from page_ingredients/chat/container.html)
 │       │   └── interaction-container
 │       └── tools-section/
-└── app-footer/
+└── app-footer/ (from page_ingredients/layout/footer.html)
 ```
 
 ## 📱 Responsive Rules
@@ -156,37 +156,34 @@ app-container/
 ## 📝 Implementation Notes
 1. File Structure:
    ```
-   /shared/assets/
+   /shared/admin/
+   ├── page_ingredients/
+   │   ├── layout/
+   │   │   ├── header.html
+   │   │   ├── sidebar.html
+   │   │   └── footer.html
+   │   ├── forms/
+   │   │   ├── welcome_affirmations.html
+   │   │   └── goalsetter_welcome.html
+   │   └── chat/
+   │       └── container.html
    ├── css/
    │   └── layout.css
    └── js/
        └── layout.js
    ```
 
-2. State Management:
-   ```javascript
-   const LayoutState = {
-       mode: 'default|embedded|live',
-       activeSection: 'welcome|interview|tools',
-       navigationEnabled: boolean,
-       threadId: null
-   }
-   ```
+2. Component Integration:
+   - All partials use CSS variables for theming
+   - Forms include validation and state management
+   - Chat container handles message display and input
+   - Layout components maintain consistent structure
 
-3. Logging Patterns:
-   ```javascript
-   // Session Initialization
-   console.log('Session initialized:', threadId ? `Using thread ${threadId}` : 'No existing thread');
-   
-   // Message Tracking
-   console.log(`Message ${messageCount}${threadId ? ` with threadId: ${threadId}` : ''}`);
-   
-   // Error Handling
-   console.error('Error with thread:', threadId, error);
-   
-   // State Changes
-   console.log('Full response:', data);
-   ```
+3. Accessibility:
+   - All components include ARIA labels
+   - Navigation uses proper roles and states
+   - Forms include proper validation feedback
+   - Chat includes live region for messages
 
 ## ⚠️ Common Issues
 1. Height Calculation:
