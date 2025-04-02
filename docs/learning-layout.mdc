@@ -34,6 +34,11 @@
     --header-height: 40px;
     --footer-height: 60px;
     --chat-input-height: 60px;
+    --learning-area-max-width: 800px;
+    --learning-area-max-height: 85vh;
+    --sidebar-width: 250px;
+    --form-group-spacing: 1.5rem;
+    --content-padding: 2rem;
     
     /* Spacing */
     --page-margin: 20px;
@@ -200,3 +205,163 @@ app-container/
    - Maintain tab state during navigation
    - Handle disabled states correctly
    - Preserve order in all modes 
+
+## Core Principles
+
+1. **Constrained Learning Area**
+   - Maximum width: 800px
+   - Maximum visible height: 85vh
+   - Optimal reading width: 65-75 characters
+   - Vertical scrolling allowed, horizontal never
+
+2. **Progressive Disclosure**
+   - Show only relevant content
+   - Minimize when not in focus
+   - Use left nav for section breakdown
+   - Collapse completed sections
+
+## Form Management
+
+1. **Long Forms Strategy**
+   ```
+   Instead of:
+   [Welcome]
+   [Standards Form - Long]
+   [Goals Form - Long]
+   [Review Form - Long]
+
+   Use:
+   Left Nav:          Content Area:
+   [Welcome]          [Current Section]
+   [Standards]        [Focused Content]
+   ├── URL           [Clear Constraints]
+   ├── Context
+   [Goals]
+   ├── Current
+   ├── Future
+   [Review]
+   ```
+
+2. **Active Area Rules**
+   - One primary action visible at a time
+   - Maximum 3 form fields in view
+   - Progressive validation
+   - Sticky navigation controls
+
+3. **Minimization Patterns**
+   ```css
+   /* Completed section */
+   .form-group.minimized {
+       padding: 0.75rem;
+       background: var(--bg-color);
+       opacity: 0.7;
+   }
+
+   /* Active section */
+   .form-group.active {
+       padding: 1.5rem;
+       background: white;
+       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+   }
+   ```
+
+4. **Header Management**
+   - Compact on scroll
+   - Hide when form gets crowded
+   - Maintain context in nav
+
+## Responsive Behavior
+
+1. **Form Sections**
+   ```css
+   .expandable-section {
+       max-height: 0;
+       overflow: hidden;
+       opacity: 0;
+       transition: 0.3s ease-out;
+   }
+
+   .expandable-section.expanded {
+       max-height: 500px;
+       opacity: 1;
+   }
+   ```
+
+2. **Navigation Controls**
+   ```css
+   .nav-controls {
+       position: sticky;
+       bottom: 0;
+       background: white;
+       padding: 1rem;
+       box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+   }
+   ```
+
+## Best Practices
+
+1. **Form Organization**
+   - Break long forms into logical sub-sections
+   - Use left nav for section hierarchy
+   - Show progress in nav items
+   - Keep active area focused
+
+2. **Visual Hierarchy**
+   - Active section gets full visibility
+   - Completed sections minimize
+   - Future sections hidden or disabled
+   - Clear visual progression
+
+3. **Space Management**
+   ```
+   [Header] - Compact when scrolling
+   [Content]
+   ├── Active Section (Full height)
+   ├── Minimized Sections (Compact)
+   └── [Sticky Nav] - Always accessible
+   ```
+
+4. **Scroll Strategy**
+   - Allow vertical scroll within constraints
+   - Sticky progress indicator
+   - Sticky navigation controls
+   - Smooth transitions between sections
+
+## Implementation Example
+
+```html
+<div class="learning-container">
+    <nav class="section-nav">
+        <div class="nav-item">
+            Welcome
+            <div class="sub-items">
+                <!-- Sub-sections -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="learning-area">
+        <div class="progress-bar sticky">
+            <!-- Progress -->
+        </div>
+
+        <div class="active-section">
+            <!-- Current focus -->
+        </div>
+
+        <div class="nav-controls sticky">
+            <!-- Navigation -->
+        </div>
+    </main>
+</div>
+```
+
+## Validation
+
+- [ ] Content fits within 800px width
+- [ ] Active section visible without scrolling
+- [ ] Navigation always accessible
+- [ ] Clear visual hierarchy
+- [ ] Smooth transitions between states
+- [ ] Proper use of minimization
+- [ ] Effective use of left nav for breakdown 
