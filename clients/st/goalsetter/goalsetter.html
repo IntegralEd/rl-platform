@@ -274,150 +274,202 @@
         }
     </style>
 </head>
-<body>
-    <div class="goalsetter-container">
-        <header class="header">
-            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="logo">
-        </header>
+<body class="goalsetter-container">
+    <div class="app-header">
+        <div class="header-logo">
+            <img src="assets/images/logo.png" alt="Recursive Learning">
+        </div>
+    </div>
 
-        <nav class="sidebar">
-            <div class="nav-item active">
+    <div class="main-container">
+        <nav class="left-nav">
+            <div class="nav-item active" data-section="welcome">
+                <span class="nav-icon">👋</span>
                 Welcome
-                <div class="progress">Step 1 of 4</div>
             </div>
-            <div class="nav-item">
+            <div class="nav-item" data-section="standards">
+                <span class="nav-icon">📚</span>
                 Standards
-                <div class="progress">Not started</div>
+                <div class="sub-items">
+                    <div class="sub-item" data-subsection="url">URL</div>
+                    <div class="sub-item" data-subsection="context">Context</div>
+                </div>
             </div>
-            <div class="nav-item">
-                Previous Goals
-                <div class="progress">Not started</div>
+            <div class="nav-item" data-section="goals">
+                <span class="nav-icon">🎯</span>
+                Goals
+                <div class="sub-items">
+                    <div class="sub-item" data-subsection="current">Current</div>
+                    <div class="sub-item" data-subsection="future">Future</div>
+                </div>
             </div>
-            <div class="nav-item">
-                Tools
-                <div class="progress">Coming soon</div>
+            <div class="nav-item" data-section="review">
+                <span class="nav-icon">📝</span>
+                Review
             </div>
         </nav>
 
-        <main class="main-content">
-            <div class="section">
-                <div class="progress-bar">
-                    <div class="fill" style="width: 25%"></div>
+        <main class="content-area">
+            <div class="progress-bar sticky">
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">1</div>
+                    <div class="step" data-step="2">2</div>
+                    <div class="step" data-step="3">3</div>
+                    <div class="step" data-step="4">4</div>
                 </div>
-
-                <div class="welcome-header">
-                    <h1>Welcome to GoalSetter</h1>
-                    <p>Let's set some meaningful goals for your classroom.</p>
-                </div>
-
-                <form id="goalsetter-form">
-                    <div class="form-container">
-                        <div class="form-group active" id="standards-group">
-                            <h2>Standards Alignment</h2>
-                            <div class="form-content">
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="standards" value="yes">
-                                        Yes, I want to align with standards
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="standards" value="no" checked>
-                                        No, I'll set goals independently
-                                    </label>
-                                </div>
-
-                                <div class="expandable-section" id="standards-details">
-                                    <label for="standards-url">Standards URL</label>
-                                    <input type="url" id="standards-url" placeholder="https://example.com/standards">
-                                    
-                                    <label for="standards-context">Additional Context</label>
-                                    <textarea id="standards-context" placeholder="Any additional context about these standards..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group" id="review-group">
-                            <h2>Previous Goals Review</h2>
-                            <div class="form-content">
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="review" value="yes">
-                                        Yes, I want to reflect on previous goals
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="review" value="no" checked>
-                                        No, I'm starting fresh
-                                    </label>
-                                </div>
-
-                                <div class="expandable-section" id="review-details">
-                                    <label for="reflection">Your Reflection</label>
-                                    <textarea id="reflection" placeholder="What worked well? What would you change?"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="nav-controls">
-                        <button type="button" class="button disabled" disabled>Back</button>
-                        <button type="button" class="button" onclick="nextStep()">Next</button>
-                    </div>
-                </form>
             </div>
+
+            <form id="goalsetterForm" class="learning-area">
+                <div class="form-group active" data-section="welcome">
+                    <h1>Welcome to GoalSetter</h1>
+                    <p>Let's set some meaningful learning goals together.</p>
+                </div>
+
+                <div class="form-group" data-section="standards">
+                    <h2>Standards Alignment</h2>
+                    <div class="form-field">
+                        <label for="standardsUrl">Standards URL</label>
+                        <input type="url" id="standardsUrl" name="standardsUrl" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="standardsContext">Context</label>
+                        <textarea id="standardsContext" name="standardsContext" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" data-section="goals">
+                    <h2>Learning Goals</h2>
+                    <div class="form-field">
+                        <label for="learningTarget">Learning Target</label>
+                        <input type="text" id="learningTarget" name="learningTarget" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="measureOfSuccess">Measure of Success</label>
+                        <input type="text" id="measureOfSuccess" name="measureOfSuccess" required>
+                    </div>
+                </div>
+
+                <div class="form-group" data-section="review">
+                    <h2>Review Your Goals</h2>
+                    <div class="review-summary">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <div class="nav-controls sticky">
+                    <button type="button" class="btn-secondary" id="backBtn" disabled>Back</button>
+                    <button type="button" class="btn-primary" id="nextBtn">Next</button>
+                </div>
+            </form>
         </main>
     </div>
 
     <script>
-        // Handle form responsiveness
-        function updateFormLayout() {
-            const welcomeHeader = document.querySelector('.welcome-header');
-            const standardsGroup = document.getElementById('standards-group');
-            const reviewGroup = document.getElementById('review-group');
-            const reviewDetails = document.getElementById('review-details');
-            
-            // If review section is expanded, minimize standards section
-            if (reviewDetails.classList.contains('expanded')) {
-                welcomeHeader.classList.add('compact');
-                standardsGroup.classList.add('minimized');
-                reviewGroup.classList.add('active');
-                standardsGroup.classList.remove('active');
-            } else {
-                welcomeHeader.classList.remove('compact');
-                standardsGroup.classList.remove('minimized');
-                standardsGroup.classList.add('active');
-                reviewGroup.classList.remove('active');
+        // State management
+        const state = {
+            currentSection: 'welcome',
+            formData: {},
+            threadId: null
+        };
+
+        // API integration
+        async function submitForm(formData) {
+            try {
+                const response = await fetch('https://e7mu4gwsvh.execute-api.us-east-2.amazonaws.com/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': 'https://recursivelearning.app'
+                    },
+                    body: JSON.stringify({
+                        intake_token: "goalsetter_chat",
+                        ...formData,
+                        url: window.location.href,
+                        thread_id: state.threadId
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.thread_id) state.threadId = data.thread_id;
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
             }
         }
 
-        // Show/hide standards details
-        document.querySelectorAll('input[name="standards"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const details = document.getElementById('standards-details');
-                if (e.target.value === 'yes') {
-                    details.classList.add('expanded');
-                } else {
-                    details.classList.remove('expanded');
-                }
-                updateFormLayout();
-            });
+        // Form navigation
+        document.getElementById('nextBtn').addEventListener('click', async () => {
+            const currentGroup = document.querySelector(`.form-group[data-section="${state.currentSection}"]`);
+            const formData = new FormData(document.getElementById('goalsetterForm'));
+            
+            // Validate current section
+            if (!validateSection(currentGroup)) return;
+            
+            // Update state
+            state.formData = { ...state.formData, ...Object.fromEntries(formData) };
+            
+            // Submit to API
+            try {
+                await submitForm(state.formData);
+                navigateToNextSection();
+            } catch (error) {
+                showError('Failed to save progress. Please try again.');
+            }
         });
 
-        // Show/hide review details
-        document.querySelectorAll('input[name="review"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const details = document.getElementById('review-details');
-                if (e.target.value === 'yes') {
-                    details.classList.add('expanded');
-                } else {
-                    details.classList.remove('expanded');
-                }
-                updateFormLayout();
-            });
-        });
+        // Section validation
+        function validateSection(section) {
+            const requiredFields = section.querySelectorAll('[required]');
+            return Array.from(requiredFields).every(field => field.value.trim());
+        }
 
-        function nextStep() {
-            // TODO: Implement next step navigation
-            console.log('Moving to next step...');
+        // Navigation helpers
+        function navigateToNextSection() {
+            const sections = ['welcome', 'standards', 'goals', 'review'];
+            const currentIndex = sections.indexOf(state.currentSection);
+            if (currentIndex < sections.length - 1) {
+                updateSection(sections[currentIndex + 1]);
+            }
+        }
+
+        function updateSection(newSection) {
+            // Update UI
+            document.querySelectorAll('.form-group').forEach(group => {
+                group.classList.remove('active');
+                if (group.dataset.section === newSection) {
+                    group.classList.add('active');
+                }
+            });
+
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.section === newSection) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Update progress
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) <= sections.indexOf(newSection) + 1) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update state
+            state.currentSection = newSection;
+            document.getElementById('backBtn').disabled = newSection === 'welcome';
+        }
+
+        // Error handling
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.content-area').prepend(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
         }
     </script>
 </body>
