@@ -3,196 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StriveTogether Admin Panel</title>
+    <title>StriveTogether Learning Platform</title>
+    
     <style>
         :root {
-            --primary-color: #425563;
-            --secondary-color: #E87722;
-            --background-color: #f9f9f9;
+            --primary-blue: #0B3D91;
+            --accent-orange: #FF6B2B;
         }
+
         body {
             font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
-            padding: 20px;
-            background: var(--background-color);
+            padding: 2rem;
+            background: #f5f5f5;
         }
-        .admin-panel {
+
+        .st-header {
+            margin-bottom: 2rem;
+        }
+
+        .st-header img {
+            height: 40px;
+            width: auto;
+        }
+
+        .panel-container {
             max-width: 800px;
             margin: 0 auto;
+        }
+
+        .goal-panel {
             background: white;
-            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .control-group {
-            margin-bottom: 20px;
+
+        .panel-title {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        .control-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 500;
+
+        .implementation-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
         }
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .radio-option {
+
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
         }
-        input[type="radio"] {
-            accent-color: var(--secondary-color);
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        button {
-            background: var(--secondary-color);
+
+        .status-badge {
+            background: #4CAF50;
             color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .status-badge.review {
+            background: #FF9800;
+        }
+
+        .url-display {
+            background: #eee;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
             border: none;
-            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.2s;
         }
-        button:hover {
+
+        .btn:hover {
             opacity: 0.9;
         }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
-            background: #e8f5e9;
-            display: none;
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
         }
-        #temp-config {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+
+        .btn-secondary {
+            background: var(--accent-orange);
+            color: white;
         }
-        #temp-config.visible {
-            display: block;
-            opacity: 1;
+
+        .icon {
+            width: 16px;
+            height: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="admin-panel">
-        <h1>GoalSetter Admin Panel</h1>
-        <div class="control-group">
-            <label>Page Status:</label>
-            <div class="radio-group">
-                <label class="radio-option">
-                    <input type="radio" name="status" value="prod">
-                    Production
-                </label>
-                <label class="radio-option">
-                    <input type="radio" name="status" value="temp" checked>
-                    Temporary
-                </label>
-                <label class="radio-option">
-                    <input type="radio" name="status" value="review">
-                    Review
-                </label>
+    <header class="st-header">
+        <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether">
+    </header>
+
+    <div class="panel-container">
+        <h1 class="panel-title">Goal Setter Interview</h1>
+        
+        <div class="goal-panel">
+            <div class="implementation-card">
+                <div class="card-header">
+                    <h2>Core Implementation</h2>
+                    <span class="status-badge">PROD</span>
+                </div>
+                <div class="url-display">https://recursivelearning.app/clients/st/goalsetter.html</div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="copyURL('prod')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        Copy URL
+                    </button>
+                    <button class="btn btn-secondary" onclick="launchGoalSetter('prod')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                        </svg>
+                        Launch
+                    </button>
+                </div>
+            </div>
+
+            <div class="implementation-card">
+                <div class="card-header">
+                    <h2>Review Interface</h2>
+                    <span class="status-badge review">REVIEW</span>
+                </div>
+                <div class="url-display">https://recursivelearning.app/clients/st/goalsetter_review.html</div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="copyURL('review')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        Copy URL
+                    </button>
+                    <button class="btn btn-secondary" onclick="launchGoalSetter('review')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                        </svg>
+                        Launch
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="control-group" id="temp-config">
-            <label>Temporary URL:</label>
-            <input type="text" id="temp-url" value="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p">
-            <div class="control-group">
-                <label>Display Settings:</label>
-                <input type="text" id="width" value="100%" placeholder="Width (e.g. 100%)">
-                <input type="text" id="height" value="100%" placeholder="Height (e.g. 700px)">
-            </div>
-        </div>
-        <button onclick="saveConfig()">Save Configuration</button>
-        <div class="status" id="status">Configuration saved!</div>
     </div>
 
     <script>
-        // Initialize state
-        const defaultState = {
-            status: 'temp',
-            pages: {
-                goalsetter: {
-                    status: 'temp',
-                    tempUrl: 'https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p',
-                    displaySettings: {
-                        width: '100%',
-                        height: '100%',
-                        responsive: true
-                    }
-                }
-            }
-        };
-
-        // Initialize on first load
-        if (!localStorage.getItem('adminPanelState')) {
-            localStorage.setItem('adminPanelState', JSON.stringify(defaultState));
-        }
-
-        // Handle radio button changes
-        document.querySelectorAll('input[name="status"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const tempConfig = document.getElementById('temp-config');
-                tempConfig.classList.toggle('visible', e.target.value === 'temp');
-            });
-        });
-
-        function saveConfig() {
-            const status = document.querySelector('input[name="status"]:checked').value;
-            const tempUrl = document.getElementById('temp-url').value;
-            const width = document.getElementById('width').value;
-            const height = document.getElementById('height').value;
-
-            const state = {
-                status: status,
-                pages: {
-                    goalsetter: {
-                        status: status,
-                        tempUrl: tempUrl,
-                        displaySettings: {
-                            width: width,
-                            height: height,
-                            responsive: true
-                        }
-                    }
-                }
-            };
-
-            localStorage.setItem('adminPanelState', JSON.stringify(state));
+        function copyURL(env) {
+            const url = env === 'prod' 
+                ? 'https://recursivelearning.app/clients/st/goalsetter.html'
+                : 'https://recursivelearning.app/clients/st/goalsetter_review.html';
             
-            // Show status
-            const statusEl = document.getElementById('status');
-            statusEl.style.display = 'block';
-            statusEl.textContent = 'Configuration saved! Refresh goalsetter_live.html to see changes.';
-            setTimeout(() => statusEl.style.display = 'none', 3000);
+            navigator.clipboard.writeText(url)
+                .then(() => alert('URL copied to clipboard!'))
+                .catch(err => console.error('Failed to copy URL:', err));
         }
 
-        // Load saved state
-        document.addEventListener('DOMContentLoaded', () => {
-            const state = JSON.parse(localStorage.getItem('adminPanelState'));
-            if (state) {
-                // Set radio button
-                const radio = document.querySelector(`input[value="${state.pages.goalsetter.status}"]`);
-                if (radio) {
-                    radio.checked = true;
-                    // Show/hide temp config
-                    const tempConfig = document.getElementById('temp-config');
-                    tempConfig.classList.toggle('visible', state.pages.goalsetter.status === 'temp');
-                }
-                
-                // Set temp values
-                document.getElementById('temp-url').value = state.pages.goalsetter.tempUrl || '';
-                document.getElementById('width').value = state.pages.goalsetter.displaySettings?.width || '100%';
-                document.getElementById('height').value = state.pages.goalsetter.displaySettings?.height || '100%';
-            }
-        });
+        function launchGoalSetter(env) {
+            const url = env === 'prod'
+                ? '/clients/st/goalsetter.html'
+                : '/clients/st/goalsetter_review.html';
+            window.location.href = url;
+        }
     </script>
 </body>
 </html> 
