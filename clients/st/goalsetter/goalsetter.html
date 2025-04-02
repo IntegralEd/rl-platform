@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoalSetter</title>
+    <title>StriveTogether Goal Setter</title>
     
     <!-- Platform level assets -->
     <link rel="stylesheet" href="../../../shared/admin/css/layout/base.css">
@@ -45,15 +45,19 @@
             --client-font-size-body: 16px;
         }
 
-        body {
+        body, html {
             margin: 0;
-            padding: var(--page-margin);
-            font-family: var(--client-font-body);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            background: #f4f4f4;
-            box-sizing: border-box;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .chatbot-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: block;
         }
 
         .app-container {
@@ -279,6 +283,15 @@
     </style>
 </head>
 <body class="goalsetter-container">
+    <iframe
+        src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
+        width="100%"
+        height="100%"
+        frameborder="0"
+        class="chatbot-container"
+        allow="microphone *;"
+    ></iframe>
+
     <!-- Header -->
     <header class="app-header">
         <div class="header-logo">
