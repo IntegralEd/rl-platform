@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ST GoalSetter</title>
+    <title>StriveTogether Goal Setter</title>
     
     <!-- Platform level assets -->
     <script src="/shared/assets/js/chat.js"></script>
@@ -29,13 +29,19 @@
             --text-color: #2b2b2b;
         }
 
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            background: var(--background-color);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: block;
         }
 
         .app-container {
@@ -241,93 +247,44 @@
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="app-header">
-            <img class="header-logo" alt="StriveTogether Logo">
-        </div>
-        <div class="main-container">
-            <div class="left-nav">
-                <div class="nav-icon active">💬</div>
-                <div class="nav-icon">⚙️</div>
-            </div>
-            <div class="content-area">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading GoalSetter...</p>
-                </div>
-            </div>
-        </div>
-        <div class="app-footer">
-            Powered by Recursive Learning
-        </div>
-    </div>
+    <iframe
+        id="contentFrame"
+        class="content-frame"
+        frameborder="0"
+    ></iframe>
 
     <script>
-        // Load admin panel state
-        const getPageConfig = () => {
-            const state = localStorage.getItem('adminPanelState');
-            if (state) {
-                const config = JSON.parse(state);
-                return config.pages.goalsetter;
-            }
-            // Default to temp mode if no state
-            return {
-                status: 'temp',
-                tempUrl: 'https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p',
-                displaySettings: {
-                    width: '100%',
-                    height: '100%',
-                    responsive: true
-                }
-            };
-        };
+        // Check page status from localStorage (set by admin panel)
+        function getPageStatus() {
+            const state = JSON.parse(localStorage.getItem('adminPanelState') || '{}');
+            return state.pages?.goalsetter?.status || 'temp';
+        }
 
-        // Initialize page based on config
-        const initializePage = () => {
-            const config = getPageConfig();
-            const contentArea = document.querySelector('.content-area');
-
-            // Remove loading state
-            const loading = document.querySelector('.loading');
-            if (loading) loading.remove();
-
-            // Default to temp mode unless explicitly set to prod or review
-            if (config.status !== 'prod' && config.status !== 'review') {
-                const iframeContainer = document.createElement('div');
-                iframeContainer.className = 'iframe-container';
-                iframeContainer.innerHTML = `
-                    <iframe
-                        src="${config.tempUrl || 'https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p'}"
-                        width="${config.displaySettings?.width || '100%'}"
-                        height="${config.displaySettings?.height || '100%'}"
-                        frameborder="0"
-                    ></iframe>
-                `;
-                contentArea.appendChild(iframeContainer);
-                return;
-            }
-
-            switch(config.status) {
-                case 'review':
-                    window.location.replace('goalsetter_review.html');
-                    break;
+        // Load appropriate content based on status
+        function loadContent() {
+            const status = getPageStatus();
+            const frame = document.getElementById('contentFrame');
+            
+            switch(status) {
                 case 'prod':
-                    // Production chat interface
-                    const chatContainer = document.createElement('div');
-                    chatContainer.className = 'chat-container';
-                    contentArea.appendChild(chatContainer);
-
-                    // Add welcome message
-                    const welcomeMessage = document.createElement('div');
-                    welcomeMessage.className = 'message assistant';
-                    welcomeMessage.textContent = "Hi! I'm here to help you set meaningful goals. What specific area would you like to focus on for this improvement cycle?";
-                    chatContainer.appendChild(welcomeMessage);
+                    frame.src = 'goalsetter.html';
+                    break;
+                case 'temp':
+                default:
+                    frame.src = 'goalsetter_temp.html';
                     break;
             }
-        };
+        }
 
         // Initialize on load
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('DOMContentLoaded', loadContent);
+
+        // Listen for status changes
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'adminPanelState') {
+                loadContent();
+            }
+        });
     </script>
 </body>
 </html> 

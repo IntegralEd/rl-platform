@@ -9,40 +9,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StriveTogether Goal Setter</title>
     
-    <!-- Platform level assets -->
-    <link rel="stylesheet" href="../../../shared/admin/css/layout/base.css">
-    <link rel="stylesheet" href="../../../shared/admin/css/layout/header.css">
-    <link rel="stylesheet" href="../../../shared/admin/css/layout/sidebar.css">
-    <link rel="stylesheet" href="../../../shared/admin/css/layout/footer.css">
-    
     <!-- Client level assets -->
     <link rel="stylesheet" href="assets/css/st-variables.css">
     <link rel="stylesheet" href="assets/css/st-custom.css">
 
     <style>
         :root {
-            --nav-width: 20%;
-            --content-width: 80%;
-            --embed-width: 1200px;
-            --embed-height: 85vh;
-            --header-height: 50px;
-            --footer-height: 100px;
-            --border-color: #eee;
-            --page-margin: 20px;
-            --chat-button-size: 60px;
-            --play-button-size: 60px;
             --primary-color: #425563;
             --secondary-color: #E87722;
-            --tertiary-color: #4fa997;
             --background-color: #f9f9f9;
             --text-color: #2b2b2b;
-            --cta-text-color: #ffffff;
-            --client-font-h1: 'Arial, sans-serif';
-            --client-font-h2: 'Arial, sans-serif';
-            --client-font-body: 'Arial, sans-serif';
-            --client-font-size-h1: 28px;
-            --client-font-size-h2: 24px;
-            --client-font-size-body: 16px;
         }
 
         body, html {
@@ -51,195 +27,60 @@
             height: 100%;
             width: 100%;
             overflow: hidden;
-        }
-
-        .chatbot-container {
-            width: 100%;
-            height: 100vh;
-            border: none;
-            display: block;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
         .app-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden;
         }
 
         .app-header {
-            height: var(--header-height);
             background: var(--primary-color);
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
-            padding: 0 24px;
-            flex-shrink: 0;
-            z-index: 10;
         }
 
         .header-logo {
             height: 35px;
-            margin: 7.5px 0;
-            content: url('../assets/images/ST TH Powered By White Logo.png');
         }
 
-        .header-menu {
-            position: absolute;
-            right: 80px;
-            display: flex;
-            align-items: center;
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .header-menu-caret {
-            width: 24px;
-            height: 24px;
-            opacity: 0.7;
-        }
-
-        .header-menu-caret svg {
-            fill: currentColor;
-        }
-
-        .app-layout {
-            display: flex;
+        .main-content {
             flex: 1;
-            min-height: 0;
+            padding: 2rem;
+            background: var(--background-color);
+            overflow-y: auto;
         }
 
-        .nav-sidebar {
-            width: var(--nav-width);
-            background: white;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .nav-tabs {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 16px 8px;
-        }
-
-        .nav-tab {
-            padding: 12px 16px;
-            border: none;
-            background: none;
-            text-align: left;
-            font-size: 16px;
-            color: var(--text-color);
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .nav-tab:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .nav-tab.active {
-            background: var(--secondary-color-light);
-        }
-
-        .interaction-container {
-            position: relative;
-        }
-
-        .interaction-bar {
-            display: none;
-        }
-
-        .interaction-bar.active {
-            display: flex;
-        }
-
-        /* Form Styling */
-        .goalsetter-welcome {
+        .goal-form {
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .welcome-title {
-            color: var(--secondary-color);
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .welcome-title.compact {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-section {
-            margin: 2rem 0;
-            padding: 1.5rem;
             background: white;
+            padding: 2rem;
             border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .form-section h2 {
-            color: var(--text-color);
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 1.5rem;
-            margin: 1rem 0;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-            color: var(--text-color);
-            cursor: pointer;
-        }
-
-        .radio-option input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--secondary-color);
-        }
-
-        .context-section {
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            margin-top: 0;
-            transition: all 0.3s ease;
-        }
-
-        .context-section.visible {
-            max-height: 500px;
-            opacity: 1;
-            margin-top: 1rem;
-            padding: 1rem;
-            border-left: 3px solid var(--secondary-color);
-            background: rgba(232, 119, 34, 0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
-            transition: all 0.2s ease;
         }
 
         .form-group input:focus,
@@ -249,136 +90,55 @@
             box-shadow: 0 0 0 2px rgba(232, 119, 34, 0.1);
         }
 
-        .form-group input.invalid,
-        .form-group textarea.invalid {
-            border-color: var(--raspberry);
-            box-shadow: 0 0 0 2px rgba(221, 87, 87, 0.1);
-        }
-
-        .validation-message {
-            display: none;
-            color: var(--raspberry);
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-            padding: 0.5rem;
+        .btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
             border-radius: 4px;
-            background: rgba(221, 87, 87, 0.1);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
         }
 
-        .validation-message.visible {
-            display: block;
-        }
-
-        /* Next Button Styling */
-        .next-button {
-            opacity: 0.5;
-            filter: grayscale(100%);
-            transition: all 0.3s ease;
-        }
-
-        .next-button.enabled {
-            opacity: 1;
-            filter: none;
+        .btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
-<body class="goalsetter-container">
-    <iframe
-        src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        class="chatbot-container"
-        allow="microphone *;"
-    ></iframe>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <img src="../assets/images/ST TH Powered By White Logo.png" alt="StriveTogether" class="header-logo">
+        </header>
 
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-logo">
-            <img src="../assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo">
-        </div>
-    </header>
-
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <nav class="nav-sidebar">
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-tab="welcome">
-                    Welcome
-                </button>
-                <button class="nav-tab" data-tab="standards">
-                    Standards
-                </button>
-                <button class="nav-tab" data-tab="goals">
-                    Goals
-                </button>
-                <button class="nav-tab" data-tab="review">
-                    Review
-                </button>
-            </div>
-        </nav>
-
-        <!-- Main content area -->
         <main class="main-content">
-            <div class="content-container">
-                <!-- Welcome tab content -->
-                <div class="tab-content active" data-tab="welcome">
-                    <!-- Include welcome form partial -->
-                    <div class="goalsetter-welcome" data-form="goalsetter">
-                        <!-- Content from shared/admin/page_ingredients/forms/goalsetter_welcome.html -->
-                    </div>
+            <form class="goal-form" id="goalForm">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" required>
                 </div>
 
-                <!-- Standards tab content -->
-                <div class="tab-content" data-tab="standards">
-                    <!-- Standards content here -->
+                <div class="form-group">
+                    <label for="subject">What do you teach?</label>
+                    <input type="text" id="subject" required>
                 </div>
 
-                <!-- Goals tab content -->
-                <div class="tab-content" data-tab="goals">
-                    <!-- Goals content here -->
+                <div class="form-group">
+                    <label for="duration">How long do you plan for this PDSA cycle to be?</label>
+                    <input type="text" id="duration" placeholder="e.g. 5-10 days" required>
                 </div>
 
-                <!-- Review tab content -->
-                <div class="tab-content" data-tab="review">
-                    <!-- Review content here -->
-                </div>
-            </div>
+                <button type="submit" class="btn">Start Goal Setting</button>
+            </form>
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-        <div class="interaction-container">
-            <div class="interaction-bar" data-bar="play">
-                <div class="interaction-left">
-                    <button class="interaction-button next-button" aria-label="Next">
-                        <svg viewBox="0 0 24 24" width="24" height="24">
-                            <path fill="#fff" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        // Tab navigation
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Update active tab
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                // Update content
-                const tabId = tab.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                    if (content.dataset.tab === tabId) {
-                        content.classList.add('active');
-                    }
-                });
-            });
+        document.getElementById('goalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here we'll add the goal-setting logic
+            console.log('Starting goal setting process...');
         });
     </script>
 </body>
