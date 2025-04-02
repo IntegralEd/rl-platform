@@ -1,0 +1,50 @@
+:root {
+  /* Branding Colors */
+  --primary-color: #6a6db3; /* Desaturated BHB Primary Blue */
+  --secondary-color: #e6184e; /* BHB Primary Red */
+  --accent-color: #0cb189; /* BHB Primary Green */
+  --background-color: #f9f9f9; /* Light Background */
+  --text-color: #2b2b2b; /* Dark Gray Text */
+
+  /* Additional Colors */
+  --additional-color-1: #7d5c48;
+  --additional-color-2: #e0c9a8;
+  --additional-color-3: #f1e8db;
+  --additional-color-4: #e7f5f7;
+  --additional-color-5: #3c3b3d;
+
+  /* Typography */
+  --client-font-h1: 'Montserrat, sans-serif';
+  --client-font-h2: 'Lora, serif';
+  --client-font-body: 'Source Sans Pro, sans-serif';
+  --client-font-size-h1: 36px;
+  --client-font-size-h2: 28px;
+  --client-font-size-body: 18px;
+
+  /* Layout */
+  --client-button-radius: 10px;
+  --client-button-padding: 14px 28px;
+  --client-card-border-radius: 16px;
+  --client-spacing-large: 40px;
+  --client-spacing-medium: 28px;
+  --client-spacing-small: 18px;
+
+  /* Accessibility */
+  --client-font-scale: 1.2;
+  --client-high-contrast-mode: true;
+
+  /* Client Logo */
+  --client-logo: url('../assets/bhb-logo.png');
+
+  /* Client Avatar */
+  --client-avatar: url('../assets/bhb-avatar.png');
+
+  /* Voice & Tone Settings */
+  --client-voice-tone: 'Empathetic, community-centered, and action-driven.';
+  --client-user-context-01: 'Supporting families to raise healthy babies.';
+  --client-user-context-02: 'Promoting social and economic justice.';
+  --client-user-context-03: 'Ensuring quality care during pregnancy.';
+  --client-case-study-01: 'How BHB reduced infant mortality in Baltimore.';
+  --client-case-study-02: 'Community partnerships improving maternal health.';
+  --client-case-study-03: 'BHB's approach to social determinants of health.';
+} 

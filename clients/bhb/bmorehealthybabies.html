@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHB Chat Assistant</title>
+    
+    <!-- Platform level assets -->
+    <script src="/shared/assets/js/chat.js"></script>
+    
+    <!-- Client level assets -->
+    <script src="/clients/bhb/assets/js/bhb-chat-auth.js"></script>
+    <link rel="stylesheet" href="/clients/bhb/assets/css/variables.css">
+    <link rel="stylesheet" href="/clients/bhb/assets/css/custom.css">
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <button onclick="showSection(0)" id="nav-welcome" class="active">Welcome</button>
+            <button onclick="showSection(1)" id="nav-public-chat">Anonymous Public Chat</button>
+            <button onclick="showSection(2)" id="nav-tools">Tools</button>
+        </div>
+        <div id="content">
+            <!-- Welcome Section -->
+            <div class="section active" id="welcome-section">
+                <div class="welcome-section">
+                    <h1>Welcome to B'more Healthy Babies</h1>
+                    <p>Access maternal health resources as a public user. Please note that this is an agreement for public use and not medical advice.</p>
+                    
+                    <div class="affirmations-group">
+                        <div class="affirmation-item">
+                            <input type="checkbox" id="tos" onclick="checkAffirmations()">
+                            <label for="tos">
+                                I affirm the terms of service and understand this is not a substitute for medical advice.
+                            </label>
+                        </div>
+                        
+                        <div class="affirmation-item">
+                            <input type="checkbox" id="norms" onclick="checkAffirmations()">
+                            <label for="norms">
+                                I affirm the community norms and guidelines for respectful communication.
+                            </label>
+                        </div>
+                        
+                        <div class="affirmation-item">
+                            <input type="checkbox" id="acknowledge" onclick="checkAffirmations()">
+                            <label for="acknowledge">
+                                I acknowledge this is a monitored public health resource and my interactions may be reviewed.
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-bar">
+                    <button id="next-button" class="next-button" onclick="showSection(1)" disabled>Next</button>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="section" id="public-chat">
+                <div class="chat-container">
+                    <div class="chat-messages" role="log" aria-live="polite">
+                        <!-- Messages will appear here -->
+                    </div>
+                    <div class="chat-input">
+                        <textarea 
+                            id="chat-input"
+                            placeholder="Type your message..."
+                            aria-label="Chat message"
+                            rows="1"
+                        ></textarea>
+                        <button type="submit" id="send-button" aria-label="Send message">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Section -->
+            <div class="section" id="tools-section">
+                <h2>Resources</h2>
+                <p>Coming soon: Access to maternal health resources and tools.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(index) {
+            // Update sections
+            document.querySelectorAll('.section').forEach((section, i) => {
+                section.classList.toggle('active', i === index);
+            });
+            
+            // Update navigation
+            document.querySelectorAll('#sidebar button').forEach((button, i) => {
+                button.classList.toggle('active', i === index);
+            });
+
+            // Initialize chat if moving to chat section
+            if (index === 1 && BHBAuth.state.isAuthenticated) {
+                BHBAuth.init();
+            }
+        }
+
+        function checkAffirmations() {
+            const tos = document.getElementById('tos').checked;
+            const norms = document.getElementById('norms').checked;
+            const acknowledge = document.getElementById('acknowledge').checked;
+            const nextButton = document.getElementById('next-button');
+            
+            nextButton.disabled = !(tos && norms && acknowledge);
+            BHBAuth.state.isAuthenticated = !nextButton.disabled;
+        }
+
+        // Initialize chat functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+
+            function sendMessage() {
+                const message = textarea.value.trim();
+                if (message && BHBAuth.state.isAuthenticated) {
+                    BHBAuth.sendMessage(message);
+                    textarea.value = '';
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            textarea.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
