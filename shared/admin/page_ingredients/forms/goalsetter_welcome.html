@@ -3,73 +3,69 @@
   Original source: activities/goalsetter_welcome.html
   Moved to forms directory for consistency
   Usage: Include this form in GoalSetter welcome pages
+  Follows shared recipe structure with constrained learning area
 -->
 
 <div class="goalsetter-welcome" data-form="goalsetter">
-  <h2>Welcome to GoalSetter</h2>
-  <p class="welcome-text">Let's set some meaningful goals for your classroom.</p>
-  
-  <form id="goalsetter-form" class="goalsetter-form">
-    <!-- Standards Alignment Section -->
-    <div class="form-section">
-      <h3>Standards Alignment</h3>
-      <div class="radio-group">
-        <label>
-          <input type="radio" name="standards" value="yes" required>
-          Yes, I want to align with standards
-        </label>
-        <label>
-          <input type="radio" name="standards" value="no">
-          No, I'll set goals independently
-        </label>
-      </div>
-
-      <!-- Standards Details (shown when yes is selected) -->
-      <div class="standards-details" data-show-when="standards" data-value="yes">
-        <div class="form-field">
-          <label for="standards-url">Standards URL</label>
-          <input type="url" id="standards-url" name="standardsUrl" 
-                 placeholder="https://example.com/standards">
+  <div class="welcome-content">
+    <h2 class="welcome-title">Welcome to GoalSetter</h2>
+    <p class="welcome-text">Let's set some meaningful goals for your classroom.</p>
+    
+    <form id="goalsetter-form" class="goalsetter-form">
+      <!-- Standards Alignment Section -->
+      <div class="form-section" data-section="standards">
+        <h3>Standards Alignment</h3>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="standards" value="yes" required>
+            Yes, I want to align with standards
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="standards" value="no">
+            No, I'll set goals independently
+          </label>
         </div>
-        <div class="form-field">
-          <label for="standards-detail">Additional Context</label>
-          <textarea id="standards-detail" name="standardsDetail" 
-                    placeholder="Any additional context about these standards..."></textarea>
-        </div>
-      </div>
-    </div>
 
-    <!-- Previous Goals Section -->
-    <div class="form-section">
-      <h3>Previous Goals Review</h3>
-      <div class="radio-group">
-        <label>
-          <input type="radio" name="reflection" value="yes" required>
-          Yes, I want to reflect on previous goals
-        </label>
-        <label>
-          <input type="radio" name="reflection" value="no">
-          No, I'm starting fresh
-        </label>
-      </div>
-
-      <!-- Reflection Details (shown when yes is selected) -->
-      <div class="reflection-details" data-show-when="reflection" data-value="yes">
-        <div class="form-field">
-          <label for="reflection-input">Your Reflection</label>
-          <textarea id="reflection-input" name="reflection" 
-                    placeholder="What worked well? What would you change?"></textarea>
+        <!-- Standards Details -->
+        <div class="details-section" data-show-when="standards" data-value="yes">
+          <div class="form-field">
+            <label for="standards-url">Standards URL</label>
+            <input type="url" id="standards-url" name="standardsUrl" 
+                   placeholder="https://example.com/standards">
+          </div>
+          <div class="form-field">
+            <label for="standards-detail">Additional Context</label>
+            <textarea id="standards-detail" name="standardsDetail" 
+                      placeholder="Any additional context about these standards..."></textarea>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Submit Button -->
-    <div class="form-actions">
-      <button type="submit" class="submit-button" disabled>
-        Start Goal Setting
-      </button>
-    </div>
-  </form>
+      <!-- Previous Goals Section -->
+      <div class="form-section" data-section="reflection">
+        <h3>Previous Goals Review</h3>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="reflection" value="yes" required>
+            Yes, I want to reflect on previous goals
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="reflection" value="no">
+            No, I'm starting fresh
+          </label>
+        </div>
+
+        <!-- Reflection Details -->
+        <div class="details-section" data-show-when="reflection" data-value="yes">
+          <div class="form-field">
+            <label for="reflection-input">Your Reflection</label>
+            <textarea id="reflection-input" name="reflection" 
+                      placeholder="What worked well? What would you change?"></textarea>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- 
@@ -78,63 +74,103 @@
 -->
 <style>
   .goalsetter-welcome {
-    --form-max-width: 700px;
-    --form-padding: 32px;
-    --form-bg: var(--color-background);
-    --form-text: var(--color-text);
-    --form-border: var(--color-border);
+    --form-max-width: 800px;
+    --form-padding: 2rem;
+    --section-spacing: 2rem;
+    --transition-speed: 0.3s;
     
+    width: 100%;
     max-width: var(--form-max-width);
     margin: 0 auto;
     padding: var(--form-padding);
-    background: var(--form-bg);
-    color: var(--form-text);
+  }
+
+  .welcome-content {
+    background: var(--color-background-light, #fff);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .welcome-title {
+    color: var(--color-primary, #425563);
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
   }
 
   .welcome-text {
-    margin-bottom: 32px;
-    font-size: 1.1em;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary, #666);
+    font-size: 1.1rem;
+    margin-bottom: var(--section-spacing);
   }
 
   .form-section {
-    margin-bottom: 40px;
-    padding: 24px;
-    border: 1px solid var(--form-border);
-    border-radius: 8px;
+    margin-bottom: var(--section-spacing);
+    padding: 1.5rem;
+    border: 1px solid var(--color-border, #eee);
+    border-radius: 6px;
+    transition: all var(--transition-speed) ease;
+  }
+
+  .form-section.minimized {
+    padding: 1rem;
+    opacity: 0.7;
+  }
+
+  .form-section h3 {
+    color: var(--color-text, #333);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
   }
 
   .radio-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin: 16px 0;
+    gap: 1rem;
   }
 
-  .radio-group label {
+  .radio-option {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     cursor: pointer;
   }
 
+  .radio-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-secondary, #E87722);
+  }
+
+  .details-section {
+    display: none;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #eee);
+  }
+
+  .details-section.visible {
+    display: block;
+  }
+
   .form-field {
-    margin: 16px 0;
+    margin-bottom: 1rem;
   }
 
   .form-field label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
+    color: var(--color-text, #333);
     font-weight: 500;
   }
 
   .form-field input,
   .form-field textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid var(--form-border);
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, #eee);
     border-radius: 4px;
-    background: var(--color-background-light);
+    font-size: 1rem;
+    transition: border-color var(--transition-speed) ease;
   }
 
   .form-field textarea {
@@ -142,99 +178,42 @@
     resize: vertical;
   }
 
-  .standards-details,
-  .reflection-details {
-    display: none;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--form-border);
-  }
-
-  .form-actions {
-    margin-top: 32px;
-    text-align: center;
-  }
-
-  .submit-button {
-    --button-bg: var(--color-primary);
-    --button-text: var(--color-text-light);
-    
-    background: var(--button-bg);
-    color: var(--button-text);
-    padding: 12px 32px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-
-  .submit-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .form-field input:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--color-secondary, #E87722);
   }
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('goalsetter-form');
-    const submitButton = form.querySelector('.submit-button');
     const radioGroups = form.querySelectorAll('.radio-group');
-    const detailSections = form.querySelectorAll('[data-show-when]');
+    const detailSections = form.querySelectorAll('.details-section');
 
-    // Show/hide detail sections based on radio selection
     function updateDetailSections() {
       detailSections.forEach(section => {
         const radioName = section.dataset.showWhen;
         const radioValue = section.dataset.value;
         const selectedRadio = form.querySelector(`input[name="${radioName}"]:checked`);
         
-        section.style.display = selectedRadio?.value === radioValue ? 'block' : 'none';
-      });
-    }
-
-    // Enable submit button when form is valid
-    function updateSubmitButton() {
-      const radios = form.querySelectorAll('input[type="radio"]');
-      const requiredRadios = Array.from(radios).filter(radio => radio.required);
-      const allRequiredChecked = requiredRadios.every(radio => 
-        radio.checked || radio.closest('.radio-group').querySelector('input:checked')
-      );
-      
-      submitButton.disabled = !allRequiredChecked;
-    }
-
-    // Add event listeners
-    radioGroups.forEach(group => {
-      group.addEventListener('change', () => {
-        updateDetailSections();
-        updateSubmitButton();
-      });
-    });
-
-    // Handle form submission
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const formData = {
-        standards: {
-          choice: form.querySelector('input[name="standards"]:checked').value,
-          url: form.querySelector('#standards-url')?.value,
-          detail: form.querySelector('#standards-detail')?.value
-        },
-        reflection: {
-          choice: form.querySelector('input[name="reflection"]:checked').value,
-          text: form.querySelector('#reflection-input')?.value
+        if (selectedRadio?.value === radioValue) {
+          section.classList.add('visible');
+          section.closest('.form-section').classList.remove('minimized');
+        } else {
+          section.classList.remove('visible');
+          if (selectedRadio) {
+            section.closest('.form-section').classList.add('minimized');
+          }
         }
-      };
+      });
+    }
 
-      // Emit event for parent component
-      document.dispatchEvent(new CustomEvent('goalsetterFormComplete', {
-        detail: formData
-      }));
+    radioGroups.forEach(group => {
+      group.addEventListener('change', updateDetailSections);
     });
 
     // Initial state
     updateDetailSections();
-    updateSubmitButton();
   });
 </script> 
