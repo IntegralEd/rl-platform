@@ -3,12 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integral Ed - Recursive Learning</title>
-    <link rel="stylesheet" href="/shared/assets/styles.css">
+    <title>Recursive Learning</title>
+    <link rel="stylesheet" href="/shared/admin/css/admin.css">
+    <style>
+        :root {
+            --primary-color: #007BFF;
+            --accent-color: #0056b3;
+            --dark-text-color: #111;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #f9f9f9, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            display: flex;
+            width: 90vw;
+            height: 80vh;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: 20%;
+            min-width: 200px;
+            background: white;
+            color: var(--dark-text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border-right: 2px solid var(--primary-color);
+            box-sizing: border-box;
+        }
+
+        #sidebar button {
+            background: none;
+            border: none;
+            color: var(--dark-text-color);
+            padding: 10px 0;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            line-height: 2;
+        }
+
+        #sidebar button.active {
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            color: var(--primary-color);
+        }
+
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .section {
+            position: relative;
+            display: none;
+            padding: 10px;
+            flex: 1;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 100%;
+        }
+
+        input, textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 10px;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .next-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .next-button:hover {
+            background: var(--accent-color);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #tree-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        #tree-menu {
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        #tree-menu a {
+            display: block;
+            padding: 5px 10px;
+            color: var(--dark-text-color);
+            text-decoration: none;
+        }
+
+        #tree-menu a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <div id="chat-container"></div>
-    <script src="/shared/templates/chat-template.html"></script>
-    <script src="auth.js"></script>
+    <img id="tree-icon" src="/shared/admin/assets/images/tree-icon.png" alt="Tree Menu" width="32" height="32">
+    <div id="tree-menu">
+        <a href="/clients/st/goalsetter/goalsetter.html">GoalSetter</a>
+        <a href="/clients/bhb/bmorehealthybabies.html">B'more Healthy Babies</a>
+        <a href="/clients/elpl/index.html">ELPL</a>
+    </div>
+
+    <div id="container">
+        <div id="sidebar">
+            <button onclick="showSection(0)" id="nav-welcome">Welcome</button>
+            <button onclick="showSection(1)" id="nav-info">Email</button>
+            <button onclick="showSection(2)" id="nav-role">What's your role?</button>
+            <button onclick="showSection(3)" id="nav-goal">What's your goal?</button>
+            <button onclick="showSection(4)" id="nav-context">How did you hear about us?</button>
+            <button onclick="showSection(5)" id="nav-submit" disabled>Submit</button>
+        </div>
+        <div id="content">
+            <div class="section active">
+                <h1>Welcome!</h1>
+                <p>You weren't supposed to find us until 2026. We're hiding out in a friends and family beta. If you have a great use for this platform, fill out the info below. If you are aligned with our values and your needs match our early-release features, you may be invited to join our 2025 learning community.</p>
+                <button class="next-button" onclick="showSection(1)">Next</button>
+            </div>
+            <div class="section">
+                <h1>Email</h1>
+                <h2>We'll use this email to get in touch and to share preview access if you are approved for a beta account.</h2>
+                <input type="email" id="signup-email" placeholder="Your Email" required oninput="validateForm()" />
+                <button class="next-button" onclick="showSection(2)">Next</button>
+            </div>
+            <div class="section">
+                <h1>What's your role?</h1>
+                <h2>You can give us your title, role, organization – or even your big dreams. Context-aware systems do not require that you define every possibility into a dropdown menu.</h2>
+                <p><em>Helper: Share what you do, how you see yourself, or what you'd like us to know about your professional or personal identity.</em></p>
+                <textarea id="intake-role"></textarea>
+                <button class="next-button" onclick="showSection(3)">Next</button>
+            </div>
+            <div class="section">
+                <h1>What's your goal?</h1>
+                <h2>What type of learning are you hoping to host or deploy on this platform?</h2>
+                <p><em>Helper: Tell us what kinds of assets you may have or want to author, and what kinds of learners and community you want to support.</em></p>
+                <textarea id="intake-goal"></textarea>
+                <button class="next-button" onclick="showSection(4)">Next</button>
+            </div>
+            <div class="section">
+                <h1>How did you hear about us?</h1>
+                <h2>Context-aware systems can manage a range of form fields and assessment item types as well as open-ended and multimodal inputs.</h2>
+                <p><em>Helper: Let us know how you found us.</em></p>
+                <textarea id="intake-source" placeholder="Tell us about it"></textarea>
+                <button class="next-button" onclick="showSection(5)">Next</button>
+            </div>
+            <div class="section">
+                <h1>Submit</h1>
+                <button id="submit-button" disabled onclick="signup()">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tree menu toggle
+        document.getElementById('tree-icon').addEventListener('click', () => {
+            const menu = document.getElementById('tree-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        function showSection(index) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, i) => {
+                section.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('#sidebar button').forEach((button, i) => {
+                button.classList.toggle('active', i === index);
+            });
+        }
+
+        function validateForm() {
+            const email = document.getElementById('signup-email').value.trim();
+            const source = document.getElementById('intake-source').value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isValid = emailPattern.test(email) && source.length > 0;
+            document.getElementById('submit-button').disabled = !isValid;
+        }
+
+        function signup() {
+            const email = document.getElementById('signup-email').value;
+            const role = document.getElementById('intake-role').value;
+            const goal = document.getElementById('intake-goal').value;
+            const source = document.getElementById('intake-source').value;
+
+            const payload = {
+                Email: email,
+                Intake_Token: "recursive.learning.app/index.html",
+                User_Status: "Lead",
+                User_Intake_Item_01: role,
+                User_Intake_Item_02: goal,
+                User_Intake_Item_03: source,
+                User_Intake_Item_04: null,
+                User_Intake_Item_05: null
+            };
+
+            fetch('https://hook.us1.make.com/gp1ykvaa7e7q5e3xnvjym2g9dkg9vl4y', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                window.location.href = '/integral-ed/util-pages/integ-estate.html';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('There was an error with your signup.');
+            });
+        }
+
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('input', validateForm);
+        });
+    </script>
 </body>
 </html> 

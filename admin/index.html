@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Learning Admin</title>
+    <link rel="stylesheet" href="/shared/admin/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Recursive Learning Admin</h1>
+        </header>
+        
+        <nav class="admin-nav">
+            <div class="client-section">
+                <h2>StriveTogether</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <h3>GoalSetter</h3>
+                        <div class="activity-links">
+                            <a href="/admin/pages/st/goalsetter/goalsetter_admin.html" class="admin-link">
+                                Admin Panel
+                            </a>
+                            <a href="/clients/st/goalsetter/goalsetter.html" class="view-link" target="_blank">
+                                View Live
+                            </a>
+                        </div>
+                        <div class="version-list">
+                            <span class="version-label">Versions:</span>
+                            <a href="/clients/st/goalsetter/goalsetter_review.html" target="_blank">Review</a>
+                            <a href="/clients/st/goalsetter/goalsetter_live.html" target="_blank">Live</a>
+                            <a href="/clients/st/goalsetter/goalsetter_embed.html" target="_blank">Embed</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="client-section">
+                <h2>B'more Healthy Babies</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <h3>Public Chat</h3>
+                        <div class="activity-links">
+                            <a href="/admin/pages/bhb/chat/chat_admin.html" class="admin-link">
+                                Admin Panel
+                            </a>
+                            <a href="/clients/bhb/bmorehealthybabies.html" class="view-link" target="_blank">
+                                View Live
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="admin-content">
+            <section class="quick-actions">
+                <h2>Quick Actions</h2>
+                <button onclick="createNewActivity()">Create New Activity</button>
+                <button onclick="publishChanges()">Publish Changes</button>
+                <button onclick="viewAnalytics()">View Analytics</button>
+            </section>
+
+            <section class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-log">
+                    <!-- Activity log will be populated dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function createNewActivity() {
+            // TODO: Implement activity creation workflow
+            console.log('Creating new activity...');
+        }
+
+        function publishChanges() {
+            // TODO: Implement publishing workflow
+            console.log('Publishing changes...');
+        }
+
+        function viewAnalytics() {
+            // TODO: Implement analytics view
+            console.log('Opening analytics...');
+        }
+    </script>
+</body>
+</html> 

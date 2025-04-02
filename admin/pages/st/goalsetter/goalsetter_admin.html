@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoalSetter Admin Panel</title>
+    <link rel="stylesheet" href="/shared/admin/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>GoalSetter Admin Panel</h1>
+            <nav class="breadcrumb">
+                <a href="/admin/index.html">Admin</a> / 
+                <a href="/admin/pages/st/index.html">StriveTogether</a> / 
+                GoalSetter
+            </nav>
+        </header>
+        
+        <nav class="admin-nav">
+            <div class="section">
+                <h2>Versions</h2>
+                <div class="version-list">
+                    <a href="/clients/st/goalsetter/goalsetter.html" target="_blank">Main</a>
+                    <a href="/clients/st/goalsetter/goalsetter_review.html" target="_blank">Review</a>
+                    <a href="/clients/st/goalsetter/goalsetter_live.html" target="_blank">Live</a>
+                    <a href="/clients/st/goalsetter/goalsetter_embed.html" target="_blank">Embed</a>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Configuration</h2>
+                <div class="config-list">
+                    <a href="#chat-settings">Chat Settings</a>
+                    <a href="#form-settings">Form Settings</a>
+                    <a href="#review-settings">Review Settings</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="admin-content">
+            <section id="chat-settings" class="settings-section">
+                <h2>Chat Settings</h2>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="enable-chat">
+                        Enable Chat
+                    </label>
+                    <label>
+                        <input type="checkbox" id="enable-history">
+                        Enable Chat History
+                    </label>
+                </div>
+            </section>
+
+            <section id="form-settings" class="settings-section">
+                <h2>Form Settings</h2>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="enable-validation">
+                        Enable Form Validation
+                    </label>
+                    <label>
+                        <input type="checkbox" id="enable-autosave">
+                        Enable Autosave
+                    </label>
+                </div>
+            </section>
+
+            <section id="review-settings" class="settings-section">
+                <h2>Review Settings</h2>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="enable-review">
+                        Enable Review Mode
+                    </label>
+                    <label>
+                        <input type="checkbox" id="enable-comments">
+                        Enable Comments
+                    </label>
+                </div>
+            </section>
+
+            <section class="publish-section">
+                <h2>Publish Changes</h2>
+                <div class="publish-options">
+                    <button onclick="publishToReview()">Publish to Review</button>
+                    <button onclick="publishToLive()">Publish to Live</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function publishToReview() {
+            // TODO: Implement review publishing
+            console.log('Publishing to review...');
+        }
+
+        function publishToLive() {
+            // TODO: Implement live publishing
+            console.log('Publishing to live...');
+        }
+    </script>
+</body>
+</html> 
