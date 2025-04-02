@@ -1,0 +1,144 @@
+<!-- 
+  Welcome Affirmations Form
+  Original source: recursive-learning/shared_jekyll/_includes/welcome_affirmations.html
+  Converted from liquid to HTML comments
+  Usage: Include this form in welcome pages for public users
+-->
+
+<div class="welcome-affirmations" data-form="affirmations">
+  <h2>Welcome to Recursive Learning</h2>
+  
+  <form id="affirmations-form" class="affirmations-form">
+    <!-- Terms of Use Section -->
+    <div class="form-section">
+      <h3>Terms of Use</h3>
+      <div class="affirmation-item">
+        <input type="checkbox" id="terms-accept" name="terms" required>
+        <label for="terms-accept">
+          I agree to the <a href="/terms" target="_blank">Terms of Use</a> and understand that:
+        </label>
+        <ul class="terms-list">
+          <li>This is an educational tool for professional development</li>
+          <li>All data is anonymized and used for educational purposes only</li>
+          <li>I maintain ownership of my content and can export it at any time</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Privacy Section -->
+    <div class="form-section">
+      <h3>Privacy & Data Usage</h3>
+      <div class="affirmation-item">
+        <input type="checkbox" id="privacy-accept" name="privacy" required>
+        <label for="privacy-accept">
+          I understand and agree to the <a href="/privacy" target="_blank">Privacy Policy</a>:
+        </label>
+        <ul class="privacy-list">
+          <li>My data will be used to improve the learning experience</li>
+          <li>I can request data deletion at any time</li>
+          <li>Aggregate data may be used for research purposes</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-actions">
+      <button type="submit" class="submit-button" disabled>
+        Continue to Learning
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- 
+  Styles moved to shared/admin/css/forms/affirmations.css
+  Original liquid styles converted to CSS variables
+-->
+<style>
+  .welcome-affirmations {
+    --form-max-width: 600px;
+    --form-padding: 24px;
+    --form-bg: var(--color-background);
+    --form-text: var(--color-text);
+    --form-border: var(--color-border);
+    
+    max-width: var(--form-max-width);
+    margin: 0 auto;
+    padding: var(--form-padding);
+    background: var(--form-bg);
+    color: var(--form-text);
+  }
+
+  .form-section {
+    margin-bottom: 32px;
+  }
+
+  .affirmation-item {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .affirmation-item input[type="checkbox"] {
+    margin-right: 8px;
+  }
+
+  .terms-list,
+  .privacy-list {
+    margin: 16px 0;
+    padding-left: 24px;
+  }
+
+  .form-actions {
+    margin-top: 32px;
+    text-align: center;
+  }
+
+  .submit-button {
+    --button-bg: var(--color-primary);
+    --button-text: var(--color-text-light);
+    
+    background: var(--button-bg);
+    color: var(--button-text);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .submit-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('affirmations-form');
+    const submitButton = form.querySelector('.submit-button');
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+
+    // Enable submit button when all checkboxes are checked
+    function updateSubmitButton() {
+      const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+      submitButton.disabled = !allChecked;
+    }
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSubmitButton);
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Emit event for parent component
+      document.dispatchEvent(new CustomEvent('affirmationsComplete', {
+        detail: {
+          termsAccepted: document.getElementById('terms-accept').checked,
+          privacyAccepted: document.getElementById('privacy-accept').checked
+        }
+      }));
+    });
+  });
+</script> 
