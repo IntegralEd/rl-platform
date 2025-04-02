@@ -408,6 +408,18 @@
             background: #d66a1c;
             transform: scale(1.05);
         }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .footer-logo {
+            height: 30px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -421,9 +433,16 @@
         <div class="main-container">
             <!-- Left Navigation -->
             <nav class="left-nav">
-                <button class="nav-tab active" onclick="switchTab('welcome')">Welcome</button>
-                <button class="nav-tab" onclick="switchTab('interview')" disabled>Interview</button>
-                <button class="nav-tab" onclick="switchTab('tools')" disabled>Tools</button>
+                <button class="nav-tab active" data-tab="welcome">
+                    <img src="assets/images/noun-next-5654311-FFFFFF.png" alt="Welcome" class="nav-icon">
+                    Welcome
+                </button>
+                <button class="nav-tab" data-tab="standards">
+                    <img src="assets/images/noun-send-7149925-FFFFFF.png" alt="Standards" class="nav-icon">
+                    Standards
+                </button>
+                <button class="nav-tab" data-tab="interview" disabled>Interview</button>
+                <button class="nav-tab" data-tab="tools" disabled>Tools</button>
             </nav>
 
             <!-- Content Area -->
@@ -490,6 +509,7 @@
 
         <!-- Footer -->
         <div class="app-footer">
+            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="footer-logo">
             <div class="playbar">
                 <button class="next-button" disabled>
                     <img src="assets/images/noun-next-5654311-FFFFFF.png" alt="Next">
@@ -618,7 +638,7 @@
             .then(data => {
                 console.log('Webhook response:', data);
                 // Enable tools tab after successful submission
-                document.querySelector('.nav-tab[onclick="switchTab(\'tools\')"]').disabled = false;
+                document.querySelector('.nav-tab[data-tab="tools"]').disabled = false;
             })
             .catch(error => console.error('Webhook error:', error));
         }
@@ -656,7 +676,7 @@
             .then(data => {
                 window.threadId = data.thread_id;
                 // Enable interview tab and switch to it
-                document.querySelector('.nav-tab[onclick="switchTab(\'interview\')"]').disabled = false;
+                document.querySelector('.nav-tab[data-tab="interview"]').disabled = false;
                 switchTab('interview');
                 
                 // Display initial assistant message
@@ -732,7 +752,7 @@
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.querySelector(`.nav-tab[data-tab="${tabName}"]`).classList.add('active');
 
             // Show correct section
             document.getElementById('welcome-section').style.display = tabName === 'welcome' ? 'block' : 'none';
