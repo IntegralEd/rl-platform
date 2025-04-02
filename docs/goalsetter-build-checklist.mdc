@@ -355,3 +355,59 @@ const metrics = {
    - [ ] Verify all assets load
    - [ ] Test all versions
    - [ ] Test admin controls 
+
+## 🏗️ Structure
+- [ ] Implement constrained learning area (800px max width)
+- [ ] Add sticky navigation controls
+- [ ] Break form into logical sub-sections
+- [ ] Implement progressive disclosure
+- [ ] Add visual hierarchy for active/minimized sections
+
+## 🔌 API Integration
+- [ ] Implement form submission handler
+- [ ] Add state management for thread_id
+- [ ] Handle API errors gracefully
+- [ ] Validate CORS headers
+- [ ] Test all URL context modes (_live, _temp, _review)
+
+## 📱 Responsive Design
+- [ ] Test constrained layout on all breakpoints
+- [ ] Verify sticky controls behavior
+- [ ] Test form field visibility
+- [ ] Validate scroll behavior
+- [ ] Check header compaction
+
+## 🎯 Form Features
+- [ ] Implement section validation
+- [ ] Add progress tracking
+- [ ] Handle form state persistence
+- [ ] Add error feedback
+- [ ] Test form submission flow
+
+## 🔒 Security
+- [ ] Sanitize user input
+- [ ] Validate API responses
+- [ ] Handle session state
+- [ ] Test error scenarios
+- [ ] Verify CORS configuration
+
+## 📊 Testing
+- [ ] Test all form sections
+- [ ] Verify API integration
+- [ ] Check responsive behavior
+- [ ] Validate error handling
+- [ ] Test state persistence
+
+## 🎨 UI/UX
+- [ ] Implement visual hierarchy
+- [ ] Add smooth transitions
+- [ ] Verify navigation flow
+- [ ] Test form feedback
+- [ ] Check accessibility
+
+## 📝 Documentation
+- [ ] Update API integration guide
+- [ ] Document state management
+- [ ] Add error handling guide
+- [ ] Update testing procedures
+- [ ] Document layout constraints 

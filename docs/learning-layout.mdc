@@ -365,3 +365,78 @@ app-container/
 - [ ] Smooth transitions between states
 - [ ] Proper use of minimization
 - [ ] Effective use of left nav for breakdown 
+
+## 🔌 API Integration
+
+1. **Request Structure**
+   ```javascript
+   // Goal Setter Format
+   {
+     "intake_token": "goalsetter_chat",
+     "name": "string",
+     "email": "string",
+     "user_id": "string",
+     "thread_id": "string",
+     "assistant_id": "string",
+     "subject_and_grade": "string",
+     "learning_target": "string",
+     "measure_of_success": "string",
+     "classroom_goal_statement": "string",
+     "org_id": "string",
+     "source": "string",
+     "url": "string"
+   }
+
+   // Standard Chat Format
+   {
+     "User_ID": "string",
+     "Org_ID": "string",
+     "Assistant_ID": "string",
+     "Thread_ID": "string",
+     "message": "string",
+     "url": "string"
+   }
+   ```
+
+2. **URL Context Modes**
+   - `*_live.html`: Production end-user interface
+   - `*_temp.html`: Development/testing interface
+   - `*_review.html`: Review/feedback interface
+   - `*.html`: Production interface
+
+3. **Form Integration**
+   ```javascript
+   // Form submission handler
+   async function submitForm(formData) {
+     const response = await fetch('https://e7mu4gwsvh.execute-api.us-east-2.amazonaws.com/chat', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json',
+         'Origin': 'https://recursivelearning.app'
+       },
+       body: JSON.stringify({
+         intake_token: "goalsetter_chat",
+         ...formData,
+         url: window.location.href
+       })
+     });
+     return response.json();
+   }
+   ```
+
+4. **State Management**
+   - Store thread_id for conversation continuity
+   - Track form progress in URL context
+   - Maintain user/org context across pages
+   - Handle error states gracefully
+
+5. **Security**
+   - Validate CORS headers
+   - Sanitize user input
+   - Handle API errors
+   - Maintain session state
+
+- [ ] API integration tests pass
+- [ ] CORS headers properly set
+- [ ] Error handling implemented
+- [ ] State persistence verified 
