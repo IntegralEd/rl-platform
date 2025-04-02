@@ -1,51 +1,56 @@
 # Recursive Learning Platform
 
-## Client Review Pattern
-The platform uses a consistent URL pattern for managing review versions of client pages:
+A context-aware multitenant chatbot platform for education.
 
-```
-{feature}_review.html -> {feature}.html (with review features)
-```
+## Project Structure
 
-This pattern enables:
-- Clean feature toggling
-- Consistent codebase
-- Safe production deploys
-- Clear client review process
-
-See [Client Review Checklist](docs/client-review-checklist.mdc) for detailed implementation.
-
-## Directory Structure
 ```
 /
-├── clients/              # Client-specific code
-│   └── {client}/
-│       ├── index.html
-│       ├── {feature}.html     # Main template
-│       ├── {feature}_review.html  # Review entry
-│       └── assets/
-├── shared/              # Shared components
-│   ├── templates/       # Base templates
-│   └── assets/         # Shared assets
-└── docs/               # Documentation
-    └── client-review-checklist.mdc
+├── clients/                 # Client-specific implementations
+│   ├── st/                 # StriveTogether
+│   │   └── goalsetter/     # GoalSetter activity
+│   ├── bhb/                # B'more Healthy Babies
+│   ├── elpl/               # Early Learning Policy Lab
+│   └── integral-ed/        # Integral Education
+├── shared/                 # Shared resources
+│   ├── admin/             # Admin-specific resources
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── assets/
+│   └── templates/         # Common templates
+└── admin/                 # Admin interface
+    └── pages/            # Admin pages by client
+        ├── st/
+        ├── bhb/
+        └── elpl/
 ```
 
-## Feature Detection
-Features like Qipu commenting are controlled by URL patterns rather than code changes:
-- Review features always present in code
-- Activated based on referrer path
-- Consistent dependencies
-- Single source of truth
+## URL Structure
+
+See [URL Alignment Rules](docs/url-alignment-rules.mdc) for detailed guidelines on:
+- Client page URLs
+- Admin panel URLs
+- Shared resource locations
+- File organization rules
+
+## Key Features
+
+- Context-aware chat interface
+- Multitenant architecture
+- Admin dashboard for each client
+- Version control (review/live/embed)
+- Lead capture and management
 
 ## Development
-1. Create main template with all features
-2. Add review entry point
-3. Use auth.js for feature detection
-4. Test both paths independently
 
-## Production
-1. Deploy complete template
-2. Control features via URL
-3. No code changes needed
-4. Safe rollback available 
+1. Clone the repository
+2. Install dependencies
+3. Run development server
+4. Follow URL alignment rules for new features
+
+## Documentation
+
+- [URL Alignment Rules](docs/url-alignment-rules.mdc)
+- [Learning Layout](docs/learning-layout.mdc)
+- [GoalSetter Checklist](docs/goalsetter-build-checklist.mdc)
+- [Client Review Checklist](docs/client-review-checklist.mdc) 
