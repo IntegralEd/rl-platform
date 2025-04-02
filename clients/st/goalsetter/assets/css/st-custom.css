@@ -1,0 +1,264 @@
+/* GoalSetter Custom Styles */
+
+:root {
+    --st-primary: #425563;
+    --st-secondary: #E87722;
+    --st-background: #f9f9f9;
+    --st-text: #333;
+    --st-border: #ddd;
+    --st-success: #28a745;
+    --st-error: #dc3545;
+    --form-transition: 0.3s ease-out;
+}
+
+/* Layout */
+.goalsetter-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: 100vh;
+    background: var(--st-background);
+}
+
+/* Header */
+.header {
+    grid-column: 1 / -1;
+    padding: 1rem;
+    background: var(--st-primary);
+    color: white;
+}
+
+.logo {
+    max-width: 200px;
+    height: auto;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    padding: 2rem 1rem;
+    background: white;
+    border-right: 1px solid var(--st-border);
+}
+
+.nav-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.nav-item.active {
+    background: var(--st-secondary);
+    color: white;
+}
+
+.nav-item .progress {
+    font-size: 0.8rem;
+    color: var(--st-text);
+    margin-top: 0.5rem;
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.section {
+    max-width: 800px;
+    margin: 0 auto;
+    transition: var(--form-transition);
+}
+
+/* Responsive Welcome Header */
+.welcome-header {
+    transition: var(--form-transition);
+    margin-bottom: 1.5rem;
+}
+
+.welcome-header.compact {
+    margin-bottom: 0.5rem;
+}
+
+.welcome-header.compact h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+}
+
+.welcome-header.compact p {
+    display: none;
+}
+
+/* Form Elements */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: var(--form-transition);
+}
+
+.form-group {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: var(--form-transition);
+}
+
+.form-group.compact {
+    padding: 1rem;
+}
+
+.form-group.minimized {
+    padding: 0.75rem;
+    background: var(--st-background);
+    box-shadow: none;
+}
+
+.form-group.minimized h2 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--st-text);
+    opacity: 0.7;
+}
+
+.form-group.minimized .form-content {
+    display: none;
+}
+
+.form-group.active {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.radio-group {
+    display: flex;
+    gap: 2rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Expandable Sections */
+.expandable-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: var(--form-transition);
+}
+
+.expandable-section.expanded {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* Form Inputs */
+input[type="radio"] {
+    accent-color: var(--st-secondary);
+}
+
+input[type="text"],
+input[type="url"],
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--st-border);
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: var(--form-transition);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Navigation Controls */
+.nav-controls {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 1px solid var(--st-border);
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    background: var(--st-secondary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--form-transition);
+}
+
+.button:hover {
+    background: var(--st-primary);
+}
+
+.button.disabled {
+    background: var(--st-border);
+    cursor: not-allowed;
+}
+
+/* Progress Bar */
+.progress-bar {
+    position: sticky;
+    top: 0;
+    height: 4px;
+    background: var(--st-border);
+    margin: 0 0 2rem;
+    border-radius: 2px;
+    z-index: 10;
+}
+
+.progress-bar .fill {
+    height: 100%;
+    background: var(--st-secondary);
+    border-radius: 2px;
+    transition: width var(--form-transition);
+}
+
+/* Validation States */
+.input-error {
+    border-color: var(--st-error) !important;
+}
+
+.error-message {
+    color: var(--st-error);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Tools Section */
+.tools-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+} 
