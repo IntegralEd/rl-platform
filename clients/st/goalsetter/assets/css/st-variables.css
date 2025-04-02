@@ -1,0 +1,32 @@
+:root {
+    /* Colors */
+    --st-primary: #425563;
+    --st-secondary: #E87722;
+    --st-tertiary: #4fa997;
+    --st-background: #f9f9f9;
+    --st-text: #2b2b2b;
+    --st-text-light: #ffffff;
+    --st-text-secondary: #666666;
+    --st-border: #eeeeee;
+
+    /* Layout */
+    --st-nav-width: 20%;
+    --st-content-width: 80%;
+    --st-header-height: 50px;
+    --st-footer-height: 60px;
+    --st-page-margin: 20px;
+
+    /* Typography */
+    --st-font-h1: 'Arial, sans-serif';
+    --st-font-h2: 'Arial, sans-serif';
+    --st-font-body: 'Arial, sans-serif';
+    --st-font-size-h1: 28px;
+    --st-font-size-h2: 24px;
+    --st-font-size-body: 16px;
+
+    /* Components */
+    --st-button-size: 60px;
+    --st-border-radius: 4px;
+    --st-box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    --st-transition: all 0.3s ease;
+} 
