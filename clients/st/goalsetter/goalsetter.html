@@ -10,10 +10,10 @@
     <title>GoalSetter</title>
     
     <!-- Platform level assets -->
-    <link rel="stylesheet" href="/shared/admin/css/layout/base.css">
-    <link rel="stylesheet" href="/shared/admin/css/layout/header.css">
-    <link rel="stylesheet" href="/shared/admin/css/layout/sidebar.css">
-    <link rel="stylesheet" href="/shared/admin/css/layout/footer.css">
+    <link rel="stylesheet" href="../../../shared/admin/css/layout/base.css">
+    <link rel="stylesheet" href="../../../shared/admin/css/layout/header.css">
+    <link rel="stylesheet" href="../../../shared/admin/css/layout/sidebar.css">
+    <link rel="stylesheet" href="../../../shared/admin/css/layout/footer.css">
     
     <!-- Client level assets -->
     <link rel="stylesheet" href="assets/css/st-variables.css">
@@ -76,7 +76,7 @@
         .header-logo {
             height: 35px;
             margin: 7.5px 0;
-            content: url('assets/images/ST TH Powered By White Logo.png');
+            content: url('../assets/images/ST TH Powered By White Logo.png');
         }
 
         .header-menu {
@@ -279,15 +279,15 @@
     </style>
 </head>
 <body class="goalsetter-container">
-    <!-- Include shared header -->
+    <!-- Header -->
     <header class="app-header">
         <div class="header-logo">
-            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo">
+            <img src="../assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo">
         </div>
     </header>
 
     <div class="app-layout">
-        <!-- Include shared sidebar -->
+        <!-- Sidebar -->
         <nav class="nav-sidebar">
             <div class="nav-tabs">
                 <button class="nav-tab active" data-tab="welcome">
@@ -334,13 +334,15 @@
         </main>
     </div>
 
-    <!-- Include shared footer -->
+    <!-- Footer -->
     <footer class="app-footer">
         <div class="interaction-container">
             <div class="interaction-bar" data-bar="play">
                 <div class="interaction-left">
                     <button class="interaction-button next-button" aria-label="Next">
-                        <img class="interaction-icon" src="/shared/assets/images/arrow-right.svg" alt="Next">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="#fff" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                        </svg>
                     </button>
                 </div>
             </div>
