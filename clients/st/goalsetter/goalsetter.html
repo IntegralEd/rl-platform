@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StriveTogether Goal Setter</title>
+    <title>GoalSetter</title>
     
     <!-- Platform level assets -->
     <script src="/shared/assets/js/chat.js"></script>
@@ -275,128 +275,150 @@
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <img class="header-logo" alt="StriveTogether Logo">
-            <div class="header-menu">
-                <div class="header-menu-caret">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7 10l5 5 5-5z"/>
-                    </svg>
-                </div>
-            </div>
+    <div class="goalsetter-container">
+        <header class="header">
+            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="logo">
         </header>
-        
-        <div class="app-layout">
-            <nav class="nav-sidebar">
-                <div class="nav-tabs">
-                    <button class="nav-tab active" onclick="STAuth.switchTab('welcome')">Welcome</button>
-                    <button class="nav-tab" onclick="STAuth.switchTab('interview')" disabled>Interview</button>
-                    <button class="nav-tab" onclick="STAuth.switchTab('tools')" disabled>Tools</button>
-                </div>
-            </nav>
 
-            <main class="main-content">
-                <div class="welcome-section" id="welcome-section">
-                    <div class="goalsetter-welcome" data-form="goalsetter">
-                        <h2>Welcome to GoalSetter</h2>
-                        <p class="welcome-text">Let's set some meaningful goals for your classroom.</p>
-                        
-                        <form id="goalsetter-form" class="goalsetter-form">
-                            <div class="form-section">
-                                <h3>Standards Alignment</h3>
+        <nav class="sidebar">
+            <div class="nav-item active">
+                Welcome
+                <div class="progress">Step 1 of 4</div>
+            </div>
+            <div class="nav-item">
+                Standards
+                <div class="progress">Not started</div>
+            </div>
+            <div class="nav-item">
+                Previous Goals
+                <div class="progress">Not started</div>
+            </div>
+            <div class="nav-item">
+                Tools
+                <div class="progress">Coming soon</div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="section">
+                <div class="progress-bar">
+                    <div class="fill" style="width: 25%"></div>
+                </div>
+
+                <div class="welcome-header">
+                    <h1>Welcome to GoalSetter</h1>
+                    <p>Let's set some meaningful goals for your classroom.</p>
+                </div>
+
+                <form id="goalsetter-form">
+                    <div class="form-container">
+                        <div class="form-group active" id="standards-group">
+                            <h2>Standards Alignment</h2>
+                            <div class="form-content">
                                 <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="standards" value="yes" required>
+                                    <label class="radio-option">
+                                        <input type="radio" name="standards" value="yes">
                                         Yes, I want to align with standards
                                     </label>
-                                    <label>
-                                        <input type="radio" name="standards" value="no">
+                                    <label class="radio-option">
+                                        <input type="radio" name="standards" value="no" checked>
                                         No, I'll set goals independently
                                     </label>
                                 </div>
 
-                                <div class="standards-details" data-show-when="standards" data-value="yes">
-                                    <div class="form-field">
-                                        <label for="standards-url">Standards URL</label>
-                                        <input type="url" id="standards-url" name="standardsUrl" 
-                                               placeholder="https://example.com/standards">
-                                    </div>
-                                    <div class="form-field">
-                                        <label for="standards-detail">Additional Context</label>
-                                        <textarea id="standards-detail" name="standardsDetail" 
-                                                  placeholder="Any additional context about these standards..."></textarea>
-                                    </div>
+                                <div class="expandable-section" id="standards-details">
+                                    <label for="standards-url">Standards URL</label>
+                                    <input type="url" id="standards-url" placeholder="https://example.com/standards">
+                                    
+                                    <label for="standards-context">Additional Context</label>
+                                    <textarea id="standards-context" placeholder="Any additional context about these standards..."></textarea>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="form-section">
-                                <h3>Previous Goals Review</h3>
+                        <div class="form-group" id="review-group">
+                            <h2>Previous Goals Review</h2>
+                            <div class="form-content">
                                 <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="reflection" value="yes" required>
+                                    <label class="radio-option">
+                                        <input type="radio" name="review" value="yes">
                                         Yes, I want to reflect on previous goals
                                     </label>
-                                    <label>
-                                        <input type="radio" name="reflection" value="no">
+                                    <label class="radio-option">
+                                        <input type="radio" name="review" value="no" checked>
                                         No, I'm starting fresh
                                     </label>
                                 </div>
 
-                                <div class="reflection-details" data-show-when="reflection" data-value="yes">
-                                    <div class="form-field">
-                                        <label for="reflection-input">Your Reflection</label>
-                                        <textarea id="reflection-input" name="reflection" 
-                                                  placeholder="What worked well? What would you change?"></textarea>
-                                    </div>
+                                <div class="expandable-section" id="review-details">
+                                    <label for="reflection">Your Reflection</label>
+                                    <textarea id="reflection" placeholder="What worked well? What would you change?"></textarea>
                                 </div>
                             </div>
-
-                            <div class="form-actions">
-                                <button type="submit" class="submit-button" disabled>
-                                    Start Goal Setting
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
 
-                <div id="interview-section" class="content-section">
-                    <div class="chat-container"></div>
-                </div>
-                
-                <div id="tools-section" class="content-section">
-                    <div class="tools-container">
-                        <p>Tools section coming soon...</p>
+                    <div class="nav-controls">
+                        <button type="button" class="button disabled" disabled>Back</button>
+                        <button type="button" class="button" onclick="nextStep()">Next</button>
                     </div>
-                </div>
-            </main>
-        </div>
-
-        <footer class="app-footer">
-            <div class="interaction-container">
-                <div class="playbar interaction-bar">
-                    <!-- Next button for welcome -->
-                </div>
-                <div class="chatbar interaction-bar">
-                    <!-- Chat input for interview -->
-                </div>
+                </form>
             </div>
-        </footer>
+        </main>
     </div>
 
     <script>
-        // Check if we're embedded
-        function isEmbedded() {
-            return window !== window.parent || window.location.href.includes('embed=true');
+        // Handle form responsiveness
+        function updateFormLayout() {
+            const welcomeHeader = document.querySelector('.welcome-header');
+            const standardsGroup = document.getElementById('standards-group');
+            const reviewGroup = document.getElementById('review-group');
+            const reviewDetails = document.getElementById('review-details');
+            
+            // If review section is expanded, minimize standards section
+            if (reviewDetails.classList.contains('expanded')) {
+                welcomeHeader.classList.add('compact');
+                standardsGroup.classList.add('minimized');
+                reviewGroup.classList.add('active');
+                standardsGroup.classList.remove('active');
+            } else {
+                welcomeHeader.classList.remove('compact');
+                standardsGroup.classList.remove('minimized');
+                standardsGroup.classList.add('active');
+                reviewGroup.classList.remove('active');
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (isEmbedded()) {
-                document.body.classList.add('embedded');
-                console.log('Embedded mode activated');
-            }
+        // Show/hide standards details
+        document.querySelectorAll('input[name="standards"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const details = document.getElementById('standards-details');
+                if (e.target.value === 'yes') {
+                    details.classList.add('expanded');
+                } else {
+                    details.classList.remove('expanded');
+                }
+                updateFormLayout();
+            });
         });
+
+        // Show/hide review details
+        document.querySelectorAll('input[name="review"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const details = document.getElementById('review-details');
+                if (e.target.value === 'yes') {
+                    details.classList.add('expanded');
+                } else {
+                    details.classList.remove('expanded');
+                }
+                updateFormLayout();
+            });
+        });
+
+        function nextStep() {
+            // TODO: Implement next step navigation
+            console.log('Moving to next step...');
+        }
     </script>
 </body>
 </html> 
