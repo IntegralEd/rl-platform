@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELPL Merit System - Review</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .review-banner {
+            background: #FF9900; /* ELPL Orange */
+            color: #003366; /* ELPL Blue */
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .review-banner p {
+            margin: 0;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .review-banner button {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .review-banner button:hover {
+            opacity: 0.9;
+        }
+
+        #merit-container {
+            margin-top: 40px;
+            height: calc(100vh - 40px);
+            width: 100%;
+        }
+
+        #merit-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="review-banner">
+        <p>🔍 Review Version - Pending Admin Approval</p>
+        <div>
+            <button onclick="approveChanges()">Approve</button>
+            <button onclick="rejectChanges()">Reject</button>
+        </div>
+    </div>
+
+    <div id="merit-container">
+        <iframe id="merit-iframe"
+                src="merit.html"
+                title="ELPL Merit System Review">
+        </iframe>
+    </div>
+
+    <script>
+        function approveChanges() {
+            localStorage.setItem('merit_system_status', 'prod');
+            window.location.href = 'merit_live.html';
+        }
+
+        function rejectChanges() {
+            localStorage.setItem('merit_system_status', 'temp');
+            window.location.href = 'merit_temp.html';
+        }
+
+        // Log for debugging
+        console.log('Merit System: Review Version');
+        console.log('Status:', localStorage.getItem('merit_system_status'));
+    </script>
+</body>
+</html> 
