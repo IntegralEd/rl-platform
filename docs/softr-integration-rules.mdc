@@ -1,0 +1,168 @@
+# Softr Integration Rules
+
+## Overview
+This document outlines the standard approach for integrating external pages and applications with Softr sites.
+
+## Header Span Data Pattern
+Use a hidden span in the header to receive user data from Softr:
+
+```html
+<span id="header-span" style="display:none" 
+    data-user-email=""
+    data-user-name=""
+    data-user-id=""
+    data-access-level=""
+    data-last-login="">
+</span>
+```
+
+### Standard Data Attributes
+- `data-user-email`: User's email address
+- `data-user-name`: User's full name
+- `data-user-id`: Softr user ID
+- `data-access-level`: User's access level/role
+- `data-last-login`: Last login timestamp
+
+## Integration Steps
+
+1. **Preheader Setup**
+   ```html
+   <!-- Add to Softr page preheader section -->
+   <script>
+   window.addEventListener('load', function() {
+       const headerSpan = document.querySelector('#header-span');
+       if (headerSpan && Softr?.user) {
+           Softr.user.get().then(userData => {
+               headerSpan.setAttribute('data-user-email', userData.email || '');
+               headerSpan.setAttribute('data-user-name', userData.Name || '');
+               headerSpan.setAttribute('data-user-id', userData.record_id || '');
+               headerSpan.setAttribute('data-access-level', userData.access_level || '');
+               headerSpan.setAttribute('data-last-login', new Date().toISOString());
+           });
+       }
+   });
+   </script>
+   ```
+
+2. **Client Page Setup**
+   ```javascript
+   function initClientPage() {
+       const headerSpan = document.getElementById('header-span');
+       let checkCount = 0;
+       const maxChecks = 20;
+       
+       function checkHeaderData() {
+           const userEmail = headerSpan.getAttribute('data-user-email');
+           if (userEmail) {
+               // Store user data
+               localStorage.setItem('user_email', userEmail);
+               localStorage.setItem('user_name', headerSpan.getAttribute('data-user-name'));
+               localStorage.setItem('user_id', headerSpan.getAttribute('data-user-id'));
+               
+               // Initialize your app
+               startApplication();
+           } else if (checkCount < maxChecks) {
+               checkCount++;
+               setTimeout(checkHeaderData, 500);
+           } else {
+               handleTimeout();
+           }
+       }
+       
+       checkHeaderData();
+   }
+   ```
+
+## Loading States
+
+1. **Standard Loading Overlay**
+   ```html
+   <div id="loading-overlay">
+       <div class="loading-spinner"></div>
+   </div>
+   ```
+
+2. **CSS for Loading States**
+   ```css
+   #loading-overlay {
+       position: fixed;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: rgba(255,255,255,0.95);
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       z-index: 1000;
+   }
+
+   .loading-spinner {
+       width: 40px;
+       height: 40px;
+       border: 4px solid #f3f3f3;
+       border-top: 4px solid #003366;
+       border-radius: 50%;
+       animation: spin 1s linear infinite;
+   }
+   ```
+
+## Best Practices
+
+1. **Version Control**
+   - Use localStorage for version/status management
+   - Implement silent version switching
+   - Never show development/staging indicators to end users
+
+2. **Error Handling**
+   - Provide fallbacks for missing user data
+   - Set reasonable timeouts for data checks
+   - Handle authentication failures gracefully
+
+3. **Performance**
+   - Minimize header span checks (max 20 attempts)
+   - Use transition effects for smooth loading
+   - Implement progressive loading where possible
+
+4. **Security**
+   - Never expose sensitive data in URL parameters
+   - Validate user access levels before showing content
+   - Clear sensitive data when user session ends
+
+## Example Implementation
+See `/clients/elpl/merit/merit_temp.html` for a complete reference implementation.
+
+## Troubleshooting
+
+1. **Header Span Not Populated**
+   - Verify Softr.user is available
+   - Check preheader script execution
+   - Confirm page load event timing
+
+2. **Version Switching Issues**
+   - Clear localStorage
+   - Check URL parameters
+   - Verify redirect paths
+
+3. **Loading States**
+   - Adjust maxChecks value
+   - Verify loading overlay z-index
+   - Check transition timing
+
+## Softr Page Setup
+
+1. **Custom Code Locations**
+   - Preheader: Add user data initialization script
+   - Custom Code Block: Add main application code
+   - Footer: Add any cleanup/analytics code
+
+2. **Page Settings**
+   - Enable "Require Login"
+   - Set appropriate access levels
+   - Configure page metadata
+
+3. **Integration Testing**
+   - Test with different user roles
+   - Verify data persistence
+   - Check version switching
+   - Validate loading states 
