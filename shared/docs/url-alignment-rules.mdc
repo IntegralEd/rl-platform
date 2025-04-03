@@ -1,0 +1,116 @@
+# URL Alignment Rules
+
+## Client Pages Structure
+```
+/clients/{client-id}/{activity-id}/{page}.html
+```
+
+Example:
+- `/clients/st/goalsetter/goalsetter.html` - Main activity page
+- `/clients/st/goalsetter/goalsetter_review.html` - Review version
+- `/clients/st/goalsetter/goalsetter_live.html` - Live version
+- `/clients/st/goalsetter/goalsetter_embed.html` - Embed variant
+- `/clients/st/goalsetter/goalsetter_chat.html` - Chat component
+- `/clients/st/goalsetter/goalsetter_temp.html` - Development version
+
+## Admin Panel Structure
+```
+/admin/pages/{client-id}/{activity-id}/{page}_admin.html
+```
+
+Example:
+- `/admin/pages/st/goalsetter/goalsetter_admin.html` - Activity admin panel
+- `/admin/pages/st/index.html` - Client admin dashboard
+- `/admin/index.html` - Main admin dashboard
+
+## Shared Resources
+```
+/shared/admin/{resource-type}/{resource-name}
+```
+
+Example:
+- `/shared/admin/css/admin.css` - Admin styles
+- `/shared/admin/js/admin.js` - Admin scripts
+- `/shared/admin/assets/images/` - Admin assets
+
+## Rules
+
+1. **Client Pages**
+   - All client pages live under `/clients/{client-id}/{activity-id}/`
+   - Each activity gets its own subdirectory
+   - Version suffixes: `_review`, `_live`, `_embed`, `_chat`, `_temp`
+   - Main page uses activity name without suffix
+   - HTML files should be in activity directory, not in assets
+
+2. **Admin Pages**
+   - Mirror client structure under `/admin/pages/`
+   - Admin panels use `_admin` suffix
+   - Each client has an index page
+   - Main admin dashboard at root
+
+3. **Shared Resources**
+   - Admin-specific resources under `/shared/admin/`
+   - Client-specific resources under `/shared/{client-id}/`
+   - Common resources under `/shared/`
+
+4. **URL Mapping**
+   - Client page → Admin panel: Add `/admin/pages/` prefix and `_admin` suffix
+   - Admin panel → Client page: Remove `/admin/pages/` prefix and `_admin` suffix
+
+## Examples
+
+### GoalSetter URLs
+```
+Client Pages:
+/clients/st/goalsetter/goalsetter.html
+/clients/st/goalsetter/goalsetter_review.html
+/clients/st/goalsetter/goalsetter_live.html
+/clients/st/goalsetter/goalsetter_embed.html
+/clients/st/goalsetter/goalsetter_chat.html
+/clients/st/goalsetter/goalsetter_temp.html
+
+Admin Pages:
+/admin/pages/st/goalsetter/goalsetter_admin.html
+/admin/pages/st/index.html
+/admin/index.html
+```
+
+### Merit System URLs
+```
+Client Pages:
+/clients/elpl/merit/merit.html
+/clients/elpl/merit/merit_review.html
+/clients/elpl/merit/merit_live.html
+/clients/elpl/merit/merit_embed.html
+/clients/elpl/merit/merit_chat.html
+/clients/elpl/merit/merit_temp.html
+
+Admin Pages:
+/admin/pages/elpl/merit/merit_admin.html
+/admin/pages/elpl/index.html
+```
+
+## Validation Checklist
+
+1. **URL Structure**
+   - [ ] Client pages follow `/clients/{client-id}/{activity-id}/{page}.html`
+   - [ ] Admin pages follow `/admin/pages/{client-id}/{activity-id}/{page}_admin.html`
+   - [ ] Version suffixes are consistent (`_review`, `_live`, `_embed`, `_chat`, `_temp`)
+   - [ ] Admin panels use `_admin` suffix
+   - [ ] HTML files are in activity directory, not in assets
+
+2. **File Organization**
+   - [ ] Each activity has its own directory
+   - [ ] Admin structure mirrors client structure
+   - [ ] Shared resources are properly categorized
+   - [ ] No HTML files in assets directories
+
+3. **Navigation**
+   - [ ] Admin panels link to corresponding client pages
+   - [ ] Client pages link to appropriate admin panels
+   - [ ] Breadcrumb navigation follows URL structure
+
+4. **Assets**
+   - [ ] Client-specific assets in `/clients/{client-id}/assets/`
+   - [ ] Admin assets in `/shared/admin/assets/`
+   - [ ] Common assets in `/shared/assets/` 
