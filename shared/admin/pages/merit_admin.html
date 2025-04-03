@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merit System Admin</title>
+    
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/layout/admin-layout.css">
+    
+    <style>
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .merit-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .merit-table th,
+        .merit-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .merit-table th {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.active { background: #4CAF50; color: white; }
+        .status.pending { background: #FFC107; color: black; }
+        .status.completed { background: #2196F3; color: white; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="metrics-panel">
+            <div class="metric-card">
+                <h3>Total Users</h3>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric-card">
+                <h3>Active Rewards</h3>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric-card">
+                <h3>Points Awarded</h3>
+                <div class="metric-value">0</div>
+            </div>
+            <div class="metric-card">
+                <h3>Rewards Claimed</h3>
+                <div class="metric-value">0</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-button" onclick="refreshData()">Refresh Data</button>
+            <button class="action-button" onclick="exportXLSX()">Export XLSX</button>
+            <button class="action-button" onclick="exportCSV()">Export CSV</button>
+        </div>
+
+        <table class="merit-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Points</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function refreshData() {
+            console.log('Refreshing data...');
+            // TODO: Implement data refresh
+        }
+
+        function exportXLSX() {
+            console.log('Exporting XLSX...');
+            // TODO: Implement XLSX export
+        }
+
+        function exportCSV() {
+            console.log('Exporting CSV...');
+            // TODO: Implement CSV export
+        }
+
+        // Initialize the admin dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+        });
+    </script>
+</body>
+</html> 
