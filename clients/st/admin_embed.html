@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --font-primary: Arial, sans-serif;
+            --primary-color: #425563;
+            --secondary-color: #E87722;
+            --imperial-purple: #4B0082;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-primary);
+            background: #f5f5f5;
+        }
+
+        #admin-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #loading-message {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #welcome-message {
+            font-family: var(--font-primary);
+            color: var(--imperial-purple);
+            margin-bottom: 1rem;
+        }
+
+        #loading-text {
+            font-family: var(--font-primary);
+            color: #666;
+        }
+
+        .spinner {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: var(--imperial-purple);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        #iframe-container {
+            width: 100%;
+            height: calc(100vh - 40px);
+            border: none;
+            border-radius: 12px;
+            display: none;
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #access-denied {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #access-denied h1 {
+            color: var(--imperial-purple);
+            margin-bottom: 1rem;
+        }
+
+        #access-denied p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div id="admin-container">
+        <div id="loading-message">
+            <h1 id="welcome-message">Welcome <span id="user-name"></span>!</h1>
+            <p id="loading-text">Verifying your access...</p>
+            <div class="spinner">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <div id="access-denied">
+            <h1>Access Denied</h1>
+            <p>You need to be logged into Integral Ed's Mothership Connection to access this page.</p>
+            <p>Please ensure you're logged in with an @integral-ed.com email address.</p>
+        </div>
+
+        <iframe id="iframe-container" src=""></iframe>
+    </div>
+
+    <script>
+        (function() {
+            const adminPageUrl = 'https://recursivelearning.app/admin/index.html';
+
+            function createIframe(userData) {
+                const iframe = document.getElementById('iframe-container');
+                const loadingMessage = document.getElementById('loading-message');
+                const accessDenied = document.getElementById('access-denied');
+
+                // Check if user has @integral-ed.com email
+                if (userData && userData.email && userData.email.endsWith('@integral-ed.com')) {
+                    const iframeUrl = `${adminPageUrl}?User_ID=${userData.record_id}&Name=${userData.Name}&Email=${userData.email}`;
+                    iframe.src = iframeUrl;
+                    iframe.style.display = 'block';
+                    loadingMessage.style.display = 'none';
+                    accessDenied.style.display = 'none';
+                } else {
+                    loadingMessage.style.display = 'none';
+                    accessDenied.style.display = 'block';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof Softr !== 'undefined' && typeof Softr.user?.get === 'function') {
+                    Softr.user.get()
+                        .then(userData => {
+                            if (userData && userData.airtable_record_id) {
+                                document.getElementById('user-name').textContent = userData.Name || 'friend';
+                                createIframe(userData);
+                            } else {
+                                createIframe(null);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error getting Softr user data:', error);
+                            createIframe(null);
+                        });
+                } else {
+                    createIframe(null);
+                }
+            });
+        })();
+    </script>
+</body>
+</html> 
