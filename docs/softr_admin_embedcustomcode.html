@@ -230,6 +230,13 @@
             const adminPageUrl = 'https://recursivelearning.app/admin/index.html';
             let checkCount = 0;
             const MAX_CHECKS = 10;
+            const DEBUG = true;
+
+            function log(...args) {
+                if (DEBUG) {
+                    console.log('[Recursive Admin]', ...args);
+                }
+            }
 
             function validateEmail(email) {
                 return email && typeof email === 'string' && email.endsWith('@integral-ed.com');
@@ -242,6 +249,7 @@
             }
 
             function showAdmin(userData) {
+                log('Showing admin interface for user:', userData.Name);
                 const iframe = document.getElementById('iframe-container');
                 const iframeUrl = `${adminPageUrl}?User_ID=${userData.record_id}&Name=${userData.Name}&Email=${userData.email}`;
                 iframe.src = iframeUrl;
@@ -251,28 +259,48 @@
             }
 
             function checkUserAccess() {
-                if (typeof Softr === 'undefined' || !Softr.user?.get) {
+                log('Checking Softr initialization state...');
+                
+                // Check if Softr page renderer has completed
+                const softrBlocks = document.querySelectorAll('[data-block-name]');
+                if (softrBlocks.length === 0) {
+                    log('Waiting for Softr blocks to render...');
                     if (checkCount < MAX_CHECKS) {
                         checkCount++;
                         setTimeout(checkUserAccess, 500);
                         return;
                     }
+                    log('Timed out waiting for Softr blocks');
                     showAccessDenied();
                     return;
                 }
 
+                // Check if Softr user API is available
+                if (typeof Softr === 'undefined' || !Softr.user?.get) {
+                    log('Waiting for Softr user API...');
+                    if (checkCount < MAX_CHECKS) {
+                        checkCount++;
+                        setTimeout(checkUserAccess, 500);
+                        return;
+                    }
+                    log('Timed out waiting for Softr user API');
+                    showAccessDenied();
+                    return;
+                }
+
+                log('Softr initialized, fetching user data...');
                 Softr.user.get()
                     .then(userData => {
-                        console.log('Softr user data:', userData);
+                        log('Received user data:', userData);
                         
                         if (!userData || !userData.email) {
-                            console.log('No user email found');
+                            log('No user email found in data');
                             showAccessDenied();
                             return;
                         }
 
                         if (!validateEmail(userData.email)) {
-                            console.log('Invalid email domain:', userData.email);
+                            log('Invalid email domain:', userData.email);
                             showAccessDenied();
                             return;
                         }
@@ -281,15 +309,18 @@
                         showAdmin(userData);
                     })
                     .catch(error => {
-                        console.error('Error getting Softr user data:', error);
+                        log('Error getting Softr user data:', error);
                         showAccessDenied();
                     });
             }
 
             // Wait for DOM and Softr to be ready
+            log('Initializing Recursive Admin embed...');
             if (document.readyState === 'loading') {
+                log('Document still loading, waiting for DOMContentLoaded...');
                 document.addEventListener('DOMContentLoaded', checkUserAccess);
             } else {
+                log('Document already loaded, checking user access...');
                 checkUserAccess();
             }
 
@@ -297,6 +328,7 @@
             window.addEventListener('message', function(event) {
                 if (event.origin === 'https://recursivelearning.app') {
                     const { type, data } = event.data;
+                    log('Received message from admin iframe:', type, data);
                     if (type === 'recursive-admin-signal' && window.parent !== window) {
                         window.parent.postMessage({
                             type: 'recursive-admin-signal',
