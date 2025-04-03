@@ -6,263 +6,68 @@
     <title>Recursive Learning Admin</title>
     <style>
         :root {
-            --primary-color: #425563;
-            --secondary-color: #E87722;
-            --tree-bg: #2b2b2b;
-            --tree-text: #ffffff;
-            --tree-hover: #3c3c3c;
-            --tree-active: var(--secondary-color);
-            --tree-width: 280px;
-            --header-height: 60px;
+            --primary: #004080;
+            --secondary: #E87722;
+            --bg-light: #f5f5f5;
+            --text: #2b2b2b;
         }
 
-        body, html {
+        body {
             margin: 0;
             padding: 0;
-            height: 100vh;
             font-family: system-ui, -apple-system, sans-serif;
-            overflow: hidden;
-        }
-
-        .admin-container {
-            display: grid;
-            grid-template-columns: var(--tree-width) 1fr;
-            grid-template-rows: var(--header-height) 1fr;
-            height: 100vh;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             background: white;
         }
 
-        /* Header Styles */
-        .admin-header {
-            grid-column: 1 / -1;
-            background: var(--primary-color);
-            color: white;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .action-button {
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: opacity 0.2s;
-        }
-
-        .action-button:hover {
-            opacity: 0.9;
-        }
-
-        /* Tree Panel Styles */
-        .tree-panel {
-            background: var(--tree-bg);
-            color: var(--tree-text);
-            padding: 20px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-        }
-
-        .tree-item {
-            padding: 4px 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tree-item:hover {
-            background: var(--tree-hover);
-        }
-
-        .tree-item.active {
-            color: var(--tree-active);
-        }
-
-        .tree-icon {
-            font-family: monospace;
-            font-size: 1.2em;
-            width: 20px;
+        main {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
             text-align: center;
         }
 
-        .tree-label {
-            flex: 1;
+        .welcome-logo {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            display: block;
         }
 
-        .tree-group {
-            margin-left: 20px;
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin: 1rem 0;
         }
 
-        /* Content Panel Styles */
-        .content-panel {
-            background: #f5f5f5;
-            overflow-y: auto;
-            position: relative;
+        p {
+            color: var(--text);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 1rem 0;
         }
 
-        .content-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-
-        /* Loading State */
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: var(--primary-color);
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--secondary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .footer {
+            margin-top: 4rem;
+            color: #666;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="admin-container">
-        <!-- Header -->
-        <header class="admin-header">
-            <h1 class="header-title">Recursive Learning Admin</h1>
-            <div class="quick-actions">
-                <button class="action-button" onclick="createNewActivity()">Create New Activity</button>
-                <button class="action-button" onclick="publishChanges()">Publish Changes</button>
-                <button class="action-button" onclick="viewAnalytics()">View Analytics</button>
-            </div>
-        </header>
-
-        <!-- Tree Panel -->
-        <nav class="tree-panel">
-            <div class="tree-item" onclick="loadClient('st')">
-                <span class="tree-icon">📁</span>
-                <span class="tree-label">StriveTogether</span>
-            </div>
-            <div class="tree-group">
-                <div class="tree-item active" onclick="loadPage('st/goalsetter/admin')">
-                    <span class="tree-icon">📄</span>
-                    <span class="tree-label">Admin Panel</span>
-                </div>
-                <div class="tree-item" onclick="loadPage('st/goalsetter/live')">
-                    <span class="tree-icon">🌐</span>
-                    <span class="tree-label">View Live</span>
-                </div>
-                <div class="tree-item" onclick="loadPage('st/goalsetter/review')">
-                    <span class="tree-icon">👀</span>
-                    <span class="tree-label">Review</span>
-                </div>
-                <div class="tree-item" onclick="loadPage('st/goalsetter/embed')">
-                    <span class="tree-icon">🔌</span>
-                    <span class="tree-label">Embed</span>
-                </div>
-            </div>
-            
-            <div class="tree-item" onclick="loadClient('bhb')">
-                <span class="tree-icon">📁</span>
-                <span class="tree-label">Bright Healthy Babies</span>
-            </div>
-            <div class="tree-group">
-                <div class="tree-item" onclick="loadPage('bhb/admin')">
-                    <span class="tree-icon">📄</span>
-                    <span class="tree-label">Admin Panel</span>
-                </div>
-                <div class="tree-item" onclick="loadPage('bhb/live')">
-                    <span class="tree-icon">🌐</span>
-                    <span class="tree-label">View Live</span>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Content Panel -->
-        <main class="content-panel">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading admin panel...</p>
-            </div>
-            <iframe id="contentFrame" class="content-frame" style="display:none"></iframe>
-        </main>
-    </div>
-
-    <script>
-        // Navigation Functions
-        function loadClient(clientId) {
-            console.log('Loading client:', clientId);
-            // Toggle tree items, update state, etc.
-        }
-
-        function loadPage(path) {
-            const frame = document.getElementById('contentFrame');
-            const loading = document.querySelector('.loading');
-            
-            // Show loading state
-            frame.style.display = 'none';
-            loading.style.display = 'block';
-
-            // Update iframe source
-            frame.src = `/admin/pages/${path}.html`;
-
-            // Handle iframe load
-            frame.onload = () => {
-                loading.style.display = 'none';
-                frame.style.display = 'block';
-            };
-
-            // Update active state in tree
-            document.querySelectorAll('.tree-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-        }
-
-        // Quick Action Functions
-        function createNewActivity() {
-            // Implement activity creation logic
-            console.log('Creating new activity...');
-        }
-
-        function publishChanges() {
-            // Implement publish logic
-            console.log('Publishing changes...');
-        }
-
-        function viewAnalytics() {
-            // Implement analytics view
-            console.log('Opening analytics...');
-        }
-
-        // Initialize with default page
-        window.onload = () => {
-            loadPage('st/goalsetter/admin');
-        };
-    </script>
+    <main>
+        <img src="/shared/assets/images/recursive-learning-logo.svg" alt="Recursive Learning" class="welcome-logo">
+        <h1>Recursive Learning Admin</h1>
+        <p>Welcome to the Recursive Learning Platform Administration.</p>
+        <p>A context-aware learning environment for personalized education.</p>
+        <div class="footer">
+            &copy; 2024 Integral Education. All rights reserved.
+        </div>
+    </main>
 </body>
 </html> 
