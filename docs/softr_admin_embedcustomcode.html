@@ -16,7 +16,7 @@
             --primary-color: #425563;
             --secondary-color: #E87722;
             --tertiary-color: #4fa997;
-            --background-color: #f9f9f9;
+            --background-color: #f5f5f5;
             --text-color: #2b2b2b;
             --cta-text-color: #ffffff;
             --client-button-padding: 12px 24px;
@@ -27,11 +27,13 @@
         }
 
         body {
-            font-family: var(--client-font-body);
-            background: var(--background-color);
-            color: var(--text-color);
             margin: 0;
             padding: 0;
+            font-family: var(--client-font-body);
+            background: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
         /* Headings */
@@ -90,39 +92,68 @@
 
         /* Admin Container */
         #admin-container {
-            width: 100%;
+            width: 1900px;
+            max-width: 100%;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            position: relative;
+            background: white;
         }
 
         #loading-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            padding: var(--client-spacing-medium);
+            padding: 40px;
             background: white;
-            border-radius: var(--client-card-border-radius);
-            margin: 20px auto;
-            width: 90%;
-            max-width: 1200px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
         }
 
-        #loading-text {
+        #access-denied {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #access-denied h1 {
+            color: var(--primary-color);
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        #access-denied p {
             color: var(--text-color);
-            margin-bottom: var(--client-spacing-medium);
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 600px;
+            text-align: center;
+            margin: 10px 0;
         }
 
         .spinner {
             display: flex;
             justify-content: center;
             gap: 8px;
-            margin-top: var(--client-spacing-medium);
+            margin-top: 20px;
         }
 
         .dot {
             width: 12px;
             height: 12px;
-            background: var(--tertiary-color);
+            background: var(--secondary-color);
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out;
         }
@@ -137,30 +168,22 @@
 
         #iframe-container {
             width: 100%;
-            height: calc(100vh - 40px);
+            height: 100vh;
             border: none;
-            border-radius: var(--client-card-border-radius);
             display: none;
-            margin: 20px auto;
-            background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        #access-denied {
-            display: none;
-            text-align: center;
-            padding: var(--client-spacing-medium);
-            background: white;
-            border-radius: var(--client-card-border-radius);
-            margin: 20px auto;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Logo styling */
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
         }
 
-        #access-denied p {
-            color: var(--text-color);
-            line-height: 1.6;
+        .logo {
+            height: 40px;
+            width: auto;
         }
 
         /* Accessibility Enhancements */
@@ -178,9 +201,13 @@
 </head>
 <body>
     <div id="admin-container">
-        <div id="loading-message" class="card">
-            <h1 id="welcome-message">Welcome <span id="user-name">there</span>!</h1>
-            <p id="loading-text">Verifying your access...</p>
+        <div class="logo-container">
+            <img src="../assets/images/integral-ed-logo.png" alt="Integral Ed" class="logo">
+        </div>
+
+        <div id="loading-message">
+            <h1>Welcome <span id="user-name">there</span>!</h1>
+            <p>Verifying your access...</p>
             <div class="spinner">
                 <div class="dot"></div>
                 <div class="dot"></div>
@@ -188,7 +215,7 @@
             </div>
         </div>
 
-        <div id="access-denied" class="card">
+        <div id="access-denied">
             <h1>Access Denied</h1>
             <p>You need to be logged into Integral Ed's Mothership Connection to access this page.</p>
             <p>Please ensure you're logged in with an @integral-ed.com email address.</p>
@@ -200,91 +227,83 @@
     <script>
         (function() {
             const SOFTR_BASE_URL = 'https://integral-mothership.softr.app';
-            const SOFTR_PAGE = '/recursive-admin-dashboard';
             const adminPageUrl = 'https://recursivelearning.app/admin/index.html';
+            let checkCount = 0;
+            const MAX_CHECKS = 10;
 
-            // Signal handler for parent window
-            function sendSignalToParent(type, data) {
-                if (window.parent !== window) {
-                    window.parent.postMessage({
-                        type: 'recursive-admin-signal',
-                        signalType: type,
-                        data: data
-                    }, SOFTR_BASE_URL);
-                }
+            function validateEmail(email) {
+                return email && typeof email === 'string' && email.endsWith('@integral-ed.com');
             }
 
-            function createIframe(userData) {
-                const iframe = document.getElementById('iframe-container');
-                const loadingMessage = document.getElementById('loading-message');
-                const accessDenied = document.getElementById('access-denied');
+            function showAccessDenied() {
+                document.getElementById('loading-message').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'flex';
+                document.getElementById('iframe-container').style.display = 'none';
+            }
 
-                // Check if user has @integral-ed.com email
-                if (userData && userData.email && userData.email.endsWith('@integral-ed.com')) {
-                    const iframeUrl = `${adminPageUrl}?User_ID=${userData.record_id}&Name=${userData.Name}&Email=${userData.email}`;
-                    iframe.src = iframeUrl;
-                    iframe.style.display = 'block';
-                    loadingMessage.style.display = 'none';
-                    accessDenied.style.display = 'none';
-                    
-                    // Send success signal
-                    sendSignalToParent('auth-success', {
-                        user: userData.Name,
-                        email: userData.email
-                    });
-                } else {
-                    loadingMessage.style.display = 'none';
-                    accessDenied.style.display = 'block';
-                    
-                    // Send failure signal
-                    sendSignalToParent('auth-failure', {
-                        reason: 'invalid-email',
-                        message: 'User email must be @integral-ed.com'
-                    });
+            function showAdmin(userData) {
+                const iframe = document.getElementById('iframe-container');
+                const iframeUrl = `${adminPageUrl}?User_ID=${userData.record_id}&Name=${userData.Name}&Email=${userData.email}`;
+                iframe.src = iframeUrl;
+                iframe.style.display = 'block';
+                document.getElementById('loading-message').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'none';
+            }
+
+            function checkUserAccess() {
+                if (typeof Softr === 'undefined' || !Softr.user?.get) {
+                    if (checkCount < MAX_CHECKS) {
+                        checkCount++;
+                        setTimeout(checkUserAccess, 500);
+                        return;
+                    }
+                    showAccessDenied();
+                    return;
                 }
+
+                Softr.user.get()
+                    .then(userData => {
+                        console.log('Softr user data:', userData);
+                        
+                        if (!userData || !userData.email) {
+                            console.log('No user email found');
+                            showAccessDenied();
+                            return;
+                        }
+
+                        if (!validateEmail(userData.email)) {
+                            console.log('Invalid email domain:', userData.email);
+                            showAccessDenied();
+                            return;
+                        }
+
+                        document.getElementById('user-name').textContent = userData.Name || 'there';
+                        showAdmin(userData);
+                    })
+                    .catch(error => {
+                        console.error('Error getting Softr user data:', error);
+                        showAccessDenied();
+                    });
+            }
+
+            // Wait for DOM and Softr to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkUserAccess);
+            } else {
+                checkUserAccess();
             }
 
             // Listen for messages from iframe
             window.addEventListener('message', function(event) {
                 if (event.origin === 'https://recursivelearning.app') {
                     const { type, data } = event.data;
-                    
-                    // Forward signals to parent
-                    if (type === 'recursive-admin-signal') {
-                        sendSignalToParent(data.signalType, data.data);
+                    if (type === 'recursive-admin-signal' && window.parent !== window) {
+                        window.parent.postMessage({
+                            type: 'recursive-admin-signal',
+                            signalType: data.signalType,
+                            data: data
+                        }, SOFTR_BASE_URL);
                     }
-                }
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof Softr !== 'undefined' && typeof Softr.user?.get === 'function') {
-                    Softr.user.get()
-                        .then(userData => {
-                            if (userData && userData.airtable_record_id) {
-                                document.getElementById('user-name').textContent = userData.Name || 'friend';
-                                createIframe(userData);
-                            } else {
-                                createIframe(null);
-                                sendSignalToParent('auth-failure', {
-                                    reason: 'no-user-data',
-                                    message: 'No user data available'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error getting Softr user data:', error);
-                            createIframe(null);
-                            sendSignalToParent('auth-failure', {
-                                reason: 'softr-error',
-                                message: error.message
-                            });
-                        });
-                } else {
-                    createIframe(null);
-                    sendSignalToParent('auth-failure', {
-                        reason: 'softr-not-found',
-                        message: 'Softr integration not available'
-                    });
                 }
             });
         })();
