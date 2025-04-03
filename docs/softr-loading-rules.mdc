@@ -1,0 +1,112 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Softr Loading Rules
+
+## Loading Order
+When embedding applications in Softr, the loading order is critical for proper initialization:
+
+1. Softr Page Renderer
+   ```log
+   INFO SPR Installing view transitions
+   DEBUG SPR Adding block root for dynamic block home-header-admin
+   DEBUG SPR Adding sentinels for pre-compiled block recursive-admin-dashoard
+   DEBUG SPR Adding block root for dynamic block Home-footer2
+   ```
+
+2. Softr Block Initialization
+   - Header blocks
+   - Content blocks
+   - Footer blocks
+   - Custom code blocks
+
+3. User Authentication State
+   - Softr.user becomes available
+   - User data can be accessed via `Softr.user.get()`
+
+## Best Practices for Embedded Apps
+
+### 1. Wait for Softr Blocks
+```javascript
+const softrBlocks = document.querySelectorAll('[data-block-name]');
+if (softrBlocks.length === 0) {
+    // Softr blocks not yet rendered
+    return;
+}
+```
+
+### 2. Check User API Availability
+```javascript
+if (typeof Softr === 'undefined' || !Softr.user?.get) {
+    // Softr user API not yet available
+    return;
+}
+```
+
+### 3. Implement Retry Logic
+```javascript
+let checkCount = 0;
+const MAX_CHECKS = 10;
+
+function checkUserAccess() {
+    if (checkCount < MAX_CHECKS) {
+        checkCount++;
+        setTimeout(checkUserAccess, 500);
+        return;
+    }
+    // Handle timeout
+}
+```
+
+## Common Issues
+
+1. **Premature Access**: Attempting to access Softr.user before page renderer completes
+   - Symptom: `Softr is not defined`
+   - Solution: Wait for blocks to render before checking user state
+
+2. **Race Conditions**: Loading iframe content before user validation
+   - Symptom: Flashing content or unauthorized access
+   - Solution: Implement proper loading states and validation checks
+
+3. **Missing User Data**: User object available but incomplete
+   - Symptom: Undefined email or missing properties
+   - Solution: Add explicit null checks for required user properties
+
+## Example Implementation
+
+```javascript
+function initializeApp() {
+    console.log('[App] Initializing...');
+    
+    // 1. Wait for Softr blocks
+    if (!document.querySelector('[data-block-name]')) {
+        console.log('[App] Waiting for Softr blocks...');
+        return setTimeout(initializeApp, 500);
+    }
+    
+    // 2. Check for Softr user API
+    if (!Softr?.user?.get) {
+        console.log('[App] Waiting for Softr user API...');
+        return setTimeout(initializeApp, 500);
+    }
+    
+    // 3. Validate user and load app
+    Softr.user.get()
+        .then(userData => {
+            if (!userData?.email) {
+                throw new Error('No user email found');
+            }
+            // Initialize app with user data
+        })
+        .catch(error => {
+            console.error('[App] Error:', error);
+            // Handle error state
+        });
+}
+```
+
+## Related Files
+- @/docs/softr_admin_embedcustomcode.html
+- @/clients/st/goalsetter/goalsetter.html 
