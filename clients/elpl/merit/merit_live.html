@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELPL Merit System</title>
     <style>
-        #loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        body {
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f4f4f4;
+        }
+
+        #loading-container {
+            display: none;
         }
 
         .spinner {
@@ -38,14 +44,11 @@
 
     <script>
         (function() {
-            // During development, always load temp version
-            const status = 'temp';
-            
-            // Log status for debugging
-            console.log('Merit System Status:', status);
-
-            // Redirect to temp version
-            window.location.href = 'merit_temp.html';
+            // Silently redirect to temp version if not in production
+            const status = localStorage.getItem('merit_system_status');
+            if (status !== 'prod') {
+                window.location.href = 'merit_temp.html';
+            }
         })();
     </script>
 </body>
