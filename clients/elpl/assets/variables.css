@@ -1,0 +1,40 @@
+:root {
+  /* Colors */
+  --primary-color: #c6123f;
+  --secondary-color: #211651;
+  --tertiary-color: #ffa409;
+  --background-color: #f9f9f9;
+  --text-color: #2b2b2b;
+  --cta-text-color: #ffffff;
+
+  /* Typography */
+  --client-font-h1: 'Lora', serif;
+  --client-font-h2: 'Montserrat', sans-serif;
+  --client-font-body: 'Source Sans Pro', sans-serif;
+  --client-font-size-h1: 36px;
+  --client-font-size-h2: 28px;
+  --client-font-size-body: 18px;
+  --client-font-scale: 1.2;
+
+  /* Layout */
+  --client-button-radius: 12px;
+  --client-button-padding: 14px 28px;
+  --client-card-border-radius: 16px;
+  --client-spacing-large: 40px;
+  --client-spacing-medium: 28px;
+  --client-spacing-small: 18px;
+
+  /* Features */
+  --client-high-contrast-mode: true;
+
+  /* Assets */
+  --client-logo: url('../assets/el-education-logo.png');
+  --client-avatar: url('../assets/el-education-avatar.png');
+  --client-voice-tone: 'Reflective, academic, and adventurous';
+
+  /* Image Paths */
+  --logo-path: '/clients/elpl/assets/images/logo.png';
+  --logo-ico-path: '/clients/elpl/assets/images/logo.ico';
+  --lockup-white-logo-path: '/clients/elpl/assets/images/lockup_white_logo.png';
+  --banner-path: '/clients/elpl/assets/images/banner.png';
+} 

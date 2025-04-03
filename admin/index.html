@@ -4,88 +4,214 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
-    <link rel="stylesheet" href="/shared/admin/css/admin.css">
+    <style>
+        :root {
+            --primary: #004080;
+            --secondary: #E87722;
+            --bg-light: #f5f5f5;
+            --text: #2b2b2b;
+            --tree-width: 300px;
+            --header-height: 60px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .admin-container {
+            display: grid;
+            grid-template-columns: var(--tree-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            height: calc(100vh - var(--header-height));
+        }
+
+        .admin-header {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: white;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .site-tree {
+            background: var(--bg-light);
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+
+        .tree-section {
+            margin-bottom: 2rem;
+        }
+
+        .tree-section-title {
+            color: var(--primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tree-item {
+            display: block;
+            padding: 8px 12px;
+            margin: 4px 0;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tree-item:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--primary);
+        }
+
+        .tree-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tree-item i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .content-panel {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--primary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <header class="admin-header">
+        <h1 class="header-title">Recursive Learning Admin</h1>
+    </header>
+
     <div class="admin-container">
-        <header class="admin-header">
-            <h1>Recursive Learning Admin</h1>
-        </header>
-        
-        <nav class="admin-nav">
-            <div class="client-section">
-                <h2>StriveTogether</h2>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <h3>GoalSetter</h3>
-                        <div class="activity-links">
-                            <a href="/admin/pages/st/goalsetter/goalsetter_admin.html" class="admin-link">
-                                Admin Panel
-                            </a>
-                            <a href="/clients/st/goalsetter/goalsetter.html" class="view-link" target="_blank">
-                                View Live
-                            </a>
-                        </div>
-                        <div class="version-list">
-                            <span class="version-label">Versions:</span>
-                            <a href="/clients/st/goalsetter/goalsetter_review.html" target="_blank">Review</a>
-                            <a href="/clients/st/goalsetter/goalsetter_live.html" target="_blank">Live</a>
-                            <a href="/clients/st/goalsetter/goalsetter_embed.html" target="_blank">Embed</a>
-                        </div>
-                    </div>
-                </div>
+        <nav class="site-tree">
+            <div class="tree-section">
+                <h2 class="tree-section-title">StriveTogether</h2>
+                <a href="/admin/pages/st/goalsetter_admin.html" class="tree-item" data-page="st/goalsetter_admin">
+                    <i>📊</i>Goal Setter Admin
+                </a>
+                <a href="/admin/pages/st/goalsetter_review.html" class="tree-item" data-page="st/goalsetter_review">
+                    <i>👀</i>Goal Setter Review
+                </a>
             </div>
 
-            <div class="client-section">
-                <h2>B'more Healthy Babies</h2>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <h3>Public Chat</h3>
-                        <div class="activity-links">
-                            <a href="/admin/pages/bhb/chat/chat_admin.html" class="admin-link">
-                                Admin Panel
-                            </a>
-                            <a href="/clients/bhb/bmorehealthybabies.html" class="view-link" target="_blank">
-                                View Live
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div class="tree-section">
+                <h2 class="tree-section-title">ELPL Professional Learning</h2>
+                <a href="/admin/pages/elpl/merit_admin.html" class="tree-item" data-page="elpl/merit_admin">
+                    <i>📊</i>Merit System Admin
+                </a>
+                <a href="/admin/pages/elpl/merit_review.html" class="tree-item" data-page="elpl/merit_review">
+                    <i>👀</i>Merit System Review
+                </a>
+            </div>
+
+            <div class="tree-section">
+                <h2 class="tree-section-title">Bright Healthy Babies</h2>
+                <a href="/admin/pages/bhb/admin.html" class="tree-item" data-page="bhb/admin">
+                    <i>📊</i>BHB Admin
+                </a>
             </div>
         </nav>
 
-        <main class="admin-content">
-            <section class="quick-actions">
-                <h2>Quick Actions</h2>
-                <button onclick="createNewActivity()">Create New Activity</button>
-                <button onclick="publishChanges()">Publish Changes</button>
-                <button onclick="viewAnalytics()">View Analytics</button>
-            </section>
-
-            <section class="recent-activity">
-                <h2>Recent Activity</h2>
-                <div class="activity-log">
-                    <!-- Activity log will be populated dynamically -->
-                </div>
-            </section>
+        <main class="content-panel">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <span>Loading admin panel...</span>
+            </div>
+            <iframe id="contentFrame" class="content-frame" style="display:none"></iframe>
         </main>
     </div>
 
     <script>
-        function createNewActivity() {
-            // TODO: Implement activity creation workflow
-            console.log('Creating new activity...');
-        }
+        // Navigation handling
+        const treeItems = document.querySelectorAll('.tree-item');
+        const contentFrame = document.getElementById('contentFrame');
+        const loading = document.querySelector('.loading');
 
-        function publishChanges() {
-            // TODO: Implement publishing workflow
-            console.log('Publishing changes...');
-        }
+        treeItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Update active state
+                treeItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
 
-        function viewAnalytics() {
-            // TODO: Implement analytics view
-            console.log('Opening analytics...');
-        }
+                // Show loading state
+                loading.style.display = 'flex';
+                contentFrame.style.display = 'none';
+
+                // Load content
+                const page = item.dataset.page;
+                contentFrame.src = `/admin/pages/${page}.html`;
+
+                // Handle load complete
+                contentFrame.onload = () => {
+                    loading.style.display = 'none';
+                    contentFrame.style.display = 'block';
+                };
+            });
+        });
+
+        // Load default page
+        window.onload = () => {
+            const defaultItem = document.querySelector('[data-page="st/goalsetter_admin"]');
+            if (defaultItem) {
+                defaultItem.click();
+            }
+        };
     </script>
 </body>
 </html> 

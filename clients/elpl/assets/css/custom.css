@@ -1,0 +1,108 @@
+:root {
+  /* Branding Colors */
+  --primary-color: #c6123f; /* EL Education Crimson */
+  --secondary-color: #211651; /* Dark Navy */
+  --tertiary-color: #ffa409; /* CTA Orange */
+  --background-color: #f9f9f9; /* Light Background */
+  --text-color: #2b2b2b; /* Dark Gray Text */
+  --cta-text-color: #ffffff; /* CTA Button Text */
+
+  /* Typography */
+  --client-font-h1: 'Lora, serif';
+  --client-font-h2: 'Montserrat, sans-serif';
+  --client-font-body: 'Source Sans Pro, sans-serif';
+  --client-font-size-h1: 36px;
+  --client-font-size-h2: 28px;
+  --client-font-size-body: 18px;
+
+  /* Layout */
+  --client-button-radius: 12px;
+  --client-button-padding: 14px 28px;
+  --client-card-border-radius: 16px;
+  --client-spacing-large: 40px;
+  --client-spacing-medium: 28px;
+  --client-spacing-small: 18px;
+
+  /* Accessibility */
+  --client-font-scale: 1.2;
+  --client-high-contrast-mode: true;
+
+  /* Client Logo & Icons */
+  --client-logo: url('../assets/el-education-logo.png');
+  --client-avatar: url('../assets/el-education-avatar.png');
+
+  /* Voice & Tone */
+  --client-voice-tone: 'Reflective, academic, and adventurous.';
+}
+
+/* Global Styles */
+body {
+  font-family: var(--client-font-body);
+  background: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Headings */
+h1 {
+  font-family: var(--client-font-h1);
+  font-size: var(--client-font-size-h1);
+  color: var(--primary-color);
+}
+
+h2 {
+  font-family: var(--client-font-h2);
+  font-size: var(--client-font-size-h2);
+  color: var(--secondary-color);
+}
+
+/* Buttons */
+button {
+  background: var(--tertiary-color);
+  color: var(--cta-text-color);
+  padding: var(--client-button-padding);
+  border: none;
+  border-radius: var(--client-button-radius);
+  font-size: var(--client-font-size-body);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: var(--secondary-color);
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: var(--client-card-border-radius);
+  padding: var(--client-spacing-medium);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Callout/Icon Styling */
+.callout {
+  display: flex;
+  align-items: center;
+  background: var(--secondary-color);
+  color: white;
+  padding: var(--client-spacing-small);
+  border-radius: 12px;
+}
+
+.callout img {
+  width: 48px;
+  height: 48px;
+  margin-right: 12px;
+}
+
+/* Accessibility Enhancements */
+@media (prefers-contrast: high) {
+  body {
+    background: white;
+    color: black;
+  }
+  button {
+    background: black;
+    color: white;
+  }
+}
