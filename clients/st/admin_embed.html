@@ -4,170 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <script src="https://www.softr.io/softr-api.js"></script>
+    <script src="../../shared/admin/js/auth.js"></script>
     <style>
-        :root {
-            --font-primary: Arial, sans-serif;
-            --primary-color: #425563;
-            --secondary-color: #E87722;
-            --imperial-purple: #4B0082;
-        }
-
         body {
             margin: 0;
             padding: 0;
-            font-family: var(--font-primary);
-            background: #f5f5f5;
-        }
-
-        #admin-container {
-            width: 100%;
+            font-family: Arial, sans-serif;
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f4f4f4;
         }
 
         #loading-message {
             text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 1200px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        #welcome-message {
-            font-family: var(--font-primary);
-            color: var(--imperial-purple);
-            margin-bottom: 1rem;
-        }
-
-        #loading-text {
-            font-family: var(--font-primary);
+            font-size: 16px;
             color: #666;
-        }
-
-        .spinner {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            background: var(--imperial-purple);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out;
-        }
-
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        #iframe-container {
-            width: 100%;
-            height: calc(100vh - 40px);
-            border: none;
-            border-radius: 12px;
-            display: none;
-            margin: 20px auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
             background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
 
         #access-denied {
             display: none;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            padding: 40px;
+            padding: 20px;
             background: white;
-            border-radius: 12px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
         }
 
-        #access-denied h1 {
-            color: var(--imperial-purple);
-            margin-bottom: 1rem;
+        #access-denied h2 {
+            color: #d32f2f;
+            margin-bottom: 10px;
         }
 
         #access-denied p {
             color: #666;
-            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #admin-container {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #admin-iframe {
+            width: 1900px;
+            height: 100%;
+            border: none;
+            transform-origin: 0 0;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <div id="loading-message">
+        <div class="loading-spinner"></div>
+        <p>Loading admin dashboard...</p>
+    </div>
+
+    <div id="access-denied">
+        <h2>Access Denied</h2>
+        <p>Please log in with an @integral-ed.com email address to access the admin dashboard.</p>
+    </div>
+
     <div id="admin-container">
-        <div id="loading-message">
-            <h1 id="welcome-message">Welcome <span id="user-name"></span>!</h1>
-            <p id="loading-text">Verifying your access...</p>
-            <div class="spinner">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-        </div>
-
-        <div id="access-denied">
-            <h1>Access Denied</h1>
-            <p>You need to be logged into Integral Ed's Mothership Connection to access this page.</p>
-            <p>Please ensure you're logged in with an @integral-ed.com email address.</p>
-        </div>
-
-        <iframe id="iframe-container" src=""></iframe>
+        <iframe id="admin-iframe"
+                src="https://integral-mothership.softr.app/recursive-admin-dashboard"
+                title="Admin Dashboard">
+        </iframe>
     </div>
 
     <script>
-        (function() {
-            const adminPageUrl = 'https://recursivelearning.app/admin/index.html';
+        // Scale iframe to fit window
+        function scaleIframe() {
+            const container = document.getElementById('admin-container');
+            const iframe = document.getElementById('admin-iframe');
+            if (!container || !iframe) return;
 
-            function createIframe(userData) {
-                const iframe = document.getElementById('iframe-container');
-                const loadingMessage = document.getElementById('loading-message');
-                const accessDenied = document.getElementById('access-denied');
+            const scale = window.innerWidth / 1900;
+            iframe.style.transform = `scale(${scale})`;
+            container.style.height = `${window.innerHeight}px`;
+        }
 
-                // Check if user has @integral-ed.com email
-                if (userData && userData.email && userData.email.endsWith('@integral-ed.com')) {
-                    const iframeUrl = `${adminPageUrl}?User_ID=${userData.record_id}&Name=${userData.Name}&Email=${userData.email}`;
-                    iframe.src = iframeUrl;
-                    iframe.style.display = 'block';
-                    loadingMessage.style.display = 'none';
-                    accessDenied.style.display = 'none';
-                } else {
-                    loadingMessage.style.display = 'none';
-                    accessDenied.style.display = 'block';
-                }
+        // Listen for admin validation
+        window.addEventListener('adminValidated', (event) => {
+            console.log('Admin validated:', event.detail);
+            const iframe = document.getElementById('admin-iframe');
+            if (iframe) {
+                iframe.contentWindow.postMessage({
+                    type: 'ADMIN_CONTEXT',
+                    data: event.detail
+                }, '*');
             }
+            scaleIframe();
+        });
 
-            document.addEventListener('DOMContentLoaded', function() {
-                if (typeof Softr !== 'undefined' && typeof Softr.user?.get === 'function') {
-                    Softr.user.get()
-                        .then(userData => {
-                            if (userData && userData.airtable_record_id) {
-                                document.getElementById('user-name').textContent = userData.Name || 'friend';
-                                createIframe(userData);
-                            } else {
-                                createIframe(null);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error getting Softr user data:', error);
-                            createIframe(null);
-                        });
-                } else {
-                    createIframe(null);
-                }
-            });
-        })();
+        // Handle window resize
+        window.addEventListener('resize', scaleIframe);
+
+        // Initialize scale on load
+        document.addEventListener('DOMContentLoaded', scaleIframe);
     </script>
 </body>
 </html> 
