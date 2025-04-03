@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Softr Integration Rules
 
 ## Overview
@@ -165,4 +170,30 @@ See `/clients/elpl/merit/merit_temp.html` for a complete reference implementatio
    - Test with different user roles
    - Verify data persistence
    - Check version switching
-   - Validate loading states 
+   - Validate loading states
+
+## Script Loading Best Practices
+
+### External Scripts
+- All external scripts must be served from GitHub Pages or another public CDN
+- Scripts must have correct MIME type (application/javascript)
+- Use absolute URLs for script sources
+- Example: `https://integral-ed.github.io/rl-platform/shared/admin/assets/js/softr_headerspan.js`
+
+### Header Span Pattern
+- Use hidden span for user data persistence
+- Initialize with window.logged_in_user data
+- Include retry logic for data availability
+- Map Airtable fields to data attributes
+
+### Common Issues
+1. 404 Errors: Ensure script paths are absolute and public
+2. MIME Type Errors: Scripts must be served with correct content type
+3. Timing Issues: Use DOMContentLoaded for initialization
+4. Data Availability: Implement retry logic for Softr user data
+
+### Debugging Tips
+- Check console for script loading errors
+- Verify GitHub Pages deployment
+- Test script MIME types
+- Monitor user data availability 
