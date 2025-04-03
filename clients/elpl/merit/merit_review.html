@@ -1,95 +1,105 @@
 <!DOCTYPE html>
+<!-- Review Version: 2024-04-03 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELPL Merit System - Review</title>
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .chatbot-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: block;
         }
 
         .review-banner {
-            background: #FF9900; /* ELPL Orange */
-            color: #003366; /* ELPL Blue */
-            text-align: center;
-            padding: 10px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
+            background: #FF9800;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-family: system-ui, -apple-system, sans-serif;
+            z-index: 1000;
+        }
+
+        .comment-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 16px;
+            font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
             display: flex;
-            justify-content: space-between;
+            gap: 16px;
             align-items: center;
         }
 
-        .review-banner p {
-            margin: 0;
+        .comment-input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
             font-size: 14px;
-            flex-grow: 1;
         }
 
-        .review-banner button {
-            background: #003366;
+        .comment-button {
+            padding: 8px 16px;
+            background: #4CAF50;
             color: white;
             border: none;
-            padding: 5px 15px;
-            margin: 0 5px;
+            border-radius: 4px;
             cursor: pointer;
-            border-radius: 3px;
         }
 
-        .review-banner button:hover {
-            opacity: 0.9;
-        }
-
-        #merit-container {
-            margin-top: 40px;
-            height: calc(100vh - 40px);
-            width: 100%;
-        }
-
-        #merit-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .comment-button:hover {
+            background: #45a049;
         }
     </style>
 </head>
 <body>
-    <div class="review-banner">
-        <p>🔍 Review Version - Pending Admin Approval</p>
-        <div>
-            <button onclick="approveChanges()">Approve</button>
-            <button onclick="rejectChanges()">Reject</button>
-        </div>
-    </div>
+    <div class="review-banner">Review Environment</div>
+    
+    <iframe
+        src="https://www.chatbase.co/chatbot-iframe/5qqQasv1fDxQQONBMuxJZ-review"
+        width="100%"
+        height="100%"
+        frameborder="0"
+        class="chatbot-container"
+        allow="microphone *;"
+    ></iframe>
 
-    <div id="merit-container">
-        <iframe id="merit-iframe"
-                src="merit.html"
-                title="ELPL Merit System Review">
-        </iframe>
+    <div class="comment-overlay">
+        <input type="text" class="comment-input" placeholder="Add a comment or feedback...">
+        <button class="comment-button" onclick="submitComment()">Submit Comment</button>
     </div>
 
     <script>
-        function approveChanges() {
-            localStorage.setItem('merit_system_status', 'prod');
-            window.location.href = 'merit_live.html';
+        function submitComment() {
+            const input = document.querySelector('.comment-input');
+            const comment = input.value.trim();
+            
+            if (comment) {
+                // Here you would typically send the comment to your feedback system
+                console.log('Comment submitted:', comment);
+                input.value = '';
+                alert('Comment submitted successfully!');
+            }
         }
-
-        function rejectChanges() {
-            localStorage.setItem('merit_system_status', 'temp');
-            window.location.href = 'merit_temp.html';
-        }
-
-        // Log for debugging
-        console.log('Merit System: Review Version');
-        console.log('Status:', localStorage.getItem('merit_system_status'));
     </script>
 </body>
 </html> 
