@@ -258,10 +258,17 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         function showAdmin(userData) {
-            log('Showing admin interface for user:', userData.Name);
+            log('Showing admin interface for user:', userData?.Name || 'Guest');
             const iframe = document.getElementById('iframe-container');
-            const iframeUrl = `${adminPageUrl}?User_ID=${userData.User_ID}&Name=${userData.Name}&Email=${userData.email}&Role=${userData.IE_Role_Level}`;
-            iframe.src = iframeUrl;
+            const iframeUrl = new URL(adminPageUrl);
+            
+            // Safely add query parameters
+            iframeUrl.searchParams.append('User_ID', userData?.User_ID || '');
+            iframeUrl.searchParams.append('Name', userData?.Name || 'Guest');
+            iframeUrl.searchParams.append('Email', userData?.email || '');
+            iframeUrl.searchParams.append('Role', userData?.IE_Role_Level || '');
+            
+            iframe.src = iframeUrl.toString();
             iframe.style.display = 'block';
             document.getElementById('loading-message').style.display = 'none';
             document.getElementById('access-denied').style.display = 'none';
