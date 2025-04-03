@@ -1,56 +1,69 @@
 # Recursive Learning Platform
 
-A context-aware multitenant chatbot platform for education.
+A context-aware learning environment for personalized education.
 
 ## Project Structure
 
 ```
-/
-├── clients/                 # Client-specific implementations
-│   ├── st/                 # StriveTogether
-│   │   └── goalsetter/     # GoalSetter activity
-│   ├── bhb/                # B'more Healthy Babies
-│   ├── elpl/               # Early Learning Policy Lab
-│   └── integral-ed/        # Integral Education
-├── shared/                 # Shared resources
-│   ├── admin/             # Admin-specific resources
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── assets/
-│   └── templates/         # Common templates
-└── admin/                 # Admin interface
-    └── pages/            # Admin pages by client
-        ├── st/
-        ├── bhb/
-        └── elpl/
+rl-platform/
+├── shared/           # Shared assets and components
+│   ├── admin/       # Admin interface
+│   └── assets/      # Common assets
+├── clients/         # Client-specific implementations
+│   ├── st/          # StriveTogether
+│   ├── elpl/        # ELPL Professional Learning
+│   ├── bhb/         # Bright Healthy Babies
+│   └── integral-ed/ # Integral Education
+└── docs/            # Documentation
 ```
 
-## URL Structure
+## Recent Updates
 
-See [URL Alignment Rules](docs/url-alignment-rules.mdc) for detailed guidelines on:
-- Client page URLs
-- Admin panel URLs
-- Shared resource locations
-- File organization rules
+### Frontend Improvements (April 2024)
+- Cleaned up landing pages for consistent branding
+- Removed vestigial admin controls
+- Implemented version switching for client implementations
+- Added review overlay functionality
+- Improved error handling for undefined user data
 
-## Key Features
+### Integration Learnings
+- Scripts must be served from public URLs (GitHub Pages)
+- Correct MIME types are crucial for script loading
+- Header span pattern effective for data persistence
+- Role validation working as expected
+- Graceful handling of undefined user data implemented
 
-- Context-aware chat interface
-- Multitenant architecture
-- Admin dashboard for each client
-- Version control (review/live/embed)
-- Lead capture and management
+### Client Implementation Checklist
+- [x] StriveTogether Goal Setter
+  - [x] Version switching (prod/review/temp)
+  - [x] Review overlay with comments
+  - [x] Production router
+- [x] ELPL Merit System
+  - [x] Version switching
+  - [x] Review interface
+  - [x] Production deployment
+- [ ] Bright Healthy Babies
+  - [ ] Initial setup
+  - [ ] Core implementation
+  - [ ] Review interface
 
 ## Development
 
+### Prerequisites
+- Node.js 18+
+- Git
+
+### Setup
 1. Clone the repository
 2. Install dependencies
-3. Run development server
-4. Follow URL alignment rules for new features
+3. Configure environment variables
+4. Start development server
 
-## Documentation
+### Deployment
+- Frontend: GitHub Pages
+- Admin: Softr integration
+- Assets: CDN distribution
 
-- [URL Alignment Rules](docs/url-alignment-rules.mdc)
-- [Learning Layout](docs/learning-layout.mdc)
-- [GoalSetter Checklist](docs/goalsetter-build-checklist.mdc)
-- [Client Review Checklist](docs/client-review-checklist.mdc) 
+## License
+
+Copyright © 2024 Integral Education. All rights reserved. 
