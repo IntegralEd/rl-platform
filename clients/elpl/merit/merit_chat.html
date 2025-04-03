@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL Merit Chat</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../platform/css/variables.css">
+    <link rel="stylesheet" href="../platform/css/custom.css">
+
+    <style>
+        :root {
+            /* Branding Colors */
+            --primary-color: #c6123f; /* EL Education Crimson */
+            --secondary-color: #211651; /* Dark Navy */
+            --tertiary-color: #ffa409; /* CTA Orange */
+            --background-color: #f9f9f9; /* Light Background */
+            --text-color: #2b2b2b; /* Dark Gray Text */
+            --cta-text-color: #ffffff; /* CTA Button Text */
+
+            /* Typography */
+            --client-font-h1: 'Lora, serif';
+            --client-font-h2: 'Montserrat, sans-serif';
+            --client-font-body: 'Source Sans Pro, sans-serif';
+            --client-font-size-h1: 36px;
+            --client-font-size-h2: 28px;
+            --client-font-size-body: 18px;
+
+            /* Layout */
+            --client-button-radius: 12px;
+            --client-button-padding: 14px 28px;
+            --client-card-border-radius: 16px;
+            --client-spacing-large: 40px;
+            --client-spacing-medium: 28px;
+            --client-spacing-small: 18px;
+
+            /* Accessibility */
+            --client-font-scale: 1.2;
+            --client-high-contrast-mode: true;
+
+            /* Client Logo & Icons */
+            --client-logo: url('images/logo.png');
+            --client-avatar: url('images/el-education-avatar.png');
+
+            /* Voice & Tone */
+            --client-voice-tone: 'Reflective, academic, and adventurous.';
+        }
+
+        /* Global Styles */
+        body {
+            font-family: var(--client-font-body);
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        /* Headings */
+        h1 {
+            font-family: var(--client-font-h1);
+            font-size: var(--client-font-size-h1);
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-family: var(--client-font-h2);
+            font-size: var(--client-font-size-h2);
+            color: var(--secondary-color);
+        }
+
+        /* Buttons */
+        button {
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
+            padding: var(--client-button-padding);
+            border: none;
+            border-radius: var(--client-button-radius);
+            font-size: var(--client-font-size-body);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--client-card-border-radius);
+            padding: var(--client-spacing-medium);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Callout/Icon Styling */
+        .callout {
+            display: flex;
+            align-items: center;
+            background: var(--secondary-color);
+            color: white;
+            padding: var(--client-spacing-small);
+            border-radius: 12px;
+        }
+
+        .callout img {
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+        }
+
+        /* Teacher Context Form on the Welcome Tab */
+        .teacher-context {
+            margin-top: var(--client-spacing-medium);
+            padding: var(--client-spacing-small);
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--client-card-border-radius);
+        }
+
+        .teacher-context p {
+            font-family: var(--client-font-h2);
+            font-size: var(--client-font-size-body);
+            margin-bottom: var(--client-spacing-small);
+            color: var(--secondary-color);
+        }
+
+        .teacher-context label {
+            display: block;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .teacher-context input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* Full-page Teacher Chat Reflection Styles */
+        .fullpage-chat {
+            padding: var(--client-spacing-large);
+            background: var(--background-color);
+        }
+
+        .fullpage-chat .chat-window {
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Minimal Embed Chat (for Storyline iframe) */
+        .embed-chat {
+            margin: 0;
+            padding: var(--client-spacing-small);
+            font-size: calc(var(--client-font-size-body) * var(--client-font-scale));
+        }
+
+        /* Accessibility Enhancements */
+        @media (prefers-contrast: high) {
+            body {
+                background: white;
+                color: black;
+            }
+            button {
+                background: black;
+                color: white;
+            }
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            width: 95vw;
+            height: 85vh;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1200px; 
+            max-height: 800px;
+            margin: 0 auto;
+            padding: 10px; /* Ensure 10px border from content to edge */
+        }
+
+        #header-bar {
+            background: var(--primary-color);
+            height: 40px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 5px 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding-top: 40px; /* To prevent overlap with header bar */
+            max-width: 1250px;
+            margin-top: 40px; /* To prevent overlap with header bar */
+        }
+
+        #sidebar {
+            width: 20%;
+            background: var(--primary-color);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #sidebar button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: #fff;
+            text-align: left;
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #sidebar button.active::after {
+            content: "";
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            bottom: 0;
+            height: 2px;
+            background-color: #fff;
+        }
+
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px; /* Ensure 10px border from content to edge */
+            overflow-y: auto;
+            background: var(--background-color);
+            box-sizing: border-box;
+        }
+
+        .section {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .section.active {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        /* Update the send button path */
+        .send-button {
+            background: url('images/noun-send-7149925-FFFFFF.png') no-repeat center;
+            background-size: contain;
+            /* Other styles */
+        }
+
+        /* Update the banner logo path */
+        #header-logo {
+            content: url('images/lockup_white_logo.png'); /* Ensure this path is correct */
+            /* Other styles */
+        }
+
+        .chat-container {
+            display: none;
+            flex-direction: column;
+            height: 700px; /* Ensure this is set */
+        }
+
+        .section.chat-active .chat-container {
+            display: flex;
+        }
+
+        .chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            max-width: 700px;
+            height: 900px;
+            overflow: hidden;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #ddd;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header-bar">
+            <img id="header-logo" src="images/lockup_white_logo.png" alt="Client Logo" style="max-height: 50px; margin: 5px;">
+        </div>
+        <div class="main-content">
+            <div id="sidebar">
+                <button onclick="showSection(0)" id="nav-welcome" class="active">Welcome</button>
+                <button onclick="showSection(1)" id="nav-chat" disabled>Chat</button>
+            </div>
+            <div id="content">
+                <div class="section active">
+                    <h1>Welcome!</h1>
+                    <p>Access educational resources as a public user. Please note that this is an agreement for public use and not educational advice, in line with our style guide.</p>
+                    <div id="teacher-context" class="teacher-context">
+                        <p>Please check the curriculum focus for this chat:</p>
+                        <label><input type="checkbox" name="grade" value="Kindergarten" onclick="checkAffirmations()"> Kindergarten</label>
+                        <label><input type="checkbox" name="grade" value="Grade 1" onclick="checkAffirmations()"> Grade 1</label>
+                        <label><input type="checkbox" name="grade" value="Grade 2" onclick="checkAffirmations()"> Grade 2</label>
+                        <label><input type="checkbox" name="grade" value="Grade 3" onclick="checkAffirmations()"> Grade 3</label>
+                        <label><input type="checkbox" name="grade" value="Grade 4" onclick="checkAffirmations()"> Grade 4</label>
+                        <label><input type="checkbox" name="grade" value="Grade 5" onclick="checkAffirmations()"> Grade 5</label>
+                    </div>
+                    <button id="next-button" class="next-button" onclick="showSection(1)" disabled>Next</button>
+                </div>
+                <div class="section">
+                    <div class="chat-container">
+                        <div class="chat-window" id="chat-window">
+                            <div class="message assistant">Welcome to the EL Education Merit Chat</div>
+                        </div>
+                        <div class="input-area">
+                            <input type="text" id="chat-input" placeholder="Type your message here...">
+                            <button class="send-button" onclick="sendMessage()">✈</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messageCount = 0; // Add at top of script
+
+        document.addEventListener("DOMContentLoaded", function() {
+            showSection(0);
+            window.threadId = localStorage.getItem('threadId') || null;
+            console.log('Session initialized:', window.threadId ? `Using thread ${window.threadId}` : 'No existing thread');
+
+            // Add keyboard handlers
+            const chatInput = document.getElementById("chat-input");
+            const sendButton = document.querySelector(".send-button");
+
+            chatInput.addEventListener("keydown", function(event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+                // Tab handling
+                if (event.key === "Tab") {
+                    event.preventDefault();
+                    sendButton.focus();
+                }
+            });
+
+            // Handle enter key on send button when focused
+            sendButton.addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        function sendMessage() {
+            const input = document.getElementById("chat-input");
+            if (input.value.trim() === "") return;
+            
+            messageCount++;
+            console.log(`Message ${messageCount}: ${window.threadId ? `Using thread ${window.threadId}` : 'No thread exists'}`);
+            
+            const requestBody = window.threadId ? 
+                { message: input.value, threadId: window.threadId } : 
+                { message: input.value };
+            
+            console.log(`Sending message ${messageCount}${window.threadId ? ` with threadId: ${window.threadId}` : ''}`);
+            
+            // Add message to UI
+            const chatWindow = document.getElementById("chat-window");
+            const message = document.createElement("div");
+            message.classList.add("message", "user");
+            message.textContent = input.value;
+            chatWindow.appendChild(message);
+            input.value = "";
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Show loading indicator
+            const transmissionIndicator = document.createElement("div");
+            transmissionIndicator.classList.add("message", "assistant");
+            transmissionIndicator.textContent = "Sending...";
+            chatWindow.appendChild(transmissionIndicator);
+
+            // Send to Lambda
+            fetch('https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Full Lambda response:', data);
+                
+                transmissionIndicator.remove(); // Remove the "Sending..." indicator
+                const responseMessage = document.createElement("div");
+                responseMessage.classList.add("message", "assistant");
+                responseMessage.textContent = data.response;
+                chatWindow.appendChild(responseMessage);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                if (messageCount === 5) {
+                    saveChat();
+                }
+            })
+            .catch((error) => {
+                console.error('Error with thread:', window.threadId, error);
+                transmissionIndicator.textContent = "Failed to send message.";
+            });
+        }
+
+        function saveChat() {
+            const threadId = window.threadId || 'new';
+            const assistantId = 'asst_IA5PsJxdShVPTAv2xeXTr4Ma';
+            const timestamp = new Date().toISOString();
+            const chatSummary = {
+                event_type: "rag_chat",
+                session: {
+                    id: threadId,
+                    timestamp: timestamp,
+                    source_url: "https://recursivelearning.app/clients/elpl/merit-chat.html",
+                    entry_point: "public_anonymous"
+                },
+                persona: {
+                    role: "teacher",
+                    context_source: "el_merit_resources",
+                    interaction_style: "reflective_guidance"
+                },
+                interaction_log: {
+                    initial_query: "I need help with EL Education Merit resources",
+                    location_context: "EL Education",
+                    identified_needs: ["merit_resources", "curriculum_support"],
+                    resources_shared: []
+                }
+            };
+            localStorage.setItem('chatSummary', JSON.stringify(chatSummary));
+        }
+
+        // Function to capture selected teacher curriculum context from checkboxes
+        function getTeacherCurriculumContext() {
+            const checkboxes = document.querySelectorAll('#teacher-context input[type="checkbox"]');
+            let selectedGrades = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedGrades.push(checkbox.value);
+                }
+            });
+            return selectedGrades;
+        }
+
+        // Add an event listener on the "Next" button to capture context and launch chat
+        document.getElementById('next-button').addEventListener('click', function() {
+            const teacherContext = getTeacherCurriculumContext();
+            // Save the teacher context (for example, in localStorage)
+            localStorage.setItem('teacherContext', JSON.stringify(teacherContext));
+            // Launch the chat with the teacher context attached
+            showSection(1);
+        });
+
+        // Minimal Popout Chat Bubble Script
+        document.addEventListener("DOMContentLoaded", function(){
+            // Create a chat bubble element
+            const chatBubble = document.createElement("div");
+            chatBubble.id = "chat-bubble";
+            chatBubble.innerHTML = '<button id="open-chat">Chat</button>';
+            // Style the bubble (adjust as needed or move styles to custom.css)
+            chatBubble.style.position = "fixed";
+            chatBubble.style.bottom = "20px";
+            chatBubble.style.right = "20px";
+            chatBubble.style.zIndex = "1000";
+            document.body.appendChild(chatBubble);
+
+            // On click, open a popout chat window (minimal version for Storyline)
+            document.getElementById("open-chat").addEventListener("click", function(){
+                const chatPopout = document.createElement("iframe");
+                chatPopout.src = "merit-chat.html?popout=true"; // Replace with your minimal embed chat URL
+                chatPopout.style.position = "fixed";
+                chatPopout.style.bottom = "80px";
+                chatPopout.style.right = "20px";
+                chatPopout.style.width = "350px";
+                chatPopout.style.height = "500px";
+                chatPopout.style.border = "none";
+                chatPopout.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+                chatPopout.id = "chat-popout";
+                document.body.appendChild(chatPopout);
+            });
+        });
+
+        function showSection(index) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, i) => {
+                section.classList.toggle('active', i === index);
+            });
+
+            const navButtons = document.querySelectorAll('#sidebar button');
+            navButtons.forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+
+            if (index === 1) {
+                document.getElementById('nav-chat').removeAttribute('disabled');
+                // Load chat logic
+                const threadId = localStorage.getItem('threadId');
+                if (threadId) {
+                    // Load existing thread
+                } else {
+                    // Start new chat
+                }
+            }
+        }
+
+        function checkAffirmations() {
+            const checkboxes = document.querySelectorAll('#teacher-context input[type="checkbox"]');
+            const nextButton = document.getElementById('next-button');
+            let anyChecked = false;
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    anyChecked = true;
+                }
+            });
+
+            if (anyChecked) {
+                nextButton.classList.add('enabled');
+                nextButton.disabled = false;
+            } else {
+                nextButton.classList.remove('enabled');
+                nextButton.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html> 
