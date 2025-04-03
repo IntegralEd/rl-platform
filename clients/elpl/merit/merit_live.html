@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELPL Merit System</title>
+    <style>
+        #loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #003366; /* ELPL Blue */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-container">
+        <div class="spinner"></div>
+        <p>Loading Merit System...</p>
+    </div>
+
+    <script>
+        (function() {
+            // During development, always load temp version
+            const status = 'temp';
+            
+            // Log status for debugging
+            console.log('Merit System Status:', status);
+
+            // Redirect to temp version
+            window.location.href = 'merit_temp.html';
+        })();
+    </script>
+</body>
+</html> 
