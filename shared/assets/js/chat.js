@@ -1,8 +1,5 @@
 const Chat = {
     messages: [],
-    endpoint: 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', // Default endpoint, can be overridden per client
-    
-    // Initialize state with embedded context
     state: {
         userId: window.USER_ID || 'anonymous',
         chatState: {
@@ -18,44 +15,41 @@ const Chat = {
         this.chatWindow = document.querySelector('.chat-container');
         this.setupEventListeners();
         
+        // Initialize API client
+        APIClient.init({
+            endpoint: window.API_ENDPOINT,
+            apiKey: window.API_KEY,
+            orgId: this.state.chatState.orgId
+        });
+
         // If we have a thread ID, load previous messages
         if (this.state.chatState.threadId) {
             this.loadThreadHistory();
         }
 
         // Add error handler for network issues
-        window.addEventListener('offline', () => this.handleError('Network connection lost. Please check your internet connection.'));
+        window.addEventListener('offline', () => this.handleError('Network connection lost'));
         window.addEventListener('online', () => this.clearError());
     },
 
     async loadThreadHistory() {
         try {
             this.showTypingIndicator();
-            const response = await fetch(this.endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: "load_history",
-                    assistant_id: this.state.chatState.assistantId,
-                    context: this.getContext()
-                })
+            const response = await APIClient.sendMessage({
+                message: "load_history",
+                userId: this.state.userId,
+                assistantId: this.state.chatState.assistantId,
+                threadId: this.state.chatState.threadId
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to load thread history');
-            }
-
-            const data = await response.json();
-            if (data.messages) {
-                data.messages.forEach(msg => {
+            if (response.messages) {
+                response.messages.forEach(msg => {
                     this.addMessage(msg.role, msg.content);
                 });
             }
         } catch (error) {
             console.error('Error loading thread history:', error);
-            this.handleError('Failed to load chat history. Please refresh the page.');
+            this.handleError('Failed to load chat history');
         } finally {
             this.hideTypingIndicator();
         }
@@ -83,48 +77,31 @@ const Chat = {
     },
 
     async sendMessage(content) {
-        if (this.state.isTyping) return; // Prevent multiple messages while typing
-        
-        // Add user message to UI
-        this.addMessage('user', content);
-        this.state.isTyping = true;
+        if (this.state.isTyping) return;
         
         try {
-            // Show typing indicator
             this.showTypingIndicator();
             
-            // Send to endpoint
-            const response = await fetch(this.endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            const response = await APIClient.withRetry(() => 
+                APIClient.sendMessage({
                     message: content,
-                    assistant_id: this.state.chatState.assistantId,
-                    context: this.getContext()
+                    userId: this.state.userId,
+                    assistantId: this.state.chatState.assistantId,
+                    threadId: this.state.chatState.threadId
                 })
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const data = await response.json();
+            );
             
-            // Store thread ID if provided
-            if (data.Thread_ID) {
-                this.state.chatState.threadId = data.Thread_ID;
-                localStorage.setItem(`chat_thread_${this.state.userId}`, data.Thread_ID);
+            if (response.thread_id) {
+                this.state.chatState.threadId = response.thread_id;
+                localStorage.setItem(`chat_thread_${this.state.userId}`, response.thread_id);
             }
             
-            // Add assistant response to UI
-            this.addMessage('assistant', data.response);
+            this.addMessage('assistant', response.message);
             this.clearError();
             
         } catch (error) {
             console.error('Error:', error);
-            this.handleError('Failed to send message. Please try again.');
+            this.handleError('Failed to send message');
         } finally {
             this.state.isTyping = false;
             this.hideTypingIndicator();
