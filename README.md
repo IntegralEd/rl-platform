@@ -17,6 +17,23 @@ rl-platform/
 └── docs/            # Documentation
 ```
 
+## Interaction Log Table
+
+The Interaction Log Table stores interaction details and relates to the Qipu comment schema.
+
+### Fields
+- **Interaction_Log_ID**: Unique interaction ID
+- **User_ID**: Links to Users table
+- **Resource_URL**: URL of the reviewed resource
+- **Raw_JSON_output**: Compressed JSON payload of the full ticket
+
+### Relationships
+- Connects with Users, Tech_Tickets, and Tech_Ticket_Annotations tables
+
+### Usage
+- Stores comprehensive interaction data
+- Facilitates tracking and analysis of review sessions
+
 ## Recent Updates
 
 ### Frontend Improvements (April 2024)

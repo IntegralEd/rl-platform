@@ -55,6 +55,22 @@ Table for individual annotations
 | Sequence_Number | Number | Order in session | 1 |
 | Screenshot_URL | URL | Local screenshot | https://storage.example.com/annotations/qipu_20240404153000_1.png |
 
+# Interaction Log Table
+
+This table stores the interaction details and relates to the Qipu comment schema.
+
+| Field Name | Type | Description | Sample Value |
+|------------|------|-------------|--------------|
+| Interaction_Log_ID | Auto-Number | Unique interaction ID | 1 |
+| User_ID | Link to Users | Reviewer reference | 12345 |
+| Resource_URL | URL | Reviewed resource URL | https://example.com/merit_review.html |
+| Raw_JSON_output | Long Text | Compressed JSON payload of the full ticket | {"ticket_id":"qipu_20240404153000",...} |
+
+## Relationships
+- **Users Table**: Links via User_ID
+- **Tech_Tickets Table**: Links via Resource_URL
+- **Tech_Ticket_Annotations Table**: Links via Interaction_Log_ID
+
 ## Sample Data
 
 ### Users
@@ -110,6 +126,16 @@ Table for individual annotations
 }
 ```
 
+### Interaction Log
+```json
+{
+    "Interaction_Log_ID": 1,
+    "User_ID": 12345,
+    "Resource_URL": "https://example.com/merit_review.html",
+    "Raw_JSON_output": "{\"ticket_id\":\"qipu_20240404153000\",...}"
+}
+```
+
 ## Implementation Notes
 
 1. Screenshots should be stored in a cloud storage service (e.g., AWS S3, Google Cloud Storage)
@@ -121,4 +147,7 @@ Table for individual annotations
 4. Create a dashboard view showing:
    - Annotations by Layout_Section
    - Activity by User_ID
-   - Tickets by Status 
+   - Tickets by Status
+5. Ensure Raw_JSON_output is compressed to save space.
+6. Use Airtable's linking features to connect tables.
+7. Update views to include interaction details. 
