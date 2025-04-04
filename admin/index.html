@@ -213,7 +213,6 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            min-height: 0; /* Ensure proper flexbox behavior */
         }
 
         .admin-card {
@@ -222,26 +221,15 @@
             padding: 20px;
             box-shadow: var(--card-shadow);
             display: flex;
-            flex-direction: row;
             align-items: center;
-            min-height: fit-content;
-        }
-
-        .card-header {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-right: 24px;
-            padding-right: 24px;
-            border-right: 1px solid #eee;
-            min-width: 200px;
+            gap: 24px;
         }
 
         .card-title {
             font-size: 1.2rem;
             font-weight: 600;
             color: var(--primary);
-            margin-bottom: 8px;
+            min-width: 200px;
         }
 
         .card-status {
@@ -302,7 +290,7 @@
         .card-actions {
             display: flex;
             gap: 8px;
-            margin-left: 24px;
+            margin-left: auto;
         }
 
         .action-button {
@@ -314,10 +302,37 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: background 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .action-button:hover {
             background: #003366;
+        }
+
+        .copy-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
+            cursor: pointer;
+            color: var(--primary);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .copy-icon:hover {
+            opacity: 1;
+        }
+
+        .tree-file {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .card-footer {
@@ -364,13 +379,10 @@
                             <div class="tree-content">
                                 <span class="tree-icon">📄</span>
                                 <span>merit_live.html</span>
-                            </div>
-                            <button class="share-button" onclick="copyToClipboard('/clients/elpl/merit/merit_live.html')">
-                                <span class="share-tooltip">Share this version</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="copyToClipboard('/clients/elpl/merit/merit_live.html')">
                                     <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                                 </svg>
-                            </button>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
                             <div class="tree-content">
@@ -420,13 +432,10 @@
                             <div class="tree-content">
                                 <span class="tree-icon">📄</span>
                                 <span>goalsetter_live.html</span>
-                            </div>
-                            <button class="share-button" onclick="copyToClipboard('/clients/st/goalsetter/goalsetter_live.html')">
-                                <span class="share-tooltip">Share this version</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="copyToClipboard('/clients/st/goalsetter/goalsetter_live.html')">
                                     <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                                 </svg>
-                            </button>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
                             <div class="tree-content">
@@ -567,136 +576,79 @@
         <div class="admin-cards">
             <!-- GoalSetter Admin Card -->
             <div class="admin-card">
-                <div class="card-header">
-                    <h2 class="card-title">Goal Setter Admin</h2>
-                    <div class="card-status">
-                        <span class="status-dot active"></span>
-                        <span class="status-dot warning"></span>
-                        <span class="status-dot error"></span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-metrics">
-                        <div class="metric">
-                            <div class="metric-value">42</div>
-                            <div class="metric-label">Active Users</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">87%</div>
-                            <div class="metric-label">Completion Rate</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">12</div>
-                            <div class="metric-label">New Today</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">3.2</div>
-                            <div class="metric-label">Avg. Time (min)</div>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="card-title">Goal Setter</h2>
                 <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">Open Admin</button>
-                    <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter.html'">View Live</button>
+                    <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                        </svg>
+                        Open Admin
+                    </button>
+                    <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        View Live
+                    </button>
                     <button class="action-button" onclick="shareActivity('/clients/st/goalsetter/goalsetter_live.html', 'Goal Setter')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                             <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                         </svg>
                         Share
                     </button>
-                </div>
-                <div class="card-footer">
-                    Last updated: 2023-04-03 14:30
                 </div>
             </div>
 
             <!-- Merit System Admin Card -->
             <div class="admin-card">
-                <div class="card-header">
-                    <h2 class="card-title">Merit System Admin</h2>
-                    <div class="card-status">
-                        <span class="status-dot active"></span>
-                        <span class="status-dot active"></span>
-                        <span class="status-dot active"></span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-metrics">
-                        <div class="metric">
-                            <div class="metric-value">128</div>
-                            <div class="metric-label">Active Users</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">92%</div>
-                            <div class="metric-label">Completion Rate</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">45</div>
-                            <div class="metric-label">New Today</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">4.7</div>
-                            <div class="metric-label">Avg. Time (min)</div>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="card-title">Merit System</h2>
                 <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">Open Admin</button>
-                    <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit.html'">View Live</button>
+                    <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                        </svg>
+                        Open Admin
+                    </button>
+                    <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        View Live
+                    </button>
                     <button class="action-button" onclick="shareActivity('/clients/elpl/merit/merit_live.html', 'Merit System')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                             <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                         </svg>
                         Share
                     </button>
-                </div>
-                <div class="card-footer">
-                    Last updated: 2023-04-03 15:45
                 </div>
             </div>
 
             <!-- BHB Admin Card -->
             <div class="admin-card">
-                <div class="card-header">
-                    <h2 class="card-title">BHB Admin</h2>
-                    <div class="card-status">
-                        <span class="status-dot active"></span>
-                        <span class="status-dot active"></span>
-                        <span class="status-dot warning"></span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-metrics">
-                        <div class="metric">
-                            <div class="metric-value">76</div>
-                            <div class="metric-label">Active Users</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">78%</div>
-                            <div class="metric-label">Completion Rate</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">23</div>
-                            <div class="metric-label">New Today</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">5.1</div>
-                            <div class="metric-label">Avg. Time (min)</div>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="card-title">BHB</h2>
                 <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">Open Admin</button>
-                    <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies.html'">View Live</button>
+                    <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                        </svg>
+                        Open Admin
+                    </button>
+                    <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        View Live
+                    </button>
                     <button class="action-button" onclick="shareActivity('/clients/bhb/bmorehealthybabies_live.html', 'BHB')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                             <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                         </svg>
                         Share
                     </button>
-                </div>
-                <div class="card-footer">
-                    Last updated: 2023-04-02 09:15
                 </div>
             </div>
         </div>
