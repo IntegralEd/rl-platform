@@ -122,8 +122,8 @@
             width: var(--content-width);
             padding: 20px;
             overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
 
@@ -133,27 +133,31 @@
             padding: 20px;
             box-shadow: var(--card-shadow);
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
         }
 
         .card-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
+            flex-direction: column;
+            justify-content: center;
+            margin-right: 24px;
+            padding-right: 24px;
+            border-right: 1px solid #eee;
+            min-width: 200px;
         }
 
         .card-title {
             font-size: 1.2rem;
             font-weight: 600;
             color: var(--primary);
+            margin-bottom: 8px;
         }
 
         .card-status {
             display: flex;
             gap: 4px;
+            margin-bottom: 8px;
         }
 
         .status-dot {
@@ -176,12 +180,13 @@
 
         .card-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .card-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            display: flex;
+            gap: 24px;
             margin-bottom: 16px;
         }
 
@@ -190,6 +195,7 @@
             padding: 12px;
             border-radius: 4px;
             text-align: center;
+            min-width: 100px;
         }
 
         .metric-value {
@@ -206,7 +212,7 @@
         .card-actions {
             display: flex;
             gap: 8px;
-            margin-top: auto;
+            margin-left: 24px;
         }
 
         .action-button {
