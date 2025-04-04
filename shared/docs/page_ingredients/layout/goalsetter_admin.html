@@ -9,63 +9,135 @@
 </head>
 <body>
     <div class="admin-container">
-        <!-- Live Switcher Panel -->
-        <div class="panel live-switcher">
-            <h2>Live Switcher</h2>
-            <p>Currently Serving: <span id="current-mode">Production</span></p>
-            <div class="preview-container">
-                <iframe src="goalsetter.html" class="preview-frame"></iframe>
-                <iframe src="goalsetter_temp.html" class="preview-frame"></iframe>
+        <!-- Collapsible Sections -->
+        <div class="collapsible-section" id="live-switcher">
+            <div class="section-header">
+                <h1>Live Switcher</h1>
+                <span class="carrot">&#9654;</span>
             </div>
-            <button id="switch-to-prod" disabled>Switch to Production</button>
-            <button id="switch-to-temp">Switch to Temp</button>
+            <div class="section-content" style="display: none;">
+                <!-- Live Switcher Content -->
+                <p>Currently Serving: <span id="current-mode">Production</span></p>
+                <div class="preview-container">
+                    <iframe src="goalsetter.html" class="preview-frame"></iframe>
+                    <iframe src="goalsetter_temp.html" class="preview-frame"></iframe>
+                </div>
+                <button id="switch-to-prod" disabled>Switch to Production</button>
+                <button id="switch-to-temp">Switch to Temp</button>
+            </div>
         </div>
 
-        <!-- Review Session Creator Panel -->
-        <div class="panel review-session">
-            <h2>Review Session Creator</h2>
-            <form id="review-session-form">
-                <label for="reviewer-emails">Reviewer Emails:</label>
-                <input type="text" id="reviewer-emails" name="reviewer-emails" placeholder="Enter emails separated by commas">
+        <div class="collapsible-section" id="review-session">
+            <div class="section-header">
+                <h1>Review Session Creator</h1>
+                <span class="carrot">&#9654;</span>
+            </div>
+            <div class="section-content" style="display: none;">
+                <!-- Review Session Creator Content -->
+                <form id="review-session-form">
+                    <label for="reviewer-emails">Reviewer Emails:</label>
+                    <input type="text" id="reviewer-emails" name="reviewer-emails" placeholder="Enter emails separated by commas">
 
-                <label for="start-date">Start Date:</label>
-                <input type="date" id="start-date" name="start-date">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" name="start-date">
 
-                <label for="end-date">End Date:</label>
-                <input type="date" id="end-date" name="end-date">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date" name="end-date">
 
-                <label for="invitation-note">Invitation Note:</label>
-                <textarea id="invitation-note" name="invitation-note" placeholder="Write a note..."></textarea>
+                    <label for="invitation-note">Invitation Note:</label>
+                    <textarea id="invitation-note" name="invitation-note" placeholder="Write a note..."></textarea>
 
-                <button type="submit">Create Review Session</button>
-            </form>
+                    <button type="submit">Create Review Session</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Iframe Generator Panel -->
-        <div class="panel iframe-generator">
-            <h2>Iframe Generator</h2>
-            <form id="iframe-generator-form">
-                <label for="source-url">Source URL:</label>
-                <select id="source-url" name="source-url">
-                    <option value="goalsetter.html">Production</option>
-                    <option value="goalsetter_temp.html">Temp</option>
-                </select>
+        <div class="collapsible-section" id="iframe-generator">
+            <div class="section-header">
+                <h1>Iframe Generator</h1>
+                <span class="carrot">&#9654;</span>
+            </div>
+            <div class="section-content" style="display: none;">
+                <!-- Iframe Generator Content -->
+                <form id="iframe-generator-form">
+                    <label for="source-url">Source URL:</label>
+                    <select id="source-url" name="source-url">
+                        <option value="goalsetter.html">Production</option>
+                        <option value="goalsetter_temp.html">Temp</option>
+                    </select>
 
-                <label for="size">Size:</label>
-                <input type="text" id="size" name="size" placeholder="e.g., 800x600 or responsive">
+                    <label for="size">Size:</label>
+                    <input type="text" id="size" name="size" placeholder="e.g., 800x600 or responsive">
 
-                <label for="options">Options:</label>
-                <input type="text" id="options" name="options" placeholder="e.g., border, scrollbars">
+                    <label for="options">Options:</label>
+                    <input type="text" id="options" name="options" placeholder="e.g., border, scrollbars">
 
-                <button type="submit">Generate Embed Code</button>
-            </form>
+                    <button type="submit">Generate Embed Code</button>
+                </form>
+            </div>
         </div>
     </div>
 
+    <style>
+        .collapsible-section {
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .section-header h1 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .carrot {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section-content {
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .unsaved {
+            background-color: #ffeb3b;
+        }
+    </style>
+
     <script>
-        // Placeholder for JavaScript logic
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize panels and forms
+        document.querySelectorAll('.collapsible-section').forEach(section => {
+            const header = section.querySelector('.section-header');
+            const content = section.querySelector('.section-content');
+            const carrot = section.querySelector('.carrot');
+
+            header.addEventListener('click', () => {
+                const isOpen = content.style.display === 'block';
+                document.querySelectorAll('.section-content').forEach(c => c.style.display = 'none');
+                document.querySelectorAll('.carrot').forEach(c => c.style.transform = 'rotate(0deg)');
+
+                if (!isOpen) {
+                    content.style.display = 'block';
+                    carrot.style.transform = 'rotate(90deg)';
+                }
+            });
+        });
+
+        // Highlight unsaved changes
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('change', () => {
+                const section = input.closest('.collapsible-section');
+                section.querySelector('.section-header').classList.add('unsaved');
+            });
         });
     </script>
 </body>
