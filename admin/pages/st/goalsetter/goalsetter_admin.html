@@ -79,6 +79,25 @@
     </div>
 
     <style>
+        .admin-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-panel {
+            width: 33%;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .right-panel {
+            width: 67%;
+            padding: 10px;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
         .collapsible-section {
             border-bottom: 1px solid #ddd;
             margin-bottom: 10px;
@@ -88,8 +107,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--primary-color);
-            color: #FFFFFF;
+            background-color: #ffffff;
+            color: #000000;
             padding: 10px;
             cursor: pointer;
         }
@@ -97,6 +116,7 @@
         .section-header h1 {
             font-size: 1.2rem;
             margin: 0;
+            color: #000000; /* Black for better contrast */
         }
 
         .carrot {
@@ -107,10 +127,30 @@
         .section-content {
             padding: 10px;
             background-color: #f9f9f9;
+            color: #000000;
         }
 
         .unsaved {
             background-color: #ffeb3b;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            border: 1px solid #000000;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            background-color: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #333333;
         }
     </style>
 
