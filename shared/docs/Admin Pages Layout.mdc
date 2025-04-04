@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Admin Pages Layout
+
+## Overview
+This document outlines the layout structure for admin pages, ensuring a consistent design across all admin interfaces.
+
+## Layout Structure
+- **Left Panel (1/3 width):**
+  - Displays the site tree with floating annotations.
+  - Always visible to provide navigation context.
+
+- **Right Panel (2/3 width):**
+  - Displays the active content based on the selected item in the site tree.
+  - Only specific pages like `goalsetter_admin.html` should load in this panel.
+
+## Dependencies
+- The left panel's site tree should dynamically update the right panel's content.
+- Ensure consistent styling and behavior across all admin pages.
+
+## Notes
+- The layout should be responsive and maintain usability across different screen sizes.
+- Floating annotations should provide additional context without obstructing navigation.

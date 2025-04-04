@@ -1,0 +1,28 @@
+# URL Conventions
+
+## Overview
+This document outlines the URL conventions for the Recursive Learning Platform, ensuring a consistent and organized structure across all projects.
+
+## URL Set Descriptions
+
+- **_live.html**
+  - Location: `/clients/[client]/[project]/`
+  - Purpose: Serves the production version of the project, displaying the finalized content to end users.
+
+- **_temp.html**
+  - Location: `/clients/[client]/[project]/`
+  - Purpose: Used for staging or testing purposes, allowing for previewing changes before they go live.
+
+- **_review.html**
+  - Location: `/clients/[client]/[project]/`
+  - Purpose: Facilitates review sessions, often with additional commenting or feedback features enabled.
+
+- **_admin.html**
+  - Location: `/admin/pages/[client]/[project]/`
+  - Purpose: Provides administrative controls and settings for managing the project, accessible only to authorized users.
+
+## Rules
+- `_admin.html` pages should not be placed within the client tree.
+- All admin pages must reside in the `/admin/pages/` directory structure to maintain a clear separation between client-specific and admin interfaces.
+- Client-specific pages should reside within their respective client directories under `/clients/`.
+- Shared assets and components should be placed in the `/shared/` directory to maintain a clear separation of concerns. 
