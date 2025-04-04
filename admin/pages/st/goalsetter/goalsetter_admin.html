@@ -139,6 +139,11 @@
                 section.querySelector('.section-header').classList.add('unsaved');
             });
         });
+
+        // Log any resource loading failures
+        window.addEventListener('error', function(event) {
+            console.error('Resource failed to load:', event.target);
+        }, true);
     </script>
 </body>
 </html> 
