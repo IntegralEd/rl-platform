@@ -66,10 +66,98 @@
             padding: 4px 0;
             cursor: pointer;
             user-select: none;
+            position: relative;
         }
 
         .tree-item:hover {
             background: rgba(0,0,0,0.05);
+        }
+
+        .tree-item:hover .share-button {
+            opacity: 1;
+        }
+
+        .tree-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .share-button {
+            opacity: 0;
+            position: absolute;
+            right: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.8rem;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+
+        .share-actions {
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            padding: 8px;
+            display: none;
+            gap: 8px;
+            margin-right: 8px;
+            z-index: 100;
+        }
+
+        .share-button:hover .share-actions {
+            display: flex;
+        }
+
+        .share-action {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--bg-light);
+            color: var(--text);
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .share-action:hover {
+            background: #e0e0e0;
+        }
+
+        .share-action svg {
+            width: 12px;
+            height: 12px;
+            margin-right: 4px;
+        }
+
+        .share-tooltip {
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            margin-right: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .share-button:hover .share-tooltip {
+            opacity: 1;
         }
 
         .tree-folder {
@@ -125,6 +213,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            min-height: 0; /* Ensure proper flexbox behavior */
         }
 
         .admin-card {
@@ -135,6 +224,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            min-height: fit-content;
         }
 
         .card-header {
@@ -265,28 +355,46 @@
                     </div>
                     <div class="tree-children open">
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit_live.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit_live.html</span>
+                            </div>
+                            <button class="share-button" onclick="copyToClipboard('/clients/elpl/merit/merit_live.html')">
+                                <span class="share-tooltip">Share this version</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                </svg>
+                            </button>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit_review.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit_review.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit_embed.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit_embed.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit_chat.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit_chat.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>merit_temp.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>merit_temp.html</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -303,20 +411,34 @@
                     </div>
                     <div class="tree-children open">
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>goalsetter.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>goalsetter.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>goalsetter_live.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>goalsetter_live.html</span>
+                            </div>
+                            <button class="share-button" onclick="copyToClipboard('/clients/st/goalsetter/goalsetter_live.html')">
+                                <span class="share-tooltip">Share this version</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                </svg>
+                            </button>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>goalsetter_review.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>goalsetter_review.html</span>
+                            </div>
                         </div>
                         <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>goalsetter_temp.html</span>
+                            <div class="tree-content">
+                                <span class="tree-icon">📄</span>
+                                <span>goalsetter_temp.html</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -476,6 +598,12 @@
                 <div class="card-actions">
                     <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">Open Admin</button>
                     <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter.html'">View Live</button>
+                    <button class="action-button" onclick="shareActivity('/clients/st/goalsetter/goalsetter_live.html', 'Goal Setter')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Share
+                    </button>
                 </div>
                 <div class="card-footer">
                     Last updated: 2023-04-03 14:30
@@ -515,6 +643,12 @@
                 <div class="card-actions">
                     <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">Open Admin</button>
                     <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit.html'">View Live</button>
+                    <button class="action-button" onclick="shareActivity('/clients/elpl/merit/merit_live.html', 'Merit System')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Share
+                    </button>
                 </div>
                 <div class="card-footer">
                     Last updated: 2023-04-03 15:45
@@ -554,6 +688,12 @@
                 <div class="card-actions">
                     <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">Open Admin</button>
                     <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies.html'">View Live</button>
+                    <button class="action-button" onclick="shareActivity('/clients/bhb/bmorehealthybabies_live.html', 'BHB')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right: 4px;">
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Share
+                    </button>
                 </div>
                 <div class="card-footer">
                     Last updated: 2023-04-02 09:15
@@ -563,6 +703,95 @@
     </div>
 
     <script>
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            const fullUrl = window.location.origin + text;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                // Show success message
+                const tooltip = document.createElement('div');
+                tooltip.className = 'copy-success-tooltip';
+                tooltip.textContent = 'URL copied!';
+                document.body.appendChild(tooltip);
+                
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Show toast message
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'copy-success-tooltip';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+
+        // Share activity function
+        function shareActivity(url, activityName) {
+            const fullUrl = window.location.origin + url;
+            const shareMenu = document.createElement('div');
+            shareMenu.className = 'share-actions';
+            
+            // Copy link option
+            const copyButton = document.createElement('button');
+            copyButton.className = 'share-action';
+            copyButton.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+                Copy Link
+            `;
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    showToast('URL copied!');
+                });
+            };
+            
+            // Email option
+            const emailButton = document.createElement('button');
+            emailButton.className = 'share-action';
+            emailButton.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Email Link
+            `;
+            emailButton.onclick = () => {
+                const subject = `Access to ${activityName}`;
+                const body = `Here's your link to access ${activityName}:\n\n${fullUrl}`;
+                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            };
+            
+            shareMenu.appendChild(copyButton);
+            shareMenu.appendChild(emailButton);
+            
+            // Remove any existing share menus
+            document.querySelectorAll('.share-actions').forEach(menu => menu.remove());
+            document.body.appendChild(shareMenu);
+            
+            // Position the menu
+            const buttonRect = event.target.getBoundingClientRect();
+            shareMenu.style.position = 'fixed';
+            shareMenu.style.top = `${buttonRect.top + buttonRect.height/2}px`;
+            shareMenu.style.right = `${window.innerWidth - buttonRect.left + 8}px`;
+            
+            // Close menu when clicking outside
+            const closeMenu = (e) => {
+                if (!shareMenu.contains(e.target) && !event.target.contains(e.target)) {
+                    shareMenu.remove();
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', closeMenu), 0);
+        }
+
         // Toggle tree folders
         document.querySelectorAll('.tree-toggle').forEach(toggle => {
             toggle.addEventListener('click', () => {
