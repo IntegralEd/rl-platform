@@ -247,11 +247,14 @@
     </style>
 </head>
 <body>
-    <iframe
-        id="contentFrame"
-        class="content-frame"
-        frameborder="0"
-    ></iframe>
+    <div class="content-area">
+        <iframe src="goalsetter_temp.html" class="content-frame"></iframe>
+    </div>
+
+    <div class="loading" id="error-message" style="display: none;">
+        <div class="spinner"></div>
+        <p>Check with your admin for access to this resource. The live page is available at <a href="goalsetter_live.html">goalsetter_live.html</a>.</p>
+    </div>
 
     <script>
         // Check page status from localStorage (set by admin panel)
@@ -263,7 +266,8 @@
         // Load appropriate content based on status
         function loadContent() {
             const status = getPageStatus();
-            const frame = document.getElementById('contentFrame');
+            const frame = document.querySelector('.content-frame');
+            const errorMessage = document.getElementById('error-message');
             
             switch(status) {
                 case 'prod':
@@ -274,6 +278,11 @@
                     frame.src = 'goalsetter_temp.html';
                     break;
             }
+
+            frame.onerror = function() {
+                frame.style.display = 'none';
+                errorMessage.style.display = 'flex';
+            };
         }
 
         // Initialize on load

@@ -424,6 +424,17 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Modal for direct access -->
+        <div id="access-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Access Options</h2>
+                <p>It seems you're accessing this page directly. What would you like to do?</p>
+                <button id="go-live">Go to Live View</button>
+                <button id="go-review">Are you here to review?</button>
+            </div>
+        </div>
+
         <header class="app-header">
             <img src="assets/images/ST TH Powered By White Logo.png" 
                  alt="StriveTogether" 
@@ -800,6 +811,42 @@
         document.addEventListener('DOMContentLoaded', function() {
             const nextButton = document.querySelector('.next-button');
             nextButton.addEventListener('click', startInterview);
+        });
+
+        // Show modal if accessed directly
+        function showModal() {
+            const modal = document.getElementById('access-modal');
+            const closeButton = document.querySelector('.close-button');
+            const goLiveButton = document.getElementById('go-live');
+            const goReviewButton = document.getElementById('go-review');
+
+            modal.style.display = 'block';
+
+            closeButton.onclick = function() {
+                modal.style.display = 'none';
+            };
+
+            goLiveButton.onclick = function() {
+                window.location.href = 'goalsetter_live.html';
+            };
+
+            goReviewButton.onclick = function() {
+                window.location.href = 'goalsetter_review.html';
+            };
+
+            window.onclick = function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            };
+        }
+
+        // Check if accessed directly
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.has('token') && !window.location.pathname.endsWith('_ending.html')) {
+                showModal();
+            }
         });
     </script>
 </body>
