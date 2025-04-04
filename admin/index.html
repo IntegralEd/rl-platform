@@ -397,6 +397,75 @@
         .bottom-icon:hover .bottom-icon-tooltip {
             opacity: 1;
         }
+
+        /* Tree File Actions */
+        .tree-file-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tree-item:hover .tree-file-actions {
+            opacity: 1;
+        }
+
+        .tree-action {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            color: var(--primary);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            padding: 2px;
+        }
+
+        .tree-action:hover {
+            opacity: 1;
+        }
+
+        /* Status Indicators */
+        .status-indicators {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-left: 24px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+            position: relative;
+        }
+
+        .status-dot[data-status="active"] { background: #4CAF50; }
+        .status-dot[data-status="warning"] { background: #FFC107; }
+        .status-dot[data-status="error"] { background: #F44336; }
+
+        .status-dot::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .status-dot:hover::after {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -451,9 +520,18 @@
                             <div class="tree-content">
                                 <span class="tree-icon">📄</span>
                                 <span>merit_live.html</span>
-                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="copyToClipboard('/clients/elpl/merit/merit_live.html')">
-                                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                </svg>
+                                <div class="tree-file-actions">
+                                    <button class="tree-action" onclick="copyUrl('/clients/elpl/merit/merit_live.html')" title="Copy URL">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                        </svg>
+                                    </button>
+                                    <button class="tree-action" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')" title="Share URL">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="tree-item tree-file">
@@ -504,9 +582,18 @@
                             <div class="tree-content">
                                 <span class="tree-icon">📄</span>
                                 <span>goalsetter_live.html</span>
-                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="copyToClipboard('/clients/st/goalsetter/goalsetter_live.html')">
-                                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                </svg>
+                                <div class="tree-file-actions">
+                                    <button class="tree-action" onclick="copyUrl('/clients/st/goalsetter/goalsetter_live.html')" title="Copy URL">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                        </svg>
+                                    </button>
+                                    <button class="tree-action" onclick="shareUrl('/clients/st/goalsetter/goalsetter_live.html', 'Goal Setter')" title="Share URL">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="tree-item tree-file">
@@ -649,25 +736,17 @@
             <!-- GoalSetter Admin Card -->
             <div class="admin-card">
                 <h2 class="card-title">Goal Setter</h2>
+                <div class="status-indicators">
+                    <div class="status-dot" data-status="active" data-tooltip="API Connected"></div>
+                    <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
+                    <div class="status-dot" data-status="error" data-tooltip="User Sessions"></div>
+                </div>
                 <div class="card-actions">
                     <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                             <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
                         </svg>
                         Open Admin
-                    </button>
-                    <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        View Live
-                    </button>
-                    <button class="action-button" onclick="shareActivity('/clients/st/goalsetter/goalsetter_live.html', 'Goal Setter')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                        </svg>
-                        Share
                     </button>
                 </div>
             </div>
@@ -727,94 +806,96 @@
     </div>
 
     <script>
-        // Copy to clipboard function
-        function copyToClipboard(text) {
-            const fullUrl = window.location.origin + text;
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                // Show success message
-                const tooltip = document.createElement('div');
-                tooltip.className = 'copy-success-tooltip';
-                tooltip.textContent = 'URL copied!';
-                document.body.appendChild(tooltip);
-                
-                setTimeout(() => {
-                    tooltip.remove();
-                }, 2000);
-            }).catch(err => {
+        // Copy URL function with fallback
+        function copyUrl(url) {
+            const fullUrl = window.location.origin + url;
+            
+            // Try using clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(fullUrl)
+                    .then(() => showToast('URL copied!'))
+                    .catch(() => fallbackCopyUrl(fullUrl));
+            } else {
+                fallbackCopyUrl(fullUrl);
+            }
+        }
+
+        // Fallback copy method using textarea
+        function fallbackCopyUrl(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                textArea.remove();
+                showToast('URL copied!');
+            } catch (err) {
                 console.error('Failed to copy:', err);
-            });
+                textArea.remove();
+                showToast('Failed to copy URL');
+            }
+        }
+
+        // Share URL function
+        function shareUrl(url, title) {
+            const fullUrl = window.location.origin + url;
+            const subject = `Access to ${title}`;
+            const body = `Here's your link to access ${title}:\n\n${fullUrl}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
 
         // Show toast message
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'copy-success-tooltip';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = '#333';
+            toast.style.color = 'white';
+            toast.style.padding = '8px 16px';
+            toast.style.borderRadius = '4px';
+            toast.style.zIndex = '1000';
             toast.textContent = message;
-            document.body.appendChild(toast);
             
+            document.body.appendChild(toast);
             setTimeout(() => {
-                toast.remove();
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 200);
             }, 2000);
         }
 
-        // Share activity function
-        function shareActivity(url, activityName) {
-            const fullUrl = window.location.origin + url;
-            const shareMenu = document.createElement('div');
-            shareMenu.className = 'share-actions';
-            
-            // Copy link option
-            const copyButton = document.createElement('button');
-            copyButton.className = 'share-action';
-            copyButton.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                </svg>
-                Copy Link
-            `;
-            copyButton.onclick = () => {
-                navigator.clipboard.writeText(fullUrl).then(() => {
-                    showToast('URL copied!');
-                });
-            };
-            
-            // Email option
-            const emailButton = document.createElement('button');
-            emailButton.className = 'share-action';
-            emailButton.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                Email Link
-            `;
-            emailButton.onclick = () => {
-                const subject = `Access to ${activityName}`;
-                const body = `Here's your link to access ${activityName}:\n\n${fullUrl}`;
-                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            };
-            
-            shareMenu.appendChild(copyButton);
-            shareMenu.appendChild(emailButton);
-            
-            // Remove any existing share menus
-            document.querySelectorAll('.share-actions').forEach(menu => menu.remove());
-            document.body.appendChild(shareMenu);
-            
-            // Position the menu
-            const buttonRect = event.target.getBoundingClientRect();
-            shareMenu.style.position = 'fixed';
-            shareMenu.style.top = `${buttonRect.top + buttonRect.height/2}px`;
-            shareMenu.style.right = `${window.innerWidth - buttonRect.left + 8}px`;
-            
-            // Close menu when clicking outside
-            const closeMenu = (e) => {
-                if (!shareMenu.contains(e.target) && !event.target.contains(e.target)) {
-                    shareMenu.remove();
-                    document.removeEventListener('click', closeMenu);
+        // Initialize status indicators
+        function initializeStatusIndicators() {
+            // Example: Listen for messages from admin pages
+            window.addEventListener('message', (event) => {
+                if (event.data.type === 'status') {
+                    updateStatus(event.data.activity, event.data.status);
                 }
-            };
-            setTimeout(() => document.addEventListener('click', closeMenu), 0);
+            });
         }
+
+        function updateStatus(activity, status) {
+            const card = document.querySelector(`.admin-card[data-activity="${activity}"]`);
+            if (card) {
+                const dots = card.querySelectorAll('.status-dot');
+                dots.forEach((dot, index) => {
+                    if (status[index]) {
+                        dot.dataset.status = status[index].state;
+                        dot.dataset.tooltip = status[index].message;
+                    }
+                });
+            }
+        }
+
+        // Initialize
+        initializeStatusIndicators();
 
         // Toggle tree folders
         document.querySelectorAll('.tree-toggle').forEach(toggle => {
