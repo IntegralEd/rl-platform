@@ -9,71 +9,24 @@
 </head>
 <body>
     <div class="admin-container">
-        <!-- Collapsible Sections -->
-        <div class="collapsible-section" id="live-switcher">
-            <div class="section-header">
-                <h1>Live Switcher</h1>
-                <span class="carrot">&#9654;</span>
-            </div>
-            <div class="section-content" style="display: none;">
-                <!-- Live Switcher Content -->
-                <p>Currently Serving: <span id="current-mode">Production</span></p>
-                <div class="preview-container">
-                    <iframe src="goalsetter.html" class="preview-frame"></iframe>
-                    <iframe src="goalsetter_temp.html" class="preview-frame"></iframe>
+        <div class="left-panel">
+            <!-- Navigation Tree -->
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Reports</a></li>
+            </ul>
+        </div>
+        <div class="right-panel">
+            <!-- Main Content -->
+            <div class="collapsible-section">
+                <div class="section-header">
+                    <h1>Review Session</h1>
+                    <span class="carrot">&#9660;</span>
                 </div>
-                <button id="switch-to-prod" disabled>Switch to Production</button>
-                <button id="switch-to-temp">Switch to Temp</button>
-            </div>
-        </div>
-
-        <div class="collapsible-section" id="review-session">
-            <div class="section-header">
-                <h1>Review Session Creator</h1>
-                <span class="carrot">&#9654;</span>
-            </div>
-            <div class="section-content" style="display: none;">
-                <!-- Review Session Creator Content -->
-                <form id="review-session-form">
-                    <label for="reviewer-emails">Reviewer Emails:</label>
-                    <input type="text" id="reviewer-emails" name="reviewer-emails" placeholder="Enter emails separated by commas">
-
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" name="start-date">
-
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" name="end-date">
-
-                    <label for="invitation-note">Invitation Note:</label>
-                    <textarea id="invitation-note" name="invitation-note" placeholder="Write a note..."></textarea>
-
-                    <button type="submit">Create Review Session</button>
-                </form>
-            </div>
-        </div>
-
-        <div class="collapsible-section" id="iframe-generator">
-            <div class="section-header">
-                <h1>Iframe Generator</h1>
-                <span class="carrot">&#9654;</span>
-            </div>
-            <div class="section-content" style="display: none;">
-                <!-- Iframe Generator Content -->
-                <form id="iframe-generator-form">
-                    <label for="source-url">Source URL:</label>
-                    <select id="source-url" name="source-url">
-                        <option value="goalsetter.html">Production</option>
-                        <option value="goalsetter_temp.html">Temp</option>
-                    </select>
-
-                    <label for="size">Size:</label>
-                    <input type="text" id="size" name="size" placeholder="e.g., 800x600 or responsive">
-
-                    <label for="options">Options:</label>
-                    <input type="text" id="options" name="options" placeholder="e.g., border, scrollbars">
-
-                    <button type="submit">Generate Embed Code</button>
-                </form>
+                <div class="section-content">
+                    <!-- Content goes here -->
+                </div>
             </div>
         </div>
     </div>
