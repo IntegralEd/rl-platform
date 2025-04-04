@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qipu Comment Bar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        #qipu-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        #qipu-bar.unauthorized {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeeba;
+        }
+
+        #qipu-bar a {
+            color: #0052CC;
+            text-decoration: none;
+        }
+
+        #qipu-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .qipu-tools {
+            display: none; /* Shown when authorized */
+        }
+
+        .qipu-tools.active {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .qipu-tool {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #0052CC;
+            color: white;
+            border: none;
+            font-size: 14px;
+        }
+
+        .qipu-tool:hover {
+            background: #003d99;
+        }
+    </style>
+</head>
+<body>
+    <div id="qipu-bar" class="unauthorized">
+        <div id="auth-message">
+            You must be logged in to provide review comments. 
+            <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" target="_blank">Login to Admin Dashboard</a>
+        </div>
+        <div class="qipu-tools">
+            <button class="qipu-tool" id="start-review">Start Review</button>
+            <button class="qipu-tool" id="view-comments">View Comments</button>
+        </div>
+    </div>
+
+    <script>
+        class QipuBar {
+            constructor() {
+                this.isAuthorized = false;
+                this.validateAuth();
+            }
+
+            validateAuth() {
+                // Check URL parameters
+                const params = new URLSearchParams(window.location.search);
+                const reviewEmail = params.get('RevEmail');
+                const userId = params.get('User_ID');
+                const orgId = params.get('Org_ID');
+
+                if (reviewEmail && userId && orgId) {
+                    this.authorize({
+                        email: reviewEmail,
+                        userId: userId,
+                        orgId: orgId
+                    });
+                }
+            }
+
+            authorize(user) {
+                this.isAuthorized = true;
+                this.user = user;
+                
+                // Update UI
+                const bar = document.getElementById('qipu-bar');
+                bar.classList.remove('unauthorized');
+                document.getElementById('auth-message').style.display = 'none';
+                document.querySelector('.qipu-tools').classList.add('active');
+
+                // Setup review handlers
+                document.getElementById('start-review').onclick = () => {
+                    window.location.href = `/shared/templates/review-wrapper.html?RevEmail=${user.email}&User_ID=${user.userId}&Org_ID=${user.orgId}&target=${encodeURIComponent(window.location.href)}`;
+                };
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            window.qipuBar = new QipuBar();
+        });
+    </script>
+</body>
+</html> 

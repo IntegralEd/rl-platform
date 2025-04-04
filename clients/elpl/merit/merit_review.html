@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELPL Merit System - Review</title>
+    <title>Merit System Review</title>
+    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/merit.css">
     <style>
         body, html {
             margin: 0;
@@ -69,6 +70,11 @@
         .comment-button:hover {
             background: #45a049;
         }
+
+        /* Ensure space for comment bar */
+        body {
+            margin-bottom: 60px;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +94,9 @@
         <button class="comment-button" onclick="submitComment()">Submit Comment</button>
     </div>
 
+    <!-- Include Qipu Comment Bar -->
+    <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
+
     <script>
         function submitComment() {
             const input = document.querySelector('.comment-input');
@@ -100,6 +109,17 @@
                 alert('Comment submitted successfully!');
             }
         }
+
+        // Listen for messages from comment bar
+        window.addEventListener('message', (event) => {
+            // Verify origin
+            if (event.origin !== window.location.origin) return;
+            
+            if (event.data.type === 'START_REVIEW') {
+                // Handle review start
+                window.location.href = event.data.url;
+            }
+        });
     </script>
 </body>
 </html> 
