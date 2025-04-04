@@ -508,23 +508,39 @@
         </div>
 
         <!-- Footer -->
-        <div class="app-footer">
-            <img src="assets/images/ST TH Powered By White Logo.png" alt="StriveTogether Logo" class="footer-logo">
-            <div class="playbar">
-                <button class="next-button" disabled>
-                    <img src="assets/images/noun-next-5654311-FFFFFF.png" alt="Next">
-                </button>
+        <footer class="app-footer" role="contentinfo">
+            <div class="interaction-container">
+                <div class="interaction-bar" data-bar="play">
+                    <div class="interaction-left">
+                        <button class="interaction-button next-button" aria-label="Next">
+                            <img class="interaction-icon" src="/shared/assets/images/arrow-right.svg" alt="Next">
+                        </button>
+                    </div>
+                    <div class="footer-content">
+                        <img class="footer-logo" src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning Logo">
+                        <span class="footer-text">Powered by Recursive Learning</span>
+                    </div>
+                </div>
+
+                <div class="interaction-bar" data-bar="chat">
+                    <div class="chat-input-container">
+                        <form class="chat-form" id="footer-chat-form">
+                            <textarea 
+                                class="chat-input" 
+                                placeholder="Type your message..."
+                                aria-label="Chat input"
+                                rows="1"
+                            ></textarea>
+                            <button type="submit" class="send-button" aria-label="Send message">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="chatbar" style="display: none;">
-                <input type="text" 
-                       class="chat-input" 
-                       placeholder="Type your message..."
-                       onkeydown="handleChatKeypress(event)">
-                <button class="send-button" onclick="sendMessage()">
-                    <img src="assets/images/noun-send-7149925-FFFFFF.png" alt="Send">
-                </button>
-            </div>
-        </div>
+        </footer>
     </div>
 
     <script>
