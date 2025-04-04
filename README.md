@@ -66,4 +66,43 @@ rl-platform/
 
 ## License
 
-Copyright © 2024 Integral Education. All rights reserved. 
+Copyright © 2024 Integral Education. All rights reserved.
+
+## Status Indicators
+
+The admin dashboard uses a three-dot status system to monitor the health of each learning activity:
+
+### API Integration Status (Left Dot)
+- 🟢 **Active** - API is connected and responding within expected latency (<300ms)
+- 🟡 **Warning** - API is responding but with high latency (>300ms)
+- 🔴 **Error** - API connection failed or timeout
+
+### Form Validation Status (Middle Dot)
+- 🟢 **Active** - All form submissions passing validation (>95%)
+- 🟡 **Warning** - Some form validation failures (85-95% pass rate)
+- 🔴 **Error** - High form validation failure rate (<85% pass rate)
+
+### User Sessions Status (Right Dot)
+- 🟢 **Active** - Normal user session activity
+- 🟡 **Warning** - Elevated error rates in user sessions (>5%)
+- 🔴 **Error** - Critical user session issues or system errors (>10%)
+
+### Implementation
+Each admin page broadcasts these statuses using the postMessage API:
+
+```javascript
+window.parent.postMessage({
+    type: 'status',
+    activity: 'goalsetter', // or 'merit', 'bhb'
+    status: [
+        {state: 'active', message: 'API: 245ms response time'},
+        {state: 'warning', message: 'Forms: 92% validation rate'},
+        {state: 'error', message: 'Sessions: 15% error rate'}
+    ]
+}, '*');
+```
+
+Status updates are sent:
+1. On page load
+2. Every 30 seconds
+3. After significant events (form submission, API calls) 
