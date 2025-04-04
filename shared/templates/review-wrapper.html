@@ -313,25 +313,68 @@
                 const frame = document.getElementById('content-frame');
                 const screenshot = await html2canvas(frame);
                 
+                const params = new URLSearchParams(window.location.search);
+                const timestamp = new Date().toISOString();
+                const ticketId = `qipu_${timestamp.replace(/[-:]/g, '').split('.')[0]}`;
+                
                 const ticketData = {
-                    screenshot: screenshot.toDataURL('image/png'),
-                    annotations: canvas.getObjects().map(obj => ({
-                        type: obj.type,
-                        content: obj.text || obj.path,
-                        position: {
-                            x: obj.left,
-                            y: obj.top,
-                            origin: { x: 0, y: frame.offsetHeight }
-                        }
-                    })),
-                    url: frame.src,
-                    timestamp: new Date().toISOString(),
+                    ticket_id: ticketId,
+                    source: {
+                        url: frame.src,
+                        version: frame.src.includes('_live') ? 'live' : 
+                                frame.src.includes('_review') ? 'review' : 'temp',
+                        viewport_height: frame.offsetHeight,
+                        viewport_width: frame.offsetWidth
+                    },
                     reviewer: {
-                        email: new URLSearchParams(window.location.search).get('RevEmail')
+                        email: params.get('RevEmail'),
+                        name: params.get('RevEmail').split('@')[0],
+                        role: 'reviewer',
+                        org_id: params.get('Org_ID')
+                    },
+                    annotations: canvas.getObjects().map(obj => {
+                        const baseAnnotation = {
+                            type: obj.type,
+                            content: obj.text || null,
+                            position: {
+                                x: obj.left,
+                                y: obj.top,
+                                origin: { x: 0, y: frame.offsetHeight }
+                            },
+                            style: {
+                                color: obj.stroke || obj.fill,
+                                strokeWidth: obj.strokeWidth || 1
+                            }
+                        };
+
+                        // Add specific properties based on annotation type
+                        if (obj.type === 'path') {
+                            baseAnnotation.type = 'arrow';
+                            baseAnnotation.position.start = { x: obj.path[0][1], y: obj.path[0][2] };
+                            baseAnnotation.position.end = { x: obj.path[1][1], y: obj.path[1][2] };
+                        }
+                        if (obj.type === 'textbox') {
+                            baseAnnotation.type = 'comment';
+                            baseAnnotation.style.fontSize = obj.fontSize;
+                            baseAnnotation.style.backgroundColor = obj.backgroundColor;
+                        }
+
+                        return baseAnnotation;
+                    }),
+                    metadata: {
+                        created_at: timestamp,
+                        status: 'Open',
+                        priority: 'Normal',
+                        labels: [],
+                        assigned_to: null,
+                        source_app: 'QipuBar',
+                        submission_method: 'web',
+                        thread_id: `qipu_thread_${timestamp.replace(/[-:]/g, '').split('.')[0]}`
                     }
                 };
 
-                await fetch(WEBHOOK_URL, {
+                // Send to webhook
+                await fetch('https://hook.us1.make.com/uzminwhwfnkyve84g9afrla4shblkiox', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(ticketData)
