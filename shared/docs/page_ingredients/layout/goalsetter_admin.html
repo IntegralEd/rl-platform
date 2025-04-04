@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goalsetter Admin Panel</title>
+    <link rel="stylesheet" href="/shared/assets/css/admin.css">
+    <script src="/shared/assets/js/admin.js" defer></script>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Live Switcher Panel -->
+        <div class="panel live-switcher">
+            <h2>Live Switcher</h2>
+            <p>Currently Serving: <span id="current-mode">Production</span></p>
+            <div class="preview-container">
+                <iframe src="goalsetter.html" class="preview-frame"></iframe>
+                <iframe src="goalsetter_temp.html" class="preview-frame"></iframe>
+            </div>
+            <button id="switch-to-prod" disabled>Switch to Production</button>
+            <button id="switch-to-temp">Switch to Temp</button>
+        </div>
+
+        <!-- Review Session Creator Panel -->
+        <div class="panel review-session">
+            <h2>Review Session Creator</h2>
+            <form id="review-session-form">
+                <label for="reviewer-emails">Reviewer Emails:</label>
+                <input type="text" id="reviewer-emails" name="reviewer-emails" placeholder="Enter emails separated by commas">
+
+                <label for="start-date">Start Date:</label>
+                <input type="date" id="start-date" name="start-date">
+
+                <label for="end-date">End Date:</label>
+                <input type="date" id="end-date" name="end-date">
+
+                <label for="invitation-note">Invitation Note:</label>
+                <textarea id="invitation-note" name="invitation-note" placeholder="Write a note..."></textarea>
+
+                <button type="submit">Create Review Session</button>
+            </form>
+        </div>
+
+        <!-- Iframe Generator Panel -->
+        <div class="panel iframe-generator">
+            <h2>Iframe Generator</h2>
+            <form id="iframe-generator-form">
+                <label for="source-url">Source URL:</label>
+                <select id="source-url" name="source-url">
+                    <option value="goalsetter.html">Production</option>
+                    <option value="goalsetter_temp.html">Temp</option>
+                </select>
+
+                <label for="size">Size:</label>
+                <input type="text" id="size" name="size" placeholder="e.g., 800x600 or responsive">
+
+                <label for="options">Options:</label>
+                <input type="text" id="options" name="options" placeholder="e.g., border, scrollbars">
+
+                <button type="submit">Generate Embed Code</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder for JavaScript logic
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize panels and forms
+        });
+    </script>
+</body>
+</html> 

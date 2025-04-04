@@ -18,7 +18,51 @@ This document outlines the features and testing checklist for the admin pages.
 - [ ] Ensure dynamic focus overlay works on site tree
 - [ ] Validate modular design integration
 
-## User Stories
-- As an admin, I want to navigate easily using breadcrumbs.
-- As a user, I want visual indicators on the site tree for better navigation.
-- As a developer, I want a modular design to easily add new features. 
+## User Stories and Future Features
+
+### User Stories
+
+- **Review Module**
+  - Purpose: Launch a review period, invite stakeholders via email-linked tokens, and collect annotation feedback.
+  - User Flow:
+    - Cara inputs: Reviewer emails, Start and end dates, Invitation note
+    - System: Creates Review_Session record, Generates tokenized URLs linked to Users + Tech_Tickets, Sends emails
+    - Reviewers: Access goalsetter_review.html with Qipu-style comment footer
+
+- **Iframe Generator Module**
+  - Purpose: Generate responsive iframe embed code and allow toggling what _live points to.
+  - User Flow:
+    - Cara chooses: Source (goalsetter.html or goalsetter_temp.html), Size (px or responsive), Options: border, scrollbars, query params
+    - System: Generates embed code block, Displays preview, Provides [Copy] and [Email Code] buttons
+
+### Future Modules (Planned)
+
+- **Behavior & Rules**
+  - Purpose: Toggle permissions, preview logic behavior
+  - cursor-directive: SetBehaviorRules
+
+- **Style & Assets**
+  - Purpose: Upload themes, override CSS, branding
+  - cursor-directive: UploadBrandAssets
+
+- **Interaction Log**
+  - Purpose: View learner data, comment logs
+  - cursor-directive: FetchInteractionLog
+
+- **Live Switcher**
+  - Purpose: Manually switch what _live points to
+  - cursor-directive: ToggleLivePage
+
+### Testing Guidance
+
+- Build each module as HTMX/Alpine fragments first in goalsetter_admin.html, then test by:
+  - Triggering email dispatch with dummy reviewers
+  - Opening a tokenized review link and confirming comment capture
+  - Validating the iframe embed code on an external site
+  - Confirming _live switcher changes iframe target
+
+### Notes
+
+- Each section should follow a consistent disclosure pattern (collapsed by default, open one at a time)
+- Prefer preview-first, irreversible-last UX
+- All cursor directives should emit logs to Interaction_Log table (mirror intent) 
