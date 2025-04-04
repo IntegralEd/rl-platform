@@ -177,6 +177,16 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="admin-controls">
+            <button id="launch-review" class="btn btn-primary">
+                Launch Review Session
+            </button>
+            <div id="review-url" class="mt-2" style="display: none;">
+                <small>Share this URL with reviewers:</small>
+                <div class="url-display"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -199,6 +209,26 @@
             
             // Set up periodic refresh
             setInterval(refreshLRSData, 30000); // Every 30 seconds
+        });
+
+        document.getElementById('launch-review').addEventListener('click', async () => {
+            const user = await getCurrentUser(); // Softr user context
+            if (!user) {
+                alert('Please log in to launch review');
+                return;
+            }
+
+            const params = new URLSearchParams({
+                RevEmail: user.email,
+                User_ID: user.id,
+                Org_ID: user.org_id || 'integral-ed',
+                source: 'admin_dashboard'
+            });
+
+            const reviewUrl = `${window.location.origin}/clients/st/goalsetter/goalsetter_review.html?${params.toString()}`;
+            
+            document.getElementById('review-url').style.display = 'block';
+            document.querySelector('.url-display').textContent = reviewUrl;
         });
     </script>
 </body>
