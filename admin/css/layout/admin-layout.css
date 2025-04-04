@@ -1,0 +1,70 @@
+/* Admin layout styles */
+:root {
+    --primary-color: #004080;
+    --secondary-color: #E87722;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --bg-color: #f8f9fa;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.admin-container {
+    padding: 20px;
+    margin-left: 250px; /* Match sidebar width */
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.admin-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-footer {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-container {
+        margin-left: 0;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+} 
