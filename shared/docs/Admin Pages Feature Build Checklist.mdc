@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Admin Pages Feature Build Checklist
+
+## Overview
+This document outlines the features and testing checklist for the admin pages.
+
+## Features
+- Breadcrumb navigation
+- Dynamic site tree with focus overlay
+- Modular design for admin features
+
+## Testing Checklist
+- [ ] Verify breadcrumb navigation links
+- [ ] Ensure dynamic focus overlay works on site tree
+- [ ] Validate modular design integration
+
+## User Stories
+- As an admin, I want to navigate easily using breadcrumbs.
+- As a user, I want visual indicators on the site tree for better navigation.
+- As a developer, I want a modular design to easily add new features. 
