@@ -1,0 +1,124 @@
+# Airtable Setup for Qipu Review System
+
+## Table Structure
+
+### 1. Users
+Primary table for reviewer information
+
+| Field Name | Type | Description | Sample Value |
+|------------|------|-------------|--------------|
+| User_ID | Auto-Number | Unique identifier | 12345 |
+| Email | Email | Reviewer's email | reviewer@example.com |
+| Name | Single Line Text | Reviewer's name | John Doe |
+| Org_ID | Single Line Text | Organization identifier | org_789 |
+| Role | Single Select | User role | reviewer |
+| Last_Active | DateTime | Last activity timestamp | 2024-04-04T15:30:00Z |
+
+### 2. Tech_Tickets
+Main table for review sessions
+
+| Field Name | Type | Description | Sample Value |
+|------------|------|-------------|--------------|
+| Ticket_ID | Single Line Text | Unique ticket identifier | qipu_20240404153000 |
+| Source_URL | URL | Reviewed page URL | https://example.com/merit_review.html |
+| Version | Single Select | Page version | review |
+| Viewport_Height | Number | Browser height | 800 |
+| Viewport_Width | Number | Browser width | 1200 |
+| Screenshot_URL | URL | Full page screenshot | https://storage.example.com/screenshots/qipu_20240404153000.png |
+| Created_At | DateTime | Creation timestamp | 2024-04-04T15:30:00Z |
+| Status | Single Select | Ticket status | Open |
+| Priority | Single Select | Priority level | Normal |
+| Source_App | Single Line Text | Source application | QipuBar |
+| Submission_Method | Single Line Text | How submitted | web |
+| Thread_ID | Single Line Text | Conversation thread | qipu_thread_20240404153000 |
+| User_ID | Link to Users | Reviewer reference | 12345 |
+| Layout_Section | Single Select | Main section annotated | slide_area |
+
+### 3. Tech_Ticket_Annotations
+Table for individual annotations
+
+| Field Name | Type | Description | Sample Value |
+|------------|------|-------------|--------------|
+| Annotation_ID | Auto-Number | Unique annotation ID | 1 |
+| Ticket_ID | Link to Tech_Tickets | Parent ticket | qipu_20240404153000 |
+| Type | Single Select | Annotation type | comment |
+| Content | Long Text | Annotation text | "This section needs clarification" |
+| Position_X | Number | X coordinate | 450 |
+| Position_Y | Number | Y coordinate | 300 |
+| Origin_X | Number | Origin X | 0 |
+| Origin_Y | Number | Origin Y | 800 |
+| Color | Single Line Text | Annotation color | #FF0000 |
+| Font_Size | Number | Text size | 16 |
+| Background_Color | Single Line Text | Background color | rgba(255,255,255,0.8) |
+| Stroke_Width | Number | Line width | 1 |
+| Layout_Section | Single Select | Section location | slide_area |
+| Sequence_Number | Number | Order in session | 1 |
+| Screenshot_URL | URL | Local screenshot | https://storage.example.com/annotations/qipu_20240404153000_1.png |
+
+## Sample Data
+
+### Users
+```json
+{
+    "User_ID": 12345,
+    "Email": "reviewer@example.com",
+    "Name": "John Doe",
+    "Org_ID": "org_789",
+    "Role": "reviewer",
+    "Last_Active": "2024-04-04T15:30:00Z"
+}
+```
+
+### Tech_Tickets
+```json
+{
+    "Ticket_ID": "qipu_20240404153000",
+    "Source_URL": "https://example.com/merit_review.html",
+    "Version": "review",
+    "Viewport_Height": 800,
+    "Viewport_Width": 1200,
+    "Screenshot_URL": "https://storage.example.com/screenshots/qipu_20240404153000.png",
+    "Created_At": "2024-04-04T15:30:00Z",
+    "Status": "Open",
+    "Priority": "Normal",
+    "Source_App": "QipuBar",
+    "Submission_Method": "web",
+    "Thread_ID": "qipu_thread_20240404153000",
+    "User_ID": 12345,
+    "Layout_Section": "slide_area"
+}
+```
+
+### Tech_Ticket_Annotations
+```json
+{
+    "Annotation_ID": 1,
+    "Ticket_ID": "qipu_20240404153000",
+    "Type": "comment",
+    "Content": "This section needs clarification",
+    "Position_X": 450,
+    "Position_Y": 300,
+    "Origin_X": 0,
+    "Origin_Y": 800,
+    "Color": "#FF0000",
+    "Font_Size": 16,
+    "Background_Color": "rgba(255,255,255,0.8)",
+    "Stroke_Width": 1,
+    "Layout_Section": "slide_area",
+    "Sequence_Number": 1,
+    "Screenshot_URL": "https://storage.example.com/annotations/qipu_20240404153000_1.png"
+}
+```
+
+## Implementation Notes
+
+1. Screenshots should be stored in a cloud storage service (e.g., AWS S3, Google Cloud Storage)
+2. Generate unique IDs using timestamp + random string to avoid collisions
+3. Use Airtable's built-in views to create:
+   - Timeline view by Created_At
+   - Kanban view by Status
+   - Gallery view with Screenshot_URL
+4. Create a dashboard view showing:
+   - Annotations by Layout_Section
+   - Activity by User_ID
+   - Tickets by Status 
