@@ -1,0 +1,93 @@
+/* Dark Theme
+   Optimized for accessibility with high contrast ratios
+   and focus states for better visibility
+*/
+
+[data-theme="dark"] {
+    /* Core Colors */
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: #333333;
+    
+    /* Brand Colors - maintaining brand identity with darker shades */
+    --primary-color: #4f86f7;
+    --primary-color-light: #6797fa;
+    --primary-color-dark: #3a6ad2;
+    --secondary-color: #1e88e5;
+    --secondary-color-dark: #1565c0;
+    --accent-color: #00c853;
+    
+    /* Feedback Colors - with higher contrast for accessibility */
+    --success-color: #00e676;
+    --warning-color: #ffab40;
+    --error-color: #ff5252;
+    --info-color: #40c4ff;
+    
+    /* Chat Specific Colors */
+    --user-message-bg: #1e4976;
+    --user-message-text: #ffffff;
+    --assistant-message-bg: #2a2a2a;
+    --assistant-message-text: #e0e0e0;
+    
+    /* Effects */
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 8px 16px rgba(0, 0, 0, 0.4);
+    
+    /* Focus States - high visibility for keyboard navigation */
+    --focus-ring-color: #ffffff;
+    --focus-ring-offset: 3px;
+}
+
+/* Optimized focus states for accessibility */
+[data-theme="dark"] *:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Dark theme specific chat component adjustments */
+[data-theme="dark"] .chat-container {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .user .message-content {
+    background: var(--user-message-bg);
+    color: var(--user-message-text);
+}
+
+[data-theme="dark"] .assistant .message-content {
+    background: var(--assistant-message-bg);
+    color: var(--assistant-message-text);
+}
+
+[data-theme="dark"] .chat-input textarea,
+[data-theme="dark"] .chat-input input {
+    background: #2d2d2d;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .message-attachment {
+    background: rgba(255,255,255,0.1);
+}
+
+/* High contrast mode for users with vision impairments */
+@media (prefers-contrast: high) {
+    [data-theme="dark"] {
+        --text-color: #ffffff;
+        --border-color: #ffffff;
+        --focus-ring-color: #ffff00;
+        --user-message-bg: #0055aa;
+        --assistant-message-bg: #333333;
+    }
+}
+
+/* Reduced motion preference support */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="dark"] * {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+} 

@@ -1,0 +1,187 @@
+/* Admin Core Styles */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --text-color: #333;
+    --bg-color: #f5f6fa;
+    --card-bg: #ffffff;
+    --border-color: #dcdde1;
+    --shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Layout Components */
+.admin-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 100vh;
+}
+
+.left-panel {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-right: 1px solid var(--border-color);
+}
+
+.right-panel {
+    padding: 2rem;
+    background: var(--card-bg);
+}
+
+/* Navigation */
+.breadcrumbs {
+    padding: 1rem 2rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.breadcrumbs a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
+
+.nav-tree {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-tree a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+}
+
+.nav-tree a:hover,
+.nav-tree a.active {
+    background: var(--secondary-color);
+    color: var(--card-bg);
+}
+
+/* Tabs */
+.tab-container {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.tab {
+    padding: 1rem 2rem;
+    cursor: pointer;
+    color: var(--text-color);
+    border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+    border-bottom-color: var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.tab-content {
+    display: none;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Forms */
+.form-section {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.form-section h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+input[type="text"],
+input[type="datetime-local"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+/* Buttons */
+.admin-actions {
+    padding: 1rem 2rem;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+button.primary-button {
+    background: var(--secondary-color);
+    color: var(--card-bg);
+}
+
+button.secondary-button {
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Utilities */
+.unsaved {
+    background: #fff3cd;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+} 
