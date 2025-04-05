@@ -9,6 +9,23 @@
 - `_temp.html` - Temporary/preview versions with placeholder content
 
 ### Directory Structure
+
+#### Component Organization
+
+* `/shared/page_ingredients/` - Contains all active, reusable HTML components that can be included in pages
+  * Components here are used in production and should follow all established patterns
+  * Only place fully tested, production-ready components here
+  
+* `/shared/docs/page_ingredients/` - Contains reference implementations and documentation of components
+  * Files here should not be directly used in production pages
+  * Use this location for experimental components, documentation examples, and pattern libraries
+  * When a component is ready for production, it should be moved to `/shared/page_ingredients/[component]`
+
+When moving components from documentation to production:
+1. Copy files from `/shared/docs/page_ingredients/[component]` to `/shared/page_ingredients/[component]`
+2. Update any references to point to the new location
+3. Consider creating a README.md in the production component folder
+
 ```
 /admin/pages/{client}/{project}/
   ├── {project}_admin.html
