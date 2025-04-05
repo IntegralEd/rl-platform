@@ -4,14 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goalsetter Admin Panel</title>
-    <link rel="stylesheet" href="/shared/assets/css/admin.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin.css">
     <script>
         // Client context
         window.clientId = 'st';
         window.projectId = 'goalsetter';
+        
+        // Set timezone to CST
+        window.timezone = 'America/Chicago';
+        
+        // Format dates in CST
+        window.formatDate = (date) => {
+            return new Date(date).toLocaleString('en-US', {
+                timeZone: window.timezone,
+                dateStyle: 'full',
+                timeStyle: 'long'
+            });
+        };
     </script>
-    <script src="/shared/assets/js/admin.js" defer></script>
-    <script src="/shared/page_ingredients/admin/tabs/review_session/review_session.js" defer></script>
+    <script src="/admin/assets/js/admin.js" defer></script>
+    <script src="/admin/assets/js/review_session.js" defer></script>
 </head>
 <body>
     <div id="admin-content" style="display: none">
@@ -55,7 +67,7 @@
     </div>
 
     <footer style="text-align: center; padding: 10px;">
-        v.1.0.3 push April 5 11:45am
+        v.1.0.4 push April 5 12:00pm CST
     </footer>
 </body>
 </html> 

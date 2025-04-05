@@ -1,0 +1,46 @@
+/* Admin Main CSS */
+
+/* Base Layout */
+@import 'layout/base.css';
+@import 'layout/grid.css';
+@import 'layout/header.css';
+@import 'layout/sidebar.css';
+
+/* Core Styles */
+@import 'admin.css';
+
+/* Components */
+@import 'components/buttons.css';
+@import 'components/forms.css';
+@import 'components/tabs.css';
+@import 'components/navigation.css';
+@import 'components/chat.css';
+
+/* Theme */
+@import 'themes/light.css';
+
+/* Print styles - load last */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .admin-container {
+        display: block;
+    }
+    
+    .left-panel {
+        display: none;
+    }
+    
+    .right-panel {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+} 

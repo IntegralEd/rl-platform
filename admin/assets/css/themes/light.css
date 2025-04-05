@@ -1,0 +1,109 @@
+/* Light Theme
+   Optimized for accessibility with proper contrast ratios
+   and focus states for better visibility
+*/
+
+:root,
+[data-theme="light"] {
+    /* Core Colors */
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    
+    /* Brand Colors */
+    --primary-color: #0d6efd;
+    --primary-color-light: #6ea8fe;
+    --primary-color-dark: #0a58ca;
+    --secondary-color: #007AFF;
+    --secondary-color-dark: #0056b3;
+    --accent-color: #20c997;
+    
+    /* Feedback Colors */
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --error-color: #dc3545;
+    --info-color: #0dcaf0;
+    
+    /* Chat Specific Colors */
+    --user-message-bg: #007AFF;
+    --user-message-text: #ffffff;
+    --assistant-message-bg: #f0f0f0;
+    --assistant-message-text: #212529;
+    
+    /* Effects */
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-elevated: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    
+    /* Focus States */
+    --focus-ring-color: #0d6efd;
+    --focus-ring-offset: 3px;
+}
+
+/* Optimized focus states for accessibility */
+[data-theme="light"] *:focus,
+:root *:focus {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Light theme specific chat component adjustments */
+[data-theme="light"] .chat-container,
+.chat-container {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+/* High contrast mode for users with vision impairments */
+@media (prefers-contrast: high) {
+    [data-theme="light"],
+    :root {
+        --text-color: #000000;
+        --border-color: #000000;
+        --focus-ring-color: #0000ff;
+        --user-message-bg: #0055aa;
+        --assistant-message-bg: #e6e6e6;
+    }
+}
+
+/* Theme toggle button styles */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .moon-icon,
+.sun-icon {
+    display: none;
+}
+
+[data-theme="light"] .sun-icon,
+.moon-icon {
+    display: block;
+    fill: currentColor;
+}
+
+/* Screen reader only class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+} 
