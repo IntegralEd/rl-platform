@@ -1,4 +1,127 @@
-# Cursor Rules - URL Schema & Admin Constraints
+# Cursor Rules
+
+## URL Conventions and Patterns
+
+### File Naming Patterns
+- `_admin.html` - Admin interface pages
+- `_live.html` - Production/live versions for iframe embedding
+- `_review.html` - Review session pages (tokenizable)
+- `_temp.html` - Temporary/preview versions with placeholder content
+
+### Directory Structure
+```
+/admin/pages/{client}/{project}/
+  ├── {project}_admin.html
+  └── assets/
+      └── js/
+
+/clients/{client}/{project}/
+  ├── {project}.html      # Main content
+  ├── {project}_live.html # Iframe-able version
+  ├── {project}_temp.html # Preview/placeholder
+  └── {project}_review.html # Review version
+```
+
+### URL Pattern Rules
+1. Admin Pages
+   - Pattern: `/admin/pages/{client}/{project}/_admin.html`
+   - Must be in `/admin/pages/` directory
+   - Client-specific admin pages in client subdirectories
+
+2. Live/Production Pages
+   - Pattern: `/clients/{client}/{project}/_live.html`
+   - Primary pages for iframe embedding
+   - Must be in client project directories
+
+3. Review Pages
+   - Pattern: `/clients/{client}/{project}/_review.html`
+   - Designed for tokenized review sessions
+   - Must be in client project directories
+
+4. Temp Pages
+   - Pattern: `/clients/{client}/{project}/_temp.html`
+   - For placeholder/preview content
+   - Must be in client project directories
+
+## Admin Interface Rules
+
+### Layout Structure
+1. Left Panel (1/3 width)
+   - Shows GitHub repository tree
+   - Validates file paths against URL conventions
+   - Provides quick actions (copy URL, open in new tab)
+
+2. Right Panel (2/3 width)
+   - Tabbed interface for different functions
+   - iFrame preview capabilities
+   - Configuration tools
+
+### Admin Features
+1. Review Session Tab
+   - Create and manage review sessions
+   - Configure review parameters
+   - Generate review URLs
+
+2. iFrame Configuration Tab
+   - Only allows `_live.html` or public URLs
+   - Provides size and style options
+   - Preview and code generation
+
+3. Temp Content Tab
+   - Configure placeholder content
+   - Preview temp page appearance
+   - Set temporary redirects
+
+## Softr Integration Rules
+
+### Authentication Flow
+1. Header Span Validation
+   ```html
+   <span id="header-span" data-user-email="" data-role-level="">
+   ```
+2. Role-based Access Control
+   - Requires 'Org Admin' role
+   - Validates through Softr context
+
+### State Management
+1. Validation State
+   - Stored in sessionStorage
+   - Includes timestamp for expiration
+   - Preserves navigation context
+
+2. Navigation Rules
+   - Maintain validation state across pages
+   - Handle redirect after login
+   - Preserve intended destination
+
+## Build Process Rules
+
+### Version Control
+1. Branch Management
+   - Work from main branch
+   - Pull before making changes
+   - Regular commits with descriptive messages
+
+2. File Organization
+   - Follow directory structure conventions
+   - Maintain asset organization
+   - Use shared resources appropriately
+
+### Quality Control
+1. URL Validation
+   - Automated path checking
+   - Pattern enforcement
+   - Console error reporting
+
+2. Resource Loading
+   - Verify asset paths
+   - Handle loading failures
+   - Report errors to console
+
+### Documentation
+1. Keep rules updated
+2. Document new patterns
+3. Maintain build checklists
 
 ## 🔒 URL Schema Rules
 ```javascript
