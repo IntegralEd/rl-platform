@@ -1,4 +1,86 @@
-# URL Conventions
+# URL and Asset Path Conventions
+
+## Core Principles
+
+1. All admin assets must be centralized in `/admin/assets/`
+2. Client-specific assets must be in `/shared/assets/` or `/clients/{client_id}/assets/`
+3. Reusable components must be in `/shared/page_ingredients/`
+
+## Deprecated Paths (DO NOT USE)
+```
+/admin/css/                    -> Use /admin/assets/css/
+/admin/pages/{client}/assets/  -> Use /admin/assets/ or /shared/assets/
+```
+
+## Asset URL Structure
+
+### Admin Assets
+```
+/admin/assets/
+├── css/
+│   ├── main.css              # Main admin stylesheet
+│   ├── components/           # Component styles
+│   ├── layout/              # Layout styles
+│   └── themes/              # Theme variations
+└── js/
+    ├── core/               # Core admin functionality
+    └── {feature}/         # Feature-specific scripts
+```
+
+### Shared Assets
+```
+/shared/assets/
+├── css/
+├── js/
+└── img/
+```
+
+### Client Assets
+```
+/clients/{client_id}/assets/
+```
+
+## Page Ingredients
+All reusable components must be placed in:
+```
+/shared/page_ingredients/{component_type}/
+```
+
+## URL Patterns
+
+### Admin Pages
+- Admin pages: `/admin/pages/{client_id}/{project}/`
+- Admin assets: `/admin/assets/{type}/{file}`
+
+### Client Pages
+- Client pages: `/clients/{client_id}/{project}/`
+- Client assets: `/clients/{client_id}/assets/{type}/{file}`
+
+### Shared Resources
+- Shared components: `/shared/page_ingredients/{component}/{file}`
+- Shared assets: `/shared/assets/{type}/{file}`
+
+## Migration Notes
+
+1. Move all admin CSS from `/admin/css/` to `/admin/assets/css/`
+2. Move client-specific assets to appropriate shared or client directories
+3. Update all asset references in HTML files
+4. Remove deprecated directories after migration
+
+## Security Considerations
+
+1. Admin assets must not be accessible from client pages
+2. Client assets must be scoped to their specific client directory
+3. Shared assets must be carefully reviewed for multi-tenant safety
+
+## Implementation Checklist
+
+- [ ] Audit existing asset locations
+- [ ] Create new directory structure
+- [ ] Migrate assets to new locations
+- [ ] Update HTML references
+- [ ] Remove deprecated directories
+- [ ] Test all affected pages
 
 ## File Naming Patterns
 - `_admin.html` - Admin interface pages
