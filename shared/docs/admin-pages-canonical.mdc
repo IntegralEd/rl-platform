@@ -1,0 +1,195 @@
+# Admin Pages April 5 Build Checklist
+
+## Core Infrastructure
+
+### URL Structure
+- [ ] Implement URL pattern validation
+- [ ] Enforce directory structure rules
+- [ ] Validate file naming conventions
+- [ ] Add automated path checking
+
+### Authentication
+- [ ] Softr header span integration
+- [ ] Role-based access control
+- [ ] Session state management
+- [ ] Validation state persistence
+
+### Layout Components
+- [ ] Left panel (1/3 width) implementation
+  - [ ] GitHub tree integration
+  - [ ] Path validation
+  - [ ] Quick actions
+  - [ ] File system navigation
+- [ ] Right panel (2/3 width) implementation
+  - [ ] Tabbed interface
+  - [ ] iFrame preview
+  - [ ] Configuration panels
+
+## Feature Tabs
+
+### Broadcast Status Tab
+- [ ] Current State Display
+  - [ ] _live.html status indicator
+  - [ ] _temp.html status indicator
+  - [ ] Active review sessions
+- [ ] Switcher Interface
+  - [ ] Railroad-style UI for state toggling
+  - [ ] State transition validation
+  - [ ] Confirmation dialogs
+- [ ] History and Logs
+  - [ ] State change history
+  - [ ] Deployment timestamps
+  - [ ] Active user counts
+
+### Review Session Tab
+- [ ] Session Management
+  - [ ] Date range selection
+  - [ ] Role assignment
+  - [ ] Token generation
+  - [ ] Instructions editor
+- [ ] Access Control
+  - [ ] Reviewer invitations
+  - [ ] Permission settings
+  - [ ] Session monitoring
+- [ ] Review Tools
+  - [ ] Feedback collection
+  - [ ] Change tracking
+  - [ ] Session analytics
+
+### Temp Content Tab
+- [ ] Source Configuration
+  - [ ] Path picker interface
+  - [ ] Preview context settings
+  - [ ] Custom override options
+- [ ] Content Preview
+  - [ ] Live preview window
+  - [ ] Mobile/desktop toggle
+  - [ ] Validation checks
+- [ ] Integration Settings
+  - [ ] Lambda/OpenAI config
+  - [ ] External source handling
+  - [ ] Cache management
+
+### Behavior Rules Tab
+- [ ] Rule Management
+  - [ ] Auth rule editor
+  - [ ] Feature flag controls
+  - [ ] Behavior settings
+- [ ] Script Integration
+  - [ ] JS file editing
+  - [ ] Rule validation
+  - [ ] Version control
+- [ ] Testing Tools
+  - [ ] Rule simulation
+  - [ ] Impact analysis
+  - [ ] Rollback options
+
+### Style Assets Tab
+- [ ] Asset Management
+  - [ ] CSS editor
+  - [ ] Image uploader
+  - [ ] Font manager
+- [ ] Theme System
+  - [ ] Theme selector
+  - [ ] Color palette editor
+  - [ ] Typography settings
+- [ ] Asset Library
+  - [ ] Shared assets browser
+  - [ ] Version history
+  - [ ] Usage tracking
+
+### Learner Interaction Tab
+- [ ] Data Integration
+  - [ ] xAPI connection
+  - [ ] LRS integration
+  - [ ] Clickstream processing
+- [ ] Analytics Display
+  - [ ] User journey visualization
+  - [ ] Interaction heatmaps
+  - [ ] Time-based analysis
+- [ ] Reporting Tools
+  - [ ] Custom report builder
+  - [ ] Export functionality
+  - [ ] Alert configuration
+
+## Quality Control
+
+### Resource Validation
+- [ ] Asset path verification
+- [ ] Loading error handling
+- [ ] Console error reporting
+- [ ] Performance monitoring
+
+### Testing Requirements
+- [ ] URL pattern tests
+- [ ] Authentication flow tests
+- [ ] iFrame functionality tests
+- [ ] Resource loading tests
+
+### Documentation
+- [ ] User guides
+- [ ] API documentation
+- [ ] Error handling guides
+- [ ] Deployment instructions
+
+## Integration Features
+
+### GitHub Integration
+- [ ] Repository sync
+- [ ] Tree view updates
+- [ ] File system access
+- [ ] Version control
+
+### Softr Platform
+- [ ] Authentication flow
+- [ ] User role management
+- [ ] State persistence
+- [ ] Navigation handling
+
+### External Services
+- [ ] Lambda/OpenAI Assistant integration
+- [ ] Analytics integration
+- [ ] Monitoring setup
+- [ ] Backup systems
+
+## Security Measures
+
+### Access Control
+- [ ] Role validation
+- [ ] Session management
+- [ ] Token handling
+- [ ] Permission checks
+
+### Data Protection
+- [ ] Secure storage
+- [ ] Data encryption
+- [ ] Session timeout
+- [ ] Error handling
+
+## Maintenance
+
+### Version Control
+- [ ] Branch management
+- [ ] Commit guidelines
+- [ ] Release process
+- [ ] Rollback procedures
+
+### Updates
+- [ ] Feature additions
+- [ ] Bug fixes
+- [ ] Security patches
+- [ ] Documentation updates
+
+## Future Enhancements
+
+### Planned Features
+- [ ] Advanced analytics
+- [ ] Bulk operations
+- [ ] Custom themes
+- [ ] API extensions
+
+### Integration Options
+- [ ] Additional platforms
+- [ ] Service connections
+- [ ] Tool integrations
+- [ ] Extension support 
