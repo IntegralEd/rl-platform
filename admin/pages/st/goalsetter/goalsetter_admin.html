@@ -8,24 +8,51 @@
     <script src="/shared/assets/js/admin.js" defer></script>
 </head>
 <body>
-    <div class="admin-container">
-        <div class="left-panel">
-            <!-- Navigation Tree -->
-            <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Settings</a></li>
-                <li><a href="#">Reports</a></li>
-            </ul>
-        </div>
-        <div class="right-panel">
-            <!-- Main Content -->
-            <div class="collapsible-section">
-                <div class="section-header">
-                    <h1>Review Session</h1>
-                    <span class="carrot">&#9660;</span>
-                </div>
-                <div class="section-content">
-                    <!-- Content goes here -->
+    <script>
+        // Check user access via Softr header span
+        function checkAccess() {
+            const headerSpan = document.querySelector('#header-span');
+            if (!headerSpan) {
+                console.error('Header span not found - redirecting to login');
+                window.location.href = '/admin/index.html';
+                return;
+            }
+
+            const roleLevel = headerSpan.getAttribute('data-role-level');
+            if (roleLevel !== 'Org Admin') {
+                console.error('Unauthorized access attempt');
+                window.location.href = '/admin/unauthorized.html';
+                return;
+            }
+
+            console.log('Access granted for:', headerSpan.getAttribute('data-user-email'));
+            document.getElementById('admin-content').style.display = 'block';
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', checkAccess);
+    </script>
+
+    <div id="admin-content" style="display: none">
+        <div class="admin-container">
+            <div class="left-panel">
+                <!-- Navigation Tree -->
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Reports</a></li>
+                </ul>
+            </div>
+            <div class="right-panel">
+                <!-- Main Content -->
+                <div class="collapsible-section">
+                    <div class="section-header">
+                        <h1>Review Session</h1>
+                        <span class="carrot">&#9660;</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="placeholder">Coming Soon</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,14 +65,14 @@
         }
 
         .left-panel {
-            width: 33%;
+            width: 300px;
             background-color: #f4f4f4;
             border-right: 1px solid #ddd;
             padding: 10px;
         }
 
         .right-panel {
-            width: 67%;
+            flex: 1;
             padding: 10px;
             background-color: #ffffff;
             color: #000000;
@@ -69,7 +96,7 @@
         .section-header h1 {
             font-size: 1.2rem;
             margin: 0;
-            color: #000000; /* Black for better contrast */
+            color: #000000;
         }
 
         .carrot {
@@ -81,6 +108,16 @@
             padding: 10px;
             background-color: #f9f9f9;
             color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            border: 1px dashed #ccc;
+        }
+
+        .placeholder {
+            font-size: 1rem;
+            color: #888;
         }
 
         .unsaved {
