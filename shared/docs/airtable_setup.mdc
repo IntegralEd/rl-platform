@@ -150,4 +150,117 @@ This table stores the interaction details and relates to the Qipu comment schema
    - Tickets by Status
 5. Ensure Raw_JSON_output is compressed to save space.
 6. Use Airtable's linking features to connect tables.
-7. Update views to include interaction details. 
+7. Update views to include interaction details.
+
+## Airtable Role Integration
+
+The IE platform integrates with Airtable for user role management and permissions. The source of truth for role types is maintained in the Airtable base.
+
+### Role Types
+
+The following role types are supported in our system:
+
+| IE Role Level | Frontend Role | Description |
+|---------------|--------------|-------------|
+| Student | student | Learners accessing content |
+| Teacher | teacher | Educators monitoring student progress |
+| Admin | admin | School or organization administrators |
+| Org Admin | org_admin | Organization-level administrators |
+| Client SME | client_sme | Subject Matter Experts who review and approve content |
+| Contributor | contributor | Internal team members who create tickets and submit feedback |
+| Team Leader | team_leader | Team leads who manage review periods and resolve tickets |
+| Test | test | Test accounts for end-to-end testing scenarios |
+| Inactive | (blocked) | Accounts that have been deactivated |
+
+### Airtable Integration
+
+The role definitions are sourced from:
+- Airtable Base: `IE_Central_Team`
+- Table: User Roles
+- View: Role Permissions
+
+The system synchronizes with this table daily to ensure role definitions are current. Any changes to role permissions in Airtable will be reflected in the system within 24 hours.
+
+### Project-User Relationships
+
+User-to-project relationships are managed through the `projects_active_at_id` array field in the user record:
+
+```json
+{
+  "email": "team.member@integraled.org",
+  "roleLevel": "contributor",
+  "organization": "IntegralEd",
+  "projects_active_at_id": ["st_goalsetter", "elpl_merit", "bhb_early"]
+}
+```
+
+This field serves several purposes:
+1. Maps users to specific client projects they have access to
+2. Links internal team members to client work for review processes
+3. Controls access to project-specific admin interfaces
+4. Determines which tickets and comments are visible to which team members
+
+### Client Token Mapping
+
+Client tokens in the URL structure (e.g., `/st/` for School Teacher) are mapped to internal project identifiers to establish relationships:
+
+| URL Token | Internal Project Name | Description |
+|-----------|----------------------|-------------|
+| st | schoolteacher | School Teacher platform |
+| elpl | epl_learning | EPL Learning platform |
+| bhb | bright_horizons | Bright Horizons platform |
+| integraled | integrated_education | Integrated Education platform |
+
+### Role Validation
+
+When a user logs in, the system:
+1. Retrieves their role from the authentication provider
+2. Validates the role against the allowed list
+3. Explicitly rejects any user with the "Inactive" role
+4. Assigns appropriate permissions based on the role definition
+5. Filters accessible projects based on their `projects_active_at_id` array
+
+### Role-Based Content Access
+
+Content visibility and actions are controlled by role:
+
+```javascript
+// Example permission mapping
+const rolePermissions = {
+  student: ["read_content", "submit_assignments"],
+  teacher: ["read_content", "view_student_data", "provide_feedback"],
+  admin: ["read_content", "manage_users", "configure_content"],
+  org_admin: ["full_access"],
+  client_sme: ["read_content", "review_content", "approve_changes"],
+  contributor: ["create_tickets", "add_comments", "submit_feedback"],
+  team_leader: ["view_aggregations", "resolve_tickets", "assign_tasks", "manage_review_periods"],
+  test: ["test_client_flow", "test_admin_flow"]
+};
+```
+
+### Qipu Comment Integration
+
+The Qipu comment system uses role information to determine commenting capabilities:
+
+| Role | Qipu Capabilities |
+|------|-------------------|
+| client_sme | Create comments, view their own comments, add attachments |
+| contributor | Create tickets, add comments, view all comments for their projects |
+| team_leader | View all comments, resolve tickets, reassign tickets, export reports |
+| admin | Full access to all Qipu features across all projects |
+
+### Migration Path for Role Changes
+
+When a role definition changes in Airtable:
+1. The change is automatically synchronized within 24 hours
+2. Users with the affected role will receive updated permissions on their next login
+3. No manual intervention is required for the permission update
+
+### Role Monitoring
+
+The system logs all role-based access attempts and permission changes:
+1. Failed access attempts due to insufficient permissions
+2. Role changes for users
+3. New roles added to the system
+
+This information is available in the admin dashboard for security monitoring. 
