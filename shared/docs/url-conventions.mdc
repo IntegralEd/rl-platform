@@ -1,5 +1,50 @@
 # URL Conventions
 
+## File Naming Patterns
+- `_admin.html` - Admin interface pages
+- `_live.html` - Production/live versions
+- `_review.html` - Review session pages
+- `_temp.html` - Temporary/preview versions
+
+## Directory Structure Rules
+
+### Admin Pages
+- Pattern: `/admin/pages/{client}/{project}/_admin.html`
+- Example: `/admin/pages/st/goalsetter/goalsetter_admin.html`
+- All admin pages must be in the `/admin/pages/` directory
+- Client-specific admin pages must be in their respective client subdirectories
+
+### Client Pages
+- Pattern: `/clients/{client}/{project}/{page}`
+- Example: `/clients/st/goalsetter/goalsetter_live.html`
+- All client-specific pages must be in the `/clients/` directory
+- Each client should have their own subdirectory
+- Project files should be grouped in project-specific subdirectories
+
+### Review Pages
+- Pattern: `/clients/{client}/{project}/_review.html`
+- Example: `/clients/st/goalsetter/goalsetter_review.html`
+- Review pages must be in their respective project directories
+- Review pages are designed to be tokenized for review sessions
+
+### Live/Production Pages
+- Pattern: `/clients/{client}/{project}/_live.html`
+- Example: `/clients/st/goalsetter/goalsetter_live.html`
+- Production versions must be in their respective project directories
+- These are the primary pages for iframe embedding
+
+## Validation
+- The admin tree interface validates these patterns
+- Invalid paths will be flagged in the console
+- URL validation is enforced through `admintree.js`
+
+## Best Practices
+1. Always use the appropriate suffix for page type
+2. Maintain consistent naming between related files
+3. Keep all project files in their designated directories
+4. Use the admin tree interface to verify correct paths
+5. Check console for URL convention violations
+
 ## Overview
 This document outlines the URL conventions for the Recursive Learning Platform, ensuring a consistent and organized structure across all projects.
 
