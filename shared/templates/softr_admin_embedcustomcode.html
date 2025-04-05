@@ -19,10 +19,10 @@ window.addEventListener('DOMContentLoaded', function() {
     function updateHeaderData() {
         if (window.logged_in_user) {
             // Map Airtable fields to header span attributes
-            headerSpan.setAttribute('data-user-email', window.logged_in_user['email'] || '');
-            headerSpan.setAttribute('data-user-name', window.logged_in_user['Name'] || '');
-            headerSpan.setAttribute('data-user-id', window.logged_in_user['User_ID'] || '');
-            headerSpan.setAttribute('data-role-level', window.logged_in_user['IE_Role_Level'] || '');
+            headerSpan.setAttribute('data-user-email', window.logged_in_user['email']);
+            headerSpan.setAttribute('data-user-name', window.logged_in_user['Name']);
+            headerSpan.setAttribute('data-user-id', window.logged_in_user['User_ID']);
+            headerSpan.setAttribute('data-role-level', window.logged_in_user['IE_Role_Level']);
             headerSpan.setAttribute('data-last-login', new Date().toISOString());
         }
     }
