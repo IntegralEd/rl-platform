@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Autonomous Build Checklist - Admin System
 
 ## 🎯 Build Parameters

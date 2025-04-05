@@ -9,11 +9,34 @@
 </head>
 <body>
     <script>
-        // Check user access via Softr header span
+        // Check user access via stored validation or Softr header span
         function checkAccess() {
+            // Check URL params first
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('validated') === 'true') {
+                document.getElementById('admin-content').style.display = 'block';
+                return;
+            }
+
+            // Check stored validation
+            const stored = sessionStorage.getItem('adminValidation');
+            if (stored) {
+                const validation = JSON.parse(stored);
+                if (new Date().getTime() - validation.timestamp <= 3600000) {
+                    if (validation.isValid) {
+                        document.getElementById('admin-content').style.display = 'block';
+                        return;
+                    }
+                } else {
+                    sessionStorage.removeItem('adminValidation');
+                }
+            }
+
+            // Fall back to header span check
             const headerSpan = document.querySelector('#header-span');
             if (!headerSpan) {
                 console.error('Header span not found - redirecting to login');
+                sessionStorage.setItem('adminRedirectAfterLogin', window.location.pathname);
                 window.location.href = '/admin/index.html';
                 return;
             }
@@ -25,7 +48,14 @@
                 return;
             }
 
-            console.log('Access granted for:', headerSpan.getAttribute('data-user-email'));
+            // Store new validation
+            const validation = {
+                isValid: true,
+                userEmail: headerSpan.getAttribute('data-user-email'),
+                roleLevel: roleLevel,
+                timestamp: new Date().getTime()
+            };
+            sessionStorage.setItem('adminValidation', JSON.stringify(validation));
             document.getElementById('admin-content').style.display = 'block';
         }
 

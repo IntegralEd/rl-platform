@@ -13,6 +13,62 @@ class AdminTree {
         };
         
         this.baseUrl = 'https://recursivelearning.app';
+        this.validationState = null;
+
+        // Define valid iframe sources
+        this.iframeRules = {
+            allowed: [
+                /^https:\/\/.*_live\.html$/,  // Only _live.html URLs
+                /^https:\/\/[^\/]+\.[^\/]+\// // Public URLs (must have domain)
+            ],
+            forbidden: [
+                /_admin\.html$/,
+                /_review\.html$/,
+                /_temp\.html$/
+            ]
+        };
+    }
+
+    /**
+     * Check and store validation state
+     */
+    async checkValidation() {
+        const headerSpan = document.querySelector('#header-span');
+        if (!headerSpan) {
+            console.error('Header span not found');
+            return false;
+        }
+
+        const roleLevel = headerSpan.getAttribute('data-role-level');
+        const userEmail = headerSpan.getAttribute('data-user-email');
+        
+        this.validationState = {
+            isValid: roleLevel === 'Org Admin',
+            userEmail,
+            roleLevel,
+            timestamp: new Date().getTime()
+        };
+
+        // Store validation state in sessionStorage
+        sessionStorage.setItem('adminValidation', JSON.stringify(this.validationState));
+        
+        return this.validationState.isValid;
+    }
+
+    /**
+     * Get stored validation state
+     */
+    getStoredValidation() {
+        const stored = sessionStorage.getItem('adminValidation');
+        if (!stored) return null;
+        
+        const validation = JSON.parse(stored);
+        // Expire after 1 hour
+        if (new Date().getTime() - validation.timestamp > 3600000) {
+            sessionStorage.removeItem('adminValidation');
+            return null;
+        }
+        return validation;
     }
 
     /**
@@ -91,31 +147,101 @@ class AdminTree {
     }
 
     /**
-     * Initialize tree view
+     * Handle admin panel navigation
      */
-    async initTree(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+    handleAdminNavigation(path) {
+        const validation = this.getStoredValidation();
+        if (!validation || !validation.isValid) {
+            // Store intended destination
+            sessionStorage.setItem('adminRedirectAfterLogin', path);
+            window.location.href = '/admin/index.html';
+            return;
+        }
 
-        const files = await this.fetchGitHubTree();
-        const treeHtml = files
-            .map(file => this.createTreeItem(file.path, file.path.split('/').pop()))
-            .join('');
-        
-        container.innerHTML = treeHtml;
+        // If we're already validated, just load the panel
+        const adminPanel = document.getElementById('admin-panel');
+        if (adminPanel) {
+            adminPanel.src = path;
+        } else {
+            // Direct navigation with validation state
+            const url = new URL(path, this.baseUrl);
+            url.searchParams.append('validated', 'true');
+            url.searchParams.append('email', validation.userEmail);
+            window.location.href = url.toString();
+        }
+    }
+
+    /**
+     * Initialize tree view with validation
+     */
+    async init(containerId) {
+        // Check validation first
+        const isValid = await this.checkValidation();
+        if (!isValid) {
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/admin/index.html') {
+                sessionStorage.setItem('adminRedirectAfterLogin', currentPath);
+                window.location.href = '/admin/index.html';
+                return;
+            }
+        }
+
+        // If we have a stored redirect, handle it
+        const redirectPath = sessionStorage.getItem('adminRedirectAfterLogin');
+        if (redirectPath && isValid) {
+            sessionStorage.removeItem('adminRedirectAfterLogin');
+            this.handleAdminNavigation(redirectPath);
+            return;
+        }
+
+        // Initialize tree if we're on the main admin page
+        if (containerId) {
+            await this.initTree(containerId);
+        }
+    }
+
+    /**
+     * Validate iframe source URL
+     */
+    validateIframeSource(url) {
+        // Check against forbidden patterns
+        if (this.iframeRules.forbidden.some(pattern => url.match(pattern))) {
+            return {
+                valid: false,
+                message: 'This URL type is not allowed for iframes'
+            };
+        }
+
+        // Check against allowed patterns
+        if (this.iframeRules.allowed.some(pattern => url.match(pattern))) {
+            return {
+                valid: true,
+                message: 'URL is valid for iframe embedding'
+            };
+        }
+
+        return {
+            valid: false,
+            message: 'URL must be either a _live.html page or public URL'
+        };
     }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.adminTree = new AdminTree();
-    window.adminTree.initTree('admin-tree');
+    
+    // Initialize with container ID if we're on the main admin page
+    const container = document.getElementById('admin-tree');
+    if (container) {
+        window.adminTree.init('admin-tree');
+    } else {
+        // Just check validation if we're on another admin page
+        window.adminTree.init();
+    }
 
-    // Handle admin panel loading
+    // Override loadAdminPanel to use new navigation handler
     window.loadAdminPanel = (path) => {
-        const adminPanel = document.getElementById('admin-panel');
-        if (adminPanel) {
-            adminPanel.src = path;
-        }
+        window.adminTree.handleAdminNavigation(path);
     };
 }); 
