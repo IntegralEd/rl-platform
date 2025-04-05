@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # URL and Asset Path Conventions
 
 ## Core Principles
@@ -5,6 +10,15 @@
 1. All admin assets must be centralized in `/admin/assets/`
 2. Client-specific assets must be in `/shared/assets/` or `/clients/{client_id}/assets/`
 3. Reusable components must be in `/shared/page_ingredients/`
+4. Keep asset directories flat - avoid unnecessary subdirectories
+5. Any directory structure changes require explicit approval
+
+## Asset Organization Best Practices
+
+1. Keep JS files directly in `assets/js/` - avoid subdirectories
+2. Use clear, descriptive filenames that indicate functionality (e.g., `auth.js`, `monitor.js`)
+3. If grouping is needed, use filename prefixes rather than subdirectories
+4. Document any exceptions to these rules with clear justification
 
 ## Deprecated Paths (DO NOT USE)
 ```
@@ -22,11 +36,11 @@
 │   ├── components/           # Component styles
 │   ├── layout/              # Layout styles
 │   └── themes/              # Theme variations
-└── js/                     # Admin JavaScript files
-    ├── admintree.js        # Admin navigation and security
+└── js/                     # All admin JavaScript files
+    ├── admintree.js        # Admin navigation and validation
     ├── auth.js            # Authentication handling
-    ├── chat.js           # Chat functionality
-    └── monitor.js        # Page monitoring
+    ├── chat.js            # Chat functionality
+    └── monitor.js         # Page monitoring
 ```
 
 ### Shared Assets
