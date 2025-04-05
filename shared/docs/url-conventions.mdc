@@ -22,9 +22,11 @@
 │   ├── components/           # Component styles
 │   ├── layout/              # Layout styles
 │   └── themes/              # Theme variations
-└── js/
-    ├── core/               # Core admin functionality
-    └── {feature}/         # Feature-specific scripts
+└── js/                     # Admin JavaScript files
+    ├── admintree.js        # Admin navigation and security
+    ├── auth.js            # Authentication handling
+    ├── chat.js           # Chat functionality
+    └── monitor.js        # Page monitoring
 ```
 
 ### Shared Assets
