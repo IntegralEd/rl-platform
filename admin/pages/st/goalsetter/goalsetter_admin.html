@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goalsetter Admin Panel</title>
     <link rel="stylesheet" href="/shared/assets/css/admin.css">
+    <script>
+        // Client context
+        window.clientId = 'st';
+        window.projectId = 'goalsetter';
+    </script>
     <script src="/shared/assets/js/admin.js" defer></script>
+    <script src="/shared/page_ingredients/admin/tabs/review_session/review_session.js" defer></script>
 </head>
 <body>
     <script>
@@ -61,6 +67,19 @@
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', checkAccess);
+
+        // Dynamic tab content loading
+        async function loadTabContent(tabName) {
+            const contentPath = `/shared/page_ingredients/admin/tabs/${tabName}/form.html`;
+            try {
+                const response = await fetch(contentPath);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const content = await response.text();
+                document.querySelector(`#${tabName}`).innerHTML = content;
+            } catch (error) {
+                console.error(`Failed to load ${tabName} content:`, error);
+            }
+        }
     </script>
 
     <div id="admin-content" style="display: none">
@@ -97,15 +116,7 @@
                 
                 <!-- Tab Content -->
                 <div class="tab-content active" id="review">
-                    <div class="collapsible-section">
-                        <div class="section-header">
-                            <h1>Review Session</h1>
-                            <span class="carrot">&#9660;</span>
-                        </div>
-                        <div class="section-content">
-                            <div class="placeholder">Coming Soon</div>
-                        </div>
-                    </div>
+                    <!-- Review session content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -309,6 +320,11 @@
         window.addEventListener('error', function(event) {
             console.error('Resource failed to load:', event.target);
         }, true);
+
+        // Load initial tab content
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTabContent('review_session');
+        });
     </script>
 
     <footer style="text-align: center; padding: 10px; background-color: #ffffff; color: #000000;">

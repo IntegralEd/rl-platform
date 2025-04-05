@@ -1,0 +1,73 @@
+<div id="reviewSessionTab" class="tab-content">
+    <div class="review-session-form">
+        <h2>Launch Review Session</h2>
+        
+        <div class="form-section">
+            <h3>Session Details</h3>
+            <div class="form-group">
+                <label for="reviewTitle">Review Title</label>
+                <input type="text" id="reviewTitle" name="reviewTitle" placeholder="e.g., Sprint 45 QC Review" required>
+            </div>
+            
+            <div class="form-group date-range">
+                <div>
+                    <label for="startDate">Start Date</label>
+                    <input type="datetime-local" id="startDate" name="startDate" required>
+                </div>
+                <div>
+                    <label for="endDate">End Date</label>
+                    <input type="datetime-local" id="endDate" name="endDate" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Reviewers</h3>
+            <div class="form-group">
+                <label for="reviewerEmails">Reviewer Emails</label>
+                <textarea id="reviewerEmails" name="reviewerEmails" 
+                    placeholder="Enter email addresses (one per line)" rows="3"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="reviewerRole">Role Assignment</label>
+                <select id="reviewerRole" name="reviewerRole">
+                    <option value="qc">QC Reviewer</option>
+                    <option value="sme">Subject Matter Expert</option>
+                    <option value="dev">Developer</option>
+                    <option value="pm">Project Manager</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Review Instructions</h3>
+            <div class="form-group">
+                <label for="reviewInstructions">Instructions for Reviewers</label>
+                <textarea id="reviewInstructions" name="reviewInstructions" 
+                    placeholder="Enter specific instructions or focus areas for this review" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Access Settings</h3>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="requireAuth" name="requireAuth" checked>
+                    Require Softr Authentication
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="trackChanges" name="trackChanges" checked>
+                    Enable Change Tracking
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="secondary" onclick="ReviewSession.preview()">Preview</button>
+            <button type="button" class="primary" onclick="ReviewSession.launch()">Launch Review</button>
+        </div>
+    </div>
+</div> 
