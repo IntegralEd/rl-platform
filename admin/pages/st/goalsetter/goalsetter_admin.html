@@ -34,24 +34,47 @@
     </script>
 
     <div id="admin-content" style="display: none">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumbs">
+            <a href="/admin">Admin</a> &gt;
+            <a href="/admin/pages/st">ST</a> &gt;
+            <a href="/admin/pages/st/goalsetter">Goalsetter</a> &gt;
+            <span>Admin Panel</span>
+        </nav>
+
+        <!-- Action buttons -->
+        <div class="admin-actions">
+            <button class="primary-button" onclick="window.open('/clients/st/goalsetter/goalsetter.html', '_blank')">Open Live</button>
+            <button class="primary-button" onclick="window.open('/clients/st/goalsetter/goalsetter_temp.html', '_blank')">Open Preview</button>
+        </div>
+
         <div class="admin-container">
             <div class="left-panel">
                 <!-- Navigation Tree -->
-                <ul>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Settings</a></li>
-                    <li><a href="#">Reports</a></li>
+                <ul class="nav-tree">
+                    <li><a href="#review" class="active">Review Session</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                    <li><a href="#reports">Reports</a></li>
                 </ul>
             </div>
             <div class="right-panel">
-                <!-- Main Content -->
-                <div class="collapsible-section">
-                    <div class="section-header">
-                        <h1>Review Session</h1>
-                        <span class="carrot">&#9660;</span>
-                    </div>
-                    <div class="section-content">
-                        <div class="placeholder">Coming Soon</div>
+                <!-- Tabs -->
+                <div class="tab-container">
+                    <div class="tab active" data-tab="review">Review Session</div>
+                    <div class="tab" data-tab="settings">Settings</div>
+                    <div class="tab" data-tab="reports">Reports</div>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="tab-content active" id="review">
+                    <div class="collapsible-section">
+                        <div class="section-header">
+                            <h1>Review Session</h1>
+                            <span class="carrot">&#9660;</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="placeholder">Coming Soon</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,6 +164,88 @@
 
         button:hover {
             background-color: #333333;
+        }
+
+        .breadcrumbs {
+            padding: 15px 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            color: #000000;
+        }
+
+        .breadcrumbs a {
+            color: #004080;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .admin-actions {
+            padding: 15px 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .primary-button {
+            background-color: #004080;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            margin-right: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .primary-button:hover {
+            background-color: #003366;
+        }
+
+        .nav-tree {
+            list-style: none;
+            padding: 0;
+        }
+
+        .nav-tree a {
+            display: block;
+            padding: 10px;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .nav-tree a:hover,
+        .nav-tree a.active {
+            background-color: #004080;
+            color: #ffffff;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #000000;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom-color: #004080;
+            color: #004080;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
     </style>
 
