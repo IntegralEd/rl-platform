@@ -23,15 +23,30 @@ Example:
 - `/admin/pages/st/index.html` - Client admin dashboard
 - `/admin/index.html` - Main admin dashboard
 
-## Shared Resources
+## Shared Resources and Assets
+
+### Admin Assets
 ```
-/shared/admin/{resource-type}/{resource-name}
+/admin/assets/
+├── css/           # Admin stylesheets
+├── js/            # Admin JavaScript files (flat structure)
+└── img/           # Admin images
 ```
 
-Example:
-- `/shared/admin/css/admin.css` - Admin styles
-- `/shared/admin/js/admin.js` - Admin scripts
-- `/shared/admin/assets/images/` - Admin assets
+### Client Assets
+```
+/clients/{client-id}/assets/
+```
+
+### Shared Assets
+```
+/shared/assets/
+```
+
+### Page Ingredients (Reusable Components)
+```
+/shared/page_ingredients/{component_type}/
+```
 
 ## Rules
 
@@ -48,10 +63,12 @@ Example:
    - Each client has an index page
    - Main admin dashboard at root
 
-3. **Shared Resources**
-   - Admin-specific resources under `/shared/admin/`
-   - Client-specific resources under `/shared/{client-id}/`
-   - Common resources under `/shared/`
+3. **Assets and Resources**
+   - Admin-specific assets under `/admin/assets/`
+   - Client-specific assets under `/clients/{client-id}/assets/`
+   - Shared assets under `/shared/assets/`
+   - Reusable components under `/shared/page_ingredients/{component_type}/`
+   - Keep JS files in a flat structure (no subdirectories)
 
 4. **URL Mapping**
    - Client page → Admin panel: Add `/admin/pages/` prefix and `_admin` suffix
@@ -112,5 +129,8 @@ Admin Pages:
 
 4. **Assets**
    - [ ] Client-specific assets in `/clients/{client-id}/assets/`
-   - [ ] Admin assets in `/shared/admin/assets/`
-   - [ ] Common assets in `/shared/assets/` 
+   - [ ] Admin assets in `/admin/assets/`
+   - [ ] Common assets in `/shared/assets/`
+   - [ ] Reusable components in `/shared/page_ingredients/{component_type}/`
+   - [ ] JS files maintained in flat structure (no subdirectories)
+   - [ ] URL references use absolute paths for consistency 
