@@ -48,9 +48,38 @@ const AdminAuth = {
 
     // Initialize auth check
     init() {
+        // Check if we already have a valid session
+        const existingValidation = this.getStoredValidation();
+        if (existingValidation && existingValidation.isValid) {
+            console.log('Using existing admin validation');
+            this.state.adminValidated = true;
+            this.showAdminUI();
+            return;
+        }
+        
         this.state.startTime = Date.now();
         console.log('Loading user DOM...', {timestamp: this.state.startTime});
         this.waitForSoftrSDK();
+    },
+
+    // Get stored validation state
+    getStoredValidation() {
+        const stored = sessionStorage.getItem('adminValidation');
+        if (!stored) return null;
+        
+        try {
+            const validation = JSON.parse(stored);
+            // Expire after 1 hour
+            if (new Date().getTime() - validation.timestamp > 3600000) {
+                sessionStorage.removeItem('adminValidation');
+                return null;
+            }
+            return validation;
+        } catch (e) {
+            console.error('Invalid session data', e);
+            sessionStorage.removeItem('adminValidation');
+            return null;
+        }
     },
 
     // Wait for Softr SDK to be available
@@ -155,11 +184,16 @@ const AdminAuth = {
             userId: user.id,
             email: user.email,
             validatedAt: new Date(validationTime).toISOString(),
-            timeToValidate: validationTime - this.state.startTime
+            timeToValidate: validationTime - this.state.startTime,
+            isValid: true,
+            timestamp: validationTime
         };
 
         // Store admin context
         window.adminContext = adminContext;
+        
+        // Store validation in session storage
+        sessionStorage.setItem('adminValidation', JSON.stringify(adminContext));
 
         console.log('Admin validated successfully', {
             context: adminContext,

@@ -136,4 +136,4 @@ const PageMonitor = {
 };
 
 // Export for use in admin pages
-export default PageMonitor; 
+window.PageMonitor = PageMonitor; 
