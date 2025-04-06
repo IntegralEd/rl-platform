@@ -57,8 +57,55 @@ const AdminAuth = {
         this.state.startTime = Date.now();
         console.log('Loading user data...', {timestamp: this.state.startTime});
         
+        // Check for URL parameters first (highest priority)
+        if (this.checkUrlParameters()) {
+            return;
+        }
+        
         // Check if header span is available (from Softr wrapper)
-        this.processHeaderSpan();
+        if (this.processHeaderSpan()) {
+            return;
+        }
+        
+        // If we get here, try SDK as last resort
+        console.log('No auth data found in URL or header, falling back to Softr SDK');
+        this.checkSoftrSDK();
+    },
+    
+    // Check URL parameters for auth data
+    checkUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('User_ID');
+        const email = urlParams.get('Email');
+        const name = urlParams.get('Name');
+        const role = urlParams.get('Role');
+        
+        if (email && role) {
+            console.log('Auth data found in URL parameters', { email, role });
+            
+            // Check if user has admin role
+            if (role === 'Org Admin') {
+                this.state.userLoaded = true;
+                
+                // Create user object
+                const user = {
+                    id: userId || 'url-param-user',
+                    email: email,
+                    name: name || email.split('@')[0],
+                    roleLevel: role
+                };
+                
+                // Skip verification since params came from wrapper
+                this.state.adminValidated = true;
+                this.onAdminValidated(user);
+                return true;
+            } else {
+                this.handleAuthError(`Invalid role level in URL: ${role}`);
+                return true;
+            }
+        }
+        
+        return false;
     },
     
     // Get stored validation state
@@ -113,18 +160,16 @@ const AdminAuth = {
                     // Skip external verification since we're already inside Softr
                     this.state.adminValidated = true;
                     this.onAdminValidated(user);
-                    return;
+                    return true;
                 } else {
                     this.handleAuthError(`Invalid role level: ${roleLevel}`);
-                    return;
+                    return true;
                 }
             }
         }
         
-        // If we get here, header span wasn't found or was incomplete
-        console.log('No header span data, falling back to Softr SDK');
-        // Only try once, don't keep retrying
-        this.checkSoftrSDK();
+        console.log('No header span data found');
+        return false;
     },
     
     // One-time check for Softr SDK
