@@ -474,96 +474,174 @@
         .status-dot:hover::after {
             opacity: 1;
         }
+
+        /* Loading indicator */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        /* Error message */
+        #error-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+            color: #d32f2f;
+            font-size: 18px;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
-    <header class="admin-header">
-        <h1 class="header-title">Recursive Learning Admin</h1>
-    </header>
-
-    <div class="admin-container">
-        <!-- Bottom Icons -->
-        <div class="bottom-icons">
-            <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
-                <span class="bottom-icon-tooltip">Curious Intake Form</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                </svg>
-            </a>
-            <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" class="bottom-icon" title="Admin Panel">
-                <span class="bottom-icon-tooltip">Admin Panel</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                </svg>
-            </a>
+    <!-- Loading overlay -->
+    <div id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Authenticating...</div>
+    </div>
+    
+    <!-- Error message container -->
+    <div id="error-message" style="display:none">
+        <div class="error-container">
+            Authentication failed. Please access through the Integral Ed Mothership portal.
         </div>
+    </div>
+    
+    <!-- Admin content (initially hidden) -->
+    <div id="admin-content" style="display:none">
+        <header class="admin-header">
+            <h1 class="header-title">Recursive Learning Admin</h1>
+        </header>
 
-        <!-- DOS Tree -->
-        <div class="dos-tree">
-            <div class="tree-item tree-folder">
-                <span class="tree-toggle open"></span>
-                <span class="tree-icon">📁</span>
-                <span>clients</span>
+        <div class="admin-container">
+            <!-- Bottom Icons -->
+            <div class="bottom-icons">
+                <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
+                    <span class="bottom-icon-tooltip">Curious Intake Form</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </a>
+                <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" class="bottom-icon" title="Admin Panel">
+                    <span class="bottom-icon-tooltip">Admin Panel</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                    </svg>
+                </a>
             </div>
-            <div class="tree-children open">
+
+            <!-- DOS Tree -->
+            <div class="dos-tree">
                 <div class="tree-item tree-folder">
                     <span class="tree-toggle open"></span>
                     <span class="tree-icon">📁</span>
-                    <span>elpl</span>
+                    <span>clients</span>
                 </div>
                 <div class="tree-children open">
                     <div class="tree-item tree-folder">
                         <span class="tree-toggle open"></span>
                         <span class="tree-icon">📁</span>
-                        <span>merit</span>
+                        <span>elpl</span>
                     </div>
                     <div class="tree-children open">
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit.html</span>
-                            </div>
+                        <div class="tree-item tree-folder">
+                            <span class="tree-toggle open"></span>
+                            <span class="tree-icon">📁</span>
+                            <span>merit</span>
                         </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit_live.html</span>
-                                <div class="tree-file-actions">
-                                    <button class="tree-action" onclick="copyUrl('/clients/elpl/merit/merit_live.html')" title="Copy URL">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                        </svg>
-                                    </button>
-                                    <button class="tree-action" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')" title="Share URL">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                        </svg>
-                                    </button>
+                        <div class="tree-children open">
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit.html</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit_review.html</span>
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit_live.html</span>
+                                    <div class="tree-file-actions">
+                                        <button class="tree-action" onclick="copyUrl('/clients/elpl/merit/merit_live.html')" title="Copy URL">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                            </svg>
+                                        </button>
+                                        <button class="tree-action" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')" title="Share URL">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit_embed.html</span>
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit_review.html</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit_chat.html</span>
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit_embed.html</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>merit_temp.html</span>
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit_chat.html</span>
+                                </div>
+                            </div>
+                            <div class="tree-item tree-file">
+                                <div class="tree-content">
+                                    <span class="tree-icon">📄</span>
+                                    <span>merit_temp.html</span>
+                                </div>
                             </div>
                         </div>
                     </div>
