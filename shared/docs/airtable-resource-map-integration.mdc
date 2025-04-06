@@ -1,0 +1,303 @@
+# Airtable Resource Map for Backend Integration
+
+*Updated: April 6, 2023*
+
+This document describes how to implement a robust and scalable system of dynamic URLs, modular components, and shared behaviors using Airtable as a centralized resource map for the Recursive Learning platform.
+
+## Overview
+
+Airtable serves as a central configuration system for our multitenant education platform, providing several key benefits:
+
+1. **Dynamic URL Resolution**: Map URL patterns to resources without hardcoding
+2. **Component Management**: Track dependencies between modular UI components
+3. **Permission Management**: Centralize access control rules
+4. **Resource Discovery**: Enable clients to discover available resources
+5. **Analytics Integration**: Map CloudWatch metrics to logical resources
+
+This approach aligns with our [Frontend Implementation Guide](frontend-implementation-guide.mdc) while providing the backend infrastructure to support it.
+
+## Resource Mapping Architecture
+
+### URL Structure Management
+
+```markdown
+| Resource Type | URL Pattern | Client Access | Components | Required Auth |
+|---------------|-------------|---------------|------------|--------------|
+| Admin Panel | /admin/{resource_type}/{action}.html | ✅ IntegralEd<br>❌ Others | header, nav, footer | admin, editor |
+| Client Content | /clients/{tenant_id}/{module_type}/{resource_id} | ✅ Owner<br>✅ Review w/token | qipu_review_ui, content_renderer | user, reviewer |
+| Shared Resources | /shared/{resource_type}/{resource_id} | ✅ All with proper auth | - | varies |
+```
+
+## Implementation Strategy
+
+### 1. Centralized URL Registry
+
+Create an Airtable table `URL_Registry` with the following structure:
+
+```markdown
+| Path Pattern | Resource Type | Auth Level | Components | Client Access Rules | Cache Policy |
+|--------------|--------------|------------|------------|---------------------|-------------|
+| /admin/users/* | admin_user | admin | admin_header, user_table | IntegralEd | no-cache |
+| /clients/:id/courses/* | client_course | user | course_viewer, qipu_bar | tenant_match | cache-1h |
+| /shared/assets/js/* | shared_script | none | - | all | cache-1w |
+```
+
+### 2. Component Dependency Management
+
+Create a `Components` table to manage dependencies and versioning:
+
+```markdown
+| Component ID | Path | Dependencies | Version | Last Updated | Client Override Allowed |
+|--------------|------|--------------|---------|--------------|-------------------------|
+| admin_header | /shared/page_ingredients/admin/header.html | auth.js, admin.css | 1.2.0 | 2023-04-03 | ❌ |
+| qipu_bar | /shared/page_ingredients/qipu/qipu_review_ui.html | qipu_integration.js | 1.0.0 | 2023-04-06 | ✅ |
+| course_viewer | /shared/templates/course_viewer.html | content.js, viewer.css | 2.1.3 | 2023-03-15 | ✅ |
+```
+
+## Backend API Implementation
+
+To support this architecture, implement the following API endpoints:
+
+### 1. Route Resolution
+
+```javascript
+// Lambda handler for route resolution
+exports.resolveRoute = async (event) => {
+  const path = event.path;
+  const clientId = extractClientId(path);
+  const userAuth = extractAuthFromEvent(event);
+  
+  try {
+    // Query Airtable for matching URL pattern
+    const routeConfig = await findMatchingRoute(path);
+    
+    if (!routeConfig) {
+      return createResponse(404, { error: "Resource not found" });
+    }
+    
+    // Check authorization
+    if (!await checkAuthorization(userAuth, routeConfig.authLevel, clientId)) {
+      return createResponse(403, { error: "Unauthorized" });
+    }
+    
+    // Load required components configuration
+    const components = await loadComponentConfigs(routeConfig.components, clientId);
+    
+    // Create response with proper cache headers and component info
+    return createResponse(200, {
+      routeConfig,
+      components,
+      resourceUrl: generateResourceUrl(routeConfig, clientId),
+      permissions: extractPermissions(userAuth, routeConfig),
+    }, getCacheHeaders(routeConfig.cachePolicy));
+  } catch (error) {
+    console.error('Route resolution error:', error);
+    return createResponse(500, { error: "Internal Server Error" });
+  }
+};
+
+// Find matching route in Airtable
+async function findMatchingRoute(path) {
+  const airtableResponse = await airtableClient.table('URL_Registry')
+    .select({
+      filterByFormula: `OR(FIND("${path}", {Path Pattern}) > 0, REGEX_MATCH("${path}", {Regex Pattern}))`
+    })
+    .firstPage();
+  
+  if (airtableResponse.length === 0) return null;
+  
+  // Sort by specificity (exact matches first, then regex patterns)
+  return airtableResponse
+    .map(record => record.fields)
+    .sort((a, b) => {
+      // Exact matches first
+      if (a['Path Pattern'] === path) return -1;
+      if (b['Path Pattern'] === path) return 1;
+      
+      // Then by pattern specificity (more segments wins)
+      const aSegments = (a['Path Pattern'].match(/\//g) || []).length;
+      const bSegments = (b['Path Pattern'].match(/\//g) || []).length;
+      return bSegments - aSegments;
+    })[0];
+}
+```
+
+### 2. Component Resolver
+
+```javascript
+// Lambda handler for component resolution
+exports.resolveComponent = async (event) => {
+  const componentId = event.pathParameters.componentId;
+  const clientId = extractClientId(event.path);
+  const userAuth = extractAuthFromEvent(event);
+  
+  try {
+    // Get component from Airtable
+    const component = await getComponent(componentId);
+    
+    if (!component) {
+      return createResponse(404, { error: "Component not found" });
+    }
+    
+    // Check for client override if allowed
+    let finalComponent = component;
+    if (component.clientOverrideAllowed) {
+      const override = await getClientComponentOverride(componentId, clientId);
+      if (override) {
+        finalComponent = {...component, ...override};
+      }
+    }
+    
+    // Check permissions
+    if (!await checkComponentPermissions(userAuth, finalComponent, clientId)) {
+      return createResponse(403, { error: "Unauthorized" });
+    }
+    
+    // Get dependencies
+    const dependencies = await resolveDependencies(finalComponent.dependencies);
+    
+    return createResponse(200, {
+      component: finalComponent,
+      dependencies,
+    }, getCacheHeaders(finalComponent.cachePolicy || 'cache-1d'));
+  } catch (error) {
+    console.error('Component resolution error:', error);
+    return createResponse(500, { error: "Internal Server Error" });
+  }
+};
+
+// Get component configuration from Airtable
+async function getComponent(componentId) {
+  const componentRecord = await airtableClient.table('Components')
+    .select({
+      filterByFormula: `{Component ID} = "${componentId}"`
+    })
+    .firstPage();
+  
+  if (componentRecord.length === 0) return null;
+  
+  return componentRecord[0].fields;
+}
+```
+
+## CloudWatch Integration
+
+To integrate with CloudWatch logs and metrics:
+
+### 1. Define Logging Schema
+
+```javascript
+// Logger middleware for API Gateway
+exports.loggerMiddleware = async (event, context) => {
+  // Extract request info
+  const path = event.path;
+  const method = event.httpMethod;
+  const clientId = extractClientId(path);
+  const userAuth = extractAuthFromEvent(event);
+  
+  // Get URL pattern from Airtable
+  const routeConfig = await findMatchingRoute(path);
+  const patternKey = routeConfig ? routeConfig['Path Pattern'] : 'unknown';
+  
+  // Log request to CloudWatch
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    requestId: context.awsRequestId,
+    path,
+    method,
+    patternKey,
+    clientId,
+    userId: userAuth?.userId || 'anonymous',
+    userAgent: event.headers['User-Agent'],
+    sourceIp: event.requestContext.identity.sourceIp
+  }));
+  
+  // Continue with handler
+  return event;
+};
+```
+
+### 2. Create CloudWatch Dashboard
+
+Generate a CloudWatch dashboard that groups metrics by URL pattern from Airtable:
+
+```javascript
+// Generate CloudWatch dashboard
+async function generateDashboard() {
+  // Get all URL patterns from Airtable
+  const patterns = await getAllUrlPatterns();
+  
+  // Create dashboard configuration
+  const dashboardConfig = {
+    widgets: [
+      // Summary widgets
+      {
+        type: 'metric',
+        properties: {
+          title: 'API Requests by URL Pattern',
+          metrics: patterns.map(p => ['AWS/ApiGateway', 'Count', 'ApiName', 'recursive-learning-api', 'Resource', p.patternKey]),
+          period: 300,
+          stat: 'Sum',
+          view: 'timeSeries'
+        }
+      },
+      // Add more widgets for errors, latency, etc.
+    ]
+  };
+  
+  // Create or update CloudWatch dashboard
+  return await cloudWatch.putDashboard({
+    DashboardName: 'RequestsByUrlPattern',
+    DashboardBody: JSON.stringify(dashboardConfig)
+  }).promise();
+}
+```
+
+## Benefits for Recently Implemented Systems
+
+### Integration with Qipu Review System
+
+The Qipu review system recently implemented can benefit from this architecture:
+
+1. **Dynamic Component Loading**: Automatically load the latest version of review UI components
+2. **URL Pattern Mapping**: Map review URLs to content resources
+3. **Permission Control**: Centralize review access rules
+4. **Analytics**: Track review system usage and performance
+
+### Integration with Authentication System
+
+The cross-domain authentication system can be enhanced by:
+
+1. **Centralized Auth Rules**: Store authentication requirements per URL pattern
+2. **Client-specific Settings**: Configure different auth providers per client
+3. **Token Validation Rules**: Define validation rules in one place
+
+## Implementation Checklist
+
+To implement this architecture:
+
+- [ ] Set up the Airtable tables as described
+- [ ] Implement the route resolver API
+- [ ] Create the component resolver API
+- [ ] Set up CloudWatch logging integration
+- [ ] Update frontend code to use the dynamic route system
+- [ ] Create admin interfaces for managing the URL registry
+- [ ] Set up monitoring and alerting for URL pattern issues
+
+## Next Steps
+
+After implementing the basic architecture:
+
+1. Create detailed metrics dashboards for URL pattern usage
+2. Implement caching strategies based on URL patterns
+3. Set up automation for component dependency tracking
+4. Create tools for simulating different client configurations
+5. Integrate with CI/CD for automated testing of URL patterns
+
+## Related Documentation
+
+- [Backend Integration Checklist](backend-integration-checklist.mdc)
+- [Backend Integration Test Plan](backend-integration-test-plan.mdc)
+- [URL Conventions](url-conventions.mdc)
+- [Cross-Domain Authentication](cross-domain-auth.mdc)
+- [Review Token Guide](review-token-guide.mdc) 
