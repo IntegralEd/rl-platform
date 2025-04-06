@@ -1,0 +1,151 @@
+# Client Review Token System
+
+This guide explains how to create and use tokenized review links for client SMEs in the Recursive Learning platform.
+
+## Overview
+
+The review token system allows clients and subject matter experts (SMEs) to access specific review pages without requiring a full login or Softr account. This enables:
+
+1. **Direct Review Access** - Clients can review content via a single link
+2. **Project-Specific Access** - Each token grants access to only the relevant project
+3. **Qipu Comment Integration** - Clients can leave feedback using the Qipu commenting system
+4. **Time-Limited Access** - Tokens expire after a set period (default: 7 days)
+
+## Creating Review Tokens
+
+### Via the Admin Panel
+
+1. Navigate to the project admin page (e.g., `goalsetter_admin.html`)
+2. Select the "Review Management" tab
+3. Click "Generate Review Link"
+4. Enter the client's email address and name
+5. Set an expiration date (optional)
+6. Click "Create Review Link"
+7. Use the "Copy Link" or "Send Email" button to share
+
+### Via the API
+
+To generate tokens programmatically:
+
+```javascript
+// Example API call
+const response = await fetch('/api/generate-review-token', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    userId: 'client_123',     // Client's user ID in Airtable
+    projectId: 'goalsetter',  // Project identifier
+    expiryHours: 168,         // 7 days (optional)
+    reviewSession: 'sprint3'  // Identifier for this review cycle (optional)
+  })
+});
+
+const { token, reviewUrl } = await response.json();
+```
+
+## Token Structure
+
+Review tokens are Base64-encoded JSON objects containing:
+
+```json
+{
+  "userId": "client_123",      // Client's user ID
+  "projectId": "goalsetter",   // Project identifier
+  "exp": 1682432125,           // Expiration timestamp (Unix seconds)
+  "reviewSession": "sprint3"   // Optional review session identifier
+}
+```
+
+In production, tokens are signed with a secret key for additional security.
+
+## Client Experience
+
+When a client clicks a review link:
+
+1. They are directed to the project review page
+2. The system validates their token
+3. The page loads with Qipu commenting enabled
+4. The client can view content and leave feedback
+5. All navigation within the system preserves their authentication
+
+## Review URL Format
+
+```
+https://recursivelearning.app/admin/pages/st/goalsetter/goalsetter_review.html?review_token=abc123
+```
+
+## Qipu Comment Integration
+
+Comments made through the review interface:
+
+1. Are associated with the client's user ID
+2. Include the client's name and role
+3. Are tagged with the review session (if specified)
+4. Can be viewed and replied to by the team
+
+## Managing Review Sessions
+
+For structured review cycles:
+
+1. Create a unique `reviewSession` identifier for each review cycle
+2. Generate tokens with this session ID
+3. Filter comments in the admin panel by review session
+4. Track feedback implementation status per session
+
+## Backend Implementation
+
+The token verification endpoint:
+
+1. Decodes and validates the token
+2. Checks expiration time
+3. Verifies the user exists in Airtable
+4. Confirms the user has access to the requested project
+5. Returns user details and project information to the frontend
+
+## Security Considerations
+
+- Tokens should only be sent to verified client email addresses
+- Each token should be unique and single-use when possible
+- Track token usage in the admin panel
+- Consider revoking tokens after feedback is complete
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Expired token | Generate a new token for the client |
+| "Invalid user" error | Verify the client exists in the team Airtable |
+| "Project access denied" | Check that the client has been assigned to the project |
+| Qipu not loading | Ensure the client's browser supports the required features |
+
+## Example: Review Email Template
+
+```html
+<p>Hello [Client Name],</p>
+
+<p>We've prepared a review version of the [Project Name] for your feedback. 
+Please use the link below to access the content and leave your comments:</p>
+
+<p><a href="[Review URL]">Review [Project Name]</a></p>
+
+<p>This link will expire in 7 days. Your feedback is crucial to us, so please 
+review at your earliest convenience.</p>
+
+<p>How to leave feedback:
+1. Click on any element to add a comment
+2. Your comments will be visible to our development team
+3. We'll notify you when we've addressed your feedback</p>
+
+<p>Thank you for your collaboration!</p>
+```
+
+## Integration with Client Portal
+
+For clients who also have access to the Recursive Review Softr portal:
+
+1. Display available review links in their dashboard
+2. Show review status and deadline
+3. Allow them to view previous feedback
+4. Provide notification when feedback has been addressed

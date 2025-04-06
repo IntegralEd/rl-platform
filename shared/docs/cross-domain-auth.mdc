@@ -3,45 +3,175 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Cross-Domain Authentication Rules
+# Cross-Domain Authentication System
 
-## Overview
+This document outlines the authentication mechanisms used for cross-domain access to admin and review resources in the Recursive Learning platform.
 
-This document outlines the authentication strategy for securely passing user credentials between Softr and embedded iframes in the Recursive Learning admin panel.
+## Authentication Sources
 
-## Authentication Flow
+The platform supports multiple authentication sources:
 
-The authentication process follows a multi-layered approach to ensure security across domains:
+1. **Integral Mothership** (integral-mothership.softr.app) - Primary admin access
+2. **Recursive Review Portal** (recursive-review.softr.app) - Client/SME review access
+3. **Tokenized Review Links** - Unique URLs with embedded tokens for direct review access
 
-1. **Session Validation**
-   - First check for existing valid session in `sessionStorage`
-   - Sessions expire after 1 hour of inactivity
+## Authentication Flows
 
-2. **URL Parameter Authentication**
-   - Primary method for iframe authentication
-   - Parameters passed from Softr wrapper to iframe:
-     - `User_ID`: Unique user identifier
-     - `Email`: User's email address
-     - `Name`: User's display name
-     - `Role`: User's role level
+### 1. Softr Iframe Authentication
 
-3. **Header Span Authentication**
-   - Used when within same origin
-   - Relies on `#header-span` element with data attributes:
-     - `data-user-email`
-     - `data-user-name`
-     - `data-user-id`
-     - `data-role-level`
-     - `data-last-login`
+When embedded in a trusted Softr application:
 
-4. **postMessage Communication**
-   - Fallback method for cross-domain communication
-   - Parent frame sends authenticated user data to iframe
-   - Strict origin verification (`https://integral-mothership.softr.app`)
+```mermaid
+sequenceDiagram
+    Softr->>Admin: Embed admin panel in iframe
+    Admin->>Admin: Check referrer origin
+    Admin->>Admin: Verify trusted source
+    Admin->>Softr: Ready for auth data
+    Softr->>Admin: Pass user data via URL params
+    Admin->>Admin: Store validation in sessionStorage
+```
 
-5. **Softr SDK Authentication**
-   - Last resort method
-   - Direct API calls to Softr user service
+### 2. Review Token Authentication
+
+For direct access via tokenized review links:
+
+```mermaid
+sequenceDiagram
+    User->>Admin: Access with review_token parameter
+    Admin->>Backend: Verify token validity
+    Backend->>Admin: Return user and project data
+    Admin->>Admin: Store validation in sessionStorage
+    Admin->>Admin: Setup review-specific UI
+    Admin->>Qipu: Initialize commenting system
+```
+
+### 3. Authentication Priority
+
+The system attempts authentication in the following order:
+
+1. Check stored authentication in sessionStorage (fastest)
+2. Check for review token in URL
+3. Check for iframe embedding from trusted source with URL parameters
+4. Check for iframe embedding from trusted source without parameters
+
+## Review Token System
+
+The review token system allows clients and SMEs to access specific review pages without requiring a full login:
+
+- **Token Format**: Base64-encoded JSON containing user ID, project ID, and expiration
+- **Token Verification**: Backend API validates the token and returns user details
+- **URL Format**: `https://recursivelearning.app/admin/pages/st/goalsetter/goalsetter_review.html?review_token=abc123`
+
+### Token Generation (Backend)
+
+```javascript
+function generateReviewToken(userId, projectId, expiryHours = 168) { // Default: 7 days
+  const payload = {
+    userId: userId,
+    projectId: projectId,
+    exp: Math.floor(Date.now() / 1000) + (expiryHours * 3600)
+  };
+  
+  // In production, this would use a proper signing mechanism
+  return Buffer.from(JSON.stringify(payload)).toString('base64');
+}
+```
+
+### Token Verification (Backend)
+
+```javascript
+function verifyReviewToken(token) {
+  try {
+    const payload = JSON.parse(Buffer.from(token, 'base64').toString());
+    
+    // Check expiration
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      return { valid: false, reason: 'Token expired' };
+    }
+    
+    // Fetch user details from Airtable
+    const user = getUserFromAirtable(payload.userId);
+    if (!user) {
+      return { valid: false, reason: 'User not found' };
+    }
+    
+    // Verify user has access to this project
+    if (!userHasProjectAccess(user, payload.projectId)) {
+      return { valid: false, reason: 'User does not have access to this project' };
+    }
+    
+    return {
+      valid: true,
+      userId: payload.userId,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      projectId: payload.projectId,
+      reviewSession: payload.reviewSession || generateReviewSession()
+    };
+  } catch (e) {
+    return { valid: false, reason: 'Invalid token format' };
+  }
+}
+```
+
+## Qipu Integration for Review Comments
+
+The authentication system integrates with the Qipu commenting system to enable client feedback:
+
+1. After successful authentication, the system initializes Qipu with the user's data
+2. For review tokens, Qipu is initialized in "review" mode
+3. For admin access, Qipu is initialized in "edit" mode
+4. Comments are associated with the user's ID and the specific project
+
+## Security Considerations
+
+1. **Trusted Origins**: Only explicitly whitelisted domains can embed admin panels
+2. **Token Expiration**: Review tokens have a limited lifespan (default: 7 days)
+3. **Session Timeout**: Authentication sessions expire after 1 hour of inactivity
+4. **Role Verification**: Backend verifies the user has appropriate permissions for the requested resource
+5. **Project Binding**: Tokens are bound to specific projects to prevent unauthorized access
+
+## Debug Mode
+
+For local development, the system provides fallback authentication methods:
+
+- In debug mode on localhost, review tokens can bypass backend verification
+- Debug-specific log messages are output to the console
+- Authentication states are clearly indicated in the UI
+
+## Usage Examples
+
+### Creating a Review Link for a Client
+
+```javascript
+// Backend code (Node.js)
+const userId = "client_123";
+const projectId = "goalsetter_project";
+const reviewToken = generateReviewToken(userId, projectId);
+
+const reviewUrl = `https://recursivelearning.app/admin/pages/st/goalsetter/goalsetter_review.html?review_token=${reviewToken}`;
+
+// Send email to client with review URL
+sendReviewInvitation(client.email, {
+  name: client.name,
+  reviewUrl: reviewUrl,
+  projectName: "GoalSetter App",
+  expiryDays: 7
+});
+```
+
+### Embedding in Recursive Review Portal
+
+```html
+<!-- In Recursive Review Softr app -->
+<iframe 
+  src="https://recursivelearning.app/admin/pages/st/goalsetter/goalsetter_review.html?User_ID=user_abc&Email=mike@example.com&Name=Mike%20Client&Role=client_sme&Project_ID=goalsetter_123" 
+  width="100%" 
+  height="800px"
+  allow="fullscreen">
+</iframe>
+```
 
 ## Security Rules
 

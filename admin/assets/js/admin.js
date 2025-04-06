@@ -5,6 +5,12 @@ class AdminPanel {
         this.projectId = window.projectId;
         this.debug = true;
         this.isAuthenticated = false;
+        this.trustedSources = [
+            'integral-mothership.softr.app',
+            'recursive-review.softr.app', // New review portal
+            'localhost',
+            '127.0.0.1'
+        ];
     }
 
     log(...args) {
@@ -20,8 +26,9 @@ class AdminPanel {
                 this.initTabs();
                 this.loadInitialContent();
                 this.initFileTree();
+                this.setupQipuComments();
             } else {
-                this.showError('Authentication required. Please access through Integral Ed Mothership.');
+                this.showError('Authentication required. Please use a valid review link or access through an authorized portal.');
             }
         } catch (error) {
             this.log('Initialization failed:', error);
@@ -38,9 +45,15 @@ class AdminPanel {
             return true;
         }
         
-        // Check if we're in an iframe from the Softr domain
-        if (this.isInSoftrIframe()) {
-            this.log('Detected valid Softr parent frame');
+        // Check review token in URL
+        if (await this.checkReviewToken()) {
+            this.log('Authenticated via review token');
+            return true;
+        }
+        
+        // Check if we're in an iframe from a trusted source
+        if (this.isInTrustedIframe()) {
+            this.log('Detected valid trusted parent frame');
             
             // Use URL parameters if available
             if (await this.checkUrlAuthentication()) {
@@ -48,16 +61,15 @@ class AdminPanel {
                 return true;
             }
             
-            // If URL params aren't available but we're in a Softr iframe, trust it
-            // and create a session that will time out in an hour
-            this.log('Authenticated via Softr origin');
+            // If URL params aren't available but we're in a trusted iframe, trust it
+            this.log('Authenticated via trusted origin');
             const validation = {
                 isValid: true,
-                userId: 'softr_user', 
+                userId: 'trusted_user', 
                 userEmail: '',
-                userName: 'Softr User',
-                roleLevel: 'org_admin', // Default role
-                source: 'softr_origin',
+                userName: 'Trusted User',
+                roleLevel: 'client_sme', // Default role for iframe without params
+                source: 'trusted_origin',
                 timestamp: new Date().getTime()
             };
             
@@ -71,7 +83,83 @@ class AdminPanel {
         return false;
     }
     
-    isInSoftrIframe() {
+    async checkReviewToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const reviewToken = urlParams.get('review_token');
+        
+        if (!reviewToken) return false;
+        
+        this.log('Found review token in URL');
+        
+        try {
+            // Verify token with backend
+            const response = await fetch('/api/verify-review-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: reviewToken })
+            });
+            
+            if (!response.ok) {
+                this.log('Invalid review token');
+                return false;
+            }
+            
+            const data = await response.json();
+            
+            // Store authentication
+            const validation = {
+                isValid: true,
+                userId: data.userId || 'review_user',
+                userEmail: data.email || '',
+                userName: data.name || 'Review User',
+                roleLevel: data.role || 'client_sme',
+                projectId: data.projectId,
+                reviewSession: data.reviewSession,
+                source: 'review_token',
+                timestamp: new Date().getTime()
+            };
+            
+            sessionStorage.setItem('adminValidation', JSON.stringify(validation));
+            this.showAdminContent();
+            this.isAuthenticated = true;
+            
+            // Set up review mode
+            if (data.projectId) {
+                this.setupReviewMode(data.projectId, reviewToken);
+            }
+            
+            return true;
+        } catch (error) {
+            this.log('Error verifying review token:', error);
+            
+            // Fallback: For development or when API isn't available
+            // In production, remove this fallback and rely on actual API verification
+            if (this.debug && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+                this.log('Debug mode: Accepting token without verification');
+                
+                const validation = {
+                    isValid: true,
+                    userId: 'dev_review_user',
+                    userEmail: 'test@example.com',
+                    userName: 'Test Review User',
+                    roleLevel: 'client_sme',
+                    source: 'review_token_debug',
+                    timestamp: new Date().getTime()
+                };
+                
+                sessionStorage.setItem('adminValidation', JSON.stringify(validation));
+                this.showAdminContent();
+                this.isAuthenticated = true;
+                return true;
+            }
+            
+            return false;
+        }
+    }
+    
+    isInTrustedIframe() {
         try {
             // Check if we're in an iframe
             if (window.self === window.top) {
@@ -81,13 +169,13 @@ class AdminPanel {
             
             // Check the referrer
             const referrer = document.referrer;
-            if (referrer && (
-                referrer.includes('integral-mothership.softr.app') || 
-                referrer.includes('localhost') || 
-                referrer.includes('127.0.0.1')
-            )) {
-                this.log('Valid Softr referrer:', referrer);
-                return true;
+            if (referrer) {
+                for (const trustedSource of this.trustedSources) {
+                    if (referrer.includes(trustedSource)) {
+                        this.log('Valid trusted referrer:', referrer);
+                        return true;
+                    }
+                }
             }
             
             this.log('Invalid referrer:', referrer);
@@ -95,7 +183,7 @@ class AdminPanel {
         } catch (e) {
             // If we can't access parent due to security restrictions,
             // it means we're in a cross-origin iframe
-            this.log('Cross-origin iframe detected, assuming Softr wrapper');
+            this.log('Cross-origin iframe detected, assuming trusted wrapper');
             return true;
         }
     }
@@ -111,6 +199,12 @@ class AdminPanel {
                 if (validation.isValid) {
                     this.showAdminContent();
                     this.isAuthenticated = true;
+                    
+                    // Set up review mode if this was a review session
+                    if (validation.source === 'review_token' && validation.projectId) {
+                        this.setupReviewMode(validation.projectId, validation.reviewSession);
+                    }
+                    
                     return true;
                 }
             } else {
@@ -142,6 +236,12 @@ class AdminPanel {
                 timestamp: new Date().getTime()
             };
             
+            // Add project ID if present
+            const projectId = urlParams.get('Project_ID');
+            if (projectId) {
+                validation.projectId = projectId;
+            }
+            
             sessionStorage.setItem('adminValidation', JSON.stringify(validation));
             this.showAdminContent();
             this.isAuthenticated = true;
@@ -149,6 +249,86 @@ class AdminPanel {
         }
         
         return false;
+    }
+    
+    setupReviewMode(projectId, reviewToken) {
+        this.log('Setting up review mode for project:', projectId);
+        
+        // Set project-specific elements if needed
+        document.body.classList.add('review-mode');
+        
+        // Add review token to all internal links
+        document.querySelectorAll('a[href^="/"]').forEach(link => {
+            const url = new URL(link.href, window.location.origin);
+            url.searchParams.set('review_token', reviewToken);
+            link.href = url.toString();
+        });
+        
+        // Highlight current project in the file tree
+        this.highlightProjectInTree(projectId);
+    }
+    
+    highlightProjectInTree(projectId) {
+        // Implementation depends on the structure of your file tree
+        // This is a simplified example
+        const projectItem = document.querySelector(`.tree-item[data-project-id="${projectId}"]`);
+        if (projectItem) {
+            projectItem.classList.add('active-review');
+            
+            // Expand parent folders
+            let parent = projectItem.parentElement;
+            while (parent) {
+                if (parent.classList.contains('tree-children')) {
+                    parent.style.display = 'block';
+                    const toggle = parent.previousElementSibling.querySelector('.tree-toggle');
+                    if (toggle) toggle.classList.add('open');
+                }
+                parent = parent.parentElement;
+            }
+        }
+    }
+    
+    setupQipuComments() {
+        // Check if we have a valid user for Qipu comments
+        const stored = sessionStorage.getItem('adminValidation');
+        if (!stored) return;
+        
+        try {
+            const validation = JSON.parse(stored);
+            
+            // Only proceed if we have a valid user
+            if (!validation.isValid || !validation.userId) return;
+            
+            this.log('Setting up Qipu comments for user:', validation.userId);
+            
+            // Check if Qipu is loaded
+            if (window.Qipu) {
+                this.initQipu(validation);
+            } else {
+                // Load Qipu script if not already loaded
+                const script = document.createElement('script');
+                script.src = '/shared/assets/js/qipu.js';
+                script.onload = () => this.initQipu(validation);
+                document.head.appendChild(script);
+            }
+        } catch (e) {
+            this.log('Failed to set up Qipu comments:', e);
+        }
+    }
+    
+    initQipu(validation) {
+        // Initialize Qipu with user data
+        window.Qipu.init({
+            userId: validation.userId,
+            userName: validation.userName,
+            userEmail: validation.userEmail,
+            userRole: validation.roleLevel,
+            projectId: validation.projectId || this.projectId,
+            reviewSession: validation.reviewSession || null,
+            mode: validation.source === 'review_token' ? 'review' : 'edit'
+        });
+        
+        this.log('Qipu comments initialized');
     }
 
     showAdminContent() {
