@@ -1,0 +1,127 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cross-Domain Authentication Rules
+
+## Overview
+
+This document outlines the authentication strategy for securely passing user credentials between Softr and embedded iframes in the Recursive Learning admin panel.
+
+## Authentication Flow
+
+The authentication process follows a multi-layered approach to ensure security across domains:
+
+1. **Session Validation**
+   - First check for existing valid session in `sessionStorage`
+   - Sessions expire after 1 hour of inactivity
+
+2. **URL Parameter Authentication**
+   - Primary method for iframe authentication
+   - Parameters passed from Softr wrapper to iframe:
+     - `User_ID`: Unique user identifier
+     - `Email`: User's email address
+     - `Name`: User's display name
+     - `Role`: User's role level
+
+3. **Header Span Authentication**
+   - Used when within same origin
+   - Relies on `#header-span` element with data attributes:
+     - `data-user-email`
+     - `data-user-name`
+     - `data-user-id`
+     - `data-role-level`
+     - `data-last-login`
+
+4. **postMessage Communication**
+   - Fallback method for cross-domain communication
+   - Parent frame sends authenticated user data to iframe
+   - Strict origin verification (`https://integral-mothership.softr.app`)
+
+5. **Softr SDK Authentication**
+   - Last resort method
+   - Direct API calls to Softr user service
+
+## Security Rules
+
+1. **Origin Validation**
+   - Only accept postMessages from trusted domains
+   - Validate source before processing messages
+
+2. **Role-Based Access**
+   - Only users with "Org Admin" role can access admin panels
+   - Role validation occurs at each authentication step
+
+3. **Cross-Origin Resource Sharing (CORS)**
+   - Maintain appropriate security headers
+   - No direct DOM access between frames of different origins
+
+4. **Session Management**
+   - Short-lived sessions (1 hour)
+   - Clear session on logout
+   - Store minimal user data
+
+## Debugging and Logs
+
+- Debug logs use `[Auth]` prefix
+- Set `AdminAuth.state.debug = false` to disable in production
+- Logs include timestamps and elapsed time metrics
+
+## Integration Examples
+
+### Softr Wrapper Setup
+
+```javascript
+// Safely add authentication parameters to iframe URL
+const iframeUrl = new URL(adminPageUrl);
+iframeUrl.searchParams.append('User_ID', userData?.User_ID || '');
+iframeUrl.searchParams.append('Name', userData?.Name || 'Guest');
+iframeUrl.searchParams.append('Email', userData?.email || '');
+iframeUrl.searchParams.append('Role', userData?.IE_Role_Level || '');
+iframe.src = iframeUrl.toString();
+
+// Also send via postMessage once iframe loads
+iframe.onload = function() {
+    iframe.contentWindow.postMessage({
+        type: 'auth-data',
+        userId: userData?.User_ID,
+        name: userData?.Name,
+        email: userData?.email,
+        role: userData?.IE_Role_Level
+    }, 'https://recursivelearning.app');
+}
+```
+
+### Iframe Authentication Check
+
+```javascript
+// Check URL parameters first (highest priority)
+function checkUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const userId = urlParams.get('User_ID') || urlParams.get('user_id');
+    const email = urlParams.get('Email') || urlParams.get('email');
+    const name = urlParams.get('Name') || urlParams.get('name');
+    const role = urlParams.get('Role') || urlParams.get('role');
+    
+    if (email && role === 'Org Admin') {
+        // Authenticate user
+    }
+}
+```
+
+## Troubleshooting
+
+1. **No authentication source available**
+   - Check URL parameters are properly passed
+   - Verify iframe src URL format
+   - Enable CORS headers on server
+
+2. **Invalid role level**
+   - Verify user has "Org Admin" role in Airtable
+   - Check URL parameter case sensitivity
+
+3. **Cross-origin errors**
+   - Use postMessage instead of direct DOM access
+   - Enable debugging with query parameter `?debug=true` 

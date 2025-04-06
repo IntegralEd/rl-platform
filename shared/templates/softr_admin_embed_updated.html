@@ -1,0 +1,388 @@
+<!-- ****************************************************
+     SOFTR ADMIN DASHBOARD INTEGRATION
+     Updated with improved cross-domain authentication
+     
+     STEP 1: ADD THIS SECTION TO PREHEADER
+     👇 START COPYING TO PREHEADER 👇
+**************************************************** -->
+<!-- Include shared header span script from GitHub Pages -->
+<script src="https://integral-ed.github.io/rl-platform/shared/assets/js/softr_headerspan.js"></script>
+
+<!-- Empty span will be populated by script -->
+<span id="header-span" style="display:none"></span>
+
+<script>
+// Initialize user data in header span using window.logged_in_user
+window.addEventListener('DOMContentLoaded', function() {
+    const headerSpan = document.querySelector('#header-span');
+    
+    // Function to update header span data
+    function updateHeaderData() {
+        if (window.logged_in_user) {
+            // Map Airtable fields to header span attributes
+            headerSpan.setAttribute('data-user-email', window.logged_in_user['email']);
+            headerSpan.setAttribute('data-user-name', window.logged_in_user['Name']);
+            headerSpan.setAttribute('data-user-id', window.logged_in_user['User_ID']);
+            headerSpan.setAttribute('data-role-level', window.logged_in_user['IE_Role_Level']);
+            headerSpan.setAttribute('data-last-login', new Date().toISOString());
+        }
+    }
+
+    // Check for user data with retry
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    function checkAndUpdateData() {
+        if (window.logged_in_user) {
+            updateHeaderData();
+        } else if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(checkAndUpdateData, 500);
+        }
+    }
+    
+    checkAndUpdateData();
+});
+</script>
+<!-- ****************************************************
+     👆 END PREHEADER SECTION 👆
+     
+     STEP 2: ADD THIS SECTION TO CUSTOM CODE BLOCK
+     👇 START COPYING TO CUSTOM CODE 👇
+**************************************************** -->
+<style>
+    /* Scoped Admin Dashboard Styles */
+    .recursive-admin-embed {
+        /* CSS Variables for consistent theming */
+        --ra-primary: #425563;
+        --ra-secondary: #E87722;
+        --ra-tertiary: #4fa997;
+        --ra-bg: #f5f5f5;
+        --ra-text: #2b2b2b;
+        --ra-radius: 12px;
+        --ra-spacing: 24px;
+        
+        /* Base container styles */
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: var(--ra-bg);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Admin container with fixed width for large screens */
+    .recursive-admin-embed #admin-container {
+        width: 1900px;
+        max-width: 100%;
+        height: 100vh;
+        position: relative;
+        background: white;
+    }
+
+    /* Loading overlay with centered spinner */
+    .recursive-admin-embed #loading-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: var(--ra-radius);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        min-width: 300px;
+    }
+
+    /* Loading message typography */
+    .recursive-admin-embed #loading-message h1 {
+        color: var(--ra-primary);
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    .recursive-admin-embed #loading-message p {
+        color: var(--ra-text);
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    .recursive-admin-embed #loading-status {
+        color: var(--ra-secondary);
+        font-size: 14px;
+        margin-top: 15px;
+        font-style: italic;
+    }
+
+    /* Access denied overlay */
+    .recursive-admin-embed #access-denied {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.98);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--ra-spacing);
+    }
+
+    /* Access denied message typography */
+    .recursive-admin-embed #access-denied h1 {
+        color: var(--ra-primary);
+        font-size: 32px;
+        margin-bottom: var(--ra-spacing);
+    }
+
+    .recursive-admin-embed #access-denied p {
+        color: var(--ra-text);
+        font-size: 18px;
+        line-height: 1.6;
+        max-width: 600px;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    /* Loading spinner animation */
+    .recursive-admin-embed .spinner {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: var(--ra-spacing);
+    }
+
+    .recursive-admin-embed .dot {
+        width: 12px;
+        height: 12px;
+        background: var(--ra-secondary);
+        border-radius: 50%;
+        animation: ra-bounce 1.4s infinite ease-in-out;
+    }
+
+    .recursive-admin-embed .dot:nth-child(1) { animation-delay: -0.32s; }
+    .recursive-admin-embed .dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes ra-bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+
+    /* Iframe container */
+    .recursive-admin-embed #iframe-container {
+        width: 100%;
+        height: 100vh;
+        border: none;
+        display: none;
+    }
+
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        .recursive-admin-embed {
+            background: white;
+            color: black;
+        }
+    }
+</style>
+
+<div class="recursive-admin-embed">
+    <div id="admin-container">
+        <!-- Loading message overlay -->
+        <div id="loading-message">
+            <h1>Welcome <span id="user-name">there</span>!</h1>
+            <p>Verifying your access...</p>
+            <div id="loading-status">Starting system initialization...</div>
+            <div class="spinner">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Access denied message -->
+        <div id="access-denied">
+            <h1>Access Denied</h1>
+            <p>You need to be logged into Integral Ed's Mothership Connection to access this page.</p>
+            <p>Please ensure you're logged in with an @integral-ed.com email address.</p>
+        </div>
+
+        <!-- Admin dashboard iframe -->
+        <iframe id="iframe-container" src=""></iframe>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Configuration constants
+        const SOFTR_BASE_URL = 'https://integral-mothership.softr.app';
+        const ADMIN_BASE_URL = 'https://recursivelearning.app';
+        const adminPageUrl = ADMIN_BASE_URL + '/admin/index.html';
+        const MAX_CHECKS = 30;
+        const CHECK_INTERVAL = 1000;
+        const DEBUG = true;
+        const REQUIRED_ROLE = 'Org Admin';
+
+        function log(...args) {
+            if (DEBUG) {
+                console.log('[Recursive Admin]', ...args);
+            }
+        }
+
+        function updateLoadingStatus(message) {
+            const status = document.getElementById('loading-status');
+            if (status) {
+                status.textContent = message;
+            }
+        }
+
+        // Validate user has Org Admin role
+        function validateUserAccess(userData) {
+            return userData && 
+                   userData['IE_Role_Level'] && 
+                   userData['IE_Role_Level'] === REQUIRED_ROLE;
+        }
+
+        function showAccessDenied() {
+            document.getElementById('loading-message').style.display = 'none';
+            document.getElementById('access-denied').style.display = 'flex';
+            document.getElementById('iframe-container').style.display = 'none';
+            
+            // Update access denied message to include role requirement
+            const accessDeniedMessage = document.querySelector('#access-denied p');
+            if (accessDeniedMessage) {
+                accessDeniedMessage.textContent = 'You need Organization Admin access to view this page. Please contact your administrator if you believe this is an error.';
+            }
+        }
+
+        function showAdmin(userData) {
+            log('Showing admin interface for user:', userData?.Name || 'Guest');
+            const iframe = document.getElementById('iframe-container');
+            const iframeUrl = new URL(adminPageUrl);
+            
+            // Safely add query parameters - these become URL params in the iframe
+            iframeUrl.searchParams.append('User_ID', userData?.User_ID || '');
+            iframeUrl.searchParams.append('Name', userData?.Name || 'Guest');
+            iframeUrl.searchParams.append('Email', userData?.email || '');
+            iframeUrl.searchParams.append('Role', userData?.IE_Role_Level || '');
+            
+            // Load the iframe with auth params
+            iframe.src = iframeUrl.toString();
+            iframe.style.display = 'block';
+            
+            // Hide other elements
+            document.getElementById('loading-message').style.display = 'none';
+            document.getElementById('access-denied').style.display = 'none';
+            
+            // Set up message passing once iframe loads
+            iframe.onload = function() {
+                try {
+                    // Send auth data via postMessage as a fallback authentication method
+                    iframe.contentWindow.postMessage({
+                        type: 'auth-data',
+                        userId: userData?.User_ID || '',
+                        name: userData?.Name || 'Guest',
+                        email: userData?.email || '',
+                        role: userData?.IE_Role_Level || ''
+                    }, ADMIN_BASE_URL);
+                    log('Sent auth data via postMessage');
+                } catch (e) {
+                    // Ignore cross-origin errors
+                    log('Could not send postMessage', e.message);
+                }
+            };
+        }
+
+        function checkUserAccess() {
+            log('Checking user access...');
+            updateLoadingStatus('Verifying admin access...');
+
+            if (!window.logged_in_user) {
+                log('No user data available');
+                showAccessDenied();
+                return;
+            }
+
+            const userData = window.logged_in_user;
+            log('User role:', userData.IE_Role_Level);
+
+            if (!validateUserAccess(userData)) {
+                log('Invalid role level:', userData.IE_Role_Level);
+                showAccessDenied();
+                return;
+            }
+
+            // Update display and show admin interface
+            document.getElementById('user-name').textContent = userData.Name || 'there';
+            updateLoadingStatus('Access granted, loading dashboard...');
+            showAdmin(userData);
+        }
+
+        // Initialize on page load
+        log('Initializing Recursive Admin embed...');
+        updateLoadingStatus('Starting system initialization...');
+        
+        // Wait for user data to be available
+        let checkCount = 0;
+        function initializeAdmin() {
+            if (window.logged_in_user) {
+                checkUserAccess();
+            } else if (checkCount < MAX_CHECKS) {
+                checkCount++;
+                setTimeout(initializeAdmin, CHECK_INTERVAL);
+            } else {
+                log('Timed out waiting for user data');
+                showAccessDenied();
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeAdmin);
+        } else {
+            initializeAdmin();
+        }
+
+        // Listen for messages from iframe
+        window.addEventListener('message', function(event) {
+            if (event.origin === ADMIN_BASE_URL) {
+                const { type, data } = event.data;
+                log('Received message from admin iframe:', type, data);
+                
+                // Handle iframe-ready message
+                if (type === 'iframe-ready') {
+                    log('Iframe is ready, resending auth data');
+                    const iframe = document.getElementById('iframe-container');
+                    if (iframe && window.logged_in_user) {
+                        try {
+                            iframe.contentWindow.postMessage({
+                                type: 'auth-data',
+                                userId: window.logged_in_user.User_ID || '',
+                                name: window.logged_in_user.Name || 'Guest',
+                                email: window.logged_in_user.email || '',
+                                role: window.logged_in_user.IE_Role_Level || ''
+                            }, ADMIN_BASE_URL);
+                        } catch (e) {
+                            // Ignore cross-origin errors
+                        }
+                    }
+                }
+                
+                // Forward signal events to parent
+                if (type === 'recursive-admin-signal' && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'recursive-admin-signal',
+                        signalType: data.signalType,
+                        data: data
+                    }, SOFTR_BASE_URL);
+                }
+            }
+        });
+    })();
+</script>
+<!-- ****************************************************
+     👆 END CUSTOM CODE SECTION 👆
+**************************************************** --> 
