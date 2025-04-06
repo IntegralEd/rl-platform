@@ -492,3 +492,94 @@ Response:
 - [ ] Create admin metrics endpoints
 - [ ] Document API endpoints in OpenAPI format
 - [ ] Deploy serverless infrastructure with proper IAM roles 
+
+# Backend Integration
+
+## URL and Asset Path Conventions
+
+When implementing backend services that interact with the frontend, it's crucial to understand the platform's URL and asset structure. The following conventions must be followed:
+
+### URL Structure
+
+1. **Client Pages**
+   - `/clients/{client-id}/{activity-id}/{page}.html`
+   - Example: `/clients/st/goalsetter/goalsetter_live.html`
+
+2. **Admin Pages**
+   - `/admin/pages/{client-id}/{activity-id}/{page}_admin.html`
+   - Example: `/admin/pages/st/goalsetter/goalsetter_admin.html`
+
+3. **Asset Paths**
+   - Admin assets: `/admin/assets/{type}/{file}`
+   - Client assets: `/clients/{client-id}/assets/{type}/{file}`
+   - Shared assets: `/shared/assets/{type}/{file}`
+   - Components: `/shared/page_ingredients/{component_type}/{file}`
+
+### Backend Integration Points
+
+1. **URL Processing**
+   When processing URLs in backend services:
+   ```javascript
+   // Extract components from URL
+   function extractUrlComponents(url) {
+     const adminPageRegex = /\/admin\/pages\/([^\/]+)\/([^\/]+)\/([^_]+)_admin\.html/;
+     const clientPageRegex = /\/clients\/([^\/]+)\/([^\/]+)\/([^\.]+)\.html/;
+     
+     let match, components = {};
+     
+     if (match = url.match(adminPageRegex)) {
+       components = {
+         type: 'admin',
+         clientId: match[1],
+         projectId: match[2],
+         pageName: match[3],
+         isAdmin: true
+       };
+     } else if (match = url.match(clientPageRegex)) {
+       components = {
+         type: 'client',
+         clientId: match[1],
+         projectId: match[2],
+         pageName: match[3],
+         isAdmin: false
+       };
+     }
+     
+     return components;
+   }
+   ```
+
+2. **Asset Resolution**
+   When resolving asset paths in backend services:
+   ```javascript
+   // Resolve asset path based on context
+   function resolveAssetPath(assetName, assetType, context) {
+     if (context.isAdmin) {
+       return `/admin/assets/${assetType}/${assetName}`;
+     } else if (context.isShared) {
+       return `/shared/assets/${assetType}/${assetName}`;
+     } else {
+       return `/clients/${context.clientId}/assets/${assetType}/${assetName}`;
+     }
+   }
+   ```
+
+3. **Component Resolution**
+   For loading page ingredients/components:
+   ```javascript
+   // Resolve component path
+   function resolveComponentPath(componentType, componentName) {
+     return `/shared/page_ingredients/${componentType}/${componentName}`;
+   }
+   ```
+
+### Validation Rules
+
+Backend services should implement validation for:
+
+1. URL patterns (to prevent security issues)
+2. Asset path traversal protection
+3. Client/project access validation based on user roles
+4. Logging all URL access patterns to CloudWatch
+
+// ... existing content ... 
