@@ -185,7 +185,7 @@
             log('Invalid auth data, missing userId or role');
             return;
         }
-        
+
         // Convert role to lowercase for case-insensitive comparison
         const role = data.role.toLowerCase();
         
@@ -195,7 +195,7 @@
             showAccessDenied(`The role "${data.role}" does not have permission to access admin features.`);
             return;
         }
-        
+
         // Valid authentication
         currentUser = {
             id: data.userId,
