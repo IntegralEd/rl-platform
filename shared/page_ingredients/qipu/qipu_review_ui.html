@@ -1,0 +1,186 @@
+<!-- Qipu Review UI Components -->
+
+<!-- Review Toggle Button -->
+<div id="paintbrush-toggle" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #f2b632 url('https://via.placeholder.com/30x30?text=%F0%9F%8E%A8') center/50% no-repeat;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    cursor: pointer;
+    z-index: 10001;
+"></div>
+
+<!-- Welcome Modal -->
+<div id="welcome-modal" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10005;
+">
+  <div style="
+    background: white;
+    padding: 24px 32px;
+    border-radius: 8px;
+    max-width: 500px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    font-family: sans-serif;
+  ">
+    <h2>Welcome <span id="reviewer-name">Reviewer</span></h2>
+    <p><strong>How to review using Qipu...</strong></p>
+    <p>Your goal in this review:</p>
+    <p><em id="review-goal">{deadline, objective}</em></p>
+    <label style="display: block; margin: 16px 0; font-size: 14px; text-align: left;">
+      <input type="checkbox" id="welcome-confirm" style="margin-right: 8px;">
+      I have seen the goals and due dates, I agree to do my best and communicate with the project team if these deadlines are in jeopardy.
+    </label>
+    <p style="margin: 8px 0 16px; font-size: 13px; color: #333;"><strong>We can't wait for your advice and feedback!!!</strong></p>
+    <button id="welcome-confirm-btn" onclick="closeWelcomeModal()" style="
+      margin-top: 8px;
+      padding: 10px 20px;
+      background: #0052CC;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    " disabled>Let's Go</button>
+  </div>
+</div>
+
+<!-- Review Footer Toolbar -->
+<div id="qipu-comment-footer" style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    background: url('https://www.transparenttextures.com/patterns/brushed-alum.png') repeat, #ffd166;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    z-index: 10000;
+">
+  <div style="display: flex; gap: 16px; align-items: center;">
+    <button class="qipu-tool" title="Camera" onclick="showCaptureOverlay()">📸</button>
+    <button class="qipu-tool" title="Draw">✏️</button>
+    <button class="qipu-tool" title="Text">🔤</button>
+    <button class="qipu-tool" title="Arrow">➡️</button>
+    <button class="qipu-tool" title="Erase">🧽</button>
+    <button class="qipu-tool" title="Comment">💬</button>
+  </div>
+  <div style="font-size: 14px; color: #333; max-width: 40%; text-align: center;">
+    <strong>Review Mode:</strong> Leave comments on any section.
+  </div>
+  <div>
+    <button style="
+        background: #0052CC;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      " onclick="submitReview()">
+      Submit
+    </button>
+  </div>
+</div>
+
+<!-- Screenshot Capture Overlay -->
+<div id="capture-overlay" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.3);
+  z-index: 10002;
+  cursor: crosshair;
+">
+  <div id="capture-box" style="
+    position: absolute;
+    top: 100px;
+    left: 100px;
+    width: 400px;
+    height: 300px;
+    border: 3px dotted #ff007f;
+    resize: both;
+    overflow: hidden;
+    z-index: 10003;
+  ">
+    <div style="position: absolute; width: 20px; height: 20px; top: -10px; right: -10px; background: #ff007f; border-radius: 50%; animation: pulse 1s infinite;"></div>
+  </div>
+</div>
+
+<style>
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .qipu-tool {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.2s;
+  }
+  .qipu-tool:hover {
+    background: #e0e0e0;
+  }
+</style>
+
+<script>
+  const paintbrushToggle = document.getElementById('paintbrush-toggle');
+  const footer = document.getElementById('qipu-comment-footer');
+  const modal = document.getElementById('welcome-modal');
+  const confirmBox = document.getElementById('welcome-confirm');
+  const confirmBtn = document.getElementById('welcome-confirm-btn');
+
+  paintbrushToggle.onclick = () => {
+    const isOpen = footer.style.display === 'flex';
+    footer.style.display = isOpen ? 'none' : 'flex';
+    paintbrushToggle.style.display = isOpen ? 'block' : 'none';
+    !isOpen && footer.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  function showCaptureOverlay() {
+    document.getElementById('capture-overlay').style.display = 'block';
+  }
+
+  function closeWelcomeModal() {
+    if (confirmBox.checked) {
+      modal.style.display = 'none';
+    } else {
+      alert('Please confirm your agreement before continuing.');
+    }
+  }
+
+  confirmBox.addEventListener('change', () => {
+    confirmBtn.disabled = !confirmBox.checked;
+  });
+
+  // Simulate config injection for demo
+  window.onload = () => {
+    document.getElementById('reviewer-name').textContent = 'Jamie';
+    document.getElementById('review-goal').textContent = 'Review Module 2 by Friday, focusing on accessibility.';
+  };
+</script> 
