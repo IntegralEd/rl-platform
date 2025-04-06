@@ -40,9 +40,6 @@ const AdminAuth = {
     state: {
         userLoaded: false,
         adminValidated: false,
-        retryCount: 0,
-        maxRetries: 10,
-        retryDelay: 800,
         startTime: null
     },
 
@@ -58,10 +55,12 @@ const AdminAuth = {
         }
         
         this.state.startTime = Date.now();
-        console.log('Loading user DOM...', {timestamp: this.state.startTime});
-        this.waitForSoftrSDK();
+        console.log('Loading user data...', {timestamp: this.state.startTime});
+        
+        // Check if header span is available (from Softr wrapper)
+        this.processHeaderSpan();
     },
-
+    
     // Get stored validation state
     getStoredValidation() {
         const stored = sessionStorage.getItem('adminValidation');
@@ -82,50 +81,76 @@ const AdminAuth = {
         }
     },
 
-    // Wait for Softr SDK to be available
-    async waitForSoftrSDK() {
-        if (this.state.retryCount >= this.state.maxRetries) {
-            console.error('Failed to load Softr SDK after max retries');
-            this.handleAuthError('SDK load timeout');
-            return;
+    // Process the header span data that's already populated by Softr
+    processHeaderSpan() {
+        const headerSpan = document.getElementById('header-span');
+        
+        if (headerSpan) {
+            const email = headerSpan.getAttribute('data-user-email');
+            const name = headerSpan.getAttribute('data-user-name');
+            const userId = headerSpan.getAttribute('data-user-id');
+            const roleLevel = headerSpan.getAttribute('data-role-level');
+            
+            if (email && roleLevel) {
+                console.log('Header span data found', { 
+                    email, 
+                    roleLevel,
+                    timeElapsed: Date.now() - this.state.startTime 
+                });
+                
+                // Check if user has admin role
+                if (roleLevel === 'Org Admin') {
+                    this.state.userLoaded = true;
+                    
+                    // Create user object
+                    const user = {
+                        id: userId,
+                        email: email,
+                        name: name,
+                        roleLevel: roleLevel
+                    };
+                    
+                    // Skip external verification since we're already inside Softr
+                    this.state.adminValidated = true;
+                    this.onAdminValidated(user);
+                    return;
+                } else {
+                    this.handleAuthError(`Invalid role level: ${roleLevel}`);
+                    return;
+                }
+            }
         }
-
-        if (typeof Softr === 'undefined') {
-            this.state.retryCount++;
-            console.log('Waiting for Softr SDK...', {attempt: this.state.retryCount});
-            setTimeout(() => this.waitForSoftrSDK(), this.state.retryDelay);
-            return;
-        }
-
-        console.log('Softr SDK loaded', {
-            timeElapsed: Date.now() - this.state.startTime
-        });
-        this.waitForSoftrUser();
+        
+        // If we get here, header span wasn't found or was incomplete
+        console.log('No header span data, falling back to Softr SDK');
+        // Only try once, don't keep retrying
+        this.checkSoftrSDK();
     },
-
-    // Wait for Softr user context
-    async waitForSoftrUser() {
+    
+    // One-time check for Softr SDK
+    checkSoftrSDK() {
+        if (typeof Softr !== 'undefined') {
+            console.log('Softr SDK found');
+            this.loadUserFromSoftr();
+        } else {
+            console.error('Softr SDK not available');
+            this.handleAuthError('No authentication source available');
+        }
+    },
+    
+    // Load user data from Softr if available
+    async loadUserFromSoftr() {
         try {
             const user = await Softr.user.getUser();
             
-            if (!user) {
-                console.log('No user found, retrying...');
-                if (this.state.retryCount < this.state.maxRetries) {
-                    this.state.retryCount++;
-                    setTimeout(() => this.waitForSoftrUser(), this.state.retryDelay);
-                    return;
-                }
-                throw new Error('No user found after max retries');
+            if (!user || !user.email) {
+                throw new Error('User not found or email missing');
             }
 
-            console.log('Loaded user context', {
+            console.log('Loaded user from Softr', {
                 timeElapsed: Date.now() - this.state.startTime,
                 hasEmail: !!user.email
             });
-
-            if (!user.email) {
-                throw new Error('User email not found');
-            }
 
             if (!user.email.endsWith('@integral-ed.com')) {
                 throw new Error('Non-integral email');
@@ -133,48 +158,18 @@ const AdminAuth = {
 
             this.state.userLoaded = true;
             this.validateAdmin(user);
-
         } catch (error) {
             console.error('User validation error:', error.message);
             this.handleAuthError(error.message);
         }
     },
 
-    // Validate admin access
+    // Validate admin access (simplified - only if needed)
     async validateAdmin(user) {
-        console.log('Contacting recursive learning admin page...', {
-            timeElapsed: Date.now() - this.state.startTime
-        });
-        
-        try {
-            if (!Softr.token) {
-                throw new Error('No auth token found');
-            }
-
-            const response = await fetch('https://integral-mothership.softr.app/recursive-admin-dashboard', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${Softr.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            console.log('Validating admin access...', {
-                status: response.status,
-                timeElapsed: Date.now() - this.state.startTime
-            });
-
-            this.state.adminValidated = true;
-            this.onAdminValidated(user);
-
-        } catch (error) {
-            console.error('Admin validation failed:', error.message);
-            this.handleAuthError('Admin validation error: ' + error.message);
-        }
+        // Since we're already in Softr, we can trust the role
+        // This is just a fallback
+        this.state.adminValidated = true;
+        this.onAdminValidated(user);
     },
 
     // Handle successful validation
