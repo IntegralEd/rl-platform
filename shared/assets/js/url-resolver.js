@@ -1,366 +1,417 @@
 /**
  * URL Resolver for Recursive Learning Platform
  * 
- * Handles advanced URL pattern matching, parameter extraction,
- * and resolving to appropriate resources using the Airtable resource map.
+ * Handles URL pattern matching, resolution to resources,
+ * and client access validation for dynamic components.
  */
 
-import { secureFetch, getClientIdFromUrl, getPageType } from './api-client.js';
+import { secureFetch, getClientIdFromUrl } from './api-client.js';
+import { log } from './cloudwatch-integration.js';
 
 // Configuration
 const RESOLVER_CONFIG = {
-  URL_REGISTRY_ENDPOINT: '/api/v1/airtable/url-registry',
-  URL_CACHE_TTL: 30 * 60 * 1000, // 30 minutes
-  PATTERN_TYPES: {
-    EXACT: 'exact',
-    PARAMETERIZED: 'parameterized',
-    REGEX: 'regex',
-    WILDCARD: 'wildcard'
-  },
-  DEBUG: false // Set to true to enable debug logging
+  API_ENDPOINT: '/api/v1/resolve',
+  CACHE_DURATION: 5 * 60 * 1000, // 5 minutes in milliseconds
+  CACHE_PREFIX: 'rl_url_',
+  MAX_CACHE_ENTRIES: 100
 };
 
-// Cache for URL patterns
-const urlPatternCache = new Map();
-// Cache for resolved URLs
-const resolvedUrlCache = new Map();
+// Cache for URL resolutions
+let urlCache = new Map();
+
+// Initialize the module
+function init() {
+  // Initialize pattern registry
+  loadUrlPatterns();
+  
+  // Set up periodic cache cleanup
+  setInterval(cleanupCache, RESOLVER_CONFIG.CACHE_DURATION);
+}
 
 /**
- * Represents a URL pattern that can match against URLs
+ * Load URL patterns from the backend
  */
-class UrlPattern {
-  /**
-   * Create a URL pattern
-   * @param {Object} config - Pattern configuration
-   * @param {string} config.pattern - The pattern string
-   * @param {string} config.type - Pattern type (exact, parameterized, regex, wildcard)
-   * @param {number} config.specificity - Pattern specificity score
-   * @param {Object} config.metadata - Additional metadata for the pattern
-   */
-  constructor(config) {
-    this.originalPattern = config.pattern;
-    this.type = config.type || detectPatternType(config.pattern);
-    this.specificity = config.specificity || calculateSpecificity(config.pattern, this.type);
-    this.metadata = config.metadata || {};
+async function loadUrlPatterns() {
+  try {
+    const response = await secureFetch(`${RESOLVER_CONFIG.API_ENDPOINT}/patterns`);
     
-    // Prepare the pattern for matching based on type
-    if (this.type === RESOLVER_CONFIG.PATTERN_TYPES.REGEX) {
-      try {
-        this.regex = new RegExp(config.pattern);
-      } catch (error) {
-        console.error(`Invalid regex pattern: ${config.pattern}`, error);
-        this.regex = /^$/; // Empty regex that won't match anything
-      }
-    } else if (this.type === RESOLVER_CONFIG.PATTERN_TYPES.PARAMETERIZED) {
-      this.segments = config.pattern.split('/');
-      this.paramNames = [];
-      
-      // Extract parameter names and create a regex for each segment
-      this.segmentMatchers = this.segments.map(segment => {
-        if (segment.startsWith(':')) {
-          const paramName = segment.substring(1);
-          this.paramNames.push(paramName);
-          return '([^/]+)'; // Match any character except /
-        } else if (segment === '*') {
-          return '([^/]+)'; // Match any segment
-        } else if (segment === '**') {
-          return '(.*)'; // Match multiple segments
-        }
-        return segment.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); // Escape regex special chars
-      });
-      
-      this.regex = new RegExp(`^${this.segmentMatchers.join('/')}$`);
+    if (response.patterns) {
+      // Store patterns in localStorage for offline use
+      localStorage.setItem('rl_url_patterns', JSON.stringify(response.patterns));
+      log('URL patterns loaded', { count: response.patterns.length }, 'info');
     }
-  }
-  
-  /**
-   * Match a URL against this pattern
-   * @param {string} url - URL to match
-   * @returns {Object|null} Match result with parameters if matched, null otherwise
-   */
-  match(url) {
-    // For exact pattern, simple string comparison
-    if (this.type === RESOLVER_CONFIG.PATTERN_TYPES.EXACT) {
-      return url === this.originalPattern ? { params: {} } : null;
-    }
-    
-    // For wildcard pattern, check if URL starts with the pattern (minus the *)
-    if (this.type === RESOLVER_CONFIG.PATTERN_TYPES.WILDCARD) {
-      const basePattern = this.originalPattern.replace(/\*$/, '');
-      return url.startsWith(basePattern) ? { params: {} } : null;
-    }
-    
-    // For regex and parameterized patterns, use the regex
-    const match = url.match(this.regex);
-    if (!match) return null;
-    
-    // For parameterized patterns, extract named parameters
-    if (this.type === RESOLVER_CONFIG.PATTERN_TYPES.PARAMETERIZED) {
-      const params = {};
-      this.paramNames.forEach((name, index) => {
-        params[name] = match[index + 1];
-      });
-      return { params };
-    }
-    
-    // For regex patterns, return captured groups
-    return {
-      params: match.slice(1).reduce((params, value, index) => {
-        params[`capture${index + 1}`] = value;
-        return params;
-      }, {})
-    };
+  } catch (error) {
+    console.error('Failed to load URL patterns:', error);
+    log('Failed to load URL patterns', { error: error.message }, 'error');
   }
 }
 
 /**
- * Detect the type of a URL pattern
- * @param {string} pattern - The pattern string
- * @returns {string} Pattern type
+ * Resolve a URL to its resource configuration
+ * @param {string} url - URL to resolve
+ * @returns {Promise<Object|null>} Resource configuration or null if not found
  */
-function detectPatternType(pattern) {
-  if (pattern.includes('(') || pattern.includes(')') || pattern.includes('?') || pattern.includes('+')) {
-    return RESOLVER_CONFIG.PATTERN_TYPES.REGEX;
-  }
-  
-  if (pattern.includes(':')) {
-    return RESOLVER_CONFIG.PATTERN_TYPES.PARAMETERIZED;
-  }
-  
-  if (pattern.endsWith('*')) {
-    return RESOLVER_CONFIG.PATTERN_TYPES.WILDCARD;
-  }
-  
-  return RESOLVER_CONFIG.PATTERN_TYPES.EXACT;
-}
-
-/**
- * Calculate the specificity score for a pattern
- * Higher score = more specific (should be matched first)
- * @param {string} pattern - The pattern string
- * @param {string} type - Pattern type
- * @returns {number} Specificity score
- */
-function calculateSpecificity(pattern, type) {
-  // Base score by type
-  let score = {
-    [RESOLVER_CONFIG.PATTERN_TYPES.EXACT]: 1000,
-    [RESOLVER_CONFIG.PATTERN_TYPES.PARAMETERIZED]: 500,
-    [RESOLVER_CONFIG.PATTERN_TYPES.REGEX]: 250,
-    [RESOLVER_CONFIG.PATTERN_TYPES.WILDCARD]: 100
-  }[type] || 0;
-  
-  // Add points for length (longer patterns are more specific)
-  score += pattern.length;
-  
-  // Subtract points for each wildcard/parameter (more dynamic = less specific)
-  const wildcardCount = (pattern.match(/[*:]/g) || []).length;
-  score -= wildcardCount * 10;
-  
-  return score;
-}
-
-/**
- * Get all URL patterns from Airtable
- * @param {boolean} [forceRefresh=false] - Force refresh the cache
- * @returns {Promise<Array<UrlPattern>>} Array of URL patterns
- */
-async function getAllUrlPatterns(forceRefresh = false) {
-  const cacheKey = 'all_patterns';
+async function resolveUrl(url) {
+  // Normalize URL by removing trailing slash and query parameters
+  url = normalizeUrl(url);
   
   // Check cache first
-  if (!forceRefresh) {
-    const cached = urlPatternCache.get(cacheKey);
-    if (cached && cached.expiry > Date.now()) {
-      debug('Using cached URL patterns');
-      return cached.patterns;
-    }
+  const cachedResource = getCachedUrl(url);
+  if (cachedResource) {
+    return cachedResource;
   }
   
   try {
-    debug('Fetching URL patterns from Airtable');
-    const response = await secureFetch(`${RESOLVER_CONFIG.URL_REGISTRY_ENDPOINT}/all`);
-    
-    // Convert to UrlPattern objects
-    const patterns = response.map(pattern => new UrlPattern({
-      pattern: pattern.path_pattern,
-      type: detectPatternType(pattern.path_pattern),
-      metadata: {
-        id: pattern.id,
-        resourceType: pattern.resource_type,
-        authLevel: pattern.auth_level,
-        components: pattern.components,
-        clientAccess: pattern.client_access,
-        cachePolicy: pattern.cache_policy
-      }
-    }));
-    
-    // Sort by specificity (highest first)
-    patterns.sort((a, b) => b.specificity - a.specificity);
-    
-    // Cache the patterns
-    urlPatternCache.set(cacheKey, {
-      patterns,
-      expiry: Date.now() + RESOLVER_CONFIG.URL_CACHE_TTL
+    // Call API to resolve URL
+    const response = await secureFetch(`${RESOLVER_CONFIG.API_ENDPOINT}/url`, {
+      method: 'POST',
+      body: JSON.stringify({ url })
     });
     
-    return patterns;
-  } catch (error) {
-    console.error('Error fetching URL patterns:', error);
+    if (response.resource) {
+      // Cache the resolution result
+      cacheUrl(url, response.resource);
+      return response.resource;
+    }
     
-    // Return empty array if fetch fails
-    return [];
+    return null;
+  } catch (error) {
+    console.error('Failed to resolve URL:', error);
+    log('URL resolution failed', { url, error: error.message }, 'error');
+    
+    // Try to resolve using local patterns in case we're offline
+    return resolveUrlLocally(url);
   }
 }
 
 /**
- * Get the best matching pattern for a URL
- * @param {string} url - URL to match
- * @param {Object} options - Options
- * @param {boolean} options.forceRefresh - Force refresh the pattern cache
- * @returns {Promise<Object|null>} Match result with pattern and parameters if matched, null otherwise
+ * Check if a client has access to a resource
+ * @param {string} clientId - Client identifier
+ * @param {Object} resource - Resource configuration
+ * @returns {boolean} True if client has access
  */
-async function matchUrl(url, options = {}) {
-  const { forceRefresh = false } = options;
+function hasClientAccess(clientId, resource) {
+  if (!resource || !resource.access) {
+    return false;
+  }
   
-  // Get all patterns
-  const patterns = await getAllUrlPatterns(forceRefresh);
-  
-  // Try to match each pattern
-  for (const pattern of patterns) {
-    const match = pattern.match(url);
-    if (match) {
-      return {
-        pattern,
-        params: match.params
-      };
+  // Check client access list
+  if (resource.access.allowedClients) {
+    const allowedClients = resource.access.allowedClients;
+    
+    // Allow all clients
+    if (allowedClients.includes('*')) {
+      return true;
     }
+    
+    // Check specific client
+    if (allowedClients.includes(clientId)) {
+      return true;
+    }
+  }
+  
+  // Check group access
+  if (resource.access.allowedGroups && resource.access.allowedGroups.length > 0) {
+    const clientGroups = getClientGroups(clientId);
+    for (const group of clientGroups) {
+      if (resource.access.allowedGroups.includes(group)) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Get groups that a client belongs to
+ * @param {string} clientId - Client identifier
+ * @returns {Array<string>} Array of group identifiers
+ */
+function getClientGroups(clientId) {
+  // This would typically be fetched from session storage or an API
+  // For now, we'll return a hardcoded set of groups
+  
+  const clientGroups = {
+    'schoolteacher': ['education', 'k12'],
+    'epl_learning': ['education', 'public_libraries'],
+    'bright_horizons': ['education', 'early_childhood'],
+    'integrated_education': ['education', 'higher_ed']
+  };
+  
+  return clientGroups[clientId] || [];
+}
+
+/**
+ * Normalize a URL for consistent comparison
+ * @param {string} url - URL to normalize
+ * @returns {string} Normalized URL
+ */
+function normalizeUrl(url) {
+  // Remove trailing slash
+  url = url.endsWith('/') ? url.slice(0, -1) : url;
+  
+  // Remove query parameters and hash
+  const urlParts = url.split(/[?#]/);
+  return urlParts[0];
+}
+
+/**
+ * Get a cached URL resolution result
+ * @param {string} url - URL to look up
+ * @returns {Object|null} Cached resource or null if not found or expired
+ */
+function getCachedUrl(url) {
+  const cacheKey = `${RESOLVER_CONFIG.CACHE_PREFIX}${url}`;
+  
+  // Check in-memory cache first
+  if (urlCache.has(cacheKey)) {
+    const cacheEntry = urlCache.get(cacheKey);
+    
+    // Check if cache entry is still valid
+    if (Date.now() - cacheEntry.timestamp < RESOLVER_CONFIG.CACHE_DURATION) {
+      return cacheEntry.resource;
+    }
+    
+    // Remove expired entry
+    urlCache.delete(cacheKey);
+  }
+  
+  // Try localStorage
+  try {
+    const storedEntry = localStorage.getItem(cacheKey);
+    if (storedEntry) {
+      const entry = JSON.parse(storedEntry);
+      
+      // Check if entry is still valid
+      if (Date.now() - entry.timestamp < RESOLVER_CONFIG.CACHE_DURATION) {
+        // Update in-memory cache
+        urlCache.set(cacheKey, entry);
+        return entry.resource;
+      }
+      
+      // Remove expired entry
+      localStorage.removeItem(cacheKey);
+    }
+  } catch (error) {
+    console.error('Error reading from URL cache:', error);
   }
   
   return null;
 }
 
 /**
- * Resolve a URL to its resource configuration
- * @param {string} url - URL to resolve
- * @param {Object} options - Options
- * @param {boolean} options.forceRefresh - Force refresh the cache
- * @returns {Promise<Object|null>} Resource configuration if resolved, null otherwise
+ * Cache a URL resolution result
+ * @param {string} url - URL that was resolved
+ * @param {Object} resource - Resource configuration
  */
-async function resolveUrl(url, options = {}) {
-  const { forceRefresh = false } = options;
-  
-  // Check cache first
-  if (!forceRefresh) {
-    const cached = resolvedUrlCache.get(url);
-    if (cached && cached.expiry > Date.now()) {
-      debug(`Using cached resolution for ${url}`);
-      return cached.resource;
-    }
-  }
-  
-  // Match the URL
-  const match = await matchUrl(url, { forceRefresh });
-  if (!match) {
-    debug(`No pattern matched for ${url}`);
-    return null;
-  }
-  
-  // Create resource configuration
-  const resource = {
-    url,
-    patternId: match.pattern.metadata.id,
-    params: match.params,
-    resourceType: match.pattern.metadata.resourceType,
-    authLevel: match.pattern.metadata.authLevel,
-    components: match.pattern.metadata.components,
-    clientAccess: match.pattern.metadata.clientAccess,
-    cachePolicy: match.pattern.metadata.cachePolicy
+function cacheUrl(url, resource) {
+  const cacheKey = `${RESOLVER_CONFIG.CACHE_PREFIX}${url}`;
+  const entry = {
+    resource,
+    timestamp: Date.now()
   };
   
-  // Cache the resolution
-  resolvedUrlCache.set(url, {
-    resource,
-    expiry: Date.now() + RESOLVER_CONFIG.URL_CACHE_TTL
-  });
+  // Update in-memory cache
+  urlCache.set(cacheKey, entry);
   
-  return resource;
+  // Update localStorage
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(entry));
+  } catch (error) {
+    console.error('Error writing to URL cache:', error);
+    
+    // If storage is full, clear some old entries
+    if (error.name === 'QuotaExceededError') {
+      clearOldCacheEntries();
+      
+      // Try again
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(entry));
+      } catch (e) {
+        // Give up if it still fails
+        console.error('Failed to cache URL after clearing old entries:', e);
+      }
+    }
+  }
 }
 
 /**
- * Check if a client has access to a resource
- * @param {string} clientId - Client ID
- * @param {Object} resource - Resource configuration
- * @returns {boolean} True if client has access, false otherwise
+ * Clear old cache entries when storage is full
  */
-function hasClientAccess(clientId, resource) {
-  if (!resource.clientAccess || resource.clientAccess.length === 0 || resource.clientAccess.includes('all')) {
-    return true;
+function clearOldCacheEntries() {
+  // Get all keys from localStorage
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith(RESOLVER_CONFIG.CACHE_PREFIX)) {
+      keys.push(key);
+    }
   }
   
-  return resource.clientAccess.includes(clientId);
+  // Sort by age (oldest first)
+  keys.sort((a, b) => {
+    const aEntry = JSON.parse(localStorage.getItem(a));
+    const bEntry = JSON.parse(localStorage.getItem(b));
+    return aEntry.timestamp - bEntry.timestamp;
+  });
+  
+  // Remove oldest entries to get under the limit
+  const entriesToRemove = Math.max(keys.length - RESOLVER_CONFIG.MAX_CACHE_ENTRIES, 
+                                   Math.floor(keys.length * 0.25)); // Remove at least 25%
+  
+  for (let i = 0; i < entriesToRemove; i++) {
+    localStorage.removeItem(keys[i]);
+    
+    // Also remove from in-memory cache
+    urlCache.delete(keys[i]);
+  }
+  
+  log('Cleared old URL cache entries', { count: entriesToRemove }, 'info');
+}
+
+/**
+ * Clean up expired cache entries periodically
+ */
+function cleanupCache() {
+  const now = Date.now();
+  const expiryTime = now - RESOLVER_CONFIG.CACHE_DURATION;
+  
+  // Clean in-memory cache
+  for (const [key, entry] of urlCache.entries()) {
+    if (entry.timestamp < expiryTime) {
+      urlCache.delete(key);
+    }
+  }
+  
+  // Clean localStorage cache
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(RESOLVER_CONFIG.CACHE_PREFIX)) {
+      try {
+        const entry = JSON.parse(localStorage.getItem(key));
+        if (entry.timestamp < expiryTime) {
+          localStorage.removeItem(key);
+        }
+      } catch (e) {
+        // If entry is corrupt, remove it
+        localStorage.removeItem(key);
+      }
+    }
+  }
+}
+
+/**
+ * Resolve a URL using locally cached patterns (for offline use)
+ * @param {string} url - URL to resolve
+ * @returns {Object|null} Resource configuration or null if not found
+ */
+function resolveUrlLocally(url) {
+  try {
+    // Get patterns from localStorage
+    const patternsJson = localStorage.getItem('rl_url_patterns');
+    if (!patternsJson) {
+      return null;
+    }
+    
+    const patterns = JSON.parse(patternsJson);
+    
+    // Find matching pattern
+    for (const pattern of patterns) {
+      if (matchesPattern(url, pattern.urlPattern)) {
+        // Generate resource config from pattern
+        return {
+          resourceId: pattern.resourceId,
+          resourceType: pattern.resourceType,
+          access: pattern.access,
+          params: extractParamsFromUrl(url, pattern.urlPattern),
+          components: pattern.components || []
+        };
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Failed to resolve URL locally:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if a URL matches a pattern
+ * @param {string} url - URL to check
+ * @param {string} pattern - URL pattern to match against
+ * @returns {boolean} True if URL matches pattern
+ */
+function matchesPattern(url, pattern) {
+  // Convert pattern to regex pattern
+  const regexPattern = pattern
+    .replace(/\//g, '\\/') // Escape slashes
+    .replace(/\{([^}]+)\}/g, '([^/]+)') // Convert {param} to capture groups
+    .replace(/\*/g, '.*'); // Convert * to wildcard
+  
+  const regex = new RegExp(`^${regexPattern}$`);
+  return regex.test(url);
 }
 
 /**
  * Extract parameters from a URL based on a pattern
- * @param {string} url - URL to extract parameters from
- * @param {string} pattern - Pattern string
- * @returns {Object|null} Parameters if matched, null otherwise
+ * @param {string} url - URL to extract from
+ * @param {string} pattern - URL pattern with parameters
+ * @returns {Object} Extracted parameters
  */
-async function extractUrlParams(url, pattern) {
-  const urlPattern = new UrlPattern({ pattern });
-  const match = urlPattern.match(url);
-  return match ? match.params : null;
-}
-
-/**
- * Log URL access for analytics
- * @param {string} url - Accessed URL
- * @param {Object} resource - Resolved resource
- * @param {number} responseTime - Response time in milliseconds
- */
-async function logUrlAccess(url, resource, responseTime) {
-  try {
-    await secureFetch('/api/v1/log', {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'url_access',
-        url,
-        patternId: resource.patternId,
-        resourceType: resource.resourceType,
-        clientId: getClientIdFromUrl(),
-        pageType: getPageType(),
-        responseTime,
-        timestamp: new Date().toISOString()
-      })
-    });
-  } catch (error) {
-    // Silently fail to avoid cascading errors
-    debug('Failed to log URL access:', error);
+function extractParamsFromUrl(url, pattern) {
+  const params = {};
+  
+  // Find parameter names in pattern
+  const paramNames = [];
+  const paramRegex = /\{([^}]+)\}/g;
+  let match;
+  
+  while ((match = paramRegex.exec(pattern)) !== null) {
+    paramNames.push(match[1]);
   }
-}
-
-/**
- * Debug logging
- * @param {string} message - Debug message
- * @param {any} data - Optional data to log
- */
-function debug(message, data) {
-  if (RESOLVER_CONFIG.DEBUG) {
-    if (data) {
-      console.debug(`[UrlResolver] ${message}`, data);
-    } else {
-      console.debug(`[UrlResolver] ${message}`);
+  
+  // Convert pattern to regex with capture groups
+  const regexPattern = pattern
+    .replace(/\//g, '\\/') // Escape slashes
+    .replace(/\{([^}]+)\}/g, '([^/]+)') // Convert {param} to capture groups
+    .replace(/\*/g, '.*'); // Convert * to wildcard
+    
+  const regex = new RegExp(`^${regexPattern}$`);
+  const matches = url.match(regex);
+  
+  // Extract values
+  if (matches && matches.length > 1) {
+    for (let i = 0; i < paramNames.length; i++) {
+      params[paramNames[i]] = matches[i + 1];
     }
   }
+  
+  // Also add client ID as a parameter
+  params.clientId = getClientIdFromUrl();
+  
+  return params;
 }
 
-// Export the public API
+/**
+ * Get component configuration for a URL
+ * @param {string} url - URL to get components for
+ * @returns {Promise<Array<Object>>} Array of component configurations
+ */
+async function getComponentsForUrl(url) {
+  const resource = await resolveUrl(url);
+  if (!resource || !resource.components) {
+    return [];
+  }
+  
+  return resource.components;
+}
+
+// Export public API
 export {
+  init,
   resolveUrl,
-  matchUrl,
-  extractUrlParams,
   hasClientAccess,
-  getAllUrlPatterns,
-  logUrlAccess
+  getComponentsForUrl
 }; 

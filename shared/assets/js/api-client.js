@@ -1,318 +1,318 @@
 /**
  * API Client for Recursive Learning Platform
- * Implements the Airtable resource map pattern for URL resolution and component management
+ * 
+ * Provides secure API communication with authentication handling
+ * and common utility functions for API interactions.
  */
 
+// Configuration
 const API_CONFIG = {
-  BASE_URL: 'https://{api-id}.execute-api.us-east-2.amazonaws.com/{environment}/api/v1/context',
-  API_KEY: 'your-api-key', // Replace with environment variable in production
-  ENVIRONMENT: 'dev', // 'dev' or 'prod'
-  AIRTABLE_API_ENDPOINT: '/api/v1/airtable',
-  LOG_ENDPOINT: '/api/v1/log',
+  BASE_URL: '',  // Will be set dynamically based on environment
+  TIMEOUT: 30000, // 30 seconds
+  RETRY_COUNT: 2,
+  RETRY_DELAY: 1000, // 1 second
+  CLIENT_TOKEN_MAP: {
+    "st": "schoolteacher",
+    "elpl": "epl_learning",
+    "bhb": "bright_horizons",
+    "integraled": "integrated_education"
+  }
 };
 
-// Client token map to convert from URL path client IDs to backend client identifiers
-const CLIENT_TOKEN_MAP = {
-  "st": "schoolteacher",
-  "elpl": "epl_learning",
-  "bhb": "bright_horizons",
-  "integraled": "integrated_education"
-};
-
-/**
- * Extract client ID from current URL path
- * @returns {string} The extracted client ID or empty string if not found
- */
-function getClientIdFromUrl() {
-  const url = window.location.pathname;
-  const matches = url.match(/\/(clients|admin\/pages)\/([^\/]+)/);
-  const clientPathId = matches ? matches[2] : '';
+// Initialize API configuration
+function init() {
+  // Determine environment and set base URL
+  const host = window.location.hostname;
   
-  // Map the path client ID to the backend client identifier
-  return CLIENT_TOKEN_MAP[clientPathId] || clientPathId;
+  if (host.includes('localhost') || host.includes('127.0.0.1')) {
+    API_CONFIG.BASE_URL = 'http://localhost:3000';
+  } else if (host.includes('dev.recursivelearning.app')) {
+    API_CONFIG.BASE_URL = 'https://dev-api.recursivelearning.app';
+  } else if (host.includes('staging.recursivelearning.app')) {
+    API_CONFIG.BASE_URL = 'https://staging-api.recursivelearning.app';
+  } else {
+    API_CONFIG.BASE_URL = 'https://api.recursivelearning.app';
+  }
+  
+  // Pre-fetch API key from meta tag if available
+  const apiKeyMeta = document.querySelector('meta[name="api-key"]');
+  if (apiKeyMeta) {
+    sessionStorage.setItem('apiKey', apiKeyMeta.content);
+  }
 }
 
 /**
- * Extract project ID from current URL path
- * @returns {string} The extracted project ID or empty string if not found
- */
-function getProjectIdFromUrl() {
-  const url = window.location.pathname;
-  const matches = url.match(/\/(clients|admin\/pages)\/[^\/]+\/([^\/]+)/);
-  return matches ? matches[2] : '';
-}
-
-/**
- * Determine the page type from URL or page attributes
- * @returns {string} 'live', 'review', 'temp', 'admin', or 'unknown'
- */
-function getPageType() {
-  const path = window.location.pathname;
-  if (path.includes('_live.html')) return 'live';
-  if (path.includes('_review.html')) return 'review';
-  if (path.includes('_temp.html')) return 'temp';
-  if (path.includes('_admin.html') || path.includes('/admin/')) return 'admin';
-  
-  // Also check for data attributes on body that might indicate page type
-  const bodyType = document.body.getAttribute('data-page-type');
-  if (bodyType) return bodyType;
-  
-  return 'unknown';
-}
-
-/**
- * Make a secure fetch request to the API with proper headers and error handling
- * @param {string} endpoint - API endpoint path
+ * Make a secure API request with authentication and error handling
+ * @param {string} url - API endpoint URL (can be relative to base URL)
  * @param {Object} options - Fetch options
- * @returns {Promise<Object>} - Parsed JSON response
+ * @returns {Promise<any>} Response data
  */
-async function secureFetch(endpoint, options = {}) {
-  // Format the base URL with environment and API ID
-  const apiId = sessionStorage.getItem('apiId') || '{api-id}';
-  const environment = API_CONFIG.ENVIRONMENT;
-  const baseUrl = API_CONFIG.BASE_URL
-    .replace('{api-id}', apiId)
-    .replace('{environment}', environment);
+async function secureFetch(url, options = {}) {
+  // Ensure API is initialized
+  if (!API_CONFIG.BASE_URL) {
+    init();
+  }
   
-  const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
-  const clientId = getClientIdFromUrl();
-  const projectId = getProjectIdFromUrl();
+  // Prepare full URL
+  const fullUrl = url.startsWith('http') 
+    ? url 
+    : `${API_CONFIG.BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
   
-  const defaultOptions = {
-    credentials: 'include',
-    mode: 'cors',
+  // Build request options with defaults
+  const requestOptions = {
+    method: options.method || 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': API_CONFIG.API_KEY,
-      'X-Session-Token': sessionStorage.getItem('sessionToken') || '',
-      'X-Client-ID': clientId,
-      'X-Project-ID': projectId,
-    }
+      ...options.headers
+    },
+    credentials: 'include',
+    mode: 'cors',
+    ...options
   };
   
+  // Add authentication headers
+  addAuthHeaders(requestOptions.headers);
+  
+  // Add request timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+  requestOptions.signal = controller.signal;
+  
   try {
-    console.debug(`API Request: ${endpoint}`, options);
-    const startTime = performance.now();
+    // Execute request
+    const response = await fetchWithRetry(fullUrl, requestOptions);
     
-    const response = await fetch(url, { 
-      ...defaultOptions, 
-      ...options,
-      headers: {
-        ...defaultOptions.headers,
-        ...options.headers
+    // Handle common response status codes
+    if (response.status === 401) {
+      // Unauthorized - refresh token and retry once
+      if (await refreshToken()) {
+        // Update auth headers and retry request once
+        addAuthHeaders(requestOptions.headers);
+        return fetchWithRetry(fullUrl, requestOptions);
+      } else {
+        throw new Error('Authentication failed');
       }
-    });
-    
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-    
-    // Log performance data
-    if (duration > 1000) {
-      console.warn(`Slow API call (${Math.round(duration)}ms): ${endpoint}`);
     }
     
-    // Log request to backend if needed
-    if (endpoint !== API_CONFIG.LOG_ENDPOINT) {
-      logApiRequest(endpoint, response.status, duration);
+    if (response.status === 403) {
+      throw new Error('Permission denied for this resource');
     }
     
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ 
-        error: { message: 'Unknown error', code: 'UNKNOWN' } 
-      }));
-      
-      handleApiError(response.status, errorData);
-      throw new Error(`API Error (${response.status}): ${errorData.error?.message || 'Unknown error'}`);
+    if (response.status === 404) {
+      throw new Error('Resource not found');
     }
     
-    // Parse and return the JSON response
-    return await response.json();
+    if (response.status >= 500) {
+      throw new Error('Server error occurred');
+    }
+    
+    // Parse JSON if expected
+    if (response.headers.get('Content-Type')?.includes('application/json')) {
+      return await response.json();
+    }
+    
+    return response;
   } catch (error) {
-    console.error('API request failed:', error);
-    // Report to CloudWatch
-    reportErrorToCloudWatch(error, endpoint);
+    // Handle specific error types
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout exceeded');
+    }
+    
+    // Re-throw original error
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Fetch with retry logic for transient errors
+ * @param {string} url - URL to fetch
+ * @param {Object} options - Fetch options
+ * @param {number} retryCount - Current retry count
+ * @returns {Promise<Response>} Fetch response
+ */
+async function fetchWithRetry(url, options, retryCount = 0) {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    // Only retry network errors, not HTTP errors
+    if (retryCount < API_CONFIG.RETRY_COUNT && (error.name === 'TypeError' || error.name === 'NetworkError')) {
+      // Wait before retry with exponential backoff
+      const delay = API_CONFIG.RETRY_DELAY * Math.pow(2, retryCount);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      // Retry request
+      return fetchWithRetry(url, options, retryCount + 1);
+    }
+    
+    // Max retries exceeded or non-retryable error
     throw error;
   }
 }
 
 /**
- * Handle API error responses based on status code
- * @param {number} status - HTTP status code
- * @param {Object} errorData - Error response data
+ * Add authentication headers to request
+ * @param {Object} headers - Headers object to modify
  */
-function handleApiError(status, errorData) {
-  switch (status) {
-    case 401:
-      // Redirect to login or refresh token
-      sessionStorage.removeItem('sessionToken');
-      console.warn('Authentication failed, redirecting to login');
-      setTimeout(() => {
-        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
-      }, 100);
-      break;
-    case 403:
-      // Permission denied
-      console.error('Permission denied:', errorData);
-      showUserFriendlyError('You don\'t have permission to access this resource.');
-      break;
-    case 404:
-      // Resource not found
-      console.error('Resource not found:', errorData);
-      showUserFriendlyError('The requested resource was not found.');
-      break;
-    case 429:
-      // Rate limiting
-      console.error('Rate limit exceeded. Please try again later.');
-      showUserFriendlyError('Too many requests. Please try again in a few minutes.');
-      break;
-    default:
-      // Generic error
-      console.error('API error:', errorData);
-      showUserFriendlyError('An error occurred while communicating with the server.');
+function addAuthHeaders(headers) {
+  // Add API key if available
+  const apiKey = sessionStorage.getItem('apiKey');
+  if (apiKey) {
+    headers['X-API-Key'] = apiKey;
+  }
+  
+  // Add session token if available
+  const sessionToken = sessionStorage.getItem('sessionToken');
+  if (sessionToken) {
+    headers['X-Session-Token'] = sessionToken;
+  }
+  
+  // Add client/project identifiers from URL
+  const clientId = getClientIdFromUrl();
+  if (clientId) {
+    headers['X-Client-ID'] = clientId;
+  }
+  
+  const projectId = getProjectIdFromUrl();
+  if (projectId) {
+    headers['X-Project-ID'] = projectId;
   }
 }
 
 /**
- * Show a user-friendly error message
- * @param {string} message - Error message to display
+ * Refresh authentication token
+ * @returns {Promise<boolean>} True if token refresh succeeded
  */
-function showUserFriendlyError(message) {
-  // Implementation depends on your UI framework
-  if (window.notify) {
-    window.notify.error(message);
-  } else {
-    alert(message);
-  }
-}
-
-/**
- * Log API request to CloudWatch
- * @param {string} endpoint - API endpoint
- * @param {number} statusCode - HTTP status code
- * @param {number} duration - Request duration in ms
- */
-async function logApiRequest(endpoint, statusCode, duration) {
+async function refreshToken() {
   try {
-    await fetch(`${API_CONFIG.LOG_ENDPOINT}`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': API_CONFIG.API_KEY,
-      },
-      body: JSON.stringify({
-        type: 'api_request',
-        endpoint,
-        statusCode,
-        duration,
-        pageType: getPageType(),
-        clientId: getClientIdFromUrl(),
-        projectId: getProjectIdFromUrl(),
-        url: window.location.href,
-        timestamp: new Date().toISOString()
-      })
-    });
-  } catch (error) {
-    // Silently fail to avoid cascading errors
-    console.debug('Failed to log API request:', error);
-  }
-}
-
-/**
- * Report errors to CloudWatch
- * @param {Error} error - The error object
- * @param {string} endpoint - API endpoint where error occurred
- */
-async function reportErrorToCloudWatch(error, endpoint) {
-  try {
-    await fetch(`${API_CONFIG.LOG_ENDPOINT}`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': API_CONFIG.API_KEY,
-      },
-      body: JSON.stringify({
-        type: 'error',
-        message: error.message,
-        stack: error.stack,
-        endpoint,
-        pageType: getPageType(),
-        clientId: getClientIdFromUrl(),
-        projectId: getProjectIdFromUrl(),
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-      })
-    });
-  } catch (e) {
-    // Silently fail to avoid cascading errors
-    console.debug('Failed to report error:', e);
-  }
-}
-
-/**
- * Get URL configuration from Airtable resource map
- * @param {string} path - URL path to look up
- * @returns {Promise<Object>} - URL configuration object
- */
-async function getUrlConfig(path = window.location.pathname) {
-  try {
-    const response = await secureFetch(`${API_CONFIG.AIRTABLE_API_ENDPOINT}/url-registry`, {
-      method: 'POST',
-      body: JSON.stringify({ path })
-    });
-    
-    // Cache the URL config
-    sessionStorage.setItem('urlConfig_' + path, JSON.stringify(response));
-    return response;
-  } catch (error) {
-    console.error('Failed to get URL configuration:', error);
-    
-    // Try to get from cache if available
-    const cachedConfig = sessionStorage.getItem('urlConfig_' + path);
-    if (cachedConfig) {
-      console.info('Using cached URL configuration');
-      return JSON.parse(cachedConfig);
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      return false;
     }
     
-    return null;
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ refreshToken })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      sessionStorage.setItem('sessionToken', data.sessionToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    return false;
   }
 }
 
 /**
- * Get component by ID from Airtable component registry
- * @param {string} componentId - Component identifier
- * @returns {Promise<Object>} - Component configuration
+ * Extract client ID from URL path
+ * @returns {string} Client ID or empty string if not found
  */
-async function getComponent(componentId) {
+function getClientIdFromUrl() {
+  const path = window.location.pathname;
+  
+  // Try to extract from path patterns
+  const patterns = [
+    /\/clients\/([^\/]+)/,      // /clients/clientid/...
+    /\/([^\/]+)\/projects\//,   // /clientid/projects/...
+    /\/c\/([^\/]+)\//           // /c/clientid/...
+  ];
+  
+  for (const pattern of patterns) {
+    const match = path.match(pattern);
+    if (match && match[1]) {
+      // Map client ID if needed
+      return API_CONFIG.CLIENT_TOKEN_MAP[match[1]] || match[1];
+    }
+  }
+  
+  // Try to get from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const clientParam = urlParams.get('client_id') || urlParams.get('client');
+  if (clientParam) {
+    return API_CONFIG.CLIENT_TOKEN_MAP[clientParam] || clientParam;
+  }
+  
+  // Fall back to session storage
+  return sessionStorage.getItem('clientId') || '';
+}
+
+/**
+ * Extract project ID from URL path
+ * @returns {string} Project ID or empty string if not found
+ */
+function getProjectIdFromUrl() {
+  const path = window.location.pathname;
+  
+  // Try to extract from path patterns
+  const patterns = [
+    /\/projects\/([^\/]+)/,     // /clients/clientid/projects/projectid/...
+    /\/p\/([^\/]+)\//           // /c/clientid/p/projectid/...
+  ];
+  
+  for (const pattern of patterns) {
+    const match = path.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  // Try to get from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectParam = urlParams.get('project_id') || urlParams.get('project');
+  if (projectParam) {
+    return projectParam;
+  }
+  
+  // Fall back to session storage
+  return sessionStorage.getItem('projectId') || '';
+}
+
+/**
+ * Get user role from session storage
+ * @returns {string} User role or 'anonymous' if not found
+ */
+function getUserRole() {
+  return sessionStorage.getItem('userRole') || 'anonymous';
+}
+
+/**
+ * Check if user has a specific permission
+ * @param {string} permission - Permission to check
+ * @returns {boolean} True if user has permission
+ */
+function hasPermission(permission) {
   try {
-    const response = await secureFetch(`${API_CONFIG.AIRTABLE_API_ENDPOINT}/components/${componentId}`);
+    const userPermissions = JSON.parse(sessionStorage.getItem('userPermissions') || '[]');
+    const userRole = getUserRole();
     
-    // Cache the component config
-    sessionStorage.setItem('component_' + componentId, JSON.stringify(response));
-    return response;
-  } catch (error) {
-    console.error(`Failed to get component ${componentId}:`, error);
-    
-    // Try to get from cache if available
-    const cachedComponent = sessionStorage.getItem('component_' + componentId);
-    if (cachedComponent) {
-      console.info(`Using cached component ${componentId}`);
-      return JSON.parse(cachedComponent);
+    // Admin has all permissions
+    if (userRole === 'admin') {
+      return true;
     }
     
-    return null;
+    return userPermissions.includes(permission);
+  } catch (error) {
+    console.error('Error checking permission:', error);
+    return false;
   }
 }
 
-// Export the public API
-export { 
-  secureFetch, 
-  getClientIdFromUrl, 
-  getProjectIdFromUrl, 
-  getPageType,
-  getUrlConfig,
-  getComponent,
-  CLIENT_TOKEN_MAP
+// Export public API
+export {
+  init,
+  secureFetch,
+  getClientIdFromUrl,
+  getProjectIdFromUrl,
+  getUserRole,
+  hasPermission
 }; 

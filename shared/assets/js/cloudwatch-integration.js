@@ -1,371 +1,334 @@
 /**
- * CloudWatch Integration for Recursive Learning Platform
+ * CloudWatch Integration Module for Recursive Learning Platform
  * 
- * Provides client-side metrics and logging to AWS CloudWatch
+ * Provides metrics, logging, and performance monitoring functionality
+ * for frontend components with CloudWatch backend integration.
  */
-
-import { secureFetch, getClientIdFromUrl, getPageType } from './api-client.js';
 
 // Configuration
-const CW_CONFIG = {
-  METRICS_ENDPOINT: '/api/v1/metrics',
-  LOG_ENDPOINT: '/api/v1/logs',
-  BATCH_SIZE: 10,
-  FLUSH_INTERVAL: 30000, // 30 seconds
-  DEFAULT_NAMESPACE: 'RecursiveLearning/Frontend',
-  MAX_RETRIES: 3,
-  RETRY_DELAY: 1000, // 1 second
-  DEBUG: false
+const CLOUDWATCH_CONFIG = {
+  API_ENDPOINT: '/api/v1/monitoring',
+  ENABLED: true,
+  LOG_LEVEL: 'info',  // debug, info, warn, error
+  SAMPLE_RATE: 0.1,   // Only send 10% of metrics to reduce costs
+  BATCH_INTERVAL: 30000, // Send metrics in batches every 30 seconds
+  LOCAL_STORAGE_KEY: 'rl_cloudwatch_metrics_buffer'
 };
 
-// Queues for metrics and logs
-const metricsQueue = [];
-const logsQueue = [];
+// Metric buffer for batching
+let metricsBuffer = [];
+let logsBuffer = [];
+let isInitialized = false;
+let batchIntervalId = null;
 
-// Timer for flushing queues
-let flushTimer = null;
+// Load buffer from localStorage if available
+try {
+  const savedBuffer = localStorage.getItem(CLOUDWATCH_CONFIG.LOCAL_STORAGE_KEY);
+  if (savedBuffer) {
+    metricsBuffer = JSON.parse(savedBuffer);
+  }
+} catch (e) {
+  console.error('Failed to load metrics buffer from localStorage:', e);
+}
 
-// Initialize the module
+/**
+ * Initialize the CloudWatch integration
+ */
 function init() {
-  // Start the flush timer
-  flushTimer = setInterval(flushAll, CW_CONFIG.FLUSH_INTERVAL);
+  if (isInitialized) return;
   
-  // Add window unload handler to flush remaining metrics
+  // Set up batch sending interval
+  batchIntervalId = setInterval(sendBufferedMetrics, CLOUDWATCH_CONFIG.BATCH_INTERVAL);
+  
+  // Send metrics on page unload
   window.addEventListener('beforeunload', () => {
-    clearInterval(flushTimer);
-    flushAll(true);
+    if (metricsBuffer.length > 0) {
+      // Save to localStorage in case send fails during unload
+      try {
+        localStorage.setItem(
+          CLOUDWATCH_CONFIG.LOCAL_STORAGE_KEY, 
+          JSON.stringify(metricsBuffer)
+        );
+      } catch (e) {
+        console.error('Failed to save metrics buffer to localStorage:', e);
+      }
+      
+      // Try to send synchronously before page unload
+      sendBufferedMetrics(true);
+    }
   });
   
-  // Add error handlers
-  window.addEventListener('error', captureError);
-  window.addEventListener('unhandledrejection', capturePromiseError);
+  isInitialized = true;
   
-  debug('CloudWatch integration initialized');
-}
-
-/**
- * Log a message to CloudWatch Logs
- * @param {string} message - Log message
- * @param {Object} additionalData - Additional data to include in the log
- * @param {string} logLevel - Log level (error, warn, info, debug)
- */
-function log(message, additionalData = {}, logLevel = 'info') {
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    message,
-    level: logLevel,
-    client_id: getClientIdFromUrl(),
-    page_type: getPageType(),
+  // Initial log
+  log('CloudWatch integration initialized', { 
+    userAgent: navigator.userAgent,
     url: window.location.href,
-    user_agent: navigator.userAgent,
-    ...additionalData
-  };
-  
-  logsQueue.push(logEntry);
-  
-  // Auto-flush if queue is full
-  if (logsQueue.length >= CW_CONFIG.BATCH_SIZE) {
-    flushLogs();
-  }
-  
-  // Also output to console for debugging
-  if (CW_CONFIG.DEBUG) {
-    console[logLevel](`[CloudWatch] ${message}`, additionalData);
-  }
+    referrer: document.referrer
+  }, 'info');
 }
 
 /**
- * Log an error to CloudWatch Logs
- * @param {Error|string} error - Error object or message
- * @param {Object} additionalData - Additional data to include in the log
- */
-function logError(error, additionalData = {}) {
-  const errorDetails = error instanceof Error ? {
-    name: error.name,
-    message: error.message,
-    stack: error.stack
-  } : { message: String(error) };
-  
-  log(
-    errorDetails.message || 'An error occurred',
-    { ...errorDetails, ...additionalData },
-    'error'
-  );
-}
-
-/**
- * Capture browser errors
- * @param {ErrorEvent} event - Error event
- */
-function captureError(event) {
-  logError(event.error || new Error(event.message), {
-    source: event.filename,
-    lineno: event.lineno,
-    colno: event.colno,
-    auto_captured: true
-  });
-}
-
-/**
- * Capture unhandled promise rejections
- * @param {PromiseRejectionEvent} event - Promise rejection event
- */
-function capturePromiseError(event) {
-  logError(event.reason || new Error('Unhandled promise rejection'), {
-    auto_captured: true,
-    is_promise_rejection: true
-  });
-}
-
-/**
- * Record a metric to CloudWatch Metrics
+ * Record a custom metric
  * @param {string} name - Metric name
  * @param {number} value - Metric value
  * @param {string} unit - Metric unit (Count, Milliseconds, Bytes, etc.)
- * @param {Object} dimensions - Metric dimensions
- * @param {string} namespace - Custom namespace to use (optional)
+ * @param {Object} dimensions - Additional dimensions for the metric
  */
-function recordMetric(name, value, unit = 'Count', dimensions = {}, namespace = CW_CONFIG.DEFAULT_NAMESPACE) {
-  // Add default dimensions
-  const allDimensions = {
-    ClientId: getClientIdFromUrl(),
-    PageType: getPageType(),
-    ...dimensions
-  };
+function recordMetric(name, value, unit = 'Count', dimensions = {}) {
+  if (!CLOUDWATCH_CONFIG.ENABLED) return;
   
-  const metric = {
-    MetricName: name,
-    Value: value,
-    Unit: unit,
-    Dimensions: Object.entries(allDimensions).map(([key, value]) => ({
-      Name: key,
-      Value: String(value)
-    })),
-    Timestamp: new Date().toISOString(),
-    Namespace: namespace
-  };
+  // Apply sampling rate
+  if (Math.random() > CLOUDWATCH_CONFIG.SAMPLE_RATE) return;
   
-  metricsQueue.push(metric);
+  // Initialize if not already done
+  if (!isInitialized) init();
   
-  // Auto-flush if queue is full
-  if (metricsQueue.length >= CW_CONFIG.BATCH_SIZE) {
-    flushMetrics();
+  // Add metric to buffer
+  metricsBuffer.push({
+    name,
+    value,
+    unit,
+    dimensions,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Send immediately if buffer gets too large
+  if (metricsBuffer.length > 100) {
+    sendBufferedMetrics();
   }
-  
-  debug(`Recorded metric: ${name} = ${value} ${unit}`, dimensions);
 }
 
 /**
- * Record a timing metric (in milliseconds)
- * @param {string} name - Metric name
- * @param {Function} fn - Function to time
- * @param {Object} dimensions - Additional dimensions
- * @returns {Promise<any>} Result of the function
+ * Record timing for an operation
+ * @param {string} name - Operation name
+ * @param {Function} fn - Function to time (can be async)
+ * @param {Object} dimensions - Additional dimensions for the metric
+ * @returns {any} The result of the function call
  */
 async function recordTiming(name, fn, dimensions = {}) {
+  if (!CLOUDWATCH_CONFIG.ENABLED) return fn();
+  
   const start = performance.now();
   try {
-    return await fn();
-  } finally {
+    const result = await fn();
     const duration = performance.now() - start;
-    recordMetric(name, duration, 'Milliseconds', dimensions);
-  }
-}
-
-/**
- * Setup performance monitoring for a page load
- */
-function setupPageLoadMetrics() {
-  // Wait for the page to fully load
-  window.addEventListener('load', () => {
-    // Get performance timing metrics
-    const performance = window.performance;
     
-    if (performance && performance.timing) {
-      const timing = performance.timing;
-      
-      // Record various page load timings
-      recordMetric('PageLoadTime', 
-        timing.loadEventEnd - timing.navigationStart, 
-        'Milliseconds'
-      );
-      
-      recordMetric('DomLoadTime', 
-        timing.domComplete - timing.domLoading, 
-        'Milliseconds'
-      );
-      
-      recordMetric('NetworkLatency', 
-        timing.responseEnd - timing.fetchStart, 
-        'Milliseconds'
-      );
-      
-      recordMetric('DomainLookupTime', 
-        timing.domainLookupEnd - timing.domainLookupStart, 
-        'Milliseconds'
-      );
-      
-      recordMetric('ServerResponseTime', 
-        timing.responseEnd - timing.requestStart, 
-        'Milliseconds'
-      );
-    }
+    recordMetric(`${name}Duration`, duration, 'Milliseconds', dimensions);
+    recordMetric(`${name}Success`, 1, 'Count', dimensions);
     
-    // Report resource timings
-    if (performance && performance.getEntriesByType) {
-      const resources = performance.getEntriesByType('resource');
-      
-      // Count resources by type
-      const resourceTypes = {};
-      resources.forEach(resource => {
-        const type = resource.initiatorType || 'other';
-        resourceTypes[type] = (resourceTypes[type] || 0) + 1;
-      });
-      
-      // Record counts
-      Object.entries(resourceTypes).forEach(([type, count]) => {
-        recordMetric(`ResourceCount`, count, 'Count', { ResourceType: type });
-      });
-      
-      // Record total resources
-      recordMetric('TotalResources', resources.length, 'Count');
-    }
-  });
-}
-
-/**
- * Flush metrics queue to CloudWatch
- * @param {boolean} sync - Whether to flush synchronously (default: false)
- * @returns {Promise<boolean>} Success status
- */
-async function flushMetrics(sync = false) {
-  if (metricsQueue.length === 0) {
-    return true;
-  }
-  
-  // Get metrics to send
-  const metrics = [...metricsQueue];
-  metricsQueue.length = 0;
-  
-  try {
-    const options = {
-      method: 'POST',
-      body: JSON.stringify({ metrics }),
-    };
-    
-    if (sync) {
-      options.keepalive = true;
-    }
-    
-    // Send metrics
-    await sendWithRetry(CW_CONFIG.METRICS_ENDPOINT, options);
-    debug(`Flushed ${metrics.length} metrics`);
-    return true;
+    return result;
   } catch (error) {
-    console.error('Error sending metrics to CloudWatch:', error);
+    const duration = performance.now() - start;
     
-    // Put metrics back in queue on failure
-    metricsQueue.unshift(...metrics);
-    return false;
-  }
-}
-
-/**
- * Flush logs queue to CloudWatch Logs
- * @param {boolean} sync - Whether to flush synchronously (default: false)
- * @returns {Promise<boolean>} Success status
- */
-async function flushLogs(sync = false) {
-  if (logsQueue.length === 0) {
-    return true;
-  }
-  
-  // Get logs to send
-  const logs = [...logsQueue];
-  logsQueue.length = 0;
-  
-  try {
-    const options = {
-      method: 'POST',
-      body: JSON.stringify({ logs }),
-    };
+    recordMetric(`${name}Duration`, duration, 'Milliseconds', dimensions);
+    recordMetric(`${name}Error`, 1, 'Count', {
+      ...dimensions,
+      errorType: error.name,
+      errorMessage: truncate(error.message, 100)
+    });
     
-    if (sync) {
-      options.keepalive = true;
-    }
-    
-    // Send logs
-    await sendWithRetry(CW_CONFIG.LOG_ENDPOINT, options);
-    debug(`Flushed ${logs.length} logs`);
-    return true;
-  } catch (error) {
-    console.error('Error sending logs to CloudWatch:', error);
-    
-    // Put logs back in queue on failure
-    logsQueue.unshift(...logs);
-    return false;
-  }
-}
-
-/**
- * Flush all queues
- * @param {boolean} sync - Whether to flush synchronously (default: false)
- * @returns {Promise<boolean>} Success status
- */
-async function flushAll(sync = false) {
-  const metricsSuccess = await flushMetrics(sync);
-  const logsSuccess = await flushLogs(sync);
-  return metricsSuccess && logsSuccess;
-}
-
-/**
- * Send data to an endpoint with retry logic
- * @param {string} endpoint - API endpoint
- * @param {Object} options - Fetch options
- * @returns {Promise<any>} API response
- */
-async function sendWithRetry(endpoint, options, retries = 0) {
-  try {
-    return await secureFetch(endpoint, options);
-  } catch (error) {
-    if (retries < CW_CONFIG.MAX_RETRIES) {
-      // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, CW_CONFIG.RETRY_DELAY));
-      
-      // Increase delay for next retry (exponential backoff)
-      CW_CONFIG.RETRY_DELAY *= 2;
-      
-      // Retry
-      return sendWithRetry(endpoint, options, retries + 1);
-    }
-    
-    // Max retries exceeded
     throw error;
   }
 }
 
 /**
- * Debug logging
- * @param {string} message - Debug message
- * @param {any} data - Optional data to log
+ * Log an event to CloudWatch Logs
+ * @param {string} message - Log message
+ * @param {Object} data - Additional data to log
+ * @param {string} level - Log level (debug, info, warn, error)
  */
-function debug(message, data) {
-  if (CW_CONFIG.DEBUG) {
-    if (data) {
-      console.debug(`[CloudWatch] ${message}`, data);
-    } else {
-      console.debug(`[CloudWatch] ${message}`);
-    }
+function log(message, data = {}, level = 'info') {
+  // Skip logs below configured level
+  const levels = ['debug', 'info', 'warn', 'error'];
+  const configLevelIndex = levels.indexOf(CLOUDWATCH_CONFIG.LOG_LEVEL);
+  const currentLevelIndex = levels.indexOf(level);
+  
+  if (currentLevelIndex < configLevelIndex) return;
+  
+  // Always log to console
+  const consoleMethod = level === 'error' ? 'error' : 
+                        level === 'warn' ? 'warn' : 
+                        level === 'debug' ? 'debug' : 'log';
+  
+  console[consoleMethod](`[CloudWatch ${level}] ${message}`, data);
+  
+  if (!CLOUDWATCH_CONFIG.ENABLED) return;
+  
+  // Initialize if not already done
+  if (!isInitialized) init();
+  
+  // Apply sampling except for errors
+  if (level !== 'error' && Math.random() > CLOUDWATCH_CONFIG.SAMPLE_RATE) return;
+  
+  // Add log to buffer
+  logsBuffer.push({
+    message,
+    data,
+    level,
+    timestamp: new Date().toISOString(),
+    url: window.location.pathname,
+    sessionId: getSessionId()
+  });
+  
+  // Send logs immediately for errors or if buffer gets too large
+  if (level === 'error' || logsBuffer.length > 20) {
+    sendBufferedLogs();
   }
+}
+
+/**
+ * Send buffered metrics to the CloudWatch API
+ * @param {boolean} sync - Whether to send synchronously (for page unload)
+ */
+function sendBufferedMetrics(sync = false) {
+  if (!CLOUDWATCH_CONFIG.ENABLED || metricsBuffer.length === 0) return;
+  
+  const metrics = [...metricsBuffer];
+  metricsBuffer = [];
+  
+  try {
+    // Clear localStorage
+    localStorage.removeItem(CLOUDWATCH_CONFIG.LOCAL_STORAGE_KEY);
+    
+    // Add client info to each metric
+    const enhancedMetrics = metrics.map(metric => ({
+      ...metric,
+      clientId: getClientId(),
+      projectId: getProjectId(),
+      url: window.location.pathname,
+      userAgent: navigator.userAgent
+    }));
+    
+    // Send to API
+    fetch(`${CLOUDWATCH_CONFIG.API_ENDPOINT}/metrics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        metrics: enhancedMetrics
+      }),
+      // Use keepalive for unload events
+      keepalive: sync
+    }).catch(error => {
+      console.error('Failed to send metrics to CloudWatch:', error);
+      // Re-add to buffer on failure
+      metricsBuffer.push(...metrics);
+    });
+  } catch (error) {
+    console.error('Error preparing metrics for CloudWatch:', error);
+    // Re-add to buffer on failure
+    metricsBuffer.push(...metrics);
+  }
+}
+
+/**
+ * Send buffered logs to the CloudWatch API
+ * @param {boolean} sync - Whether to send synchronously (for page unload)
+ */
+function sendBufferedLogs() {
+  if (!CLOUDWATCH_CONFIG.ENABLED || logsBuffer.length === 0) return;
+  
+  const logs = [...logsBuffer];
+  logsBuffer = [];
+  
+  try {
+    // Add client info to each log
+    const enhancedLogs = logs.map(log => ({
+      ...log,
+      clientId: getClientId(),
+      projectId: getProjectId()
+    }));
+    
+    // Send to API
+    fetch(`${CLOUDWATCH_CONFIG.API_ENDPOINT}/logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        logs: enhancedLogs
+      }),
+      // Use keepalive for error logs to ensure delivery
+      keepalive: true
+    }).catch(error => {
+      console.error('Failed to send logs to CloudWatch:', error);
+      // Re-add to buffer on failure
+      logsBuffer.push(...logs);
+    });
+  } catch (error) {
+    console.error('Error preparing logs for CloudWatch:', error);
+    // Re-add to buffer on failure
+    logsBuffer.push(...logs);
+  }
+}
+
+/**
+ * Get the client ID from the URL or session storage
+ * @returns {string} Client ID
+ */
+function getClientId() {
+  // Try to get from URL first
+  const path = window.location.pathname;
+  const urlMatch = path.match(/\/clients\/([^\/]+)/);
+  
+  if (urlMatch && urlMatch[1]) {
+    return urlMatch[1];
+  }
+  
+  // Fall back to session storage
+  return sessionStorage.getItem('clientId') || 'unknown';
+}
+
+/**
+ * Get the project ID from the URL or session storage
+ * @returns {string} Project ID
+ */
+function getProjectId() {
+  // Try to get from URL first
+  const path = window.location.pathname;
+  const urlMatch = path.match(/\/projects\/([^\/]+)/);
+  
+  if (urlMatch && urlMatch[1]) {
+    return urlMatch[1];
+  }
+  
+  // Fall back to session storage
+  return sessionStorage.getItem('projectId') || 'unknown';
+}
+
+/**
+ * Get a unique session ID for this browsing session
+ * @returns {string} Session ID
+ */
+function getSessionId() {
+  let sessionId = sessionStorage.getItem('rl_session_id');
+  
+  if (!sessionId) {
+    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    sessionStorage.setItem('rl_session_id', sessionId);
+  }
+  
+  return sessionId;
+}
+
+/**
+ * Truncate a string to a maximum length
+ * @param {string} str - String to truncate
+ * @param {number} maxLength - Maximum length
+ * @returns {string} Truncated string
+ */
+function truncate(str, maxLength) {
+  if (!str) return '';
+  if (str.length <= maxLength) return str;
+  return str.substring(0, maxLength) + '...';
 }
 
 // Export public API
 export {
   init,
-  log,
-  logError,
   recordMetric,
   recordTiming,
-  setupPageLoadMetrics,
-  flushAll
+  log
 }; 
