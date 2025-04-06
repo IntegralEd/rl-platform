@@ -1,0 +1,153 @@
+# Backend Integration Checklist
+
+This checklist provides a structured approach for integrating backend services with the Recursive Learning platform. It covers required implementation steps, validation tests, and integration points.
+
+## URL and Authentication Implementation
+
+### URL Pattern Validation
+- [ ] Implement regex validation for URL patterns:
+  - [ ] `/clients/{client}/{project}/{project}_live.html`
+  - [ ] `/clients/{client}/{project}/{project}_review.html`
+  - [ ] `/clients/{client}/{project}/{project}_temp.html`
+  - [ ] `/admin/pages/{client}/{project}/{project}_admin.html`
+- [ ] Validate URL components extraction functionality
+- [ ] Implement directory traversal protection
+- [ ] Add logging for URL access patterns to CloudWatch
+
+### Authentication Flow
+- [ ] Implement JWT validation with proper signature verification
+- [ ] Set up authentication header extraction
+- [ ] Create handshake protocol endpoints
+- [ ] Implement session token storage and retrieval
+- [ ] Establish token refresh mechanism
+
+### Role-Based Access Control
+- [ ] Implement user validation schema with all required roles
+- [ ] Create role permission mapping functions
+- [ ] Add inactive role blocking functionality
+- [ ] Implement project access validation based on user's `projects_active_at_id`
+- [ ] Create client token to internal project ID mapping
+
+## API Gateway Configuration
+
+### Endpoint Setup
+- [ ] Create API routes matching URL patterns:
+  - [ ] `/api/v1/{client}/{project}/content` (live content)
+  - [ ] `/api/v1/{client}/{project}/review/{token}` (review content)
+  - [ ] `/api/v1/{client}/{project}/preview` (temp preview)
+  - [ ] `/api/v1/admin/{client}/{project}` (admin functions)
+- [ ] Configure CORS headers for cross-domain compatibility
+- [ ] Add request validation with JSON schemas
+- [ ] Implement rate limiting per client/project
+
+### Security Settings
+- [ ] Set up WAF (Web Application Firewall) rules
+- [ ] Implement IP allow/deny lists as needed
+- [ ] Configure TLS certificate and HTTPS enforcement
+- [ ] Add request size limitations
+- [ ] Set up API keys for admin endpoints
+
+## Lambda Functions Implementation
+
+### Core Functions
+- [ ] Create content delivery Lambda with caching strategy
+- [ ] Implement review session management Lambda
+- [ ] Build admin control panel data provider Lambda
+- [ ] Set up WebSocket connection handler
+- [ ] Create metrics collection and reporting Lambda
+
+### Integration Points
+- [ ] Implement URL component extraction
+- [ ] Add asset path resolution functionality
+- [ ] Create component resolution utility
+- [ ] Set up user options interpretation
+- [ ] Add configuration management
+
+## Testing and Validation
+
+### Authentication Tests
+- [ ] Verify token validation with valid credentials
+- [ ] Test token validation with expired credentials
+- [ ] Verify role-based access restrictions
+- [ ] Test project access validation
+- [ ] Verify client token mapping
+
+### URL Pattern Tests
+- [ ] Test URL validation with valid patterns
+- [ ] Verify URL validation rejects invalid patterns
+- [ ] Test component extraction from URLs
+- [ ] Verify admin URL pattern restrictions
+- [ ] Test URL logging functionality
+
+### Integration Tests
+- [ ] Test API Gateway endpoints with valid requests
+- [ ] Verify CORS headers in responses
+- [ ] Test rate limiting functionality
+- [ ] Verify WebSocket connections
+- [ ] Test end-to-end request flow
+
+## Monitoring and Reporting
+
+### CloudWatch Integration
+- [ ] Set up metrics collection:
+  - [ ] API request counts
+  - [ ] Latency measurements
+  - [ ] Error rates
+  - [ ] User session data
+- [ ] Create alarms for critical thresholds
+- [ ] Implement detailed error logging
+- [ ] Set up dashboards for key metrics
+
+### Admin Panel Metrics
+- [ ] Create metrics API endpoints
+- [ ] Implement real-time dashboard updates
+- [ ] Add metric export capabilities
+- [ ] Set up alarm notification system
+
+## Documentation
+
+### API Documentation
+- [ ] Create OpenAPI specification
+- [ ] Document authentication flow
+- [ ] Detail URL pattern requirements
+- [ ] Document role-based permissions
+- [ ] Create example request/response pairs
+
+### Integration Guide
+- [ ] Document backend integration points
+- [ ] Create troubleshooting guide
+- [ ] Add configuration reference
+- [ ] Document monitoring setup
+- [ ] Create deployment guide
+
+## Deployment
+
+### Infrastructure Setup
+- [ ] Configure serverless deployment
+- [ ] Set up proper IAM roles
+- [ ] Configure environment variables
+- [ ] Implement deployment pipeline
+- [ ] Set up staging and production environments
+
+### Post-Deployment
+- [ ] Verify all endpoints are accessible
+- [ ] Test cross-domain functionality
+- [ ] Validate metrics collection
+- [ ] Run security scans
+- [ ] Perform load testing
+
+## Softr Integration
+
+### Cross-Domain Authentication
+- [ ] Implement header span data extraction
+- [ ] Create URL parameter passing mechanism
+- [ ] Set up postMessage communication
+- [ ] Test authentication with embedded iframes
+- [ ] Verify role validation across domains
+
+### Admin Panel Integration
+- [ ] Test admin panel loading in Softr iframe
+- [ ] Verify access control based on Softr roles
+- [ ] Implement error handling for cross-domain issues
+- [ ] Set up logging for authentication failures
+- [ ] Create fallback mechanisms for authentication 
