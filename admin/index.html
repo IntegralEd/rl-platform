@@ -50,6 +50,11 @@
             font-size: 1.5rem;
             font-weight: 500;
         }
+        
+        .header-logo {
+            height: 40px;
+            margin-right: 15px;
+        }
 
         /* DOS Tree Styles */
         .dos-tree {
@@ -539,6 +544,16 @@
     </style>
 </head>
 <body>
+    <header class="admin-header">
+        <div class="header-left">
+            <img src="/shared/assets/images/recursive-learning-logo.svg" alt="Recursive Learning" class="header-logo">
+            <span class="header-title">Recursive Learning Admin</span>
+        </div>
+        <div class="header-right">
+            <span class="current-user" id="current-user">Admin User</span>
+        </div>
+    </header>
+    
     <!-- Loading overlay -->
     <div id="loading">
         <div class="loading-spinner"></div>
@@ -554,10 +569,6 @@
     
     <!-- Admin content (initially hidden) -->
     <div id="admin-content" style="display:none">
-        <header class="admin-header">
-            <h1 class="header-title">Recursive Learning Admin</h1>
-        </header>
-
         <div class="admin-container">
             <!-- Bottom Icons -->
             <div class="bottom-icons">
@@ -890,6 +901,10 @@
             </div>
         </div>
     </div>
+
+    <footer class="admin-footer">
+        <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
+    </footer>
 
     <!-- Admin Scripts -->
     <script src="assets/js/admin-common.js"></script>
