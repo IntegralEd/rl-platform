@@ -61,7 +61,7 @@ function publishToAirtable(filePath) {
 
     const options = {
         hostname: 'recursivelearning.app',
-        path: '/api/v1/airtable/records',
+        path: '/api/v1/airtable/web-button/records',
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -69,9 +69,7 @@ function publishToAirtable(filePath) {
             'X-Team': 'frontend',
             'X-Airtable-Access': 'standup-reports',
             'X-Resource-Type': 'standup',
-            'X-API-Key': process.env.AIRTABLE_API_KEY,
-            'X-Session-Token': process.env.SESSION_TOKEN,
-            'X-Client-ID': process.env.CLIENT_ID
+            'X-Web-Button': 'true'
         }
     };
 
@@ -113,4 +111,5 @@ publishToAirtable(filePath)
     })
     .catch(error => {
         console.error('Error publishing to Airtable:', error);
-        process.exit(1); 
+        process.exit(1);
+    }); 
