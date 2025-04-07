@@ -16,7 +16,16 @@ const API_CONFIG = {
     "elpl": "epl_learning",
     "bhb": "bright_horizons",
     "integraled": "integrated_education"
-  }
+  },
+  // Development mode - set to true to bypass authentication checks
+  DEV_MODE: true,
+  // Trusted domains that don't require auth in dev mode
+  TRUSTED_DOMAINS: [
+    'softr.app',
+    'recursivelearning.app',
+    'localhost',
+    '127.0.0.1'
+  ]
 };
 
 // Initialize API configuration
@@ -70,8 +79,15 @@ async function secureFetch(url, options = {}) {
     ...options
   };
   
-  // Add authentication headers
-  addAuthHeaders(requestOptions.headers);
+  // Add authentication headers - bypassed in dev mode for trusted domains
+  const skipAuth = API_CONFIG.DEV_MODE && isTrustedDomain();
+  if (!skipAuth) {
+    addAuthHeaders(requestOptions.headers);
+  } else {
+    // Add dev bypass headers
+    requestOptions.headers['X-Dev-Mode'] = 'true';
+    requestOptions.headers['X-Auth-Bypass'] = 'development-only';
+  }
   
   // Add request timeout
   const controller = new AbortController();
@@ -82,20 +98,23 @@ async function secureFetch(url, options = {}) {
     // Execute request
     const response = await fetchWithRetry(fullUrl, requestOptions);
     
-    // Handle common response status codes
-    if (response.status === 401) {
-      // Unauthorized - refresh token and retry once
-      if (await refreshToken()) {
-        // Update auth headers and retry request once
-        addAuthHeaders(requestOptions.headers);
-        return fetchWithRetry(fullUrl, requestOptions);
-      } else {
-        throw new Error('Authentication failed');
+    // Skip auth checks in dev mode with trusted domains
+    if (!skipAuth) {
+      // Handle common response status codes
+      if (response.status === 401) {
+        // Unauthorized - refresh token and retry once
+        if (await refreshToken()) {
+          // Update auth headers and retry request once
+          addAuthHeaders(requestOptions.headers);
+          return fetchWithRetry(fullUrl, requestOptions);
+        } else {
+          throw new Error('Authentication failed');
+        }
       }
-    }
-    
-    if (response.status === 403) {
-      throw new Error('Permission denied for this resource');
+      
+      if (response.status === 403) {
+        throw new Error('Permission denied for this resource');
+      }
     }
     
     if (response.status === 404) {
@@ -122,6 +141,19 @@ async function secureFetch(url, options = {}) {
     throw error;
   } finally {
     clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Check if current domain is in trusted list for dev mode
+ * @returns {boolean} True if domain is trusted
+ */
+function isTrustedDomain() {
+  try {
+    const hostname = window.location.hostname;
+    return API_CONFIG.TRUSTED_DOMAINS.some(domain => hostname.includes(domain));
+  } catch (e) {
+    return false;
   }
 }
 
@@ -255,8 +287,8 @@ function getProjectIdFromUrl() {
   
   // Try to extract from path patterns
   const patterns = [
-    /\/projects\/([^\/]+)/,     // /clients/clientid/projects/projectid/...
-    /\/p\/([^\/]+)\//           // /c/clientid/p/projectid/...
+    /\/projects\/([^\/]+)/,     // /projects/projectid/...
+    /\/p\/([^\/]+)\//          // /p/projectid/...
   ];
   
   for (const pattern of patterns) {
@@ -314,5 +346,6 @@ export {
   getClientIdFromUrl,
   getProjectIdFromUrl,
   getUserRole,
-  hasPermission
+  hasPermission,
+  API_CONFIG
 }; 
