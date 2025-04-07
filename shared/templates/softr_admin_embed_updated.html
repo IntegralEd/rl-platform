@@ -307,18 +307,31 @@ window.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            const userData = window.logged_in_user;
-            log('User role:', userData.IE_Role_Level);
+            // Use Softr's specific syntax for user properties
+            const userRole = window.logged_in_user!IE_Role_Level || '';
+            const userName = window.logged_in_user!Name || window.logged_in_user!email || 'Guest';
+            const userId = window.logged_in_user!User_ID || '';
+            const userEmail = window.logged_in_user!email || '';
+            
+            log('User role:', userRole);
 
-            if (!validateUserAccess(userData)) {
-                log('Invalid role level:', userData.IE_Role_Level);
+            if (userRole !== 'Org Admin') {
+                log('Invalid role level:', userRole);
                 showAccessDenied();
                 return;
             }
 
             // Update display and show admin interface
-            document.getElementById('user-name').textContent = userData.Name || 'there';
+            document.getElementById('user-name').textContent = userName;
             updateLoadingStatus('Access granted, loading dashboard...');
+            
+            const userData = {
+                User_ID: userId,
+                Name: userName,
+                email: userEmail,
+                IE_Role_Level: userRole
+            };
+            
             showAdmin(userData);
         }
 
@@ -381,6 +394,8 @@ window.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+
+        console.log('Softr user data:', window.logged_in_user);
     })();
 </script>
 <!-- ****************************************************
