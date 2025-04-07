@@ -516,6 +516,36 @@
             color: #425563;
         }
         
+        /* Session info table */
+        .session-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .session-info-table th {
+            text-align: left;
+            padding: 12px;
+            background: #425563;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .session-info-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+        
+        .session-info-table tr:last-child td {
+            border-bottom: none;
+        }
+        
         .tickets-table {
             width: 100%;
             border-collapse: collapse;
@@ -707,6 +737,55 @@
             color: #555;
             margin-bottom: 0;
         }
+        
+        /* Session information display */
+        .session-info-display {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 140px;
+            width: auto;
+            min-width: 320px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px 20px;
+            z-index: 898;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-family: system-ui, -apple-system, sans-serif;
+            display: none;
+        }
+        
+        .session-info-display.visible {
+            display: block;
+        }
+        
+        .session-info-display h4 {
+            margin: 0 0 10px 0;
+            color: #425563;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .session-info-display-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 20px;
+            font-size: 13px;
+        }
+        
+        .session-info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .session-info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .session-info-value {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -816,6 +895,31 @@
                 </div>
             </div>
             
+            <h3>Session Information</h3>
+            <table class="session-info-table">
+                <thead>
+                    <tr>
+                        <th>Review Session ID</th>
+                        <th>User ID</th>
+                        <th>Scope</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Tickets Entered</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionInfoTableBody">
+                    <!-- Session info will be added here -->
+                    <tr>
+                        <td id="sessionInfoId">-</td>
+                        <td id="sessionInfoUserId">-</td>
+                        <td id="sessionInfoScope">Goalsetter</td>
+                        <td id="sessionInfoStart">-</td>
+                        <td id="sessionInfoEnd">-</td>
+                        <td id="sessionInfoTickets">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            
             <h3>QC Tickets</h3>
             <table class="tickets-table">
                 <thead>
@@ -918,6 +1022,37 @@
         </svg>
     </button>
     
+    <!-- Session information display -->
+    <div class="session-info-display" id="sessionInfoDisplay">
+        <h4>Session Information</h4>
+        <div class="session-info-display-grid" id="sessionInfoDisplayGrid">
+            <div class="session-info-item">
+                <span class="session-info-label">Session ID:</span>
+                <span class="session-info-value" id="infoDisplaySessionId">-</span>
+            </div>
+            <div class="session-info-item">
+                <span class="session-info-label">User ID:</span>
+                <span class="session-info-value" id="infoDisplayUserId">-</span>
+            </div>
+            <div class="session-info-item">
+                <span class="session-info-label">Scope:</span>
+                <span class="session-info-value" id="infoDisplayScope">Goalsetter</span>
+            </div>
+            <div class="session-info-item">
+                <span class="session-info-label">Start Date:</span>
+                <span class="session-info-value" id="infoDisplayStart">-</span>
+            </div>
+            <div class="session-info-item">
+                <span class="session-info-label">End Date:</span>
+                <span class="session-info-value" id="infoDisplayEnd">-</span>
+            </div>
+            <div class="session-info-item">
+                <span class="session-info-label">Tickets Entered:</span>
+                <span class="session-info-value" id="infoDisplayTickets">0</span>
+            </div>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get query parameters for token-based auth
@@ -932,15 +1067,17 @@
                     session_id: "recGASOE7sWrsOVdK",
                     reviewer_name: "David",
                     reviewer_email: "david@integral-ed.com",
-                    start_date: "4/1/2025",
-                    end_date: "4/30/2025"
+                    start_date: "1/1/2025",
+                    end_date: "12/31/2099", // Extended far into the future
+                    is_admin: true          // Mark as admin token
                 },
                 {
                     session_id: "reclsM4lpZVwg7LnC",
                     reviewer_name: "Cara",
                     reviewer_email: "cara@integral-ed.com",
-                    start_date: "4/1/2025",
-                    end_date: "4/30/2025"
+                    start_date: "1/1/2025",
+                    end_date: "12/31/2099", // Extended far into the future
+                    is_admin: true          // Mark as admin token
                 }
             ];
             
@@ -982,6 +1119,9 @@
             const closeTokenPanel = document.getElementById('closeTokenPanel');
             const tokenTable = document.getElementById('tokenTable').querySelector('tbody');
             const invalidTokenOverlay = document.getElementById('invalidTokenOverlay');
+            
+            // Session info display
+            const sessionInfoDisplay = document.getElementById('sessionInfoDisplay');
             
             // Set default expiry date to 7 days from now
             const defaultExpiry = new Date();
@@ -1306,6 +1446,27 @@
                             document.getElementById('summaryCommentCount').textContent = allQCTickets.length;
                             document.getElementById('summaryDate').textContent = new Date().toLocaleDateString();
                             
+                            // Update session info table
+                            const sessionToken = validTokens.find(t => t.session_id === reviewSession.id);
+                            document.getElementById('sessionInfoId').textContent = reviewSession.id || '-';
+                            document.getElementById('sessionInfoUserId').textContent = reviewSession.user_id || '-';
+                            document.getElementById('sessionInfoScope').textContent = 'Goalsetter Review';
+                            
+                            if (sessionToken) {
+                                document.getElementById('sessionInfoStart').textContent = sessionToken.start_date;
+                                document.getElementById('sessionInfoEnd').textContent = sessionToken.end_date;
+                            } else {
+                                // If no matching token, use current date
+                                const now = new Date();
+                                document.getElementById('sessionInfoStart').textContent = now.toLocaleDateString();
+                                // End date is 30 days from now
+                                const endDate = new Date(now);
+                                endDate.setDate(now.getDate() + 30);
+                                document.getElementById('sessionInfoEnd').textContent = endDate.toLocaleDateString();
+                            }
+                            
+                            document.getElementById('sessionInfoTickets').textContent = allQCTickets.length;
+                            
                             // Populate tickets table
                             const ticketsTableBody = document.getElementById('ticketsTableBody');
                             ticketsTableBody.innerHTML = '';
@@ -1357,6 +1518,10 @@
                         // Initialize review functionality
                         initReviewTools();
                         
+                        // Update and show session info display
+                        updateSessionInfoDisplay();
+                        sessionInfoDisplay.classList.add('visible');
+                        
                         // Ping session to record presence
                         pingSession();
                     } else {
@@ -1407,6 +1572,10 @@
                     
                     // Initialize review functionality
                     initReviewTools();
+                    
+                    // Update and show session info display
+                    updateSessionInfoDisplay();
+                    sessionInfoDisplay.classList.add('visible');
                     
                     // Ping session to record presence
                     pingSession();
@@ -1616,6 +1785,8 @@
                         
                         if (result.success) {
                             showNotification('Feedback submitted successfully!', 'success');
+                            // Update ticket count display
+                            updateTicketCount();
                         } else {
                             showNotification('Error submitting feedback. Try again later.', 'error');
                         }
@@ -1667,6 +1838,8 @@
                         
                         if (result.success) {
                             showNotification('Screenshot submitted successfully!', 'success');
+                            // Update ticket count display
+                            updateTicketCount();
                         } else {
                             showNotification('Error submitting screenshot. Try again later.', 'error');
                         }
@@ -1709,7 +1882,51 @@
                 commentList.appendChild(commentItem);
             }
             
-            // Run authentication 
+            // Update session info display
+            function updateSessionInfoDisplay() {
+                // Get session token information
+                const sessionToken = validTokens.find(t => t.session_id === reviewSession.id);
+                
+                // Set session ID and user ID
+                document.getElementById('infoDisplaySessionId').textContent = reviewSession.id || '-';
+                document.getElementById('infoDisplayUserId').textContent = reviewSession.user_id || '-';
+                document.getElementById('infoDisplayScope').textContent = 'Goalsetter Review';
+                document.getElementById('infoDisplayTickets').textContent = reviewSession.comment_count || '0';
+                
+                // Set dates based on token if available
+                if (sessionToken) {
+                    document.getElementById('infoDisplayStart').textContent = sessionToken.start_date;
+                    document.getElementById('infoDisplayEnd').textContent = sessionToken.end_date;
+                    
+                    // Store dates in session object for consistency
+                    reviewSession.start_date = sessionToken.start_date;
+                    reviewSession.end_date = sessionToken.end_date;
+                } else {
+                    // If no matching token, use current date
+                    const now = new Date();
+                    const nowString = now.toLocaleDateString();
+                    document.getElementById('infoDisplayStart').textContent = nowString;
+                    
+                    // End date is 30 days from now
+                    const endDate = new Date(now);
+                    endDate.setDate(now.getDate() + 30);
+                    const endDateString = endDate.toLocaleDateString();
+                    document.getElementById('infoDisplayEnd').textContent = endDateString;
+                    
+                    // Store dates in session object
+                    reviewSession.start_date = nowString;
+                    reviewSession.end_date = endDateString;
+                }
+            }
+            
+            // Update ticket count in session info display
+            function updateTicketCount() {
+                document.getElementById('infoDisplayTickets').textContent = reviewSession.comment_count || '0';
+                document.getElementById('sessionInfoTickets').textContent = reviewSession.comment_count || '0';
+                document.getElementById('summaryCommentCount').textContent = reviewSession.comment_count || '0';
+            }
+            
+            // Run authentication
             handleAuth();
         });
     </script>
