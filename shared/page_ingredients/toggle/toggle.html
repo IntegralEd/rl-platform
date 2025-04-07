@@ -1,0 +1,527 @@
+<!-- 
+  Toggle Component v1.0.0
+  Created: 2025-04-07
+  
+  Features:
+  - Live/Temp version toggling with visual preview boxes
+  - Animation effects for state changes
+  - Confirmation system for promoting content
+  - Warning modal for sensitive operations
+  - Event emission for state changes
+-->
+
+<template id="toggle-component">
+  <style>
+    :host {
+      display: block;
+      width: 100%;
+      font-family: var(--font-family, system-ui);
+    }
+    
+    .toggle-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--border-color, #e0e0e0);
+      border-radius: var(--border-radius, 8px);
+      background: var(--bg-color, #ffffff);
+    }
+    
+    .toggle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .toggle-title {
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--text-color, #333);
+      margin: 0;
+    }
+    
+    .toggle-status {
+      font-size: 13px;
+      color: var(--text-secondary, #666);
+    }
+    
+    .toggle-panel {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin: 24px 0;
+    }
+    
+    .preview-box {
+      background: #f0f0f0;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      width: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .preview-box.active {
+      outline: 3px solid var(--primary-color, #007bff);
+    }
+    
+    .preview-box.swap {
+      animation: flicker 0.4s ease-in-out, scaleBig 0.4s ease-in-out;
+    }
+    
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    
+    @keyframes scaleBig {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .preview-box span {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .switch-control {
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: fit-content;
+    }
+    
+    .switch-control label {
+      font-size: 14px;
+      color: var(--text-color, #333);
+    }
+    
+    .switch-control input {
+      padding: 8px 12px;
+      width: 280px;
+      border: 1px solid var(--border-color, #e0e0e0);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .toggle-url {
+      font-family: monospace;
+      background: #f5f5f5;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      word-break: break-all;
+      margin: 8px 0;
+    }
+    
+    .toggle-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .toggle-button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background: var(--primary-color, #007bff);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .toggle-button:hover {
+      background: var(--primary-hover, #0069d9);
+    }
+    
+    .toggle-button.secondary {
+      background: var(--secondary-color, #6c757d);
+    }
+    
+    .toggle-button.secondary:hover {
+      background: var(--secondary-hover, #5a6268);
+    }
+    
+    .iframe-link {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--primary-color, #007bff);
+      text-decoration: underline;
+      cursor: pointer;
+      text-align: center;
+    }
+    
+    .modal-warning {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid var(--primary-color, #007bff);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 10;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+    
+    .modal-warning h3 {
+      margin-top: 0;
+      color: var(--text-color, #333);
+    }
+    
+    .modal-warning p {
+      color: var(--text-color, #333);
+    }
+    
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .toggle-container {
+        --border-color: #404040;
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --text-secondary: #aaaaaa;
+      }
+      
+      .toggle-url {
+        background: #333;
+      }
+      
+      .preview-box {
+        background: #333;
+      }
+      
+      .preview-box span {
+        color: #e0e0e0;
+      }
+      
+      .modal-warning {
+        background: #1a1a1a;
+        border-color: var(--primary-color, #007bff);
+      }
+    }
+  </style>
+
+  <div class="toggle-container">
+    <div class="toggle-header">
+      <h3 class="toggle-title">Version Control</h3>
+      <span class="toggle-status">Current: <span id="current-mode">TEMP</span></span>
+    </div>
+    
+    <div class="toggle-panel">
+      <div id="temp-preview" class="preview-box active"><span id="temp-label">goalsetter_temp.html</span></div>
+      <div id="live-preview" class="preview-box"><span id="live-label">goalsetter.html</span></div>
+    </div>
+    
+    <div class="switch-control">
+      <label id="confirm-label">Type "Switch Goalsetter_live" and press confirm to queue this change:</label>
+      <input type="text" placeholder="Type to confirm..." id="confirm-input">
+    </div>
+    
+    <div class="toggle-url" id="current-url">
+      https://recursivelearning.app/clients/st/goalsetter/goalsetter_temp.html
+    </div>
+    
+    <div class="toggle-actions">
+      <button class="toggle-button" id="apply-button">Confirm Change</button>
+      <button class="toggle-button secondary" id="cancel-button">Cancel</button>
+    </div>
+    
+    <div class="iframe-link" id="iframe-config">→ Configure iframe settings</div>
+    
+    <div class="modal-warning" id="warning-modal">
+      <h3>⚠️ Caution</h3>
+      <p>You are attempting to promote <strong id="promote-filename">goalsetter.html</strong> during a review period. Proceed with intention.</p>
+      <div class="modal-actions">
+        <button class="toggle-button" id="proceed-button">Proceed</button>
+        <button class="toggle-button secondary" id="cancel-modal-button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+class ToggleComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    
+    // State
+    this.state = {
+      mode: 'temp', // 'temp' or 'live'
+      baseUrl: '',
+      resourcePath: '',
+      liveUrl: '',
+      tempUrl: '',
+      liveFilename: '',
+      tempFilename: '',
+      targetMode: '', // Mode we're switching to
+      confirmText: '',
+      showModal: false
+    };
+  }
+
+  static get observedAttributes() {
+    return ['resource-path', 'base-url', 'mode'];
+  }
+
+  connectedCallback() {
+    const template = document.getElementById('toggle-component');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    // Cache elements
+    this.currentMode = this.shadowRoot.getElementById('current-mode');
+    this.currentUrl = this.shadowRoot.getElementById('current-url');
+    this.tempPreview = this.shadowRoot.getElementById('temp-preview');
+    this.livePreview = this.shadowRoot.getElementById('live-preview');
+    this.tempLabel = this.shadowRoot.getElementById('temp-label');
+    this.liveLabel = this.shadowRoot.getElementById('live-label');
+    this.confirmLabel = this.shadowRoot.getElementById('confirm-label');
+    this.confirmInput = this.shadowRoot.getElementById('confirm-input');
+    this.applyButton = this.shadowRoot.getElementById('apply-button');
+    this.cancelButton = this.shadowRoot.getElementById('cancel-button');
+    this.iframeConfig = this.shadowRoot.getElementById('iframe-config');
+    this.warningModal = this.shadowRoot.getElementById('warning-modal');
+    this.promoteFilename = this.shadowRoot.getElementById('promote-filename');
+    this.proceedButton = this.shadowRoot.getElementById('proceed-button');
+    this.cancelModalButton = this.shadowRoot.getElementById('cancel-modal-button');
+    
+    // Set initial state
+    this.updateState();
+    
+    // Add event listeners
+    this.tempPreview.addEventListener('click', () => this.selectPreview('temp'));
+    this.livePreview.addEventListener('click', () => this.selectPreview('live'));
+    
+    this.applyButton.addEventListener('click', () => this.confirmChange());
+    this.cancelButton.addEventListener('click', () => this.cancelChange());
+    
+    this.iframeConfig.addEventListener('click', () => this.openIframeConfig());
+    
+    this.proceedButton.addEventListener('click', () => this.proceedWithChange());
+    this.cancelModalButton.addEventListener('click', () => this.closeModal());
+    
+    this.confirmInput.addEventListener('input', (e) => {
+      this.state.confirmText = e.target.value;
+    });
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    
+    switch (name) {
+      case 'resource-path':
+        this.state.resourcePath = newValue;
+        break;
+      case 'base-url':
+        this.state.baseUrl = newValue;
+        break;
+      case 'mode':
+        this.state.mode = newValue;
+        break;
+    }
+    
+    this.updateState();
+  }
+
+  updateState() {
+    if (!this.currentMode) return;
+    
+    // Update text displays
+    this.currentMode.textContent = this.state.mode.toUpperCase();
+    
+    // Create URLs and filenames
+    if (this.state.resourcePath) {
+      const resourcePath = this.state.resourcePath;
+      const baseUrl = this.state.baseUrl || window.location.origin;
+      
+      // Extract project name for confirmation text
+      const pathParts = resourcePath.split('/');
+      const projectName = pathParts[pathParts.length - 1].replace('.html', '');
+      
+      if (resourcePath.endsWith('.html')) {
+        // Handle HTML files
+        const basePath = resourcePath.replace('.html', '');
+        this.state.liveUrl = `${baseUrl}${basePath}.html`;
+        this.state.tempUrl = `${baseUrl}${basePath}_temp.html`;
+        
+        // Set filenames for the preview boxes
+        this.state.liveFilename = `${projectName}.html`;
+        this.state.tempFilename = `${projectName}_temp.html`;
+      } else {
+        // Handle directories or other formats
+        this.state.liveUrl = `${baseUrl}${resourcePath}`;
+        this.state.tempUrl = `${baseUrl}${resourcePath}_temp`;
+        
+        // Set filenames for the preview boxes
+        this.state.liveFilename = projectName;
+        this.state.tempFilename = `${projectName}_temp`;
+      }
+      
+      // Update labels
+      this.tempLabel.textContent = this.state.tempFilename;
+      this.liveLabel.textContent = this.state.liveFilename;
+      
+      // Update confirmation text template
+      const targetMode = this.state.mode === 'temp' ? 'live' : 'temp';
+      const targetFile = targetMode === 'live' ? this.state.liveFilename : this.state.tempFilename;
+      this.confirmLabel.textContent = `Type "Switch ${projectName}_${targetMode}" and press confirm to queue this change:`;
+      
+      // Update current URL display
+      this.currentUrl.textContent = this.state.mode === 'live' ? 
+        this.state.liveUrl : this.state.tempUrl;
+      
+      // Update preview box active state
+      if (this.state.mode === 'live') {
+        this.livePreview.classList.add('active');
+        this.tempPreview.classList.remove('active');
+      } else {
+        this.tempPreview.classList.add('active');
+        this.livePreview.classList.remove('active');
+      }
+    }
+  }
+
+  selectPreview(mode) {
+    if (mode === this.state.mode) return;
+    
+    this.state.targetMode = mode;
+    
+    // Show the confirmation flow
+    if (mode === 'live') {
+      // When switching to live, show warning
+      this.showWarningModal();
+    } else {
+      // When switching to temp, just update the preview
+      this.updatePreview(mode);
+    }
+  }
+  
+  updatePreview(mode) {
+    // Update active states
+    if (mode === 'live') {
+      this.livePreview.classList.add('active');
+      this.tempPreview.classList.remove('active');
+      this.livePreview.classList.add('swap');
+      setTimeout(() => {
+        this.livePreview.classList.remove('swap');
+      }, 400);
+    } else {
+      this.tempPreview.classList.add('active');
+      this.livePreview.classList.remove('active');
+      this.tempPreview.classList.add('swap');
+      setTimeout(() => {
+        this.tempPreview.classList.remove('swap');
+      }, 400);
+    }
+  }
+
+  showWarningModal() {
+    this.state.showModal = true;
+    this.warningModal.style.display = 'block';
+    this.promoteFilename.textContent = this.state.liveFilename;
+  }
+  
+  closeModal() {
+    this.state.showModal = false;
+    this.warningModal.style.display = 'none';
+  }
+  
+  proceedWithChange() {
+    this.closeModal();
+    this.updatePreview(this.state.targetMode);
+  }
+
+  confirmChange() {
+    const projectName = this.state.resourcePath.split('/').pop().replace('.html', '');
+    const expectedText = `Switch ${projectName}_${this.state.targetMode}`;
+    
+    if (this.state.confirmText === expectedText) {
+      // Apply the change
+      this.applyChange();
+    } else {
+      // Show error - could enhance this with a visual indication
+      this.confirmInput.style.borderColor = 'red';
+      setTimeout(() => {
+        this.confirmInput.style.borderColor = '';
+      }, 2000);
+    }
+  }
+  
+  cancelChange() {
+    // Reset to current mode
+    this.updatePreview(this.state.mode);
+    this.confirmInput.value = '';
+    this.state.confirmText = '';
+  }
+
+  applyChange() {
+    // In a real implementation, this would make an API call
+    // to update the state on the server
+    this.state.mode = this.state.targetMode;
+    this.updateState();
+    
+    // Reset confirmation input
+    this.confirmInput.value = '';
+    this.state.confirmText = '';
+    
+    // Show success feedback
+    this.applyButton.textContent = 'Change Applied!';
+    setTimeout(() => {
+      this.applyButton.textContent = 'Confirm Change';
+    }, 2000);
+    
+    // Emit change event
+    this.dispatchEvent(new CustomEvent('mode-change', {
+      bubbles: true,
+      composed: true,
+      detail: {
+        mode: this.state.mode,
+        url: this.state.mode === 'live' ? this.state.liveUrl : this.state.tempUrl
+      }
+    }));
+  }
+  
+  openIframeConfig() {
+    // In a real implementation, this would open iframe configuration
+    this.dispatchEvent(new CustomEvent('open-iframe-config', {
+      bubbles: true,
+      composed: true
+    }));
+  }
+}
+
+// Register custom element
+customElements.define('rl-toggle', ToggleComponent);
+</script>
+
+<!-- Usage Example:
+<rl-toggle 
+  resource-path="/clients/st/goalsetter/goalsetter.html"
+  base-url="https://recursivelearning.app"
+  mode="temp">
+</rl-toggle>
+--> 

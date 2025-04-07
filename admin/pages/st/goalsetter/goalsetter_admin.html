@@ -3,319 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goalsetter Admin Panel</title>
-    <link rel="stylesheet" href="/admin/assets/css/admin.css">
-    <script>
-        // Client context
-        window.clientId = 'st';
-        window.projectId = 'goalsetter';
+    <title>Goalsetter Admin - Recursive Learning</title>
+    <style>
+        :root {
+            --primary: #004080;
+            --secondary: #E87722;
+            --primary-hover: #003366;
+            --secondary-hover: #d66b1b;
+            --bg-light: #f5f5f5;
+            --bg-dark: #333;
+            --text: #2b2b2b;
+            --text-light: #fff;
+            --card-bg: white;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --card-radius: 12px;
+            --button-radius: 4px;
+            --header-height: 50px;
+            --sidebar-width: 260px;
+            --status-active: #4CAF50;
+            --status-warning: #FFC107;
+            --status-error: #F44336;
+            --gem-color: #007bff;
+            --gem-shadow: rgba(0,123,255,0.2);
+        }
         
-        // Set timezone to CST
-        window.timezone = 'America/Chicago';
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: var(--text);
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         
-        // Format dates in CST
-        window.formatDate = (date) => {
-            return new Date(date).toLocaleString('en-US', {
-                timeZone: window.timezone,
-                dateStyle: 'full',
-                timeStyle: 'long'
-            });
-        };
-    </script>
-    <!-- Core admin scripts -->
-    <script src="/admin/assets/js/auth.js" defer></script>
-    <script src="/admin/assets/js/chat.js" defer></script>
-    <script src="/admin/assets/js/monitor.js" defer></script>
-    <!-- Page specific scripts -->
-    <script src="/admin/assets/js/admin.js" defer></script>
-    <script src="/admin/assets/js/review_session.js" defer></script>
+        /* Header styles */
+        .admin-header {
+            background: var(--primary);
+            color: var(--text-light);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-logo {
+            height: 40px;
+            padding: 5px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .admin-info {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .version-info {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Main layout */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 24px;
+            padding: 24px;
+            flex: 1;
+        }
+        
+        /* Module cards */
+        .nav-card {
+            position: relative;
+            border-radius: 12px;
+            padding: 16px;
+            background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .nav-card.collapsed {
+            height: 60px;
+            padding: 12px 16px;
+        }
+        
+        .nav-card .gem-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 8px;
+            background: var(--gem-color);
+            border-radius: 50%;
+        }
+        
+        .active-gem {
+            position: absolute;
+            top: 50%;
+            right: -12px;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--gem-color);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--gem-shadow);
+        }
+        
+        .callout-connector {
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 12px solid var(--gem-color);
+        }
+        
+        .feature-list {
+            margin-top: 12px;
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .feature-list li:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .feature-list li.active {
+            background: var(--gem-shadow);
+        }
+        
+        .feature-list .gem-icon {
+            width: 10px;
+            height: 10px;
+            background: var(--gem-color);
+            border-radius: 50%;
+        }
+        
+        /* Content panel */
+        .content-panel {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        
+        .tab-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #e9f2ff;
+            border-radius: 24px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: var(--gem-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .tab:hover {
+            background: #d9eaff;
+        }
+        
+        .tab.active {
+            background: var(--gem-color);
+            color: white;
+        }
+        
+        .tab.active .gem-icon {
+            background: white;
+        }
+        
+        .tab .gem-icon {
+            width: 10px;
+            height: 10px;
+            background: var(--gem-color);
+            border-radius: 50%;
+        }
+        
+        /* Tab content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Footer */
+        .admin-footer {
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            background: white;
+            border-top: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading indicator -->
-    <div id="loading-indicator" class="loading-screen">
-        <div class="loader"></div>
-        <p>Loading admin panel...</p>
-    </div>
-    
-    <!-- Authentication error -->
-    <div id="auth-error" class="auth-error" style="display: none;">
-        <h2>Authentication Error</h2>
-        <p>You do not have permission to access this page.</p>
-        <button onclick="location.href='/admin'">Return to Admin Dashboard</button>
-    </div>
-    
-    <div id="admin-content" style="display: none">
-        <!-- Breadcrumbs -->
-        <nav class="breadcrumbs">
-            <a href="/admin">Admin</a> &gt;
-            <a href="/admin/pages/st">ST</a> &gt;
-            <a href="/admin/pages/st/goalsetter">Goalsetter</a> &gt;
-            <span>Admin Panel</span>
-        </nav>
-
-        <!-- Action buttons -->
-        <div class="admin-actions">
-            <button class="primary-button" onclick="window.open('/clients/st/goalsetter/goalsetter.html', '_blank')">Open Live</button>
-            <button class="primary-button" onclick="window.open('/clients/st/goalsetter/goalsetter_temp.html', '_blank')">Open Preview</button>
+    <header class="admin-header">
+        <div class="header-left">
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
         </div>
-
-        <div class="admin-container">
-            <div class="left-panel">
-                <!-- Resource Tree Navigation -->
-                <div class="resource-tree">
-                    <h3>Project Resources</h3>
-                    
-                    <!-- Resource Item - Goalsetter -->
-                    <div class="resource-item expanded">
-                        <div class="resource-header">
-                            <span class="toggle-icon">▼</span>
-                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
-                            <span class="resource-name">Goalsetter</span>
-                            <div class="status-lights">
-                                <span class="status-light active" title="API Connected"></span>
-                                <span class="status-light warning" title="Content Status"></span>
-                                <span class="status-light error" title="Reviewers"></span>
-                            </div>
-                        </div>
-                        <div class="resource-children">
-                            <a href="#" class="resource-link" data-mode="live">
-                                <span class="mode-icon">🌐</span>
-                                <span class="mode-name">Live View</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="temp">
-                                <span class="mode-icon">🔍</span>
-                                <span class="mode-name">Preview</span>
-                            </a>
-                            <a href="#" class="resource-link active" data-mode="review">
-                                <span class="mode-icon">📝</span>
-                                <span class="mode-name">Review Sessions</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="lrs">
-                                <span class="mode-icon">📊</span>
-                                <span class="mode-name">Analytics</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Resource Item - Continuous Improvement -->
-                    <div class="resource-item">
-                        <div class="resource-header">
-                            <span class="toggle-icon">►</span>
-                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
-                            <span class="resource-name">Continuous Improvement</span>
-                            <div class="status-lights">
-                                <span class="status-light active" title="API Connected"></span>
-                                <span class="status-light active" title="Content Status"></span>
-                                <span class="status-light warning" title="Reviewers"></span>
-                            </div>
-                        </div>
-                        <div class="resource-children" style="display:none">
-                            <a href="#" class="resource-link" data-mode="live">
-                                <span class="mode-icon">🌐</span>
-                                <span class="mode-name">Live View</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="temp">
-                                <span class="mode-icon">🔍</span>
-                                <span class="mode-name">Preview</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="review">
-                                <span class="mode-icon">📝</span>
-                                <span class="mode-name">Review Sessions</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Resource Item - Network Leader -->
-                    <div class="resource-item">
-                        <div class="resource-header">
-                            <span class="toggle-icon">►</span>
-                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
-                            <span class="resource-name">Network Leader</span>
-                            <div class="status-lights">
-                                <span class="status-light active" title="API Connected"></span>
-                                <span class="status-light error" title="Content Status"></span>
-                                <span class="status-light warning" title="Reviewers"></span>
-                            </div>
-                        </div>
-                        <div class="resource-children" style="display:none">
-                            <a href="#" class="resource-link" data-mode="live">
-                                <span class="mode-icon">🌐</span>
-                                <span class="mode-name">Live View</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="temp">
-                                <span class="mode-icon">🔍</span>
-                                <span class="mode-name">Preview</span>
-                            </a>
-                            <a href="#" class="resource-link" data-mode="review">
-                                <span class="mode-icon">📝</span>
-                                <span class="mode-name">Review Sessions</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="quick-actions">
-                    <h3>Quick Actions</h3>
-                    <button class="action-button" onclick="window.open('/clients/st/goalsetter/goalsetter_review.html?qcid=reclsM4lpZVwg7LnC', '_blank')">
-                        <span class="action-icon">👁️</span>
-                        Open Current Review
-                    </button>
-                    <button class="action-button" onclick="window.open('/clients/st/goalsetter/goalsetter.html', '_blank')">
-                        <span class="action-icon">🚀</span>
-                        Launch Live
-                    </button>
-                    <button class="action-button" onclick="window.open('/admin/assets/js/review_session.js', '_blank')">
-                        <span class="action-icon">🛠️</span>
-                        Edit Scripts
-                    </button>
+        <div class="header-right">
+            <div class="admin-info">
+                <span>Admin: David</span>
+                <span class="version-info">Version 04.07.2025.16:11pm</span>
+            </div>
+            <div id="dev-mode-indicator"></div>
+        </div>
+    </header>
+    
+    <div class="admin-layout">
+        <!-- Left panel with module cards -->
+        <div>
+            <div class="nav-card">
+                <span class="gem-icon"></span> Goalsetter
+                <div class="active-gem"></div>
+                <div class="callout-connector"></div>
+                <ul class="feature-list">
+                    <li data-tab="toggle" class="active"><span class="gem-icon"></span> Toggle</li>
+                    <li data-tab="iframe"><span class="gem-icon"></span> Iframe</li>
+                    <li data-tab="comments"><span class="gem-icon"></span> Comments</li>
+                    <li data-tab="change-orders"><span class="gem-icon"></span> Change Orders</li>
+                    <li data-tab="lrs"><span class="gem-icon"></span> LRS</li>
+                    <li data-tab="status"><span class="gem-icon"></span> Status</li>
+                </ul>
+            </div>
+            <div class="nav-card collapsed">
+                <span class="gem-icon"></span> Continuous Improvement
+            </div>
+            <div class="nav-card collapsed">
+                <span class="gem-icon"></span> Network Leader
+            </div>
+        </div>
+        
+        <!-- Right panel with tab content -->
+        <div class="content-panel">
+            <div class="tab-header">
+                <div class="tab active" data-tab="toggle"><span class="gem-icon"></span> Toggle</div>
+                <div class="tab" data-tab="iframe"><span class="gem-icon"></span> Iframe</div>
+                <div class="tab" data-tab="comments"><span class="gem-icon"></span> Comments</div>
+                <div class="tab" data-tab="change-orders"><span class="gem-icon"></span> Change</div>
+                <div class="tab" data-tab="lrs"><span class="gem-icon"></span> LRS</div>
+                <div class="tab" data-tab="status"><span class="gem-icon"></span> Status</div>
+            </div>
+            
+            <h2>Goalsetter Admin</h2>
+            
+            <div class="tab-content active" id="toggle-tab">
+                <div id="toggle-container">
+                    <rl-toggle 
+                        resource-path="/clients/st/goalsetter/goalsetter.html"
+                        base-url="https://recursivelearning.app"
+                        mode="temp">
+                    </rl-toggle>
                 </div>
             </div>
-            <div class="right-panel">
-                <!-- Tabs -->
-                <div class="tab-container">
-                    <div class="tab active" data-tab="review">Review Session</div>
-                    <div class="tab" data-tab="settings">Settings</div>
-                    <div class="tab" data-tab="reports">Reports</div>
-                </div>
-                
-                <!-- Tab Content -->
-                <div class="tab-content active" id="review">
-                    <!-- Review session content -->
-                    <h2>Review Session Management</h2>
-                    
-                    <div class="section-container">
-                        <h3>Active Review Sessions</h3>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Session ID</th>
-                                    <th>Reviewer</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="review-sessions-table">
-                                <!-- Table rows will be populated dynamically -->
-                                <tr>
-                                    <td>reclsM4lpZVwg7LnC</td>
-                                    <td>Cara</td>
-                                    <td>2025-04-07</td>
-                                    <td>2025-04-11</td>
-                                    <td><span class="badge badge-success">Active</span></td>
-                                    <td>
-                                        <button class="action-button" onclick="copyReviewLink('reclsM4lpZVwg7LnC')">Copy Link</button>
-                                        <button class="action-button" onclick="extendSession('reclsM4lpZVwg7LnC')">Extend</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>recgL7pIF0tNooOEC</td>
-                                    <td>Mike</td>
-                                    <td>2025-04-01</td>
-                                    <td>2025-04-04</td>
-                                    <td><span class="badge badge-error">Expired</span></td>
-                                    <td>
-                                        <button class="action-button" onclick="extendSession('recgL7pIF0tNooOEC')">Extend</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="section-container">
-                        <h3>Create New Review Session</h3>
-                        <form id="new-review-session" class="form-grid">
-                            <div class="form-group">
-                                <label for="reviewer-name">Reviewer Name:</label>
-                                <input type="text" id="reviewer-name" name="reviewer-name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="reviewer-email">Reviewer Email:</label>
-                                <input type="email" id="reviewer-email" name="reviewer-email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="start-date">Start Date:</label>
-                                <input type="date" id="start-date" name="start-date" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="end-date">End Date:</label>
-                                <input type="date" id="end-date" name="end-date" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="reviewer-role">Role:</label>
-                                <select id="reviewer-role" name="reviewer-role">
-                                    <option value="client_sme">Client SME</option>
-                                    <option value="internal">Internal Reviewer</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group form-full-width">
-                                <label for="review-notes">Notes:</label>
-                                <textarea id="review-notes" name="review-notes" rows="3"></textarea>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="primary-button">Create Session</button>
-                                <button type="button" class="secondary-button" onclick="clearForm()">Clear</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="section-container">
-                        <h3>Token Management</h3>
-                        <div class="token-actions">
-                            <button class="primary-button" onclick="updateReviewPage()">Update Review Page</button>
-                            <div class="info-box">
-                                <p>This will update the token validation on the review page to match the active review sessions in this panel.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="settings" style="display: none;">
-                    <!-- Settings content will be loaded here -->
-                    <h2>Settings</h2>
-                    <div class="settings-form">
-                        <div class="form-group">
-                            <label for="mode-selector">Display Mode:</label>
-                            <select id="mode-selector">
-                                <option value="prod">Production</option>
-                                <option value="temp" selected>Temporary</option>
-                                <option value="review">Review</option>
-                            </select>
-                        </div>
-                        <button class="primary-button" id="save-settings">Save Settings</button>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="reports" style="display: none;">
-                    <!-- Reports content will be loaded here -->
-                    <h2>Usage Reports</h2>
-                    <div class="report-filters">
-                        <label for="date-range">Date Range:</label>
-                        <select id="date-range">
-                            <option value="7">Last 7 days</option>
-                            <option value="30" selected>Last 30 days</option>
-                            <option value="90">Last 90 days</option>
-                        </select>
-                        <button class="refresh-button">Refresh</button>
-                    </div>
-                    <div id="report-container">
-                        <p>Select a date range and click refresh to load reports.</p>
-                    </div>
-                </div>
+            
+            <div class="tab-content" id="iframe-tab">
+                <div id="iframe-container"></div>
+            </div>
+            
+            <div class="tab-content" id="comments-tab">
+                <p>Comments feature will be implemented in a future update.</p>
+            </div>
+            
+            <div class="tab-content" id="change-orders-tab">
+                <p>Change Orders feature will be implemented in a future update.</p>
+            </div>
+            
+            <div class="tab-content" id="lrs-tab">
+                <p>Learning Record Store (LRS) feature will be implemented in a future update.</p>
+            </div>
+            
+            <div class="tab-content" id="status-tab">
+                <p>Status monitoring feature will be implemented in a future update.</p>
             </div>
         </div>
     </div>
-
-    <footer style="text-align: center; padding: 10px;">
-        v.1.0.4 push April 5 12:00pm CST
+    
+    <footer class="admin-footer">
+        <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
     </footer>
+    
+    <script>
+        // Component loader
+        class PartialLoader {
+            constructor(baseUrl = '/shared/page_ingredients/') {
+                this.baseUrl = baseUrl;
+                this.loadedPartials = new Set();
+            }
+            
+            async load(partialName, targetElement) {
+                if (this.loadedPartials.has(partialName)) {
+                    // Component already loaded, just create and append
+                    const element = document.createElement(`rl-${partialName}`);
+                    targetElement.innerHTML = '';
+                    targetElement.appendChild(element);
+                    return element;
+                }
+                
+                // Load the component definition
+                try {
+                    const link = document.createElement('link');
+                    link.rel = 'import';
+                    link.href = `${this.baseUrl}${partialName}/${partialName}.html`;
+                    
+                    const loaded = new Promise((resolve, reject) => {
+                        link.onload = resolve;
+                        link.onerror = reject;
+                    });
+                    
+                    document.head.appendChild(link);
+                    await loaded;
+                    
+                    // Create and append the element
+                    const element = document.createElement(`rl-${partialName}`);
+                    targetElement.innerHTML = '';
+                    targetElement.appendChild(element);
+                    
+                    this.loadedPartials.add(partialName);
+                    return element;
+                } catch (error) {
+                    console.error(`Failed to load partial: ${partialName}`, error);
+                    targetElement.innerHTML = `<div class="error-message">Failed to load ${partialName} component</div>`;
+                    return null;
+                }
+            }
+        }
+        
+        // Tab navigation functionality
+        function initTabNavigation() {
+            const tabs = document.querySelectorAll('.tab');
+            const featureItems = document.querySelectorAll('.feature-list li');
+            
+            // Handle tab clicks
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    activateTab(tabName);
+                });
+            });
+            
+            // Handle feature list item clicks
+            featureItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const tabName = item.getAttribute('data-tab');
+                    activateTab(tabName);
+                });
+            });
+            
+            // Function to activate a tab
+            function activateTab(tabName) {
+                // Update tab styles
+                tabs.forEach(tab => {
+                    if (tab.getAttribute('data-tab') === tabName) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                // Update feature list styles
+                featureItems.forEach(item => {
+                    if (item.getAttribute('data-tab') === tabName) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Show appropriate content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                
+                // Save active tab to localStorage
+                localStorage.setItem('goalsetter-active-tab', tabName);
+            }
+            
+            // Load active tab from localStorage
+            const activeTab = localStorage.getItem('goalsetter-active-tab');
+            if (activeTab) {
+                activateTab(activeTab);
+            }
+        }
+        
+        // Card expansion functionality
+        function initCardExpansion() {
+            const cards = document.querySelectorAll('.nav-card.collapsed');
+            
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Collapse currently expanded card
+                    const expandedCard = document.querySelector('.nav-card:not(.collapsed)');
+                    if (expandedCard) {
+                        expandedCard.classList.add('collapsed');
+                    }
+                    
+                    // Expand this card
+                    card.classList.remove('collapsed');
+                });
+            });
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize tab navigation
+            initTabNavigation();
+            
+            // Initialize card expansion
+            initCardExpansion();
+            
+            // Add dev mode indicator if needed
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                document.getElementById('dev-mode-indicator').innerHTML = 
+                    '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
+            }
+            
+            // Load the components
+            const loader = new PartialLoader();
+            
+            // Load toggle component
+            loader.load('toggle', document.getElementById('toggle-container'))
+                .then(element => {
+                    if (element) {
+                        element.setAttribute('resource-path', '/clients/st/goalsetter/goalsetter.html');
+                        element.setAttribute('base-url', window.location.origin);
+                        element.setAttribute('mode', 'temp');
+                        
+                        // Listen for toggle events
+                        element.addEventListener('mode-change', (e) => {
+                            console.log('Mode changed:', e.detail);
+                            
+                            // Update iframe if it exists
+                            const iframeElement = document.querySelector('rl-iframe');
+                            if (iframeElement) {
+                                iframeElement.setAttribute('src', e.detail.url);
+                            }
+                        });
+                    }
+                });
+            
+            // Load iframe component
+            loader.load('iframe', document.getElementById('iframe-container'))
+                .then(element => {
+                    if (element) {
+                        element.setAttribute('src', `${window.location.origin}/clients/st/goalsetter/goalsetter_temp.html`);
+                        element.setAttribute('title', 'Goalsetter Preview');
+                    }
+                });
+        });
+    </script>
 </body>
 </html> 
