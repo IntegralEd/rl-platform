@@ -266,37 +266,88 @@ async function publishToAirtable(mdcFilePath, status = 'Drafted') {
   try {
     // Fetch MDC file content
     const response = await fetch(mdcFilePath);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch MDC file: ${response.status} ${response.statusText}`);
+    }
+    
     const mdcContent = await response.text();
+    log('MDC file content fetched successfully', { path: mdcFilePath, contentLength: mdcContent.length }, 'debug');
     
     // Parse MDC content
     const reportData = parseStandupReportMdc(mdcContent);
+    log('Parsed standup report data', { 
+      title: reportData.title, 
+      date: reportData.date,
+      reportNumber: reportData.reportNumber
+    }, 'debug');
     
     // Format for Airtable
     const airtableRecord = formatReportForAirtable(reportData, status);
+    log('Formatted report for Airtable', { 
+      title: airtableRecord.fields.Title,
+      team: airtableRecord.fields.Team,
+      status: airtableRecord.fields.Status,
+      tags: airtableRecord.fields.Tags
+    }, 'debug');
+    
+    // Prepare request data
+    const requestBody = {
+      tableId: PUBLISHER_CONFIG.STANDUP_TABLE_ID,
+      records: [airtableRecord]
+    };
+    
+    log('Sending request to Airtable API', { 
+      endpoint: `${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records`,
+      tableId: PUBLISHER_CONFIG.STANDUP_TABLE_ID,
+      method: 'POST'
+    }, 'info');
     
     // Send to Airtable
-    const result = await secureFetch(`${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records`, {
-      method: 'POST',
-      body: JSON.stringify({
+    try {
+      const result = await secureFetch(`${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!result || !result.records || !result.records[0] || !result.records[0].id) {
+        throw new Error('Invalid response from Airtable API: Missing record ID');
+      }
+      
+      log('Standup report published to Airtable successfully', { 
+        reportTitle: reportData.title, 
+        status,
+        recordId: result.records[0].id
+      }, 'info');
+      
+      return {
+        success: true,
+        recordId: result.records[0].id,
+        report: reportData
+      };
+    } catch (apiError) {
+      // Enhanced API error handling
+      log('Airtable API request failed', {
+        error: apiError.message,
+        endpoint: `${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records`,
         tableId: PUBLISHER_CONFIG.STANDUP_TABLE_ID,
-        records: [airtableRecord]
-      })
-    });
-    
-    log('Standup report published to Airtable', { reportTitle: reportData.title, status }, 'info');
-    
-    return {
-      success: true,
-      recordId: result.records[0].id,
-      report: reportData
-    };
+        statusCode: apiError.status || 'unknown',
+        responseText: apiError.responseText || 'no response text'
+      }, 'error');
+      
+      throw new Error(`Airtable API error: ${apiError.message}`);
+    }
   } catch (error) {
     console.error('Failed to publish standup report:', error);
-    log('Failed to publish standup report', { error: error.message, path: mdcFilePath }, 'error');
+    log('Failed to publish standup report', { 
+      error: error.message, 
+      path: mdcFilePath,
+      stack: error.stack 
+    }, 'error');
     
     return {
       success: false,
-      error: error.message
+      error: error.message,
+      details: error.stack
     };
   }
 }
@@ -542,6 +593,56 @@ async function publishStandupWorkflow(mdcFilePath) {
   }
 }
 
+/**
+ * Diagnose API connectivity issues
+ * @returns {Promise<Object>} Diagnostic information
+ */
+async function diagnoseAirtableConnection() {
+  const diagnostics = {
+    timestamp: new Date().toISOString(),
+    apiEndpoint: PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT,
+    tableId: PUBLISHER_CONFIG.STANDUP_TABLE_ID,
+    viewId: PUBLISHER_CONFIG.STANDUP_VIEW_ID,
+    authHeadersPresent: false,
+    connectionTest: 'untested',
+    errors: []
+  };
+  
+  try {
+    // Check if auth headers are available
+    const testHeaders = {};
+    import('./api-client.js').then(apiClient => {
+      apiClient.addAuthHeaders(testHeaders);
+      diagnostics.authHeadersPresent = !!(testHeaders['X-API-Key'] || testHeaders['X-Session-Token']);
+    }).catch(err => {
+      diagnostics.errors.push(`Failed to import api-client: ${err.message}`);
+    });
+    
+    // Test connection with minimal request
+    try {
+      const pingResult = await secureFetch(`${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/ping`, {
+        method: 'GET'
+      });
+      
+      diagnostics.connectionTest = 'success';
+      diagnostics.pingResponse = pingResult;
+    } catch (pingError) {
+      diagnostics.connectionTest = 'failed';
+      diagnostics.errors.push(`Ping test failed: ${pingError.message}`);
+    }
+    
+    log('Airtable connection diagnostics', diagnostics, 'info');
+    return diagnostics;
+  } catch (error) {
+    log('Failed to run Airtable diagnostics', { error: error.message }, 'error');
+    return {
+      ...diagnostics,
+      status: 'error',
+      error: error.message
+    };
+  }
+}
+
 // Export public API
 export {
   publishToAirtable,
@@ -551,5 +652,6 @@ export {
   findStandupReports,
   parseStandupReportMdc,
   formatReportForAirtable,
-  publishStandupWorkflow
+  publishStandupWorkflow,
+  diagnoseAirtableConnection
 }; 
