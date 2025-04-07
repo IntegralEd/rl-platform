@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Admin Pages April 5 Build Checklist
 
 ## Core Infrastructure
@@ -192,4 +197,132 @@
 - [ ] Additional platforms
 - [ ] Service connections
 - [ ] Tool integrations
-- [ ] Extension support 
+- [ ] Extension support
+
+# Admin Pages Canonical Structure
+
+This document provides the canonical structure for admin pages in the Recursive Learning platform.
+
+## Admin Tree Structure
+
+All admin pages must follow this general structure to maintain consistency:
+
+```
+/admin/
+├── index.html                 # Main admin dashboard
+├── assets/                    # Admin-specific assets
+│   ├── css/                   # Admin stylesheets
+│   ├── js/                    # Admin JavaScript files
+│   └── img/                   # Admin images
+└── pages/                     # Client-specific admin pages
+    └── {client_id}/           # Client-specific directory
+        └── {project}/         # Project-specific directory
+            └── *_admin.html   # Admin page for specific project
+```
+
+## Review Page Structure
+
+Review pages follow a parallel structure within the client directory:
+
+```
+/clients/
+└── {client_id}/               # Client-specific directory
+    └── {project}/             # Project-specific directory
+        └── {project}.html_review.html  # Review page with token validation
+```
+
+## Admin Page Components
+
+Each admin page should include the following components:
+
+1. **Header**
+   - Recursive Learning logo
+   - Admin navigation
+   - User info & logout
+
+2. **Sidebar Navigation**
+   - Project selection
+   - Section navigation
+   - Quick actions
+
+3. **Main Content Area**
+   - Tab-based interface
+   - Content management
+   - User management
+   - Review management
+
+4. **Footer**
+   - Copyright information
+   - Version information
+
+## Token-Based Review System
+
+The Recursive Learning platform uses an Airtable-driven token validation system for review pages:
+
+### Airtable Integration
+
+Review tokens are generated using Airtable formulas that combine:
+- The Resource_HTML path from QC_Platform_Pages table
+- The Session_ID from QC_Review_Session table
+
+Formula:
+```
+=CONCATENATE({Resource_HTML},"_review.html/?qcid=",Session_ID)
+```
+
+This produces URLs in the format:
+```
+https://recursivelearning.app/clients/st/goalsetter/goalsetter.html_review.html/?qcid=reclsM4lpZVwg7LnC
+```
+
+### Review Page Implementation
+
+Each `*_review.html` page should include:
+
+1. **Token Validation Panel**
+   - A minimal table showing active tokens with start/end dates
+   - Located at the bottom of the page in a collapsible panel
+   - Styled to match the admin interface
+
+2. **Review UI Components**
+   - Primary viewport (1200-1900px × 900px)
+   - QIPU comment bar (60px collapsed, 150px expanded)
+   - Comment management accordion (styled like admin panel)
+
+### JavaScript Integration
+
+The review page should include validation JavaScript that:
+1. Extracts the `qcid` parameter from the URL
+2. Checks it against a literal array of valid tokens in the page header
+3. Verifies the current date falls within the token's validity period
+4. Enables or disables the review interface accordingly
+
+## Admin Page JavaScript Components
+
+All admin pages should include:
+
+1. **admin-common.js** - Core functionality for all admin pages
+2. **admin-nav.js** - Navigation and sidebar behavior
+3. **user-management.js** - User authentication and permissions
+4. **content-review.js** - Review system integration
+
+## Authentication Flow
+
+1. Admin users authenticate through the main admin interface
+2. Review users authenticate through tokenized URLs
+3. Both experiences should maintain a consistent design language
+
+## URL Conventions
+
+- Admin pages: `/admin/pages/{client_id}/{project}/{project}_admin.html`
+- Review pages: `/clients/{client_id}/{project}/{project}.html_review.html/?qcid={session_id}`
+
+## Implementation Checklist
+
+- [ ] Create consistent header and footer
+- [ ] Implement responsive sidebar
+- [ ] Add tab-based content areas
+- [ ] Implement token validation for review pages
+- [ ] Add user management interface
+- [ ] Create review management tools
+- [ ] Test across all supported browsers 

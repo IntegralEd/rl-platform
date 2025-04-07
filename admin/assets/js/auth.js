@@ -307,18 +307,30 @@ async function authenticateFromUrlParams() {
  * Update UI to show admin interface
  */
 function showAdminInterface() {
-  // Hide loading and error
-  document.getElementById('loading-indicator').style.display = 'none';
-  document.getElementById('auth-error').style.display = 'none';
+  // Hide loading and error if they exist
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'none';
+  }
   
-  // Show content
-  document.getElementById('admin-content').style.display = 'block';
+  const authError = document.getElementById('auth-error');
+  if (authError) {
+    authError.style.display = 'none';
+  }
+  
+  // Show content if it exists
+  const adminContent = document.getElementById('admin-content');
+  if (adminContent) {
+    adminContent.style.display = 'block';
+  }
   
   // Update user info if element exists
   const userElement = document.getElementById('current-user');
   if (userElement && authState.user) {
     userElement.textContent = authState.user.name;
   }
+  
+  console.log('Admin interface displayed');
 }
 
 /**
