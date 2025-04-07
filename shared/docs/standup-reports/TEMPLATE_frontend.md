@@ -1,4 +1,79 @@
-# Frontend Standup Report - [DATE] - [SEQUENCE]
+# Frontend Standup Report Template
+
+## Webhook Submission Method
+
+Use this curl command to submit your report:
+
+```bash
+curl -X POST https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Title": "Frontend_Cursor | YYYY.MM.DD.V",
+    "ID": "YYYY-MM-DD-NNN",
+    "Created": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+    "Findings": [
+      "Finding item 1",
+      "Finding item 2",
+      "Finding item 3"
+    ],
+    "Priorities": [
+      "Priority item 1",
+      "Priority item 2",
+      "Priority item 3"
+    ],
+    "Next_Steps": [
+      "Next step 1",
+      "Next step 2",
+      "Next step 3"
+    ],
+    "Future_Features": [
+      "Feature idea 1",
+      "Feature idea 2",
+      "Feature idea 3"
+    ]
+  }'
+```
+
+## JSON Format (Replace with your content)
+
+```json
+{
+  "Title": "Frontend_Cursor | YYYY.MM.DD.V",
+  "ID": "YYYY-MM-DD-NNN",
+  "Created": "YYYY-MM-DDThh:mm:ss.000Z",
+  "Findings": [
+    "Finding item 1",
+    "Finding item 2",
+    "Finding item 3"
+  ],
+  "Priorities": [
+    "Priority item 1",
+    "Priority item 2",
+    "Priority item 3"
+  ],
+  "Next_Steps": [
+    "Next step 1",
+    "Next step 2",
+    "Next step 3"
+  ],
+  "Future_Features": [
+    "Feature idea 1",
+    "Feature idea 2",
+    "Feature idea 3"
+  ]
+}
+```
+
+## Format Requirements
+
+- **Title**: Must follow format "Frontend_Cursor | YYYY.MM.DD.V" where V is version number
+- **ID**: Must follow format "YYYY-MM-DD-NNN" where NNN is sequential for the day (001, 002, etc.)
+- **Created**: Must be ISO-8601 timestamp format (use the date command in the curl example)
+- **All arrays**: Must contain at least one item
+
+## Reference
+
+See full documentation in `/shared/docs/frontend_standup_guide.md`
 
 ## Team Member(s)
 - [Your Name]

@@ -7,9 +7,9 @@
  * Can be set up as a Cursor rule for always-on monitoring.
  */
 
-import { queryStandupReports } from './airtable-query.js';
 import { secureFetch } from './api-client.js';
 import { log } from './cloudwatch-integration.js';
+import { checkBackendUpdates } from './frontend-standup-client.js';
 
 // Configuration
 const MONITOR_CONFIG = {
@@ -23,7 +23,7 @@ const MONITOR_CONFIG = {
 // Track last check timestamps
 const lastChecks = {
   backend: 0,
-  airtable: 0,
+  webhook: 0,
   mdc: 0
 };
 
@@ -31,7 +31,7 @@ const lastChecks = {
  * Query backend for updated resources and changes
  * @returns {Promise<Object>} Backend update status
  */
-async function checkBackendUpdates() {
+async function checkBackendResources() {
   try {
     log('Checking backend for updates', { timestamp: new Date().toISOString() }, 'info');
     
@@ -70,46 +70,37 @@ async function checkBackendUpdates() {
 }
 
 /**
- * Check Airtable for new standup reports from backend team
- * @returns {Promise<Object>} Airtable update status
+ * Check webhook for new standup reports from backend team
+ * @returns {Promise<Object>} Webhook update status
  */
-async function checkAirtableReports() {
+async function checkWebhookReports() {
   try {
-    log('Checking Airtable for backend team updates', { timestamp: new Date().toISOString() }, 'info');
+    log('Checking webhook for backend team updates', { timestamp: new Date().toISOString() }, 'info');
     
-    // Query backend team reports
-    const result = await queryStandupReports({
-      team: 'Backend Cursor',
-      maxRecords: 5,
-      sortField: 'Date',
-      sortDirection: 'desc'
-    });
-    
-    if (!result.success) {
-      throw new Error(`Failed to query Airtable: ${result.error}`);
-    }
+    // Use the imported checkBackendUpdates function from frontend-standup-client.js
+    const updates = await checkBackendUpdates();
     
     // Filter for reports since last check
-    const newReports = result.records.filter(record => {
-      const reportDate = new Date(record.fields.Date).getTime();
-      return reportDate > lastChecks.airtable;
+    const newReports = updates.filter(update => {
+      const reportDate = new Date(update.created).getTime();
+      return reportDate > lastChecks.webhook;
     });
     
-    log('Airtable check completed', { 
-      totalReports: result.records.length,
+    log('Webhook check completed', { 
+      totalReports: updates.length,
       newReports: newReports.length,
-      changedSince: new Date(lastChecks.airtable).toISOString()
+      changedSince: new Date(lastChecks.webhook).toISOString()
     }, 'info');
     
-    lastChecks.airtable = Date.now();
+    lastChecks.webhook = Date.now();
     
     return {
       success: true,
       newReports,
-      allReports: result.records
+      allReports: updates
     };
   } catch (error) {
-    log('Airtable check failed', { error: error.message }, 'error');
+    log('Webhook check failed', { error: error.message }, 'error');
     return {
       success: false,
       error: error.message
@@ -198,115 +189,138 @@ async function runDevelopmentCycleCheck() {
   const results = {
     timestamp: new Date().toISOString(),
     backend: null,
-    airtable: null,
+    webhook: null,
     mdc: null,
     suggestedActions: []
   };
   
   try {
-    // Check backend updates
-    results.backend = await checkBackendUpdates();
+    // Check backend resources
+    results.backend = await checkBackendResources();
     
-    // Check Airtable for backend team reports
-    results.airtable = await checkAirtableReports();
+    // Check standup reports via webhook
+    results.webhook = await checkWebhookReports();
     
-    // Only check MDC if we have backend resources
+    // Check MDC files if we have backend resources
     if (results.backend.success && results.backend.newResources.length > 0) {
       results.mdc = await checkMdcDocumentation(results.backend.newResources);
-      
-      // Generate suggested actions
-      if (results.mdc.success && results.mdc.mdcUpdateNeeds.length > 0) {
-        results.suggestedActions.push({
-          type: 'mdc_update',
-          description: 'Update MDC documentation to reflect backend changes',
-          items: results.mdc.mdcUpdateNeeds
-        });
-      }
     }
     
-    // Check if we need to create a new standup report
-    if (results.airtable.success && results.airtable.newReports.length > 0) {
+    // Generate suggested actions
+    
+    // If backend has new resources, suggest MDC updates
+    if (results.backend.success && results.backend.newResources.length > 0) {
       results.suggestedActions.push({
-        type: 'standup_sync',
-        description: 'Create a new standup report to align with backend team',
-        backendReports: results.airtable.newReports.slice(0, 2)
+        type: 'backend_review',
+        description: `Review ${results.backend.newResources.length} new backend resources for potential integration`,
+        priority: 'high',
+        resources: results.backend.newResources.map(r => r.name)
       });
     }
     
-    log('Development cycle check completed', {
-      suggestedActions: results.suggestedActions.length
-    }, 'info');
+    // If MDC needs updates, suggest updates
+    if (results.mdc && results.mdc.success && results.mdc.mdcUpdateNeeds.length > 0) {
+      results.suggestedActions.push({
+        type: 'mdc_update',
+        description: `Update ${results.mdc.mdcUpdateNeeds.length} MDC files to match backend changes`,
+        priority: 'medium',
+        files: results.mdc.mdcUpdateNeeds.map(n => n.path)
+      });
+    }
     
-    return results;
+    // Check if we need to create a new standup report
+    if ((results.backend.success && results.backend.newResources.length > 0) ||
+        (results.webhook.success && results.webhook.newReports.length > 0)) {
+      results.suggestedActions.push({
+        type: 'standup_sync',
+        description: 'Create a new standup report to align with backend team',
+        priority: 'medium'
+      });
+    }
+    
+    return formatCheckResults(results);
   } catch (error) {
     log('Development cycle check failed', { error: error.message }, 'error');
     return {
-      ...results,
-      error: error.message
+      success: false,
+      error: error.message,
+      suggestedActions: []
     };
   }
 }
 
 /**
- * Format check results for display
- * @param {Object} results - Development cycle check results
- * @returns {string} Formatted results
+ * Format the check results for display
+ * @param {Object} results - Raw check results
+ * @returns {Object} Formatted results
  */
 function formatCheckResults(results) {
-  let output = `# Development Cycle Check: ${results.timestamp}\n\n`;
+  let output = `# Development Cycle Check: ${new Date(results.timestamp).toLocaleString()}\n\n`;
   
-  if (results.error) {
-    output += `⚠️ **Check Failed**: ${results.error}\n\n`;
-  }
-  
-  // Backend status
-  output += `## Backend Resources\n`;
-  if (results.backend.success) {
-    output += `- ${results.backend.newResources.length} new/updated resources found\n`;
-    
-    if (results.backend.newResources.length > 0) {
-      output += `\nUpdated resources:\n`;
-      results.backend.newResources.forEach(resource => {
-        output += `- **${resource.name}** (${resource.type}) - Updated ${new Date(resource.updated_at).toLocaleString()}\n`;
-      });
-    }
-  } else {
-    output += `- ❌ Check failed: ${results.backend.error}\n`;
-  }
-  
-  // Airtable status
-  output += `\n## Backend Team Reports\n`;
-  if (results.airtable.success) {
-    output += `- ${results.airtable.newReports.length} new reports found\n`;
-    
-    if (results.airtable.newReports.length > 0) {
-      output += `\nLatest reports:\n`;
-      results.airtable.newReports.slice(0, 2).forEach(report => {
-        output += `- **${report.fields.Title}** - ${report.fields.Date}\n`;
-        if (report.fields.Summary) {
-          output += `  Summary: ${report.fields.Summary.slice(0, 100)}${report.fields.Summary.length > 100 ? '...' : ''}\n`;
-        }
-      });
-    }
-  } else {
-    output += `- ❌ Check failed: ${results.airtable.error}\n`;
-  }
-  
-  // MDC status
-  if (results.mdc) {
-    output += `\n## Documentation Status\n`;
-    if (results.mdc.success) {
-      output += `- ${results.mdc.mdcUpdateNeeds.length} documents need updates\n`;
+  // Backend resources
+  if (results.backend) {
+    if (results.backend.success) {
+      output += `## Backend Resources\n`;
+      output += `- Found ${results.backend.allResources.length} total resources\n`;
+      output += `- ${results.backend.newResources.length} new/updated resources\n`;
       
-      if (results.mdc.mdcUpdateNeeds.length > 0) {
-        output += `\nDocuments to update:\n`;
-        results.mdc.mdcUpdateNeeds.forEach(doc => {
-          output += `- **${doc.path.split('/').pop()}**\n`;
-          output += `  Reason: ${doc.updateReason}\n`;
+      if (results.backend.newResources.length > 0) {
+        output += `\n### New Backend Resources\n`;
+        results.backend.newResources.forEach(resource => {
+          output += `- ${resource.name} (${resource.type}): Updated ${new Date(resource.updated_at).toLocaleString()}\n`;
+          if (resource.description) {
+            output += `  - ${resource.description}\n`;
+          }
         });
       }
     } else {
-      output += `- ❌ Check failed: ${results.mdc.error}\n`;
+      output += `## Backend Resources Check Failed\n`;
+      output += `- Error: ${results.backend.error}\n`;
+    }
+  }
+  
+  // Webhook reports
+  if (results.webhook) {
+    if (results.webhook.success) {
+      output += `\n## Backend Team Reports\n`;
+      output += `- Found ${results.webhook.allReports.length} total reports\n`;
+      output += `- ${results.webhook.newReports.length} new reports\n`;
+      
+      if (results.webhook.newReports.length > 0) {
+        output += `\n### New Backend Team Reports\n`;
+        results.webhook.newReports.forEach(report => {
+          output += `- ${report.title}\n`;
+          if (report.priorities && report.priorities.length > 0) {
+            output += `  - Priorities: ${report.priorities.join(', ')}\n`;
+          }
+        });
+      }
+    } else {
+      output += `\n## Backend Team Reports Check Failed\n`;
+      output += `- Error: ${results.webhook.error}\n`;
+    }
+  }
+  
+  // MDC documentation
+  if (results.mdc) {
+    if (results.mdc.success) {
+      output += `\n## MDC Documentation\n`;
+      
+      if (results.mdc.mdcUpdateNeeds.length > 0) {
+        output += `- Found ${results.mdc.mdcUpdateNeeds.length} MDC files that need updates\n`;
+        output += `\n### MDC Files Needing Updates\n`;
+        results.mdc.mdcUpdateNeeds.forEach(need => {
+          output += `- ${need.path}\n`;
+          output += `  - Reason: ${need.updateReason}\n`;
+          output += `  - Resource updated: ${new Date(need.resourceUpdated).toLocaleString()}\n`;
+          output += `  - MDC last updated: ${new Date(need.mdcUpdated).toLocaleString()}\n`;
+        });
+      } else {
+        output += `- All MDC files are up to date\n`;
+      }
+    } else {
+      output += `\n## MDC Documentation Check Failed\n`;
+      output += `- Error: ${results.mdc.error}\n`;
     }
   }
   
@@ -314,83 +328,64 @@ function formatCheckResults(results) {
   if (results.suggestedActions.length > 0) {
     output += `\n## Suggested Actions\n`;
     results.suggestedActions.forEach(action => {
-      output += `### ${action.description}\n`;
-      
-      if (action.type === 'mdc_update') {
-        action.items.forEach(item => {
-          output += `- Update \`${item.path.split('/').pop()}\` to reflect changes in ${item.resource}\n`;
-        });
+      if (action.type === 'backend_review') {
+        output += `- Review backend changes: ${action.resources.length} resources updated\n`;
+      } else if (action.type === 'mdc_update') {
+        output += `- Update MDC files: ${action.files.join(', ')}\n`;
       } else if (action.type === 'standup_sync') {
         output += `- Create a new standup report addressing backend updates\n`;
-        output += `- Reference the latest backend report: **${action.backendReports[0].fields.Title}**\n`;
       }
     });
   } else {
-    output += `\n## Suggested Actions\n- No actions needed at this time\n`;
+    output += `\n## Suggested Actions\n`;
+    output += `- No actions required at this time\n`;
   }
   
-  return output;
+  return {
+    ...results,
+    formattedOutput: output
+  };
 }
 
 /**
- * Start monitoring with regular checks
- * Runs once immediately and then at the configured interval
+ * Start the development cycle monitoring
+ * @param {boolean} runOnce - Run only once, then exit
  */
-function startMonitoring() {
-  log('Starting development cycle monitoring', {
-    interval: `${MONITOR_CONFIG.CHECK_INTERVAL / 60000} minutes`
+function startMonitoring(runOnce = false) {
+  log('Starting development cycle monitoring', { 
+    interval: MONITOR_CONFIG.CHECK_INTERVAL,
+    runOnce
   }, 'info');
   
-  // Run initial check
   runDevelopmentCycleCheck().then(results => {
-    const formattedResults = formatCheckResults(results);
-    console.log(formattedResults);
+    console.log(results.formattedOutput);
     
-    // Create a standup report if needed and auto-update is enabled
-    if (MONITOR_CONFIG.AUTO_UPDATE && 
-        results.suggestedActions.some(action => action.type === 'standup_sync')) {
+    if (MONITOR_CONFIG.AUTO_UPDATE && results.suggestedActions.some(action => action.type === 'standup_sync')) {
       console.log('Auto-update is enabled. Would create a new standup report here.');
-      // Implementation for auto-creating standup reports would go here
+      // Implementation for auto-creating standup reports using the new webhook approach would go here
+    }
+    
+    if (!runOnce) {
+      setTimeout(() => startMonitoring(false), MONITOR_CONFIG.CHECK_INTERVAL);
+    }
+  }).catch(error => {
+    console.error('Development cycle check failed:', error);
+    log('Development cycle check error', { error: error.message }, 'error');
+    
+    if (!runOnce) {
+      setTimeout(() => startMonitoring(false), MONITOR_CONFIG.CHECK_INTERVAL);
     }
   });
-  
-  // Set up interval for regular checks
-  const intervalId = setInterval(async () => {
-    const results = await runDevelopmentCycleCheck();
-    const formattedResults = formatCheckResults(results);
-    console.log(formattedResults);
-    
-    // Take automated actions if enabled
-    if (MONITOR_CONFIG.AUTO_UPDATE && results.suggestedActions.length > 0) {
-      console.log('Auto-update is enabled. Would take suggested actions here.');
-      // Implementation for auto-updates would go here
-    }
-  }, MONITOR_CONFIG.CHECK_INTERVAL);
-  
-  // Return a function to stop monitoring
-  return () => {
-    clearInterval(intervalId);
-    log('Development cycle monitoring stopped', {}, 'info');
-  };
 }
 
-// For use in cursor rules or manual execution
+// Export functions for external use
 export {
-  runDevelopmentCycleCheck,
-  formatCheckResults,
   startMonitoring,
+  runDevelopmentCycleCheck,
   MONITOR_CONFIG
 };
 
-// For manual testing in console
-if (typeof window !== 'undefined') {
-  window.developmentCycleMonitor = {
-    run: runDevelopmentCycleCheck,
-    start: startMonitoring,
-    config: MONITOR_CONFIG
-  };
-  
-  console.log('📊 Development Cycle Monitor loaded');
-  console.log('Run a check: developmentCycleMonitor.run()');
-  console.log('Start monitoring: developmentCycleMonitor.start()');
+// Auto-start if this is being loaded directly
+if (typeof window !== 'undefined' && window.autoStartMonitor) {
+  startMonitoring(false);
 } 
