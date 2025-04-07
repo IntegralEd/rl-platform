@@ -14,6 +14,9 @@
     const MAX_RETRIES = 20;
     const RETRY_INTERVAL = 500; // ms
     
+    // TEMPORARY: Bypass authentication for direct access
+    const BYPASS_AUTH = true;
+    
     // Debug logging helper
     function log(...args) {
         if (DEBUG) {
@@ -35,6 +38,25 @@
             log('Created header span element');
         }
         
+        // TEMPORARY: If bypassing auth, create simulated user data
+        if (BYPASS_AUTH) {
+            log('⚠️ AUTH BYPASS ENABLED - Using simulated admin user');
+            const simulatedUser = {
+                User_ID: 'admin-bypass',
+                Name: 'Admin User',
+                email: 'admin@integral-ed.com',
+                IE_Role_Level: 'Org Admin',
+                First_Name: 'Admin'
+            };
+            
+            // Store in window for other scripts
+            window.logged_in_user = simulatedUser;
+            
+            // Update header span with simulated data
+            updateHeaderSpan(simulatedUser);
+            return;
+        }
+        
         // Try to get Softr user data
         if (window.logged_in_user) {
             updateHeaderSpan(window.logged_in_user);
@@ -49,6 +71,26 @@
         if (window.logged_in_user) {
             log('Softr user data found');
             updateHeaderSpan(window.logged_in_user);
+            return;
+        }
+        
+        // TEMPORARY: If bypassing auth and we're still waiting after several retries,
+        // create a simulated user
+        if (BYPASS_AUTH && retryCount >= 5) {
+            log('⚠️ AUTH BYPASS ENABLED - Creating simulated user after timeout');
+            const simulatedUser = {
+                User_ID: 'admin-bypass',
+                Name: 'Admin User',
+                email: 'admin@integral-ed.com',
+                IE_Role_Level: 'Org Admin',
+                First_Name: 'Admin'
+            };
+            
+            // Store in window for other scripts
+            window.logged_in_user = simulatedUser;
+            
+            // Update header span with simulated data
+            updateHeaderSpan(simulatedUser);
             return;
         }
         
@@ -67,11 +109,11 @@
         if (!headerSpan) return;
         
         try {
-            // Set data attributes
-            headerSpan.setAttribute('data-user-email', userData.email || '');
-            headerSpan.setAttribute('data-user-name', userData.Name || '');
-            headerSpan.setAttribute('data-user-id', userData.User_ID || '');
-            headerSpan.setAttribute('data-role-level', userData.IE_Role_Level || '');
+            // Set data attributes (using both bracket notation and dot notation for compatibility)
+            headerSpan.setAttribute('data-user-email', userData.email || userData['email'] || '');
+            headerSpan.setAttribute('data-user-name', userData.Name || userData['Name'] || userData['First Name'] || '');
+            headerSpan.setAttribute('data-user-id', userData.User_ID || userData['User_ID'] || '');
+            headerSpan.setAttribute('data-role-level', userData.IE_Role_Level || userData['IE_Role_Level'] || '');
             headerSpan.setAttribute('data-last-login', new Date().toISOString());
             
             log('Updated header span with user data');
@@ -79,10 +121,10 @@
             // Dispatch event for other scripts
             const event = new CustomEvent('header-span-updated', {
                 detail: {
-                    userId: userData.User_ID,
-                    email: userData.email,
-                    name: userData.Name,
-                    role: userData.IE_Role_Level
+                    userId: userData.User_ID || userData['User_ID'],
+                    email: userData.email || userData['email'],
+                    name: userData.Name || userData['Name'] || userData['First Name'],
+                    role: userData.IE_Role_Level || userData['IE_Role_Level']
                 },
                 bubbles: true
             });
@@ -130,6 +172,10 @@
                 role: headerSpan.getAttribute('data-role-level'),
                 lastLogin: headerSpan.getAttribute('data-last-login')
             };
+        },
+        // TEMPORARY: Add bypass flag accessor
+        isAuthBypassed: function() {
+            return BYPASS_AUTH;
         }
     };
     
