@@ -3,36 +3,75 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-require('dotenv').config();
 
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const AIRTABLE_BASE_ID = 'appqFjYLZiRlgZQDM';
-const AIRTABLE_TABLE_ID = 'tblNfEQbQINXSN8C6';
+function parseReportContent(content) {
+    const sections = {
+        priorities: [],
+        findings: [],
+        nextSteps: [],
+        futureFeatures: []
+    };
+
+    const lines = content.split('\n');
+    let currentSection = null;
+
+    for (const line of lines) {
+        if (line.startsWith('## Current Build Features')) {
+            currentSection = 'priorities';
+        } else if (line.startsWith('## Completed Tasks')) {
+            currentSection = 'findings';
+        } else if (line.startsWith('## Next Steps')) {
+            currentSection = 'nextSteps';
+        } else if (line.startsWith('## Future Integrations')) {
+            currentSection = 'futureFeatures';
+        } else if (line.startsWith('##') && currentSection) {
+            currentSection = null;
+        } else if (currentSection && line.trim().startsWith('-')) {
+            sections[currentSection].push(line.trim().substring(1).trim());
+        }
+    }
+
+    return sections;
+}
 
 function publishToAirtable(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
     const title = path.basename(filePath, '.mdc');
+    const sections = parseReportContent(content);
     
     const data = JSON.stringify({
+        tableId: 'tblNfEQbQINXSN8C6',
         records: [{
             fields: {
                 Title: title,
-                Status: 'Drafted',
+                Date: new Date().toISOString().split('T')[0],
                 Team: 'Frontend Cursor',
+                Reporter: 'Cursor AI',
+                Summary: content.split('## Summary')[1]?.split('##')[0]?.trim() || 'No summary provided',
+                'Current Features': sections.priorities,
+                'Completed Tasks': sections.findings,
+                'Next Steps': sections.nextSteps,
+                'Future Integrations': sections.futureFeatures,
                 Tags: ['frontend_cursor'],
-                Content: content
+                Status: 'Drafted',
+                Branch: 'main'
             }
         }]
     });
 
     const options = {
-        hostname: 'api.airtable.com',
-        path: `/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`,
+        hostname: 'recursivelearning.app',
+        path: '/api/v1/airtable/records',
         method: 'POST',
         headers: {
-            'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
             'Content-Type': 'application/json',
-            'Content-Length': data.length
+            'Content-Length': data.length,
+            'X-Team': 'frontend',
+            'X-Airtable-Access': 'standup-reports',
+            'X-Resource-Type': 'standup',
+            'X-API-Key': process.env.AIRTABLE_API_KEY,
+            'X-Session-Token': process.env.SESSION_TOKEN,
+            'X-Client-ID': process.env.CLIENT_ID
         }
     };
 
@@ -45,33 +84,26 @@ function publishToAirtable(filePath) {
             });
             
             res.on('end', () => {
-                if (res.statusCode === 200) {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
                     resolve(JSON.parse(responseData));
                 } else {
                     reject(new Error(`Failed to publish: ${responseData}`));
                 }
             });
         });
-
+        
         req.on('error', (error) => {
             reject(error);
         });
-
+        
         req.write(data);
         req.end();
     });
 }
 
-// Get the file path from command line arguments
 const filePath = process.argv[2];
-
 if (!filePath) {
     console.error('Please provide a file path');
-    process.exit(1);
-}
-
-if (!AIRTABLE_API_KEY) {
-    console.error('AIRTABLE_API_KEY environment variable is required');
     process.exit(1);
 }
 
@@ -81,5 +113,4 @@ publishToAirtable(filePath)
     })
     .catch(error => {
         console.error('Error publishing to Airtable:', error);
-        process.exit(1);
-    }); 
+        process.exit(1); 
