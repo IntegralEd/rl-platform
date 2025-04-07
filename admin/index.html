@@ -49,11 +49,12 @@
         .header-title {
             font-size: 1.5rem;
             font-weight: 500;
+            display: none; /* Hide the text title */
         }
         
         .header-logo {
             height: 40px;
-            margin-right: 15px;
+            padding: 5px;
         }
         
         .header-left {
@@ -64,7 +65,19 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 16px;
+        }
+        
+        .admin-info {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .version-info {
+            font-size: 0.8rem;
+            opacity: 0.8;
         }
 
         /* DOS Tree Styles */
@@ -609,11 +622,14 @@
 <body>
     <header class="admin-header">
         <div class="header-left">
-            <img src="/shared/assets/images/recursive-learning-logo.svg" alt="Recursive Learning" class="header-logo">
-            <span class="header-title">Recursive Learning Admin</span>
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
         </div>
         <div class="header-right">
-            <span class="current-user" id="current-user">Admin User</span>
+            <div class="admin-info">
+                <span>Admin: David</span>
+                <span class="version-info">Version 04.07.2025.16:11pm</span>
+            </div>
+            <div id="dev-mode-indicator"></div>
         </div>
     </header>
     
@@ -930,6 +946,20 @@
 
     <!-- Active JavaScript files -->
     <script src="assets/js/admin-common.js"></script>
-    <script src="assets/js/admin-nav.js"></script>
+    <script>
+        // Fix for RecursiveAdmin variable conflict
+        // Ensure admin-nav.js doesn't redeclare the RecursiveAdmin variable
+        document.addEventListener('DOMContentLoaded', function() {
+            const script = document.createElement('script');
+            script.src = 'assets/js/admin-nav.js';
+            document.body.appendChild(script);
+            
+            // Add dev mode indicator
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                document.getElementById('dev-mode-indicator').innerHTML = 
+                    '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
+            }
+        });
+    </script>
 </body>
 </html> 

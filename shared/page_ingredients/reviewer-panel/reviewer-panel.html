@@ -1,0 +1,354 @@
+<!-- 
+  Reviewer Panel Component v1.0.0
+  Created: 2025-04-07
+  
+  Features:
+  - Six-field table display for review session information
+  - Collapsible interface
+  - Automated ticket counter integration
+  - Token validation integration
+  - Real-time updates
+-->
+
+<template id="reviewer-panel-template">
+  <style>
+    :host {
+      display: block;
+      width: 100%;
+      font-family: var(--font-family, system-ui);
+      margin-top: 16px;
+    }
+    
+    .reviewer-panel {
+      border: 1px solid var(--border-color, #e0e0e0);
+      border-radius: var(--border-radius, 8px);
+      overflow: hidden;
+      background: var(--bg-color, #ffffff);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .reviewer-panel.collapsed .reviewer-table {
+      display: none;
+    }
+    
+    .reviewer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--header-bg, #f5f7f9);
+      border-bottom: 1px solid var(--border-color, #e0e0e0);
+    }
+    
+    .reviewer-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-color, #333);
+    }
+    
+    .toggle-panel {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--primary-color, #0066cc);
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    
+    .toggle-panel:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .toggle-panel::before {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid currentColor;
+      margin-right: 6px;
+      transition: transform 0.2s;
+    }
+    
+    .reviewer-panel.collapsed .toggle-panel::before {
+      transform: rotate(-90deg);
+    }
+    
+    .reviewer-table {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    @media (min-width: 768px) {
+      .reviewer-table {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    .reviewer-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .reviewer-field {
+      font-size: 12px;
+      color: var(--text-secondary, #666);
+      font-weight: 500;
+    }
+    
+    .reviewer-value {
+      font-size: 14px;
+      color: var(--text-color, #333);
+      padding: 4px 0;
+      font-family: var(--mono-font, monospace);
+    }
+    
+    .ticket-count {
+      position: relative;
+    }
+    
+    .ticket-count::after {
+      content: attr(data-count);
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--primary-color, #0066cc);
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      height: 16px;
+      min-width: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      box-sizing: border-box;
+      transition: all 0.3s;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    
+    .ticket-count.updated::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .reviewer-panel {
+        --border-color: #404040;
+        --bg-color: #1a1a1a;
+        --header-bg: #2a2a2a;
+        --text-color: #e0e0e0;
+        --text-secondary: #aaaaaa;
+      }
+    }
+  </style>
+
+  <div class="reviewer-panel">
+    <div class="reviewer-header">
+      <h3>Review Session Information</h3>
+      <button class="toggle-panel">Hide</button>
+    </div>
+    <div class="reviewer-table">
+      <div class="reviewer-row">
+        <div class="reviewer-field">User ID</div>
+        <div class="reviewer-value" id="reviewer-userid"></div>
+      </div>
+      <div class="reviewer-row">
+        <div class="reviewer-field">QCID</div>
+        <div class="reviewer-value" id="reviewer-qcid"></div>
+      </div>
+      <div class="reviewer-row">
+        <div class="reviewer-field">Start Date</div>
+        <div class="reviewer-value" id="reviewer-startdate"></div>
+      </div>
+      <div class="reviewer-row">
+        <div class="reviewer-field">End Date</div>
+        <div class="reviewer-value" id="reviewer-enddate"></div>
+      </div>
+      <div class="reviewer-row">
+        <div class="reviewer-field">Role</div>
+        <div class="reviewer-value" id="reviewer-role"></div>
+      </div>
+      <div class="reviewer-row ticket-count" id="ticket-count-row">
+        <div class="reviewer-field">Tickets Entered</div>
+        <div class="reviewer-value" id="reviewer-tickets">0</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+class ReviewerPanelComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    
+    // State
+    this.ticketCount = 0;
+    this.collapsed = false;
+  }
+
+  static get observedAttributes() {
+    return ['user-id', 'qcid', 'start-date', 'end-date', 'role', 'tickets-entered'];
+  }
+
+  connectedCallback() {
+    const template = document.getElementById('reviewer-panel-template');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    // Cache elements
+    this.panel = this.shadowRoot.querySelector('.reviewer-panel');
+    this.toggleButton = this.shadowRoot.querySelector('.toggle-panel');
+    this.userIdElem = this.shadowRoot.getElementById('reviewer-userid');
+    this.qcidElem = this.shadowRoot.getElementById('reviewer-qcid');
+    this.startDateElem = this.shadowRoot.getElementById('reviewer-startdate');
+    this.endDateElem = this.shadowRoot.getElementById('reviewer-enddate');
+    this.roleElem = this.shadowRoot.getElementById('reviewer-role');
+    this.ticketsElem = this.shadowRoot.getElementById('reviewer-tickets');
+    this.ticketCountRow = this.shadowRoot.getElementById('ticket-count-row');
+    
+    // Set initial values
+    this.updateAttributes();
+    
+    // Set up event listeners
+    this.toggleButton.addEventListener('click', () => this.togglePanel());
+    
+    // Listen for comment/ticket additions
+    window.addEventListener('commentAdded', () => this.incrementTicketCount());
+    
+    // Check for saved state
+    const savedCollapsed = localStorage.getItem('reviewerPanelCollapsed');
+    if (savedCollapsed === 'true') {
+      this.collapsed = true;
+      this.panel.classList.add('collapsed');
+      this.toggleButton.textContent = 'Show';
+    }
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    
+    if (this.shadowRoot) {
+      this.updateAttributes();
+    }
+  }
+  
+  updateAttributes() {
+    if (this.hasAttribute('user-id')) {
+      this.userIdElem.textContent = this.getAttribute('user-id');
+    }
+    
+    if (this.hasAttribute('qcid')) {
+      this.qcidElem.textContent = this.getAttribute('qcid');
+    }
+    
+    if (this.hasAttribute('start-date')) {
+      this.startDateElem.textContent = this.formatDate(this.getAttribute('start-date'));
+    }
+    
+    if (this.hasAttribute('end-date')) {
+      this.endDateElem.textContent = this.formatDate(this.getAttribute('end-date'));
+    }
+    
+    if (this.hasAttribute('role')) {
+      this.roleElem.textContent = this.formatRole(this.getAttribute('role'));
+    }
+    
+    if (this.hasAttribute('tickets-entered')) {
+      this.ticketCount = parseInt(this.getAttribute('tickets-entered')) || 0;
+      this.ticketsElem.textContent = this.ticketCount.toString();
+      this.ticketCountRow.setAttribute('data-count', this.ticketCount);
+    }
+  }
+  
+  formatDate(dateStr) {
+    if (!dateStr) return '';
+    
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  }
+  
+  formatRole(role) {
+    if (!role) return '';
+    
+    const roles = {
+      'client_sme': 'Client SME',
+      'internal': 'Internal Reviewer',
+      'admin': 'Administrator'
+    };
+    
+    return roles[role] || role;
+  }
+  
+  togglePanel() {
+    this.collapsed = !this.collapsed;
+    
+    if (this.collapsed) {
+      this.panel.classList.add('collapsed');
+      this.toggleButton.textContent = 'Show';
+    } else {
+      this.panel.classList.remove('collapsed');
+      this.toggleButton.textContent = 'Hide';
+    }
+    
+    // Save state
+    localStorage.setItem('reviewerPanelCollapsed', this.collapsed);
+  }
+  
+  incrementTicketCount() {
+    this.ticketCount++;
+    this.ticketsElem.textContent = this.ticketCount.toString();
+    this.setAttribute('tickets-entered', this.ticketCount.toString());
+    
+    // Highlight the updated count
+    this.ticketCountRow.classList.add('updated');
+    this.ticketCountRow.setAttribute('data-count', this.ticketCount);
+    
+    // Remove highlight after animation
+    setTimeout(() => {
+      this.ticketCountRow.classList.remove('updated');
+    }, 3000);
+    
+    // Emit event for other components
+    this.dispatchEvent(new CustomEvent('ticket-count-updated', {
+      bubbles: true,
+      composed: true,
+      detail: { count: this.ticketCount }
+    }));
+  }
+}
+
+// Register custom element
+customElements.define('rl-reviewer-panel', ReviewerPanelComponent);
+</script>
+
+<!-- Usage Example:
+<rl-reviewer-panel
+  user-id="reviewer123"
+  qcid="QC20250407001"
+  start-date="2025-04-07"
+  end-date="2025-04-14"
+  role="client_sme"
+  tickets-entered="0">
+</rl-reviewer-panel>
+--> 
