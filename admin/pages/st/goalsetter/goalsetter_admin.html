@@ -61,12 +61,114 @@
 
         <div class="admin-container">
             <div class="left-panel">
-                <!-- Navigation Tree -->
-                <ul class="nav-tree">
-                    <li><a href="#review" class="active">Review Session</a></li>
-                    <li><a href="#settings">Settings</a></li>
-                    <li><a href="#reports">Reports</a></li>
-                </ul>
+                <!-- Resource Tree Navigation -->
+                <div class="resource-tree">
+                    <h3>Project Resources</h3>
+                    
+                    <!-- Resource Item - Goalsetter -->
+                    <div class="resource-item expanded">
+                        <div class="resource-header">
+                            <span class="toggle-icon">▼</span>
+                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
+                            <span class="resource-name">Goalsetter</span>
+                            <div class="status-lights">
+                                <span class="status-light active" title="API Connected"></span>
+                                <span class="status-light warning" title="Content Status"></span>
+                                <span class="status-light error" title="Reviewers"></span>
+                            </div>
+                        </div>
+                        <div class="resource-children">
+                            <a href="#" class="resource-link" data-mode="live">
+                                <span class="mode-icon">🌐</span>
+                                <span class="mode-name">Live View</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="temp">
+                                <span class="mode-icon">🔍</span>
+                                <span class="mode-name">Preview</span>
+                            </a>
+                            <a href="#" class="resource-link active" data-mode="review">
+                                <span class="mode-icon">📝</span>
+                                <span class="mode-name">Review Sessions</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="lrs">
+                                <span class="mode-icon">📊</span>
+                                <span class="mode-name">Analytics</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Resource Item - Continuous Improvement -->
+                    <div class="resource-item">
+                        <div class="resource-header">
+                            <span class="toggle-icon">►</span>
+                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
+                            <span class="resource-name">Continuous Improvement</span>
+                            <div class="status-lights">
+                                <span class="status-light active" title="API Connected"></span>
+                                <span class="status-light active" title="Content Status"></span>
+                                <span class="status-light warning" title="Reviewers"></span>
+                            </div>
+                        </div>
+                        <div class="resource-children" style="display:none">
+                            <a href="#" class="resource-link" data-mode="live">
+                                <span class="mode-icon">🌐</span>
+                                <span class="mode-name">Live View</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="temp">
+                                <span class="mode-icon">🔍</span>
+                                <span class="mode-name">Preview</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="review">
+                                <span class="mode-icon">📝</span>
+                                <span class="mode-name">Review Sessions</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Resource Item - Network Leader -->
+                    <div class="resource-item">
+                        <div class="resource-header">
+                            <span class="toggle-icon">►</span>
+                            <img src="/shared/assets/images/StriveTogether-Logo-Black.jpg" alt="ST" class="resource-logo">
+                            <span class="resource-name">Network Leader</span>
+                            <div class="status-lights">
+                                <span class="status-light active" title="API Connected"></span>
+                                <span class="status-light error" title="Content Status"></span>
+                                <span class="status-light warning" title="Reviewers"></span>
+                            </div>
+                        </div>
+                        <div class="resource-children" style="display:none">
+                            <a href="#" class="resource-link" data-mode="live">
+                                <span class="mode-icon">🌐</span>
+                                <span class="mode-name">Live View</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="temp">
+                                <span class="mode-icon">🔍</span>
+                                <span class="mode-name">Preview</span>
+                            </a>
+                            <a href="#" class="resource-link" data-mode="review">
+                                <span class="mode-icon">📝</span>
+                                <span class="mode-name">Review Sessions</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <button class="action-button" onclick="window.open('/clients/st/goalsetter/goalsetter_review.html?qcid=reclsM4lpZVwg7LnC', '_blank')">
+                        <span class="action-icon">👁️</span>
+                        Open Current Review
+                    </button>
+                    <button class="action-button" onclick="window.open('/clients/st/goalsetter/goalsetter.html', '_blank')">
+                        <span class="action-icon">🚀</span>
+                        Launch Live
+                    </button>
+                    <button class="action-button" onclick="window.open('/admin/assets/js/review_session.js', '_blank')">
+                        <span class="action-icon">🛠️</span>
+                        Edit Scripts
+                    </button>
+                </div>
             </div>
             <div class="right-panel">
                 <!-- Tabs -->
@@ -78,7 +180,102 @@
                 
                 <!-- Tab Content -->
                 <div class="tab-content active" id="review">
-                    <!-- Review session content will be loaded here -->
+                    <!-- Review session content -->
+                    <h2>Review Session Management</h2>
+                    
+                    <div class="section-container">
+                        <h3>Active Review Sessions</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Session ID</th>
+                                    <th>Reviewer</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="review-sessions-table">
+                                <!-- Table rows will be populated dynamically -->
+                                <tr>
+                                    <td>reclsM4lpZVwg7LnC</td>
+                                    <td>Cara</td>
+                                    <td>2025-04-07</td>
+                                    <td>2025-04-11</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                    <td>
+                                        <button class="action-button" onclick="copyReviewLink('reclsM4lpZVwg7LnC')">Copy Link</button>
+                                        <button class="action-button" onclick="extendSession('reclsM4lpZVwg7LnC')">Extend</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>recgL7pIF0tNooOEC</td>
+                                    <td>Mike</td>
+                                    <td>2025-04-01</td>
+                                    <td>2025-04-04</td>
+                                    <td><span class="badge badge-error">Expired</span></td>
+                                    <td>
+                                        <button class="action-button" onclick="extendSession('recgL7pIF0tNooOEC')">Extend</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section-container">
+                        <h3>Create New Review Session</h3>
+                        <form id="new-review-session" class="form-grid">
+                            <div class="form-group">
+                                <label for="reviewer-name">Reviewer Name:</label>
+                                <input type="text" id="reviewer-name" name="reviewer-name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reviewer-email">Reviewer Email:</label>
+                                <input type="email" id="reviewer-email" name="reviewer-email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="start-date">Start Date:</label>
+                                <input type="date" id="start-date" name="start-date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="end-date">End Date:</label>
+                                <input type="date" id="end-date" name="end-date" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reviewer-role">Role:</label>
+                                <select id="reviewer-role" name="reviewer-role">
+                                    <option value="client_sme">Client SME</option>
+                                    <option value="internal">Internal Reviewer</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group form-full-width">
+                                <label for="review-notes">Notes:</label>
+                                <textarea id="review-notes" name="review-notes" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="primary-button">Create Session</button>
+                                <button type="button" class="secondary-button" onclick="clearForm()">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="section-container">
+                        <h3>Token Management</h3>
+                        <div class="token-actions">
+                            <button class="primary-button" onclick="updateReviewPage()">Update Review Page</button>
+                            <div class="info-box">
+                                <p>This will update the token validation on the review page to match the active review sessions in this panel.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="tab-content" id="settings" style="display: none;">
