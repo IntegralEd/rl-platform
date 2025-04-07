@@ -13,7 +13,7 @@ curl -X POST https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj -H "Cont
 
 Include an incremental version number (YYYY.MM.DD.V format)
 Use unique Report_ID (YYYY-MM-DD-NNN format)
-Specify frontend source (Report_Source: Frontend_Cursor)
+Specify frontend source (Report_Source: repository-branch(feature)
 Include the author's name (User_ID: Your name)
 Report Template
 Use this exact format for all frontend reports:
@@ -21,7 +21,7 @@ Use this exact format for all frontend reports:
 Report_ID: YYYY-MM-DD-NNN (NNN = sequential number for the day)
 Date: YYYY-MM-DD
 Version: YYYY.MM.DD.V
-Report_Source: Frontend_Cursor
+Report_Source: rl-frontend or rl-backend (rest-api-lambda) / branch 
 User_ID: YourName
 
 ## Priorities
@@ -47,7 +47,7 @@ User_ID: YourName
 ##Sample JSON Payload
 
 {
-  "Title": "Frontend_Cursor | 2025.04.11.2",
+  "Title": "Frontend_Cursor / admin-pages| 2025.04.11.2",
   "ID": "recl7tbuOSNJbTiu",
   "Created": "2025-04-07T05:08:52.000Z",
   "Findings": [
@@ -76,7 +76,7 @@ User_ID: YourName
 
 
 Usage
-Follow this structure for all frontend reports.
+Follow this structure for all standup reports.
 Ensure consistency in formatting and content.
 Use the JSON payload as a template for submissions.
 This approach will help maintain clarity and uniformity in your standup reports
