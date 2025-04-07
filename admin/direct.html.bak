@@ -130,6 +130,19 @@
     <div class="admin-container">
         <!-- Admin Cards -->
         <div class="admin-cards">
+            <!-- Airtable Test Card -->
+            <div class="admin-card">
+                <h2 class="card-title">Standup Reports</h2>
+                <div class="card-actions">
+                    <button class="action-button" onclick="testAirtableStandup.queryReports()">
+                        Query Reports
+                    </button>
+                    <button class="action-button" onclick="testAirtableStandup.publishReport()">
+                        Publish Report
+                    </button>
+                </div>
+            </div>
+
             <!-- GoalSetter Admin Card -->
             <div class="admin-card">
                 <h2 class="card-title">Goal Setter</h2>
@@ -190,5 +203,8 @@
             email: "admin@integral-ed.com"
         };
     </script>
+
+    <!-- Airtable Test Script -->
+    <script type="module" src="/admin/assets/js/test-standup-airtable.js"></script>
 </body>
 </html> 
