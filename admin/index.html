@@ -1007,43 +1007,58 @@
             }
         }
 
-        // Initialize
-        initializeStatusIndicators();
+        // Development bypass for local testing
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('Development mode: Authentication bypassed');
+            // Set admin user role for testing
+            localStorage.setItem('userRole', 'admin');
+            document.querySelector('.admin-header').insertAdjacentHTML('beforeend', 
+                '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px;">DEV MODE</div>');
+        }
 
-        // Toggle tree folders
-        document.querySelectorAll('.tree-toggle').forEach(toggle => {
-            toggle.addEventListener('click', () => {
-                const children = toggle.parentElement.nextElementSibling;
-                if (children && children.classList.contains('tree-children')) {
-                    children.classList.toggle('open');
-                    toggle.classList.toggle('open');
-                }
-            });
-        });
-
-        // Make tree items clickable
-        document.querySelectorAll('.tree-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                // Don't trigger if clicking on toggle
-                if (e.target.classList.contains('tree-toggle')) return;
-                
-                // Highlight selected item
-                document.querySelectorAll('.tree-item').forEach(i => i.classList.remove('selected'));
-                item.classList.add('selected');
-                
-                // If it's a file, show its admin card if available
-                if (item.classList.contains('tree-file')) {
-                    const fileName = item.querySelector('span:last-child').textContent;
-                    if (fileName.includes('_admin.html')) {
-                        const activityName = fileName.replace('_admin.html', '');
-                        const card = document.querySelector(`.admin-card[data-activity="${activityName}"]`);
-                        if (card) {
-                            card.scrollIntoView({ behavior: 'smooth' });
-                        }
+        // Initialize tree view functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggles = document.querySelectorAll('.tree-toggle');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const item = this.parentElement;
+                    const children = item.nextElementSibling;
+                    if (children && children.classList.contains('tree-children')) {
+                        children.classList.toggle('expanded');
+                        this.classList.toggle('open');
                     }
-                }
+                });
             });
+
+            initializeStatusIndicators();
         });
+
+        // Share activity function for buttons
+        function shareActivity(url, title) {
+            const shareMenu = document.createElement('div');
+            shareMenu.className = 'share-menu';
+            shareMenu.innerHTML = `
+                <div class="share-option" onclick="copyUrl('${url}')">Copy Link</div>
+                <div class="share-option" onclick="shareUrl('${url}', '${title}')">Email Link</div>
+            `;
+            
+            document.body.appendChild(shareMenu);
+            
+            // Position near the click
+            const rect = event.target.getBoundingClientRect();
+            shareMenu.style.top = (rect.bottom + 10) + 'px';
+            shareMenu.style.left = rect.left + 'px';
+            
+            // Close on next click
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu() {
+                    shareMenu.remove();
+                    document.removeEventListener('click', closeMenu);
+                });
+            }, 0);
+            
+            event.stopPropagation();
+        }
     </script>
 </body>
 </html> 
