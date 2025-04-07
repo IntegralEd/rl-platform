@@ -13,7 +13,31 @@ The review token system allows clients and subject matter experts (SMEs) to acce
 
 ## Creating Review Tokens
 
-### Via the Admin Panel
+### Via Airtable Formulas (Recommended)
+
+The most reliable approach is generating tokens directly in Airtable using formulas:
+
+```
+=CONCATENATE({Resource_HTML},"_review.html/?qcid=",Session_ID)
+```
+
+This produces a URL in the format:
+```
+https://recursivelearning.app/clients/st/goalsetter/goalsetter.html_review.html/?qcid=reclsM4lpZVwg7LnC
+```
+
+Key benefits:
+- Maintains data integrity with Airtable schema
+- Eliminates dependency on folder structures
+- Auto-updates when records change
+- Visible in Airtable for easy QA/debugging
+
+For additional security, you can include a second parameter for validation:
+```
+=CONCATENATE({Resource_HTML},"_review.html/?qcid=",Session_ID,"&reviewer=",SUBSTITUTE(Reviewer_Email,"@","-at-"))
+```
+
+### Via the Admin Panel (Legacy)
 
 1. Navigate to the project admin page (e.g., `goalsetter_admin.html`)
 2. Select the "Review Management" tab
@@ -23,102 +47,75 @@ The review token system allows clients and subject matter experts (SMEs) to acce
 6. Click "Create Review Link"
 7. Use the "Copy Link" or "Send Email" button to share
 
-### Via the API
-
-To generate tokens programmatically:
-
-```javascript
-// Example API call
-const response = await fetch('/api/generate-review-token', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    userId: 'client_123',     // Client's user ID in Airtable
-    projectId: 'goalsetter',  // Project identifier
-    expiryHours: 168,         // 7 days (optional)
-    reviewSession: 'sprint3'  // Identifier for this review cycle (optional)
-  })
-});
-
-const { token, reviewUrl } = await response.json();
-```
-
 ## Token Structure
 
-Review tokens are Base64-encoded JSON objects containing:
+Using the Airtable-driven approach, tokens are simply Airtable record IDs that reference:
 
-```json
-{
-  "userId": "client_123",      // Client's user ID
-  "projectId": "goalsetter",   // Project identifier
-  "exp": 1682432125,           // Expiration timestamp (Unix seconds)
-  "reviewSession": "sprint3"   // Optional review session identifier
-}
-```
+1. The **Session_ID** from the QC_Review_Session table
+2. A link to the **Resource_HTML** from the QC_Platform_Pages table
 
-In production, tokens are signed with a secret key for additional security.
+The system validates by checking:
+- Token exists in Airtable
+- Current date falls within Start_ReviewPeriod and End_ReviewPeriod
+- Reviewer is authorized for this session
+
+## Review Page Implementation
+
+The `*_review.html` page should include:
+
+1. **Token Validation Panel**
+   - A minimal table showing active tokens with start/end dates
+   - Located at the bottom of the page in a collapsible panel
+   - Serves as a visible reference for testing and production
+
+2. **Review UI Components**
+   - Primary viewport (1200-1900px × 900px)
+   - QIPU comment bar (60px collapsed, 150px expanded)
+   - Comment management accordion (styled like admin panel)
 
 ## Client Experience
 
 When a client clicks a review link:
 
 1. They are directed to the project review page
-2. The system validates their token
+2. The token (qcid parameter) is validated against Airtable records
 3. The page loads with Qipu commenting enabled
-4. The client can view content and leave feedback
-5. All navigation within the system preserves their authentication
+4. Client can view content and leave feedback
+5. All navigation within the review page preserves their authentication
 
 ## Review URL Format
 
 ```
-https://recursivelearning.app/admin/pages/st/goalsetter/goalsetter_review.html?review_token=abc123
+https://recursivelearning.app/clients/st/goalsetter/goalsetter.html_review.html/?qcid=reclsM4lpZVwg7LnC
 ```
 
 ## Qipu Comment Integration
 
-Comments made through the review interface:
+The _review.html page integrates Qipu commenting with a UI that includes:
 
-1. Are associated with the client's user ID
-2. Include the client's name and role
-3. Are tagged with the review session (if specified)
-4. Can be viewed and replied to by the team
-
-## Managing Review Sessions
-
-For structured review cycles:
-
-1. Create a unique `reviewSession` identifier for each review cycle
-2. Generate tokens with this session ID
-3. Filter comments in the admin panel by review session
-4. Track feedback implementation status per session
-
-## Backend Implementation
-
-The token verification endpoint:
-
-1. Decodes and validates the token
-2. Checks expiration time
-3. Verifies the user exists in Airtable
-4. Confirms the user has access to the requested project
-5. Returns user details and project information to the frontend
+1. **Main viewport** (1200-1900px × 900px)
+2. **QIPU comment bar** (~60px at rest, ~150px when expanded)
+3. **Comment management accordion** styled like admin/index.html
+4. **Tree structure** for team admins to:
+   - Manage comments
+   - Aggregate feedback
+   - Generate change orders
 
 ## Security Considerations
 
-- Tokens should only be sent to verified client email addresses
-- Each token should be unique and single-use when possible
-- Track token usage in the admin panel
-- Consider revoking tokens after feedback is complete
+- Review tokens should only be sent to verified client email addresses
+- Use Airtable record IDs as they're difficult to guess
+- Enforce date validation based on start/end review period
+- Consider adding multi-factor validation via email + record ID
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Expired token | Generate a new token for the client |
-| "Invalid user" error | Verify the client exists in the team Airtable |
-| "Project access denied" | Check that the client has been assigned to the project |
-| Qipu not loading | Ensure the client's browser supports the required features |
+| Expired token | Check End_ReviewPeriod in Airtable and extend if needed |
+| "Invalid session" error | Verify Session_ID exists in QC_Review_Session table |
+| Page not found | Ensure Resource_HTML path is correct in Airtable |
+| Qipu not loading | Check browser compatibility with Qipu requirements |
 
 ## Example: Review Email Template
 
@@ -130,8 +127,8 @@ Please use the link below to access the content and leave your comments:</p>
 
 <p><a href="[Review URL]">Review [Project Name]</a></p>
 
-<p>This link will expire in 7 days. Your feedback is crucial to us, so please 
-review at your earliest convenience.</p>
+<p>This link will be active from [Start_Date] to [End_Date]. Your feedback is crucial to us, 
+so please review at your earliest convenience.</p>
 
 <p>How to leave feedback:
 1. Click on any element to add a comment
