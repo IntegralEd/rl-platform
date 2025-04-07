@@ -21,17 +21,23 @@ const PUBLISHER_CONFIG = {
 /**
  * Format a standup report for Airtable
  * @param {Object} report - Standup report data
+ * @param {string} status - Report status ('Drafted', 'Completed', 'In Progress')
  * @returns {Object} Formatted Airtable record
  */
-function formatReportForAirtable(report) {
+function formatReportForAirtable(report, status = 'Drafted') {
+  // Create a default title with date and version if not provided
+  const defaultDate = report.date || new Date().toISOString().split('T')[0];
+  const defaultVersion = report.reportNumber || 1;
+  const defaultTitle = `Front End Standup ${defaultDate} v${String(defaultVersion).padStart(2, '0')}`;
+  
   return {
     fields: {
-      Title: report.title || 'Untitled Standup Report',
+      Title: report.title || defaultTitle,
       Date: report.date || new Date().toISOString().split('T')[0],
       Team: 'Frontend Cursor', 
       Reporter: report.reporter || 'Cursor AI',
       Summary: report.summary || '',
-      Status: report.status || 'Completed',
+      Status: status,
       'Current Features': report.currentFeatures || [],
       'Completed Tasks': report.completedTasks || [],
       'Test Results': report.testResults || [],
@@ -253,9 +259,10 @@ function extractChallenges(mdcContent) {
 /**
  * Publish standup report to Airtable
  * @param {string} mdcFilePath - Path to MDC file
+ * @param {string} status - Report status ('Drafted', 'Completed', 'In Progress')
  * @returns {Promise<Object>} Result of publishing
  */
-async function publishToAirtable(mdcFilePath) {
+async function publishToAirtable(mdcFilePath, status = 'Drafted') {
   try {
     // Fetch MDC file content
     const response = await fetch(mdcFilePath);
@@ -265,7 +272,7 @@ async function publishToAirtable(mdcFilePath) {
     const reportData = parseStandupReportMdc(mdcContent);
     
     // Format for Airtable
-    const airtableRecord = formatReportForAirtable(reportData);
+    const airtableRecord = formatReportForAirtable(reportData, status);
     
     // Send to Airtable
     const result = await secureFetch(`${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records`, {
@@ -276,7 +283,7 @@ async function publishToAirtable(mdcFilePath) {
       })
     });
     
-    log('Standup report published to Airtable', { reportTitle: reportData.title }, 'info');
+    log('Standup report published to Airtable', { reportTitle: reportData.title, status }, 'info');
     
     return {
       success: true,
@@ -295,11 +302,47 @@ async function publishToAirtable(mdcFilePath) {
 }
 
 /**
+ * Update report status in Airtable
+ * @param {string} recordId - Airtable record ID
+ * @param {string} status - New status ('Drafted', 'Completed', 'In Progress')
+ * @returns {Promise<Object>} Result of update
+ */
+async function updateReportStatus(recordId, status = 'Completed') {
+  try {
+    const result = await secureFetch(`${PUBLISHER_CONFIG.AIRTABLE_API_ENDPOINT}/records/${recordId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        tableId: PUBLISHER_CONFIG.STANDUP_TABLE_ID,
+        fields: {
+          Status: status
+        }
+      })
+    });
+    
+    log('Standup report status updated', { recordId, status }, 'info');
+    
+    return {
+      success: true,
+      recordId: result.id
+    };
+  } catch (error) {
+    console.error('Failed to update report status:', error);
+    log('Failed to update report status', { error: error.message, recordId }, 'error');
+    
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+/**
  * Publish latest standup report to Slack
  * @param {Object} report - Report data (from parseStandupReportMdc)
+ * @param {string} recordId - Airtable record ID (if available, to update status)
  * @returns {Promise<Object>} Result of publishing
  */
-async function publishToSlack(report) {
+async function publishToSlack(report, recordId = null) {
   try {
     // Format for Slack
     const slackMessage = formatReportForSlack(report);
@@ -311,6 +354,11 @@ async function publishToSlack(report) {
     });
     
     log('Standup report published to Slack', { reportTitle: report.title }, 'info');
+    
+    // Update status in Airtable if record ID is provided
+    if (recordId) {
+      await updateReportStatus(recordId, 'Completed');
+    }
     
     return {
       success: true,
@@ -457,12 +505,51 @@ async function findStandupReports(directoryPath) {
   }
 }
 
+/**
+ * Complete workflow to publish standup report to Airtable and then Slack
+ * @param {string} mdcFilePath - Path to MDC file
+ * @returns {Promise<Object>} Result of publishing
+ */
+async function publishStandupWorkflow(mdcFilePath) {
+  try {
+    // First publish to Airtable as "Drafted"
+    const airtableResult = await publishToAirtable(mdcFilePath, 'Drafted');
+    
+    if (!airtableResult.success) {
+      return {
+        success: false,
+        stage: 'airtable',
+        error: airtableResult.error
+      };
+    }
+    
+    // Then publish to Slack and update status
+    const slackResult = await publishToSlack(airtableResult.report, airtableResult.recordId);
+    
+    return {
+      success: slackResult.success,
+      stage: 'completed',
+      airtableRecordId: airtableResult.recordId,
+      report: airtableResult.report
+    };
+  } catch (error) {
+    console.error('Failed to complete standup workflow:', error);
+    return {
+      success: false,
+      stage: 'workflow',
+      error: error.message
+    };
+  }
+}
+
 // Export public API
 export {
   publishToAirtable,
   publishToSlack,
+  updateReportStatus,
   loadStandupReport,
   findStandupReports,
   parseStandupReportMdc,
-  formatReportForAirtable
+  formatReportForAirtable,
+  publishStandupWorkflow
 }; 
