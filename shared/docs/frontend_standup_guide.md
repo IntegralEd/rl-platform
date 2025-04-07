@@ -1,152 +1,138 @@
-# Frontend Standup Guide
+# Frontend Standup Report Guide (Updated April 12, 2025)
 
 ## Overview
-This guide outlines the standardized process for frontend standup reporting in the Recursive Learning platform. Maintaining consistent documentation helps with backend integration, progress tracking, and ensures critical issues are communicated effectively.
 
-## Standup Report Format
+This guide documents the standardized webhook approach for submitting frontend standup reports. Reports are automatically formatted and published to Airtable via the secure webhook system.
 
-### Basic Template Structure
-```markdown
-# Frontend Standup Report - [DATE] - [SEQUENCE]
+## Quick Start
 
-## Team Member(s)
-- [Your Name]
+Send your report with:
 
-## Overview
-[Brief 1-2 sentence summary of the report's key points]
-
-## Accomplishments
-- [List major tasks completed with specific file paths or PRs]
-
-## Current Work
-- [List what you're actively working on with expected completion timeline]
-
-## Blockers
-- [List any issues blocking progress with specific error details]
-
-## Integration Notes
-- [Any notes about backend integration points]
-- [API endpoint requirements]
-- [Authentication details]
-
-## Next Steps
-- [List planned next actions with priorities]
+```bash
+curl -X POST https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Title": "Frontend_Cursor | 2025.04.12.1",
+    "ID": "2025-04-12-001",
+    "Created": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+    "Findings": [
+      "Your completed work item 1",
+      "Your completed work item 2"
+    ],
+    "Priorities": [
+      "Your priority 1",
+      "Your priority 2"
+    ],
+    "Next_Steps": [
+      "Your next step 1",
+      "Your next step 2"
+    ],
+    "Future_Features": [
+      "Your feature idea 1",
+      "Your feature idea 2"
+    ]
+  }'
 ```
 
-### Required Sections for Detailed Reports
-For integration-focused reports, include these additional sections:
+## Report Format
 
-```markdown
-## Technical Implementation Details
-- [Specific implementation aspects that affect the backend]
-- [Data structures you're sending/receiving]
-- [Authentication approaches used]
+Your report MUST follow this exact JSON structure:
 
-## API Requirements
-- [Specific endpoints needed]
-- [Required headers]
-- [Expected response formats]
-
-## External Integration Points
-- [Airtable integration details]
-- [Softr embedding requirements]
-- [Other third-party services]
-
-## Testing Steps
-- [How to verify the implementation works]
-- [Expected outcomes]
-
-## Documentation Changes
-- [Updates needed to existing docs]
-- [New documentation created]
+```json
+{
+  "Title": "Frontend_Cursor | YYYY.MM.DD.V",
+  "ID": "YYYY-MM-DD-NNN",
+  "Created": "YYYY-MM-DDThh:mm:ss.000Z",
+  "Findings": [
+    "Finding item 1",
+    "Finding item 2"
+  ],
+  "Priorities": [
+    "Priority item 1",
+    "Priority item 2"
+  ],
+  "Next_Steps": [
+    "Next step 1",
+    "Next step 2"
+  ],
+  "Future_Features": [
+    "Feature idea 1",
+    "Feature idea 2"
+  ]
+}
 ```
 
-## Report Naming and Location
+## Format Requirements
 
-### File Location
-- All frontend standup reports should be saved to: `/shared/docs/standup-reports/`
+- **Title**: Must follow format "Frontend_Cursor | YYYY.MM.DD.V" where V is the version number
+- **ID**: Must follow format "YYYY-MM-DD-NNN" where NNN is sequential for the day (001, 002, etc.)
+- **Created**: Must be ISO-8601 timestamp format
+- **All arrays**: Must contain at least one item
 
-### Naming Convention
-- Use the strict format: `[month]-[day]-frontend-standup-[sequence].mdc`
-- Example: `april-7-frontend-standup-01.mdc`
-- Sequence numbers should increment (01, 02, 03) for multiple reports on the same day
+## Verification Steps
 
-## Reporting Process and Schedule
+Before submitting, verify:
 
-1. **Daily Reporting Requirement**
-   - At least one standup report must be filed per active development day
-   - Reports should be filed by 5:00 PM EST or before ending work for the day
+1. ✓ All required fields are present
+2. ✓ Title and ID follow the required format
+3. ✓ Created field has correct ISO timestamp format
+4. ✓ All arrays contain at least one item
 
-2. **Integration-Focused Reports**
-   - Additional reports must be filed when:
-     - Starting work on a backend integration
-     - Encountering integration issues
-     - Completing an integration milestone
+## Common Issues & Solutions
 
-3. **Report Writing Guidelines**
-   - Be specific and include exact file paths
-   - Include error messages and screenshots for issues
-   - Reference related documentation or backend resources
-   - Always include next steps, even if blocked
+### "Error: Invalid payload"
+- Check JSON structure matches exactly
+- Ensure all required fields are present
+- Verify date format is correct
 
-4. **Submission Process**
-   - Commit report to the repository
-   - Push to the current branch
-   - When Airtable integration is functional, publish through API
+### "Error: Authentication failed"
+- Check webhook URL is correct (must use the one above)
+- Verify Content-Type header is set to "application/json"
+- Contact backend team for access issues
 
-## Integration Focus Areas
+## Example Successful Report
 
-When documenting backend integration issues, always include:
+```json
+{
+  "Title": "Frontend_Cursor | 2025.04.12.1",
+  "ID": "2025-04-12-001",
+  "Created": "2025-04-12T15:23:47.000Z",
+  "Findings": [
+    "Implemented goal setter UI components",
+    "Fixed responsive design issues",
+    "Added loading states for better UX"
+  ],
+  "Priorities": [
+    "Implement form validation",
+    "Fix mobile layout issues",
+    "Add error handling for API calls"
+  ],
+  "Next_Steps": [
+    "Complete form validation implementation",
+    "Test on mobile devices",
+    "Update documentation"
+  ],
+  "Future_Features": [
+    "Dark mode support",
+    "Keyboard shortcuts",
+    "Offline mode"
+  ]
+}
+```
 
-1. **Authentication Context**
-   - Current authentication method being used
-   - Token handling approach
-   - Any CORS or cross-origin issues
+## Security Requirements
 
-2. **API Connectivity Details**
-   - Exact endpoint URLs being accessed
-   - HTTP methods being used
-   - Request/response headers
-   - Request body format
+- **CRITICAL**: Do NOT attempt direct Airtable writes for standup reports
+- Use ONLY the webhook approach documented here
+- This method ensures proper security and consistent formatting
 
-3. **Error Diagnostics**
-   - Exact error messages
-   - HTTP status codes
-   - Network request logs
-   - Browser console output for client-side errors
+## Need Help?
 
-4. **User Context**
-   - User role/permissions being tested
-   - Session state information
-   - Field mapping issues (e.g., inconsistent naming)
+1. Check the webhook response for error messages
+2. Contact backend team on Slack (#frontend-support)
+3. Include the full error response in your support request
 
-## Airtable Publishing Process
+## Implementation Status
 
-When the Airtable integration is operational:
-
-1. Create your report file following this guide
-2. Ensure all required sections are completed
-3. Use the standup report publisher to submit:
-   ```javascript
-   import { publishStandupReport } from '../assets/js/standup-report-publisher.js';
-   
-   publishStandupReport({
-     filePath: '/shared/docs/standup-reports/april-7-frontend-standup-01.mdc',
-     tags: ['frontend', 'authentication', 'integration']
-   });
-   ```
-4. Verify submission using the query tool
-5. Add report link to any related GitHub issues
-
-## Related Documentation
-- Backend integration documentation: `/shared/docs/backend-integration-checklist.mdc`
-- Airtable setup documentation: `/shared/docs/airtable_setup.mdc`
-- API client documentation: `/shared/docs/cross-domain-auth.mdc`
-- Example reports in `/shared/docs/standup-reports/`
-
-## Backend Team Alignment
-This guide and template align with the backend team's requirements as specified in:
-https://github.com/IntegralEd/rl-restapi-lambda/blob/main/docs/frontend_standup_guide.md
-
-Always check for template updates at:
-https://github.com/IntegralEd/rl-restapi-lambda/blob/main/docs/standup_reports/TEMPLATE_frontend.md 
+This webhook system is fully operational as of April 12, 2025.
+All previous reporting methods are now deprecated and should not be used. 

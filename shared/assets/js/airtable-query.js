@@ -1,15 +1,23 @@
 /**
- * Airtable Query Utility
+ * Standup Report Query Utility
  * 
- * Simple tool to query Airtable for existing standup reports
- * and verify the bidirectional reporting system is working.
+ * Updated tool to query standup reports via webhook
+ * instead of direct Airtable access.
+ * 
+ * Updated: April 12, 2025
  */
 
-import { airtableFetch, AIRTABLE_CONFIG } from './standup_reporting_airtable.js';
 import { log } from './cloudwatch-integration.js';
+import { checkBackendUpdates } from './frontend-standup-client.js';
+
+// Configuration
+const WEBHOOK_CONFIG = {
+  WEBHOOK_URL: 'https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj',
+  DEFAULT_HEADERS: { 'Content-Type': 'application/json' }
+};
 
 /**
- * Query standup reports in Airtable
+ * Query standup reports via webhook
  * @param {Object} options - Query options
  * @returns {Promise<Object>} Query results
  */
@@ -17,61 +25,43 @@ async function queryStandupReports(options = {}) {
   try {
     const defaultOptions = {
       maxRecords: 10,
-      team: 'Frontend Cursor',
-      status: null, // null means any status
-      sortField: 'Date',
-      sortDirection: 'desc'
+      team: 'Frontend_Cursor',
+      days: 7, // Last 7 days by default
+      tags: [] // No tag filtering by default
     };
     
     const queryOptions = { ...defaultOptions, ...options };
-    console.log('Querying Airtable for standup reports with options:', queryOptions);
+    console.log('Querying webhook for standup reports with options:', queryOptions);
     
-    // Build filter formula
-    let filterFormula = "";
-    if (queryOptions.team) {
-      filterFormula += `{Team} = "${queryOptions.team}"`;
-    }
-    
-    if (queryOptions.status) {
-      if (filterFormula) filterFormula += " AND ";
-      filterFormula += `{Status} = "${queryOptions.status}"`;
-    }
-    
-    // Build query parameters
-    const queryParams = {
-      tableId: AIRTABLE_CONFIG.STANDUP_TABLE_ID,
-      maxRecords: queryOptions.maxRecords,
-      view: AIRTABLE_CONFIG.STANDUP_VIEW_ID,
-      sort: [
-        { field: queryOptions.sortField, direction: queryOptions.sortDirection }
-      ]
-    };
-    
-    if (filterFormula) {
-      queryParams.filterByFormula = filterFormula;
-    }
-    
-    // Make query request
-    const result = await airtableFetch('/query', {
+    // Make query request to webhook
+    const response = await fetch(`${WEBHOOK_CONFIG.WEBHOOK_URL}/query`, {
       method: 'POST',
-      body: JSON.stringify(queryParams)
+      headers: WEBHOOK_CONFIG.DEFAULT_HEADERS,
+      body: JSON.stringify({
+        team: queryOptions.team,
+        days: queryOptions.days,
+        maxRecords: queryOptions.maxRecords,
+        tags: queryOptions.tags
+      })
     });
     
-    if (!result || !result.records) {
-      throw new Error('Invalid response from Airtable API');
+    if (!response.ok) {
+      throw new Error(`Webhook error (${response.status}): ${await response.text()}`);
     }
     
+    const reports = await response.json();
+    
     // Success
-    console.log(`Found ${result.records.length} standup reports`);
+    console.log(`Found ${reports.length} standup reports`);
     
     return {
       success: true,
-      records: result.records,
-      count: result.records.length
+      reports: reports,
+      count: reports.length
     };
   } catch (error) {
     console.error('Query failed:', error);
-    log('Failed to query Airtable', { error: error.message }, 'error');
+    log('Failed to query reports via webhook', { error: error.message }, 'error');
     
     return {
       success: false,
@@ -82,32 +72,35 @@ async function queryStandupReports(options = {}) {
 
 /**
  * Display standup reports in the console in a user-friendly format
- * @param {Array} records - Airtable records
+ * @param {Array} reports - Reports from webhook
  */
-function displayReports(records) {
-  if (!records || records.length === 0) {
-    console.log('No records found');
+function displayReports(reports) {
+  if (!reports || reports.length === 0) {
+    console.log('No reports found');
     return;
   }
   
-  console.log(`----- Found ${records.length} Standup Reports -----`);
+  console.log(`----- Found ${reports.length} Standup Reports -----`);
   
-  records.forEach((record, index) => {
-    const fields = record.fields;
+  reports.forEach((report, index) => {
+    console.log(`\n[${index + 1}] ${report.Title || 'Untitled Report'}`);
+    console.log(`ID: ${report.ID || 'Unknown'}`);
+    console.log(`Created: ${report.Created ? new Date(report.Created).toLocaleString() : 'Unknown'}`);
     
-    console.log(`\n[${index + 1}] ${fields.Title || 'Untitled Report'}`);
-    console.log(`Date: ${fields.Date || 'Unknown'}`);
-    console.log(`Team: ${fields.Team || 'Unknown'}`);
-    console.log(`Status: ${fields.Status || 'Unknown'}`);
-    console.log(`Reporter: ${fields.Reporter || 'Unknown'}`);
-    
-    // Show summary if available
-    if (fields.Summary) {
-      console.log(`\nSummary: ${fields.Summary.slice(0, 100)}${fields.Summary.length > 100 ? '...' : ''}`);
+    if (report.Priorities && report.Priorities.length > 0) {
+      console.log('\nPriorities:');
+      report.Priorities.forEach(priority => console.log(`- ${priority}`));
     }
     
-    // Show ID and record URL
-    console.log(`\nRecord ID: ${record.id}`);
+    if (report.Findings && report.Findings.length > 0) {
+      console.log('\nFindings:');
+      report.Findings.forEach(finding => console.log(`- ${finding}`));
+    }
+    
+    if (report.Next_Steps && report.Next_Steps.length > 0) {
+      console.log('\nNext Steps:');
+      report.Next_Steps.forEach(step => console.log(`- ${step}`));
+    }
   });
 }
 
@@ -116,12 +109,12 @@ function displayReports(records) {
  * @param {Object} options - Query options
  */
 async function queryAndDisplay(options = {}) {
-  console.log('Querying Airtable for standup reports...');
+  console.log('Querying webhook for standup reports...');
   
   const result = await queryStandupReports(options);
   
   if (result.success) {
-    displayReports(result.records);
+    displayReports(result.reports);
   } else {
     console.error('Query failed:', result.error);
   }
@@ -130,59 +123,40 @@ async function queryAndDisplay(options = {}) {
 }
 
 /**
- * Publish a report and then query to confirm it exists
- * @param {string} reportPath - Path to report
+ * Check for backend team updates
+ * @param {number} days - Number of days to look back
  */
-async function publishAndVerify(reportPath) {
+async function checkBackendTeamUpdates(days = 3) {
   try {
-    // Import publisher
-    const publisher = await import('./publish-standup-report.js');
+    console.log(`Checking for backend team updates in the last ${days} days...`);
     
-    // Run diagnostics
-    console.log('Running diagnostics before publishing...');
-    const diagnostics = await publisher.runDiagnostics();
+    const updates = await checkBackendUpdates();
     
-    if (diagnostics.status === 'failed' || !diagnostics.authed) {
-      console.warn('⚠️ Diagnostics indicate potential issues, but will try to publish anyway');
-    }
-    
-    // Publish report
-    console.log('Publishing report...');
-    const publishResult = await publisher.publishWithNotification(reportPath);
-    
-    if (!publishResult.success) {
-      throw new Error(`Failed to publish: ${publishResult.error || 'Unknown error'}`);
-    }
-    
-    console.log('✅ Report published successfully!');
-    
-    // Wait a moment for Airtable to process
-    console.log('Waiting for Airtable to process...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Query to verify
-    console.log('Querying Airtable to verify report exists...');
-    const queryResult = await queryStandupReports();
-    
-    if (queryResult.success && queryResult.records.length > 0) {
-      console.log('✅ Verification successful! Found records in Airtable');
-      displayReports(queryResult.records);
+    if (!updates || updates.length === 0) {
+      console.log('No recent backend team updates found.');
       return {
         success: true,
-        publishResult,
-        queryResult
-      };
-    } else {
-      console.error('❌ Verification failed: Could not find published report in Airtable');
-      return {
-        success: false,
-        publishResult,
-        queryResult,
-        error: 'Verification failed'
+        updates: [],
+        count: 0
       };
     }
+    
+    console.log(`Found ${updates.length} backend team updates:`);
+    updates.forEach((update, index) => {
+      console.log(`\n[${index + 1}] ${update.title}`);
+      if (update.priorities && update.priorities.length > 0) {
+        console.log('Priorities:');
+        update.priorities.forEach(priority => console.log(`- ${priority}`));
+      }
+    });
+    
+    return {
+      success: true,
+      updates,
+      count: updates.length
+    };
   } catch (error) {
-    console.error('❌ Publish and verify failed:', error);
+    console.error('Failed to check backend updates:', error);
     return {
       success: false,
       error: error.message
@@ -195,15 +169,15 @@ export {
   queryStandupReports,
   displayReports,
   queryAndDisplay,
-  publishAndVerify
+  checkBackendTeamUpdates
 };
 
 // Add to window for console access
 if (typeof window !== 'undefined') {
   window.queryStandupReports = queryAndDisplay;
-  window.publishAndVerify = publishAndVerify;
+  window.checkBackendTeamUpdates = checkBackendTeamUpdates;
   
   console.log('📊 Airtable query utility loaded');
   console.log('To query reports: queryStandupReports()');
-  console.log('To publish and verify: publishAndVerify("/shared/docs/standup-reports/april-7-frontend-standup-01.mdc")');
+  console.log('To check backend updates: checkBackendTeamUpdates()');
 } 
