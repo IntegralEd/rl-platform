@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Goalsetter Build Checklist
+# Goalsetter Build Checklist (Updated April 12, 2025)
 
 ## 🎯 Current State
 ```
@@ -13,6 +13,20 @@ alwaysApply: false
 ├── goalsetter_temp.html # Temp version (2.8KB)
 └── goalsetter_review.html # Review version (2.8KB) - READ ONLY
 ```
+
+## 📋 Development Workflow Requirements
+
+### Branch Management (NEW)
+- [ ] Work only on main branch for this project
+- [ ] Only modify files in `/clients`, `/shared`, and specific `/scripts`
+- [ ] Follow the new CURSOR rule `main-branch-directory-restrictions.mdc`
+- [ ] Pull latest changes before beginning work
+
+### Standup Reporting (UPDATED)
+- [ ] Use new webhook-based standup reporting system
+- [ ] Submit reports using `submit-standup-webhook.js` script
+- [ ] Follow standardized JSON format as defined in `frontend_standup_guide.md`
+- [ ] Label reports with source "Frontend_Cursor"
 
 ## 🔄 Phase 1: Core Cleanup (Steps 1-6)
 ```javascript
@@ -127,6 +141,13 @@ const Monitor = {
 - [ ] Create reports
 - [ ] Add Qipu integration
 
+### Webhook Integration (NEW)
+- [ ] Import `frontend-standup-client.js` for standup reporting
+- [ ] Add build process monitoring hooks
+- [ ] Implement automatic report generation
+- [ ] Configure backend update monitoring
+- [ ] Add documentation status checks
+
 🛑 FINAL DECISION POINT
 Options:
 1. Deploy if all tests pass
@@ -156,6 +177,7 @@ describe('Goalsetter', () => {
 - 100% accessibility score
 - All tests passing
 - No modifications to _live.html pages
+- Successful standup report submissions via webhook
 
 ## 🚨 Abort Conditions
 1. State corruption
@@ -210,6 +232,7 @@ const metrics = {
 - [ ] Message tracking logs
 - [ ] Error handling logs
 - [ ] State change logs
+- [ ] Standup report submission logs (NEW)
 
 ## Testing Requirements
 - [ ] Viewport responsiveness
@@ -229,12 +252,14 @@ const metrics = {
 - [x] Logging patterns documented
 - [ ] State management flows
 - [ ] Error handling procedures
+- [x] Standup reporting procedures (NEW)
 
 ## Migration Notes
 - [x] BHB layout patterns integrated
 - [x] Logging standards adopted
 - [ ] Navigation flow updated
-- [ ] Chat UI modernized 
+- [ ] Chat UI modernized
+- [x] Standup report system migrated to webhook (NEW)
 
 ## Directory Structure
 ```
@@ -248,7 +273,7 @@ const metrics = {
     │   ├── st-variables.css  # ST brand variables
     │   └── st-custom.css     # Custom styles
     ├── js/
-    │   └── st-goalsetter-auth.js  # Auth logic
+    │   └── goalsetter-reporting.js # For webhook integration (NEW)
     └── images/
         └── ST TH Powered By White Logo.png
 ```
@@ -416,3 +441,43 @@ const metrics = {
 - [ ] Add error handling guide
 - [ ] Update testing procedures
 - [ ] Document layout constraints 
+
+## Webhook Implementation (NEW)
+```javascript
+// Standup webhook integration
+import { submitStandupReport } from '/shared/assets/js/frontend-standup-client.js';
+
+// Example report submission
+submitStandupReport({
+  developer: 'Frontend Team',
+  findings: [
+    'Implemented goal setter UI component',
+    'Fixed responsive layout issues'
+  ],
+  priorities: [
+    'Complete loading state animations',
+    'Integrate with backend API'
+  ],
+  nextSteps: [
+    'User testing',
+    'Documentation updates'
+  ],
+  futureFeatures: [
+    'Real-time collaboration',
+    'Dashboard integration'
+  ]
+});
+```
+
+## Webhook Resources (NEW)
+- Standard Implementation: `/shared/assets/js/frontend-standup-client.js`
+- Command-line Tool: `/scripts/submit-standup-webhook.js` 
+- Documentation: `/shared/docs/frontend_standup_guide.md`
+- Report Template: `/shared/docs/standup-reports/TEMPLATE_frontend.md`
+
+## Team Collaboration (NEW)
+- Frontend team works on `/clients` and `/shared` directories in main branch
+- Admin team works on `/admin` directory in their own branch
+- All teams use the webhook system for standup reporting
+- Admin team labels reports with source "Frontend/admin-tree"
+- Coordination happens through the webhook system 
