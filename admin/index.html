@@ -10,8 +10,8 @@
             --secondary: #E87722;
             --bg-light: #f5f5f5;
             --text: #2b2b2b;
-            --tree-width: 33%;
-            --content-width: 67%;
+            --tree-width: 280px;
+            --content-width: calc(100% - 280px);
             --header-height: 60px;
             --card-bg: white;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -55,6 +55,17 @@
             height: 40px;
             margin-right: 15px;
         }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         /* DOS Tree Styles */
         .dos-tree {
@@ -64,6 +75,7 @@
             overflow-y: auto;
             border-right: 1px solid #ddd;
             box-shadow: var(--card-shadow);
+            flex-shrink: 0;
         }
 
         .tree-item {
@@ -207,7 +219,7 @@
             display: none;
         }
 
-        .tree-children.open {
+        .tree-children.expanded {
             display: block;
         }
 
@@ -541,6 +553,57 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             max-width: 600px;
         }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-info {
+            background-color: #2196F3;
+        }
+        
+        .toast-success {
+            background-color: #4CAF50;
+        }
+        
+        .toast-warning {
+            background-color: #FF9800;
+        }
+        
+        .toast-error {
+            background-color: #F44336;
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            background: var(--card-bg);
+            border-top: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -557,22 +620,6 @@
     <!-- Admin content -->
     <div id="admin-content">
         <div class="admin-container">
-            <!-- Bottom Icons -->
-            <div class="bottom-icons">
-                <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
-                    <span class="bottom-icon-tooltip">Curious Intake Form</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                    </svg>
-                </a>
-                <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" class="bottom-icon" title="Admin Panel">
-                    <span class="bottom-icon-tooltip">Admin Panel</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                    </svg>
-                </a>
-            </div>
-
             <!-- DOS Tree -->
             <div class="dos-tree">
                 <div class="tree-item tree-folder">
@@ -580,19 +627,19 @@
                     <span class="tree-icon">📁</span>
                     <span>clients</span>
                 </div>
-                <div class="tree-children open">
+                <div class="tree-children expanded">
                     <div class="tree-item tree-folder">
                         <span class="tree-toggle open"></span>
                         <span class="tree-icon">📁</span>
                         <span>elpl</span>
                     </div>
-                    <div class="tree-children open">
+                    <div class="tree-children expanded">
                         <div class="tree-item tree-folder">
                             <span class="tree-toggle open"></span>
                             <span class="tree-icon">📁</span>
                             <span>merit</span>
                         </div>
-                        <div class="tree-children open">
+                        <div class="tree-children expanded">
                             <div class="tree-item tree-file">
                                 <div class="tree-content">
                                     <span class="tree-icon">📄</span>
@@ -604,14 +651,9 @@
                                     <span class="tree-icon">📄</span>
                                     <span>merit_live.html</span>
                                     <div class="tree-file-actions">
-                                        <button class="tree-action" onclick="copyUrl('/clients/elpl/merit/merit_live.html')" title="Copy URL">
+                                        <button class="tree-action" onclick="RecursiveAdmin.ui.clipboard.copy(window.location.origin + '/clients/elpl/merit/merit_live.html')" title="Copy URL">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                            </svg>
-                                        </button>
-                                        <button class="tree-action" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')" title="Share URL">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                             </svg>
                                         </button>
                                     </div>
@@ -655,7 +697,7 @@
                         <span class="tree-icon">📁</span>
                         <span>goalsetter</span>
                     </div>
-                    <div class="tree-children open">
+                    <div class="tree-children expanded">
                         <div class="tree-item tree-file">
                             <div class="tree-content">
                                 <span class="tree-icon">📄</span>
@@ -667,14 +709,9 @@
                                 <span class="tree-icon">📄</span>
                                 <span>goalsetter_live.html</span>
                                 <div class="tree-file-actions">
-                                    <button class="tree-action" onclick="copyUrl('/clients/st/goalsetter/goalsetter_live.html')" title="Copy URL">
+                                    <button class="tree-action" onclick="RecursiveAdmin.ui.clipboard.copy(window.location.origin + '/clients/st/goalsetter/goalsetter_live.html')" title="Copy URL">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                        </svg>
-                                    </button>
-                                    <button class="tree-action" onclick="shareUrl('/clients/st/goalsetter/goalsetter_live.html', 'Goal Setter')" title="Share URL">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
                                     </button>
                                 </div>
@@ -705,37 +742,31 @@
                         <span>bmorehealthybabies.html</span>
                     </div>
                 </div>
-            </div>
-            <div class="tree-item tree-folder">
-                <span class="tree-toggle open"></span>
-                <span class="tree-icon">📁</span>
-                <span>admin</span>
-            </div>
-            <div class="tree-children open">
+                
                 <div class="tree-item tree-folder">
                     <span class="tree-toggle open"></span>
                     <span class="tree-icon">📁</span>
-                    <span>pages</span>
+                    <span>admin</span>
                 </div>
-                <div class="tree-children open">
+                <div class="tree-children expanded">
                     <div class="tree-item tree-folder">
                         <span class="tree-toggle open"></span>
                         <span class="tree-icon">📁</span>
-                        <span>elpl</span>
+                        <span>pages</span>
                     </div>
-                    <div class="tree-children open">
+                    <div class="tree-children expanded">
                         <div class="tree-item tree-folder">
                             <span class="tree-toggle open"></span>
                             <span class="tree-icon">📁</span>
-                            <span>merit</span>
+                            <span>elpl</span>
                         </div>
-                        <div class="tree-children open">
+                        <div class="tree-children expanded">
                             <div class="tree-item tree-folder">
                                 <span class="tree-toggle open"></span>
                                 <span class="tree-icon">📁</span>
                                 <span>merit</span>
                             </div>
-                            <div class="tree-children open">
+                            <div class="tree-children expanded">
                                 <div class="tree-item tree-file">
                                     <span class="tree-icon">📄</span>
                                     <span>merit_admin.html</span>
@@ -746,145 +777,149 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle open"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>st</span>
-                    </div>
-                    <div class="tree-children open">
                         <div class="tree-item tree-folder">
                             <span class="tree-toggle open"></span>
                             <span class="tree-icon">📁</span>
-                            <span>goalsetter</span>
+                            <span>st</span>
                         </div>
-                        <div class="tree-children open">
+                        <div class="tree-children expanded">
+                            <div class="tree-item tree-folder">
+                                <span class="tree-toggle open"></span>
+                                <span class="tree-icon">📁</span>
+                                <span>goalsetter</span>
+                            </div>
+                            <div class="tree-children expanded">
+                                <div class="tree-item tree-file">
+                                    <span class="tree-icon">📄</span>
+                                    <span>goalsetter_admin.html</span>
+                                </div>
+                                <div class="tree-item tree-file">
+                                    <span class="tree-icon">📄</span>
+                                    <span>goalsetter_review.html</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tree-item tree-folder">
+                            <span class="tree-toggle"></span>
+                            <span class="tree-icon">📁</span>
+                            <span>bhb</span>
+                        </div>
+                        <div class="tree-children">
                             <div class="tree-item tree-file">
                                 <span class="tree-icon">📄</span>
-                                <span>goalsetter_admin.html</span>
+                                <span>admin.html</span>
                             </div>
-                            <div class="tree-item tree-file">
-                                <span class="tree-icon">📄</span>
-                                <span>goalsetter_review.html</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>bhb</span>
-                    </div>
-                    <div class="tree-children">
-                        <div class="tree-item tree-file">
-                            <span class="tree-icon">📄</span>
-                            <span>admin.html</span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="tree-item tree-folder">
-                <span class="tree-toggle"></span>
-                <span class="tree-icon">📁</span>
-                <span>shared</span>
-            </div>
-            <div class="tree-children">
                 <div class="tree-item tree-folder">
                     <span class="tree-toggle"></span>
                     <span class="tree-icon">📁</span>
-                    <span>admin</span>
+                    <span>shared</span>
                 </div>
                 <div class="tree-children">
                     <div class="tree-item tree-folder">
                         <span class="tree-toggle"></span>
                         <span class="tree-icon">📁</span>
-                        <span>assets</span>
+                        <span>admin</span>
                     </div>
                     <div class="tree-children">
                         <div class="tree-item tree-folder">
                             <span class="tree-toggle"></span>
                             <span class="tree-icon">📁</span>
-                            <span>images</span>
+                            <span>assets</span>
+                        </div>
+                        <div class="tree-children">
+                            <div class="tree-item tree-folder">
+                                <span class="tree-toggle"></span>
+                                <span class="tree-icon">📁</span>
+                                <span>images</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>docs</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Cards -->
-        <div class="admin-cards">
-            <!-- GoalSetter Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">Goal Setter</h2>
-                <div class="status-indicators">
-                    <div class="status-dot" data-status="active" data-tooltip="API Connected"></div>
-                    <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
-                    <div class="status-dot" data-status="error" data-tooltip="User Sessions"></div>
-                </div>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                        </svg>
-                        Open Admin
-                    </button>
+                    <div class="tree-item tree-folder">
+                        <span class="tree-toggle"></span>
+                        <span class="tree-icon">📁</span>
+                        <span>docs</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Merit System Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">Merit System</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                        </svg>
-                        Open Admin
-                    </button>
-                    <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        View Live
-                    </button>
-                    <button class="action-button" onclick="shareActivity('/clients/elpl/merit/merit_live.html', 'Merit System')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                        </svg>
-                        Share
-                    </button>
+            <!-- Admin Cards -->
+            <div class="admin-cards">
+                <!-- GoalSetter Admin Card -->
+                <div class="admin-card" data-activity="goalsetter">
+                    <h2 class="card-title">Goal Setter</h2>
+                    <div class="status-indicators">
+                        <div class="status-dot" data-status="active" data-tooltip="API Connected"></div>
+                        <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
+                        <div class="status-dot" data-status="error" data-tooltip="User Sessions"></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Merit System Admin Card -->
+                <div class="admin-card" data-activity="merit">
+                    <h2 class="card-title">Merit System</h2>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                        <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BHB Admin Card -->
+                <div class="admin-card" data-activity="bhb">
+                    <h2 class="card-title">BHB</h2>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                        <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Live
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <!-- BHB Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">BHB</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                        </svg>
-                        Open Admin
-                    </button>
-                    <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                        </svg>
-                        View Live
-                    </button>
-                    <button class="action-button" onclick="shareActivity('/clients/bhb/bmorehealthybabies_live.html', 'BHB')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                        </svg>
-                        Share
-                    </button>
-                </div>
+            
+            <!-- Bottom Icons -->
+            <div class="bottom-icons">
+                <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
+                    <span class="bottom-icon-tooltip">Curious Intake Form</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                </a>
+                <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" class="bottom-icon" title="Admin Panel">
+                    <span class="bottom-icon-tooltip">Admin Panel</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                    </svg>
+                </a>
             </div>
         </div>
     </div>
@@ -893,160 +928,8 @@
         <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
     </footer>
 
-    <!-- Commented out script references until implementation
+    <!-- Active JavaScript files -->
     <script src="assets/js/admin-common.js"></script>
     <script src="assets/js/admin-nav.js"></script>
-    <script src="assets/js/user-management.js"></script>
-    <script src="assets/js/content-review.js"></script>
-    <script src="assets/js/analytics-dashboard.js"></script> -->
-    
-    <!-- Active scripts -->
-    <!-- Removed test-standup-airtable.js as we're using webhooks now -->
-    <script src="assets/js/admin-common.js"></script>
-    <script src="assets/js/admin-nav.js"></script>
-    
-    <!-- Page-specific scripts loaded dynamically -->
-    <script>
-        // Copy URL function with fallback
-        function copyUrl(url) {
-            const fullUrl = window.location.origin + url;
-            
-            // Try using clipboard API first
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(fullUrl)
-                    .then(() => showToast('URL copied!'))
-                    .catch(() => fallbackCopyUrl(fullUrl));
-            } else {
-                fallbackCopyUrl(fullUrl);
-            }
-        }
-
-        // Fallback copy method using textarea
-        function fallbackCopyUrl(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-
-            try {
-                document.execCommand('copy');
-                textArea.remove();
-                showToast('URL copied!');
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                textArea.remove();
-                showToast('Failed to copy URL');
-            }
-        }
-
-        // Share URL function
-        function shareUrl(url, title) {
-            const fullUrl = window.location.origin + url;
-            const subject = `Access to ${title}`;
-            const body = `Here's your link to access ${title}:\n\n${fullUrl}`;
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-
-        // Show toast message
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'copy-success-tooltip';
-            toast.style.position = 'fixed';
-            toast.style.bottom = '20px';
-            toast.style.right = '20px';
-            toast.style.background = '#333';
-            toast.style.color = 'white';
-            toast.style.padding = '8px 16px';
-            toast.style.borderRadius = '4px';
-            toast.style.zIndex = '1000';
-            toast.textContent = message;
-            
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 200);
-            }, 2000);
-        }
-
-        // Initialize status indicators
-        function initializeStatusIndicators() {
-            // Example: Listen for messages from admin pages
-            window.addEventListener('message', (event) => {
-                if (event.data.type === 'status') {
-                    updateStatus(event.data.activity, event.data.status);
-                }
-            });
-        }
-
-        function updateStatus(activity, status) {
-            const card = document.querySelector(`.admin-card[data-activity="${activity}"]`);
-            if (card) {
-                const dots = card.querySelectorAll('.status-dot');
-                dots.forEach((dot, index) => {
-                    if (status[index]) {
-                        dot.dataset.status = status[index].state;
-                        dot.dataset.tooltip = status[index].message;
-                    }
-                });
-            }
-        }
-
-        // Development bypass for local testing
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log('Development mode: Authentication bypassed');
-            // Set admin user role for testing
-            localStorage.setItem('userRole', 'admin');
-            document.querySelector('.admin-header').insertAdjacentHTML('beforeend', 
-                '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px;">DEV MODE</div>');
-        }
-
-        // Initialize tree view functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggles = document.querySelectorAll('.tree-toggle');
-            toggles.forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    const item = this.parentElement;
-                    const children = item.nextElementSibling;
-                    if (children && children.classList.contains('tree-children')) {
-                        children.classList.toggle('expanded');
-                        this.classList.toggle('open');
-                    }
-                });
-            });
-
-            initializeStatusIndicators();
-        });
-
-        // Share activity function for buttons
-        function shareActivity(url, title) {
-            const shareMenu = document.createElement('div');
-            shareMenu.className = 'share-menu';
-            shareMenu.innerHTML = `
-                <div class="share-option" onclick="copyUrl('${url}')">Copy Link</div>
-                <div class="share-option" onclick="shareUrl('${url}', '${title}')">Email Link</div>
-            `;
-            
-            document.body.appendChild(shareMenu);
-            
-            // Position near the click
-            const rect = event.target.getBoundingClientRect();
-            shareMenu.style.top = (rect.bottom + 10) + 'px';
-            shareMenu.style.left = rect.left + 'px';
-            
-            // Close on next click
-            setTimeout(() => {
-                document.addEventListener('click', function closeMenu() {
-                    shareMenu.remove();
-                    document.removeEventListener('click', closeMenu);
-                });
-            }, 0);
-            
-            event.stopPropagation();
-        }
-    </script>
 </body>
 </html> 
