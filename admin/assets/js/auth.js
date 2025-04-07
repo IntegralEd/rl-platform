@@ -1,403 +1,452 @@
 /**
- * Authentication Module for Recursive Learning Admin
- * Handles multiple authentication sources in priority order:
- * 1. URL parameters (highest priority)
- * 2. Header span (secondary)
- * 3. PostMessage from parent frame (fallback)
+ * Authentication Module (Simplified for Softr Integration)
+ * 
+ * Provides simplified authentication for development purposes when running
+ * in a Softr iframe. Focuses on allowing easy access from trusted domains
+ * with minimal authentication barriers.
  */
-(function() {
-    // Configuration
-    const DEBUG = true;
-    const SOFTR_ORIGIN = 'https://integral-mothership.softr.app';
-    const AUTH_TIMEOUT = 10000; // 10 seconds timeout for auth
 
-    // Required roles for admin access
-    const ADMIN_ROLES = ['admin', 'org_admin', 'team_leader'];
-    
-    // Set to track authentication attempts
-    const authMethodsAttempted = new Set();
-    
-    // User session data
-    let currentUser = null;
-    let authTimer = null;
-    
-    // Debug logging helper
-    function log(...args) {
-        if (DEBUG) {
-            console.log('[Auth]', ...args);
-        }
-    }
-    
-    /**
-     * Main authentication controller
-     * Tries all available auth methods in sequence
-     */
-    function initAuth() {
-        log('Initializing authentication...');
-        
-        // Set timeout for authentication
-        authTimer = setTimeout(function() {
-            log('Authentication timed out');
-            if (!currentUser) {
-                showAccessDenied('Authentication timed out. Please refresh or log in again.');
-            }
-        }, AUTH_TIMEOUT);
-        
-        // Try authentication methods in priority order
-        tryUrlAuth();
-        tryHeaderSpanAuth();
-        setupPostMessageAuth();
-        
-        // Notify parent frame that we're ready for auth data
-        notifyParentFrame();
-    }
-    
-    /**
-     * 1. Try URL parameter authentication (highest priority)
-     */
-    function tryUrlAuth() {
-        log('Attempting URL parameter authentication');
-        authMethodsAttempted.add('url');
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('User_ID') || urlParams.get('user_id') || urlParams.get('userId');
-        const name = urlParams.get('Name') || urlParams.get('name');
-        const email = urlParams.get('Email') || urlParams.get('email');
-        const role = urlParams.get('Role') || urlParams.get('role');
-        
-        if (userId && role) {
-            log('Auth data found in URL params');
-            processAuthData({
-                userId,
-                name: name || 'Guest',
-                email: email || '',
-                role: role.toLowerCase(),
-                source: 'url'
-            });
-            return true;
-        }
-        
-        log('No valid auth data in URL params');
-        return false;
-    }
-    
-    /**
-     * 2. Try header span authentication (secondary)
-     */
-    function tryHeaderSpanAuth() {
-        log('Attempting header span authentication');
-        authMethodsAttempted.add('header-span');
-        
-        const headerSpan = document.querySelector('#header-span');
-        if (!headerSpan) {
-            log('No header span found in document');
-            return false;
-        }
-        
-        const userId = headerSpan.getAttribute('data-user-id');
-        const name = headerSpan.getAttribute('data-user-name');
-        const email = headerSpan.getAttribute('data-user-email');
-        const role = headerSpan.getAttribute('data-role-level');
-        
-        if (userId && role) {
-            log('Auth data found in header span');
-            processAuthData({
-                userId,
-                name: name || 'Guest',
-                email: email || '',
-                role: role.toLowerCase(),
-                source: 'header-span'
-            });
-            return true;
-        }
-        
-        log('No valid auth data in header span');
-        return false;
-    }
-    
-    /**
-     * 3. Set up postMessage authentication listener (fallback)
-     */
-    function setupPostMessageAuth() {
-        log('Setting up postMessage authentication listener');
-        authMethodsAttempted.add('postMessage');
-        
-        window.addEventListener('message', function(event) {
-            // Only accept messages from trusted origins
-            if (event.origin !== SOFTR_ORIGIN && 
-                !event.origin.includes('recursivelearning.app') && 
-                !event.origin.includes('localhost')) {
-                return;
-            }
-            
-            try {
-                const message = event.data;
-                
-                // Handle auth-data message type
-                if (message && message.type === 'auth-data') {
-                    log('Received auth data via postMessage');
-                    processAuthData({
-                        userId: message.userId,
-                        name: message.name || 'Guest',
-                        email: message.email || '',
-                        role: message.role ? message.role.toLowerCase() : '',
-                        source: 'postMessage'
-                    });
-                }
-            } catch (e) {
-                log('Error processing postMessage', e);
-            }
-        });
-    }
-    
-    /**
-     * Notify parent frame that we're ready for auth data
-     */
-    function notifyParentFrame() {
-        if (window.parent !== window) {
-            try {
-                log('Notifying parent frame we are ready for auth');
-                window.parent.postMessage({
-                    type: 'iframe-ready',
-                    url: window.location.href
-                }, '*');
-            } catch (e) {
-                log('Could not notify parent frame', e);
-            }
-        }
-    }
-    
-    /**
-     * Process authentication data from any source
-     * @param {Object} data - User authentication data
-     */
-    function processAuthData(data) {
-        // Skip if we already have authenticated
-        if (currentUser) {
-            log('Auth already completed, ignoring new data from', data.source);
-            return;
-        }
-        
-        log('Processing auth data from', data.source, data);
-        
-        // Validate required fields
-        if (!data.userId || !data.role) {
-            log('Invalid auth data, missing userId or role');
-            return;
-        }
+// Configuration
+const AUTH_CONFIG = {
+  // Development mode (enable for easier access during development)
+  DEBUG: true,
+  
+  // Trusted origins that will be auto-authenticated
+  TRUSTED_ORIGINS: [
+    'integral-mothership.softr.app',
+    'recursivelearning.app',
+    'localhost'
+  ],
+  
+  // Login endpoint (for fallback)
+  LOGIN_ENDPOINT: '/auth/login',
+  
+  // Redirect URL param (might be used by Softr embedding)
+  REDIRECT_PARAM: 'redirect_uri',
+  
+  // How long to wait for authentication (ms)
+  AUTH_TIMEOUT: 5000
+};
 
-        // Convert role to lowercase for case-insensitive comparison
-        const role = data.role.toLowerCase();
-        
-        // Check if role is allowed
-        if (!ADMIN_ROLES.includes(role)) {
-            log('Access denied for role:', role);
-            showAccessDenied(`The role "${data.role}" does not have permission to access admin features.`);
-            return;
-        }
+// Default user for development
+const DEV_USER = {
+  id: 'dev-user-1234',
+  name: 'Development User',
+  email: 'dev@recursivelearning.app',
+  role: 'admin',
+  permissions: ['read', 'write', 'admin'],
+  token: 'dev-token-1234',
+  origin: 'development'
+};
 
-        // Valid authentication
-        currentUser = {
-            id: data.userId,
-            name: data.name || 'Guest',
-            email: data.email || '',
-            role: role,
-            authenticated: true,
-            authSource: data.source,
-            timestamp: new Date().toISOString()
-        };
-        
-        // Clear timeout since we're authenticated
-        if (authTimer) {
-            clearTimeout(authTimer);
-            authTimer = null;
-        }
-        
-        // Save to session storage for persistence
-        try {
-            sessionStorage.setItem('rl_admin_user', JSON.stringify(currentUser));
-        } catch (e) {
-            log('Could not save to session storage', e);
-        }
-        
-        // Update UI
-        showAdminInterface();
-        
-        // Publish event for other modules
-        dispatchUserAuthenticated(currentUser);
-        
-        return currentUser;
+// State
+let authState = {
+  authenticated: false,
+  user: null,
+  token: null,
+  processingAuth: false,
+  origin: null
+};
+
+/**
+ * Initialize authentication
+ * @returns {Promise<boolean>} Whether authentication was successful
+ */
+async function initAuth() {
+  console.log('Initializing authentication...');
+  
+  // If already authenticated, return immediately
+  if (authState.authenticated && authState.user) {
+    console.log('Already authenticated:', authState.user.name);
+    return true;
+  }
+  
+  // Try methods in order:
+  // 1. Restore from session
+  // 2. URL params auth
+  // 3. Check for Softr iframe
+  // 4. Dev user fallback
+  
+  try {
+    // 1. Try to restore from session first
+    if (await restoreSession()) {
+      console.log('Session restored');
+      return true;
     }
     
-    /**
-     * Show access denied message
-     * @param {string} message - Custom error message
-     */
-    function showAccessDenied(message) {
-        const accessDeniedEl = document.getElementById('access-denied');
-        const loadingEl = document.getElementById('loading');
-        const adminContentEl = document.getElementById('admin-content');
-        
-        // If elements don't exist, create them
-        if (!accessDeniedEl) {
-            const newEl = document.createElement('div');
-            newEl.id = 'access-denied';
-            newEl.className = 'access-denied';
-            newEl.innerHTML = `
-                <div class="access-denied-content">
-                    <h2>Access Denied</h2>
-                    <p id="access-denied-message">${message || 'You do not have permission to access this page.'}</p>
-                    <div class="actions">
-                        <button onclick="window.location.reload()">Try Again</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(newEl);
-        } else {
-            const messageEl = accessDeniedEl.querySelector('#access-denied-message');
-            if (messageEl) {
-                messageEl.textContent = message || 'You do not have permission to access this page.';
-            }
-            accessDeniedEl.style.display = 'flex';
-        }
-        
-        // Hide other elements
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (adminContentEl) adminContentEl.style.display = 'none';
-        
-        // Log authentication methods that were attempted
-        log('Authentication failed. Methods attempted:', Array.from(authMethodsAttempted).join(', '));
-        
-        // Clear timeout
-        if (authTimer) {
-            clearTimeout(authTimer);
-            authTimer = null;
-        }
+    // 2. Check URL params
+    if (await authenticateFromUrlParams()) {
+      console.log('Authenticated from URL params');
+      return true;
     }
     
-    /**
-     * Show the admin interface after successful authentication
-     */
-    function showAdminInterface() {
-        const accessDeniedEl = document.getElementById('access-denied');
-        const loadingEl = document.getElementById('loading');
-        const adminContentEl = document.getElementById('admin-content');
-        
-        // Hide non-content elements
-        if (accessDeniedEl) accessDeniedEl.style.display = 'none';
-        if (loadingEl) loadingEl.style.display = 'none';
-        
-        // Show content
-        if (adminContentEl) {
-            adminContentEl.style.display = 'block';
-            log('Admin interface displayed');
-        } else {
-            log('Warning: #admin-content element not found');
-        }
-        
-        // Update user display if it exists
-        updateUserDisplay();
+    // 3. Check if running in a Softr iframe
+    if (isInSoftrFrame()) {
+      console.log('Running in Softr iframe - auto authenticating');
+      return await autoAuthenticateSoftrUser();
     }
     
-    /**
-     * Update UI elements with user info
-     */
-    function updateUserDisplay() {
-        if (!currentUser) return;
-        
-        const userNameEl = document.getElementById('user-name');
-        const userRoleEl = document.getElementById('user-role');
-        
-        if (userNameEl) {
-            userNameEl.textContent = currentUser.name;
-        }
-        
-        if (userRoleEl) {
-            userRoleEl.textContent = currentUser.role;
-        }
+    // 4. Fall back to development user if in DEBUG mode
+    if (AUTH_CONFIG.DEBUG) {
+      console.log('DEBUG MODE: Using development user');
+      authState.user = DEV_USER;
+      authState.token = DEV_USER.token;
+      authState.authenticated = true;
+      authState.origin = 'development';
+      
+      // Update UI
+      showAdminInterface();
+      
+      // Dispatch event
+      dispatchAuthEvent('auth:success', {
+        user: authState.user,
+        origin: 'development'
+      });
+      
+      return true;
     }
     
-    /**
-     * Dispatch custom event for other modules
-     * @param {Object} userData - User data to include in event
-     */
-    function dispatchUserAuthenticated(userData) {
-        const event = new CustomEvent('rl-user-authenticated', {
-            detail: userData,
-            bubbles: true
-        });
-        document.dispatchEvent(event);
-        log('User authenticated event dispatched');
+    // None of the methods worked, redirect to login
+    redirectToLogin();
+    return false;
+  } catch (error) {
+    console.error('Authentication failed:', error);
+    
+    // If in DEBUG mode, use development user anyway
+    if (AUTH_CONFIG.DEBUG) {
+      console.log('DEBUG MODE: Using development user despite error');
+      authState.user = DEV_USER;
+      authState.token = DEV_USER.token;
+      authState.authenticated = true;
+      authState.origin = 'development';
+      
+      // Update UI
+      showAdminInterface();
+      
+      return true;
     }
     
-    /**
-     * Check if user is already authenticated from session storage
-     */
-    function checkExistingSession() {
-        try {
-            const storedUser = sessionStorage.getItem('rl_admin_user');
-            if (storedUser) {
-                const userData = JSON.parse(storedUser);
-                log('Found existing session', userData);
-                
-                // Verify the session isn't too old (30 minutes)
-                const timestamp = new Date(userData.timestamp);
-                const now = new Date();
-                const sessionAge = now - timestamp;
-                const maxAge = 30 * 60 * 1000; // 30 minutes
-                
-                if (sessionAge > maxAge) {
-                    log('Session expired, re-authenticating');
-                    sessionStorage.removeItem('rl_admin_user');
-                    return false;
-                }
-                
-                // Valid existing session
-                currentUser = userData;
-                showAdminInterface();
-                dispatchUserAuthenticated(currentUser);
-                return true;
-            }
-        } catch (e) {
-            log('Error checking existing session', e);
-        }
-        
-        return false;
+    // Show error UI
+    document.getElementById('auth-error-message').textContent = 
+      'Authentication failed: ' + error.message;
+    document.getElementById('auth-error').style.display = 'block';
+    document.getElementById('loading-indicator').style.display = 'none';
+    return false;
+  }
+}
+
+/**
+ * Check if running in a trusted Softr frame
+ * @returns {boolean} Whether in a Softr frame
+ */
+function isInSoftrFrame() {
+  try {
+    // Check if iframe
+    if (window.self === window.top) {
+      return false;
     }
     
-    /**
-     * Public API
-     */
-    window.RLAuth = {
-        // Initialize authentication
-        init: function() {
-            if (!checkExistingSession()) {
-                initAuth();
-            }
-        },
-        
-        // Get current authenticated user
-        getCurrentUser: function() {
-            return currentUser;
-        },
-        
-        // Check if user has specific role
-        hasRole: function(role) {
-            return currentUser && currentUser.role === role.toLowerCase();
-        },
-        
-        // Force logout
-        logout: function() {
-            currentUser = null;
-            sessionStorage.removeItem('rl_admin_user');
-            window.location.href = '/';
-        }
+    // Check origin if available
+    const currentHostname = window.location.hostname;
+    return AUTH_CONFIG.TRUSTED_ORIGINS.some(
+      origin => currentHostname.includes(origin)
+    );
+  } catch (e) {
+    // If we can't access parent due to same-origin policy,
+    // we might be in an iframe from another domain
+    return true;
+  }
+}
+
+/**
+ * Auto-authenticate users coming from Softr
+ * @returns {Promise<boolean>} Whether authentication was successful
+ */
+async function autoAuthenticateSoftrUser() {
+  // Create a user based on available information
+  const urlParams = new URLSearchParams(window.location.search);
+  const clientId = urlParams.get('client_id') || 'softr-client';
+  const userId = urlParams.get('user_id') || 'softr-user';
+  
+  // Try to get email and name from URL
+  const email = urlParams.get('email') || `${userId}@recursivelearning.app`;
+  const name = urlParams.get('name') || 'Softr User';
+  
+  // Create user object
+  const softrUser = {
+    id: userId,
+    name: name,
+    email: email,
+    role: 'member',
+    permissions: ['read', 'write'],
+    token: `softr-token-${Date.now()}`,
+    origin: 'softr'
+  };
+  
+  // Set state
+  authState.user = softrUser;
+  authState.token = softrUser.token;
+  authState.authenticated = true;
+  authState.origin = 'softr';
+  
+  // Store session
+  localStorage.setItem('auth_token', softrUser.token);
+  localStorage.setItem('auth_user', JSON.stringify(softrUser));
+  
+  // Update UI
+  showAdminInterface();
+  
+  // Dispatch event
+  dispatchAuthEvent('auth:success', {
+    user: authState.user,
+    origin: 'softr'
+  });
+  
+  return true;
+}
+
+/**
+ * Try to restore authentication from session storage
+ * @returns {Promise<boolean>} Whether session was restored
+ */
+async function restoreSession() {
+  try {
+    const token = localStorage.getItem('auth_token');
+    const userJson = localStorage.getItem('auth_user');
+    
+    if (!token || !userJson) {
+      return false;
+    }
+    
+    // Parse user
+    const user = JSON.parse(userJson);
+    
+    // Validate (minimal check)
+    if (!user.id || !user.email) {
+      return false;
+    }
+    
+    // Set state
+    authState.user = user;
+    authState.token = token;
+    authState.authenticated = true;
+    authState.origin = 'session';
+    
+    // Update UI
+    showAdminInterface();
+    
+    // Dispatch event
+    dispatchAuthEvent('auth:success', {
+      user: authState.user,
+      origin: 'session'
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to restore session:', error);
+    return false;
+  }
+}
+
+/**
+ * Try to authenticate from URL parameters
+ * @returns {Promise<boolean>} Whether authentication was successful
+ */
+async function authenticateFromUrlParams() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    if (!token) {
+      return false;
+    }
+    
+    // Get user info from token
+    const userId = urlParams.get('user_id') || 'url-user';
+    const email = urlParams.get('email') || `${userId}@recursivelearning.app`;
+    const name = urlParams.get('name') || 'URL User';
+    
+    // Create user
+    const urlUser = {
+      id: userId,
+      name: name,
+      email: email,
+      role: 'member',
+      permissions: ['read', 'write'],
+      token: token,
+      origin: 'url'
     };
     
-    // Auto-initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', window.RLAuth.init);
+    // Set state
+    authState.user = urlUser;
+    authState.token = token;
+    authState.authenticated = true;
+    authState.origin = 'url';
+    
+    // Store session
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('auth_user', JSON.stringify(urlUser));
+    
+    // Update UI
+    showAdminInterface();
+    
+    // Dispatch event
+    dispatchAuthEvent('auth:success', {
+      user: authState.user,
+      origin: 'url'
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Failed to authenticate from URL:', error);
+    return false;
+  }
+}
+
+/**
+ * Update UI to show admin interface
+ */
+function showAdminInterface() {
+  // Hide loading and error
+  document.getElementById('loading-indicator').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  
+  // Show content
+  document.getElementById('admin-content').style.display = 'block';
+  
+  // Update user info if element exists
+  const userElement = document.getElementById('current-user');
+  if (userElement && authState.user) {
+    userElement.textContent = authState.user.name;
+  }
+}
+
+/**
+ * Redirect to login page
+ */
+function redirectToLogin() {
+  if (AUTH_CONFIG.DEBUG) {
+    console.log('DEBUG MODE: Would redirect to login, but staying on page');
+    return;
+  }
+  
+  const currentUrl = encodeURIComponent(window.location.href);
+  window.location.href = `${AUTH_CONFIG.LOGIN_ENDPOINT}?${AUTH_CONFIG.REDIRECT_PARAM}=${currentUrl}`;
+}
+
+/**
+ * Add auth token to headers
+ * @param {Object} headers - Headers object to modify
+ */
+function addAuthHeaders(headers) {
+  if (authState.token) {
+    headers['X-Auth-Token'] = authState.token;
+  }
+  
+  // For Softr, add special bypass header
+  if (authState.origin === 'softr' || isInSoftrFrame()) {
+    headers['X-Auth-Bypass'] = 'softr-embedded';
+  }
+  
+  // In debug mode, also add this header
+  if (AUTH_CONFIG.DEBUG) {
+    headers['X-Auth-Debug'] = 'true';
+  }
+}
+
+/**
+ * Get current user
+ * @returns {Object|null} User object or null
+ */
+function getCurrentUser() {
+  return authState.user;
+}
+
+/**
+ * Check if user has a specific permission
+ * @param {string} permission - Permission to check
+ * @returns {boolean} Whether user has permission
+ */
+function hasPermission(permission) {
+  // In debug mode, always return true
+  if (AUTH_CONFIG.DEBUG) {
+    return true;
+  }
+  
+  // If running in Softr, also grant permissions
+  if (isInSoftrFrame()) {
+    return true;
+  }
+  
+  if (!authState.user || !authState.user.permissions) {
+    return false;
+  }
+  
+  // Check for admin permission (grants all)
+  if (authState.user.permissions.includes('admin')) {
+    return true;
+  }
+  
+  return authState.user.permissions.includes(permission);
+}
+
+/**
+ * Dispatch authentication event
+ * @param {string} type - Event type
+ * @param {Object} detail - Event detail
+ */
+function dispatchAuthEvent(type, detail = {}) {
+  const event = new CustomEvent(type, {
+    detail: {
+      ...detail,
+      timestamp: new Date().toISOString()
+    },
+    bubbles: true
+  });
+  document.dispatchEvent(event);
+}
+
+/**
+ * Log out current user
+ */
+function logout() {
+  // Clear state
+  authState = {
+    authenticated: false,
+    user: null,
+    token: null,
+    processingAuth: false,
+    origin: null
+  };
+  
+  // Clear storage
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('auth_user');
+  
+  // Dispatch event
+  dispatchAuthEvent('auth:logout');
+  
+  // Redirect to login
+  redirectToLogin();
+}
+
+// Initialize authentication when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded, initializing auth...');
+  initAuth().then(success => {
+    if (success) {
+      console.log('Authentication initialized successfully');
     } else {
-        window.RLAuth.init();
+      console.error('Authentication initialization failed');
     }
-})(); 
+  });
+});
+
+// Export public API
+window.auth = {
+  init: initAuth,
+  getUser: getCurrentUser,
+  hasPermission,
+  addAuthHeaders,
+  logout
+}; 

@@ -14,8 +14,32 @@ const AIRTABLE_CONFIG = {
   STANDUP_TABLE_ID: 'tblNfEQbQINXSN8C6',
   STANDUP_VIEW_ID: 'viwIwhW0J7LWD4wNo',
   FRONTEND_CURSOR_TAG: 'frontend_cursor',
-  BACKEND_CURSOR_TAG: 'backend_cursor'
+  BACKEND_CURSOR_TAG: 'backend_cursor',
+  // Development mode setting
+  DEV_MODE: true,
+  // Direct Airtable access for development (when API not available)
+  DIRECT_AIRTABLE_URL: 'https://api.airtable.com/v0/appqFjYLZiRlgZQDM',
+  // Trusted origins
+  TRUSTED_ORIGINS: [
+    'softr.app', 
+    'recursivelearning.app',
+    'localhost'
+  ]
 };
+
+/**
+ * Check if running in a trusted domain
+ * @returns {boolean} True if in trusted domain
+ */
+function isInTrustedDomain() {
+  try {
+    const hostname = window.location.hostname;
+    return AIRTABLE_CONFIG.TRUSTED_ORIGINS.some(domain => hostname.includes(domain));
+  } catch (e) {
+    // If we can't check, assume trusted in development
+    return AIRTABLE_CONFIG.DEV_MODE;
+  }
+}
 
 /**
  * Enhanced fetch for Airtable operations with proper authentication
@@ -33,6 +57,7 @@ async function airtableFetch(endpoint, options = {}) {
   options.headers['X-Team'] = 'frontend';
   options.headers['X-Airtable-Access'] = 'standup-reports';
   options.headers['X-Resource-Type'] = 'standup';
+  options.headers['X-Dev-Mode'] = AIRTABLE_CONFIG.DEV_MODE ? 'true' : 'false';
   
   // Add client info if available from URL
   try {
@@ -45,6 +70,11 @@ async function airtableFetch(endpoint, options = {}) {
     // Ignore URL parsing errors
   }
   
+  // For Softr embedded apps, add special bypass header
+  if (isInTrustedDomain()) {
+    options.headers['X-Auth-Bypass'] = 'softr-embedded';
+  }
+  
   // Set content type if sending data
   if (options.body) {
     options.headers['Content-Type'] = 'application/json';
@@ -55,7 +85,8 @@ async function airtableFetch(endpoint, options = {}) {
   try {
     log('Making Airtable API request', { 
       endpoint: fullEndpoint, 
-      method: options.method || 'GET' 
+      method: options.method || 'GET',
+      trusted: isInTrustedDomain()
     }, 'debug');
     
     const response = await secureFetch(fullEndpoint, options);
@@ -67,7 +98,106 @@ async function airtableFetch(endpoint, options = {}) {
       status: error.status
     }, 'error');
     
+    // If API fails and we're in development mode, try direct access
+    if (AIRTABLE_CONFIG.DEV_MODE) {
+      log('Attempting direct Airtable access fallback', {}, 'info');
+      return tryDirectAirtableAccess(endpoint, options);
+    }
+    
     throw error;
+  }
+}
+
+/**
+ * Emergency fallback for direct Airtable access (development only)
+ * @param {string} endpoint - Endpoint path 
+ * @param {Object} options - Request options
+ * @returns {Promise<any>} Response data
+ */
+async function tryDirectAirtableAccess(endpoint, options = {}) {
+  try {
+    // This is a development only fallback
+    if (!AIRTABLE_CONFIG.DEV_MODE) {
+      throw new Error('Direct Airtable access only allowed in development mode');
+    }
+    
+    // Extract table ID from request body if available
+    let tableId = AIRTABLE_CONFIG.STANDUP_TABLE_ID;
+    if (options.body) {
+      try {
+        const body = JSON.parse(options.body);
+        if (body.tableId) {
+          tableId = body.tableId;
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+    }
+    
+    // Build direct Airtable URL
+    const directUrl = `${AIRTABLE_CONFIG.DIRECT_AIRTABLE_URL}/${tableId}`;
+    
+    // Show warning in console
+    console.warn('⚠️ DEVELOPMENT MODE: Bypassing authentication for direct Airtable access');
+    console.warn('This should only be used during development');
+    
+    // Ask for a temporary API key if needed
+    let airtableApiKey = localStorage.getItem('dev_airtable_key');
+    if (!airtableApiKey) {
+      airtableApiKey = prompt('Enter a temporary Airtable API key for development:');
+      if (airtableApiKey) {
+        localStorage.setItem('dev_airtable_key', airtableApiKey);
+      }
+    }
+    
+    if (!airtableApiKey) {
+      throw new Error('Airtable API key required for direct access');
+    }
+    
+    // Build direct request options
+    const directOptions = {
+      method: options.method,
+      headers: {
+        'Authorization': `Bearer ${airtableApiKey}`,
+        'Content-Type': 'application/json'
+      }
+    };
+    
+    // For POST/PATCH requests, transform the body format
+    if (options.body && (options.method === 'POST' || options.method === 'PATCH')) {
+      const parsedBody = JSON.parse(options.body);
+      
+      // Handle different endpoints
+      if (endpoint.includes('/records')) {
+        // For standard record operations
+        if (parsedBody.records) {
+          directOptions.body = JSON.stringify({
+            records: parsedBody.records
+          });
+        } else if (parsedBody.fields) {
+          // For single record updates
+          directOptions.body = JSON.stringify({
+            fields: parsedBody.fields
+          });
+        }
+      } else if (endpoint.includes('/query')) {
+        // For query operations
+        directOptions.method = 'GET';
+        // Add query params instead of body
+        const url = new URL(directUrl);
+        if (parsedBody.maxRecords) url.searchParams.append('maxRecords', parsedBody.maxRecords);
+        if (parsedBody.view) url.searchParams.append('view', parsedBody.view);
+        if (parsedBody.filterByFormula) url.searchParams.append('filterByFormula', parsedBody.filterByFormula);
+        return fetch(url.toString(), directOptions).then(res => res.json());
+      }
+    }
+    
+    // Make direct request
+    const response = await fetch(directUrl, directOptions);
+    return await response.json();
+  } catch (error) {
+    console.error('Direct Airtable access failed:', error);
+    throw new Error(`Direct Airtable access failed: ${error.message}`);
   }
 }
 
@@ -239,7 +369,8 @@ async function submitReport(mdcPath, status = 'Drafted') {
     
     log('Submitting report to Airtable', { 
       title: formattedReport.fields.Title,
-      status: formattedReport.fields.Status
+      status: formattedReport.fields.Status,
+      trusted: isInTrustedDomain()
     }, 'info');
     
     // Submit to Airtable
@@ -325,6 +456,8 @@ async function diagnoseConnection() {
     environment: process.env.NODE_ENV || 'unknown',
     apiEndpoint: AIRTABLE_CONFIG.API_ENDPOINT,
     tableId: AIRTABLE_CONFIG.STANDUP_TABLE_ID,
+    devMode: AIRTABLE_CONFIG.DEV_MODE,
+    inTrustedDomain: isInTrustedDomain(),
     status: 'pending',
     authed: false,
     headers: {}
@@ -406,5 +539,6 @@ export {
   parseReportMdc,
   formatReport,
   completeReportingWorkflow,
+  airtableFetch,
   AIRTABLE_CONFIG
 }; 
