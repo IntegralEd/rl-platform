@@ -6,7 +6,7 @@
      👇 START COPYING TO PREHEADER 👇
 **************************************************** -->
 <!-- Include shared header span script from GitHub Pages -->
-<script src="https://integral-ed.github.io/rl-platform/shared/assets/js/softr_headerspan.js"></script>
+<script src="https://recursivelearning.app/shared/assets/js/softr_headerspan.js"></script>
 
 <!-- Empty span will be populated by script -->
 <span id="header-span" style="display:none"></span>
@@ -307,11 +307,11 @@ window.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Use Softr's specific syntax for user properties
-            const userRole = window.logged_in_user!IE_Role_Level || '';
-            const userName = window.logged_in_user!Name || window.logged_in_user!email || 'Guest';
-            const userId = window.logged_in_user!User_ID || '';
-            const userEmail = window.logged_in_user!email || '';
+            // Use regular JS dot notation or bracket notation
+            const userRole = window.logged_in_user['IE_Role_Level'] || '';
+            const userName = window.logged_in_user['Name'] || window.logged_in_user['email'] || 'Guest';
+            const userId = window.logged_in_user['User_ID'] || '';
+            const userEmail = window.logged_in_user['email'] || '';
             
             log('User role:', userRole);
 
