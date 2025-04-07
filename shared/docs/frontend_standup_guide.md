@@ -1,120 +1,152 @@
 # Frontend Standup Guide
 
 ## Overview
-This guide outlines the recommended process for frontend standup reporting in the Recursive Learning platform. Standup reports help maintain alignment between frontend and backend teams, document progress, and ensure efficient resolution of integration issues.
+This guide outlines the standardized process for frontend standup reporting in the Recursive Learning platform. Maintaining consistent documentation helps with backend integration, progress tracking, and ensures critical issues are communicated effectively.
 
 ## Standup Report Format
 
-### Basic Template
+### Basic Template Structure
 ```markdown
 # Frontend Standup Report - [DATE] - [SEQUENCE]
 
 ## Team Member(s)
 - [Your Name]
 
+## Overview
+[Brief 1-2 sentence summary of the report's key points]
+
 ## Accomplishments
-- [List major tasks completed]
+- [List major tasks completed with specific file paths or PRs]
 
 ## Current Work
-- [List what you're currently working on]
+- [List what you're actively working on with expected completion timeline]
 
 ## Blockers
-- [List any issues blocking progress]
+- [List any issues blocking progress with specific error details]
 
 ## Integration Notes
-- [Any notes about integration with backend/Airtable/Softr]
+- [Any notes about backend integration points]
+- [API endpoint requirements]
+- [Authentication details]
 
 ## Next Steps
-- [List planned next actions]
+- [List planned next actions with priorities]
 ```
 
-### Extended Version (For Complex Reports)
-For more detailed reports, include these sections:
+### Required Sections for Detailed Reports
+For integration-focused reports, include these additional sections:
 
 ```markdown
-## Technical Details
-- [Relevant implementation details]
+## Technical Implementation Details
+- [Specific implementation aspects that affect the backend]
+- [Data structures you're sending/receiving]
+- [Authentication approaches used]
 
-## Data Requirements
-- [Data structures or API needs]
+## API Requirements
+- [Specific endpoints needed]
+- [Required headers]
+- [Expected response formats]
 
-## Resource Requirements
-- [Additional resources needed]
+## External Integration Points
+- [Airtable integration details]
+- [Softr embedding requirements]
+- [Other third-party services]
 
-## Screenshots/Demos
-- [Links to visual references]
+## Testing Steps
+- [How to verify the implementation works]
+- [Expected outcomes]
+
+## Documentation Changes
+- [Updates needed to existing docs]
+- [New documentation created]
 ```
 
-## Reporting Process
+## Report Naming and Location
 
-1. **Create Report File**
-   - Create a new file in `/shared/docs/standup-reports/`
-   - Use naming convention: `[date]-frontend-standup-[sequence].mdc`
-   - Example: `april-8-frontend-standup-01.mdc`
+### File Location
+- All frontend standup reports should be saved to: `/shared/docs/standup-reports/`
 
-2. **Write Report Content**
-   - Fill out all relevant sections
-   - Be specific about integration points
-   - Document any auth/API issues
+### Naming Convention
+- Use the strict format: `[month]-[day]-frontend-standup-[sequence].mdc`
+- Example: `april-7-frontend-standup-01.mdc`
+- Sequence numbers should increment (01, 02, 03) for multiple reports on the same day
 
-3. **Include Diagnostic Information**
-   - For auth/API issues, include console logs
-   - Reference specific file paths when discussing code
-   - Link to relevant docs or backend endpoints
+## Reporting Process and Schedule
 
-4. **Push to Repository**
-   - Commit with clear message
-   - Example: `git commit -m "Add frontend standup report for April 8"`
+1. **Daily Reporting Requirement**
+   - At least one standup report must be filed per active development day
+   - Reports should be filed by 5:00 PM EST or before ending work for the day
 
-5. **Publish to Airtable** (When Available)
-   - Use the standup report publisher module
-   - Tag relevant team members for visibility
+2. **Integration-Focused Reports**
+   - Additional reports must be filed when:
+     - Starting work on a backend integration
+     - Encountering integration issues
+     - Completing an integration milestone
+
+3. **Report Writing Guidelines**
+   - Be specific and include exact file paths
+   - Include error messages and screenshots for issues
+   - Reference related documentation or backend resources
+   - Always include next steps, even if blocked
+
+4. **Submission Process**
+   - Commit report to the repository
+   - Push to the current branch
+   - When Airtable integration is functional, publish through API
 
 ## Integration Focus Areas
 
-For Softr and admin integration specifically, always include:
+When documenting backend integration issues, always include:
 
-1. **Authentication Status**
-   - Document any auth issues with Softr
-   - Check bracket notation usage for accessing user data
-   - Verify field mapping (e.g., `First Name` vs `Name`)
+1. **Authentication Context**
+   - Current authentication method being used
+   - Token handling approach
+   - Any CORS or cross-origin issues
 
-2. **API Connectivity**
-   - Test connection to backend endpoints
-   - Document any CORS or permission issues
-   - Verify correct header usage
+2. **API Connectivity Details**
+   - Exact endpoint URLs being accessed
+   - HTTP methods being used
+   - Request/response headers
+   - Request body format
 
-3. **Airtable Integration**
-   - Check data flow to/from Airtable
-   - Document any field mapping issues
-   - Verify permissions for write operations
+3. **Error Diagnostics**
+   - Exact error messages
+   - HTTP status codes
+   - Network request logs
+   - Browser console output for client-side errors
 
-## Tools and Resources
+4. **User Context**
+   - User role/permissions being tested
+   - Session state information
+   - Field mapping issues (e.g., inconsistent naming)
 
-- **Diagnostic Tools**
-  - Browser Console for auth/API debugging
-  - Network tab for checking request headers
-  - Application tab for localStorage inspection
+## Airtable Publishing Process
 
-- **Documentation Resources**
-  - `/shared/docs/softr-integration-rules.mdc`
-  - `/shared/docs/airtable_setup.mdc`
-  - `/shared/docs/cross-domain-auth.mdc`
-  - Backend API documentation
+When the Airtable integration is operational:
 
-## Example Reports
+1. Create your report file following this guide
+2. Ensure all required sections are completed
+3. Use the standup report publisher to submit:
+   ```javascript
+   import { publishStandupReport } from '../assets/js/standup-report-publisher.js';
+   
+   publishStandupReport({
+     filePath: '/shared/docs/standup-reports/april-7-frontend-standup-01.mdc',
+     tags: ['frontend', 'authentication', 'integration']
+   });
+   ```
+4. Verify submission using the query tool
+5. Add report link to any related GitHub issues
 
-See the following for examples:
-- `/shared/docs/standup-reports/april-7-frontend-standup-01.mdc`
-- `/shared/docs/standup-reports/april-6-frontend-standup-03.mdc`
+## Related Documentation
+- Backend integration documentation: `/shared/docs/backend-integration-checklist.mdc`
+- Airtable setup documentation: `/shared/docs/airtable_setup.mdc`
+- API client documentation: `/shared/docs/cross-domain-auth.mdc`
+- Example reports in `/shared/docs/standup-reports/`
 
-## Publishing to Airtable
+## Backend Team Alignment
+This guide and template align with the backend team's requirements as specified in:
+https://github.com/IntegralEd/rl-restapi-lambda/blob/main/docs/frontend_standup_guide.md
 
-When the Airtable integration is functioning:
-
-1. Create your report using this guide
-2. Use the standup report publisher to submit
-3. Include proper tags for the report type
-4. Verify submission with the query tool
-
-For temporary issues with Airtable integration, document the issue and use direct repository commits until resolved. 
+Always check for template updates at:
+https://github.com/IntegralEd/rl-restapi-lambda/blob/main/docs/standup_reports/TEMPLATE_frontend.md 
