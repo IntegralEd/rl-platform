@@ -5,11 +5,7 @@
  * bidirectional reporting system with Airtable.
  */
 
-// Import our reporting tools
-import { 
-  queryAndDisplay, 
-  publishAndVerify 
-} from '../../shared/assets/js/airtable-query.js';
+// } from '../../shared/assets/js/airtable-query.js'; // Marked for deletion in first standup
 
 // Set up UI elements
 const testUI = {

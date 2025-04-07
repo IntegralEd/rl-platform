@@ -7,7 +7,7 @@
  * Can be set up as a Cursor rule for always-on monitoring.
  */
 
-import { queryStandupReports } from './airtable-query.js';
+// import { queryStandupReports } from './airtable-query.js'; // Marked for deletion in first standup
 import { secureFetch } from './api-client.js';
 import { log } from './cloudwatch-integration.js';
 
