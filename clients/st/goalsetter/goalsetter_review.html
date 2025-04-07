@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<!-- Review Version: 2024-03-31 -->
+<!-- Review Version: 2025-04-13 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StriveTogether Goal Setter - Review</title>
+    <script src="../../../shared/assets/js/html2canvas.min.js"></script>
+    <script src="../../../shared/assets/js/fabric.min.js"></script>
     <style>
         body, html {
             margin: 0;
@@ -14,13 +16,18 @@
             overflow: hidden;
         }
         
-        .chatbot-container {
+        /* Main content iframe */
+        .content-frame {
             width: 100%;
             height: 100vh;
             border: none;
-            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
+        /* Review elements */
         .review-banner {
             position: fixed;
             top: 0;
@@ -32,18 +39,718 @@
             padding: 8px;
             font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
+            display: none; /* Hidden by default, shown when authorized */
+        }
+
+        /* Yellow review footer */
+        .review-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 30px;
+            background: #FFEB3B; /* Yellow background */
+            color: #333;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            z-index: 999;
+            border-top-right-radius: 4px;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Qipu annotation toolbar */
+        .qipu-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            transform: translateY(0);
+            transition: transform 0.3s ease, height 0.3s ease;
+        }
+
+        .qipu-toolbar.expanded {
+            height: 200px;
+        }
+
+        .qipu-tools {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .tool-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .tool-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tool-button.active {
+            background: var(--tool-color, #E87722);
+        }
+
+        .paintbrush-tool {
+            --tool-color: #E87722;
+        }
+
+        .text-tool {
+            --tool-color: #4fa997;
+        }
+
+        .eraser-tool {
+            --tool-color: #425563;
+        }
+
+        .screenshot-tool {
+            --tool-color: #6200EA;
+        }
+
+        /* Color picker */
+        .color-options {
+            display: flex;
+            gap: 10px;
+            margin-left: 20px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        .color-green {
+            background-color: #4CAF50;
+        }
+
+        .color-red {
+            background-color: #F44336;
+        }
+
+        .color-blue {
+            background-color: #2196F3;
+        }
+
+        .color-yellow {
+            background-color: #FFC107;
+        }
+
+        /* Comment panel */
+        .comment-panel {
+            position: fixed;
+            right: 0;
+            top: 40px;
+            bottom: 50px;
+            width: 300px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 990;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comment-panel.visible {
+            transform: translateX(0);
+        }
+
+        .comment-header {
+            padding: 15px;
+            background: #425563;
+            color: white;
+            font-weight: bold;
+        }
+
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .comment-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .comment-metadata {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .comment-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .comment-thumbnail {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .comment-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            margin-bottom: 10px;
+        }
+
+        .comment-submit {
+            background: #425563;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Annotation canvas */
+        #annotationCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        #annotationCanvas.active {
+            pointer-events: auto;
+        }
+
+        /* Toggle buttons */
+        .toggle-comments {
+            position: fixed;
+            right: 20px;
+            bottom: 60px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #425563;
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-toolbar {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            color: white;
+            z-index: 1001;
+            cursor: pointer;
+        }
+
+        /* Auth message */
+        .auth-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-family: system-ui, -apple-system, sans-serif;
+            z-index: 2000;
+            max-width: 400px;
+            text-align: center;
+            display: none;
+        }
+
+        .auth-message.visible {
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="review-banner">Review Environment</div>
-    <iframe
-        src="https://www.chatbase.co/chatbot-iframe/adSj1Q4esAT-KQsSma99p-review"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        class="chatbot-container"
-        allow="microphone *;"
-    ></iframe>
+    
+    <!-- Content iframe (loads the actual goalsetter.html) -->
+    <iframe 
+        src="goalsetter.html" 
+        class="content-frame" 
+        id="contentFrame"
+        scrolling="yes">
+    </iframe>
+    
+    <!-- Yellow review footer -->
+    <div class="review-footer" id="reviewFooter">
+        REVIEW
+    </div>
+    
+    <!-- Qipu annotation canvas -->
+    <canvas id="annotationCanvas"></canvas>
+    
+    <!-- Comment panel -->
+    <div class="comment-panel" id="commentPanel">
+        <div class="comment-header">
+            Comments
+        </div>
+        <div class="comment-list" id="commentList">
+            <!-- Comments will be dynamically added here -->
+        </div>
+        <div class="comment-input">
+            <textarea class="comment-textarea" placeholder="Add a comment..."></textarea>
+            <button class="comment-submit">Submit</button>
+        </div>
+    </div>
+    
+    <!-- Authentication message -->
+    <div class="auth-message" id="authMessage">
+        <h3>Authentication Required</h3>
+        <p>You need valid credentials to access this review session.</p>
+    </div>
+    
+    <!-- Qipu toolbar -->
+    <div class="qipu-toolbar" id="qipuToolbar">
+        <button class="toggle-toolbar" id="toggleToolbar">▼</button>
+        <div class="qipu-tools">
+            <button class="tool-button paintbrush-tool" title="Draw">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                </svg>
+            </button>
+            <button class="tool-button text-tool" title="Add Text">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                    <line x1="9" y1="20" x2="15" y2="20"></line>
+                    <line x1="12" y1="4" x2="12" y2="20"></line>
+                </svg>
+            </button>
+            <button class="tool-button eraser-tool" title="Erase">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L21 10C21.5 10.5 21.5 11.5 21 12L11 22"></path>
+                </svg>
+            </button>
+            <button class="tool-button screenshot-tool" title="Take Screenshot">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+            </button>
+        </div>
+        <div class="color-options">
+            <div class="color-option color-green active" data-color="#4CAF50" title="Positive"></div>
+            <div class="color-option color-red" data-color="#F44336" title="Needs Change"></div>
+            <div class="color-option color-blue" data-color="#2196F3" title="Suggestion"></div>
+            <div class="color-option color-yellow" data-color="#FFC107" title="Question"></div>
+        </div>
+    </div>
+    
+    <!-- Toggle comment panel button -->
+    <button class="toggle-comments" id="toggleComments">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get query parameters for token-based auth
+            const urlParams = new URLSearchParams(window.location.search);
+            const reviewToken = urlParams.get('review_token');
+            const userId = urlParams.get('user_id');
+            const sessionId = urlParams.get('session_id');
+            
+            // Init session data
+            let reviewSession = {
+                id: sessionId || null,
+                user_id: userId || null,
+                airtable_review_session_id: null,
+                authorized: false
+            };
+            
+            // Elements
+            const authMessage = document.getElementById('authMessage');
+            const reviewBanner = document.querySelector('.review-banner');
+            const reviewFooter = document.getElementById('reviewFooter');
+            const qipuToolbar = document.getElementById('qipuToolbar');
+            const commentPanel = document.getElementById('commentPanel');
+            const toggleComments = document.getElementById('toggleComments');
+            
+            // Token validation function
+            function validateToken(token) {
+                // In a production environment, this would make an API call to validate the token
+                // For now, we'll simply check if the token exists and has a basic format
+                if (token && token.length > 8) {
+                    // Simulating successful auth
+                    return {
+                        valid: true,
+                        user: {
+                            id: userId || 'reviewer_' + Math.floor(Math.random() * 1000),
+                            name: 'Reviewer',
+                            email: 'reviewer@example.com'
+                        },
+                        session: {
+                            id: sessionId || 'session_' + Math.floor(Math.random() * 10000),
+                            airtable_id: 'rec' + Math.random().toString(36).substring(2, 10)
+                        }
+                    };
+                }
+                
+                // Invalid token
+                return { valid: false };
+            }
+            
+            // Handle authentication
+            function handleAuth() {
+                // Check if token exists and is valid
+                if (reviewToken) {
+                    const authResult = validateToken(reviewToken);
+                    
+                    if (authResult.valid) {
+                        // Store session data
+                        reviewSession.authorized = true;
+                        reviewSession.user_id = authResult.user.id;
+                        reviewSession.airtable_review_session_id = authResult.session.airtable_id;
+                        
+                        // Show review UI elements
+                        reviewFooter.style.display = 'flex';
+                        qipuToolbar.style.display = 'flex';
+                        toggleComments.style.display = 'flex';
+                        
+                        // Initialize review functionality
+                        initReviewTools();
+                    } else {
+                        // Show auth error
+                        authMessage.classList.add('visible');
+                        
+                        // Hide review UI
+                        reviewFooter.style.display = 'none';
+                        qipuToolbar.style.display = 'none';
+                        toggleComments.style.display = 'none';
+                    }
+                } else {
+                    // No token provided
+                    authMessage.classList.add('visible');
+                    
+                    // Hide review UI
+                    reviewFooter.style.display = 'none';
+                    qipuToolbar.style.display = 'none';
+                    toggleComments.style.display = 'none';
+                }
+            }
+            
+            // Initialize variables
+            let activeToolButton = null;
+            let activeColorOption = document.querySelector('.color-option.active');
+            let currentColor = activeColorOption.dataset.color;
+            let isDrawing = false;
+            
+            // Get elements
+            const toolbar = document.getElementById('qipuToolbar');
+            const toggleToolbar = document.getElementById('toggleToolbar');
+            const toolButtons = document.querySelectorAll('.tool-button');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const contentFrame = document.getElementById('contentFrame');
+            
+            // Set up canvas
+            const canvas = document.getElementById('annotationCanvas');
+            let fabricCanvas;
+            
+            // Initialize Fabric canvas when resources are loaded
+            function initCanvas() {
+                if (typeof fabric !== 'undefined') {
+                    fabricCanvas = new fabric.Canvas('annotationCanvas', {
+                        isDrawingMode: false,
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    });
+                    
+                    // Set up drawing brush
+                    fabricCanvas.freeDrawingBrush.width = 3;
+                    fabricCanvas.freeDrawingBrush.color = currentColor;
+                    
+                    // Handle window resize
+                    window.addEventListener('resize', function() {
+                        fabricCanvas.setWidth(window.innerWidth);
+                        fabricCanvas.setHeight(window.innerHeight);
+                        fabricCanvas.renderAll();
+                    });
+                } else {
+                    setTimeout(initCanvas, 100);
+                }
+            }
+            
+            // Initialize review tools
+            function initReviewTools() {
+                // Initialize after ensuring resources are loaded
+                window.addEventListener('load', initCanvas);
+                
+                // Toggle toolbar expanded state
+                toggleToolbar.addEventListener('click', function() {
+                    toolbar.classList.toggle('expanded');
+                    toggleToolbar.textContent = toolbar.classList.contains('expanded') ? '▲' : '▼';
+                });
+                
+                // Toggle comment panel
+                toggleComments.addEventListener('click', function() {
+                    commentPanel.classList.toggle('visible');
+                });
+                
+                // Tool button click handlers
+                toolButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Handle tool activation
+                        if (activeToolButton) {
+                            activeToolButton.classList.remove('active');
+                        }
+                        
+                        // Set active state
+                        button.classList.add('active');
+                        activeToolButton = button;
+                        
+                        // Handle tool-specific actions
+                        if (button.classList.contains('paintbrush-tool')) {
+                            if (fabricCanvas) {
+                                fabricCanvas.isDrawingMode = true;
+                                canvas.classList.add('active');
+                            }
+                        } else if (button.classList.contains('text-tool')) {
+                            if (fabricCanvas) {
+                                fabricCanvas.isDrawingMode = false;
+                                canvas.classList.add('active');
+                                
+                                // Add text object
+                                const text = new fabric.IText('Click to edit', {
+                                    left: 100,
+                                    top: 100,
+                                    fontFamily: 'Arial',
+                                    fill: currentColor,
+                                    fontSize: 20
+                                });
+                                fabricCanvas.add(text);
+                                fabricCanvas.setActiveObject(text);
+                            }
+                        } else if (button.classList.contains('eraser-tool')) {
+                            if (fabricCanvas) {
+                                // Remove selected objects
+                                const activeObjects = fabricCanvas.getActiveObjects();
+                                if (activeObjects.length) {
+                                    fabricCanvas.remove(...activeObjects);
+                                    fabricCanvas.discardActiveObject();
+                                    fabricCanvas.renderAll();
+                                }
+                            }
+                        } else if (button.classList.contains('screenshot-tool')) {
+                            takeScreenshot();
+                        }
+                    });
+                });
+                
+                // Color option click handlers
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Update active state
+                        activeColorOption.classList.remove('active');
+                        option.classList.add('active');
+                        activeColorOption = option;
+                        
+                        // Set color
+                        currentColor = option.dataset.color;
+                        
+                        // Update drawing brush color
+                        if (fabricCanvas) {
+                            fabricCanvas.freeDrawingBrush.color = currentColor;
+                            
+                            // Update active text object color if any
+                            const activeObject = fabricCanvas.getActiveObject();
+                            if (activeObject && activeObject.type === 'i-text') {
+                                activeObject.set('fill', currentColor);
+                                fabricCanvas.renderAll();
+                            }
+                        }
+                    });
+                });
+                
+                // Submit comment button handler
+                const submitButton = document.querySelector('.comment-submit');
+                const commentTextarea = document.querySelector('.comment-textarea');
+                
+                submitButton.addEventListener('click', function() {
+                    const commentText = commentTextarea.value.trim();
+                    if (commentText) {
+                        // Get annotations from canvas
+                        let canvasJson = null;
+                        if (fabricCanvas) {
+                            canvasJson = JSON.stringify(fabricCanvas.toJSON());
+                        }
+                        
+                        // Create comment object
+                        const comment = {
+                            id: Date.now(),
+                            user: 'Reviewer',
+                            timestamp: new Date().toISOString(),
+                            content: commentText,
+                            url: contentFrame.contentWindow.location.href,
+                            annotations: canvasJson
+                        };
+                        
+                        // Add to comment list
+                        addComment(comment);
+                        
+                        // Clear textarea
+                        commentTextarea.value = '';
+                        
+                        // Create Airtable payload for QC_Tickets
+                        const qcTicketPayload = {
+                            review_session_id: reviewSession.airtable_review_session_id,
+                            user_id: reviewSession.user_id,
+                            comment: commentText,
+                            url: comment.url,
+                            created_at: comment.timestamp,
+                            status: 'New'
+                        };
+                        
+                        if (canvasJson) {
+                            qcTicketPayload.annotations = canvasJson;
+                        }
+                        
+                        // Submit to Airtable (simulate API call)
+                        console.log('Airtable QC_Ticket Payload:', qcTicketPayload);
+                        // Here you would send the payload to your Airtable API integration
+                        
+                        // Clear canvas after submitting
+                        if (fabricCanvas) {
+                            fabricCanvas.clear();
+                        }
+                    }
+                });
+            }
+            
+            // Take screenshot function
+            function takeScreenshot() {
+                // Use html2canvas to capture the iframe content
+                if (typeof html2canvas !== 'undefined') {
+                    html2canvas(contentFrame).then(canvas => {
+                        // Create thumbnail
+                        const dataUrl = canvas.toDataURL();
+                        
+                        // Create a new comment with screenshot
+                        const comment = {
+                            id: Date.now(),
+                            user: 'Reviewer',
+                            timestamp: new Date().toISOString(),
+                            content: 'Screenshot comment',
+                            screenshot: dataUrl,
+                            url: contentFrame.contentWindow.location.href
+                        };
+                        
+                        // Add to comment list
+                        addComment(comment);
+                        
+                        // Show comment panel
+                        commentPanel.classList.add('visible');
+                        
+                        // Create Airtable payload for QC_Tickets
+                        const qcTicketPayload = {
+                            review_session_id: reviewSession.airtable_review_session_id,
+                            user_id: reviewSession.user_id,
+                            comment: 'Screenshot comment',
+                            url: comment.url,
+                            screenshot: dataUrl,
+                            created_at: comment.timestamp,
+                            status: 'New',
+                            type: 'screenshot'
+                        };
+                        
+                        // Submit to Airtable (simulate API call)
+                        console.log('Airtable QC_Ticket Screenshot Payload:', qcTicketPayload);
+                        // Here you would send the payload to your Airtable API integration
+                    });
+                } else {
+                    console.error('html2canvas not loaded');
+                }
+            }
+            
+            // Add comment to the list
+            function addComment(comment) {
+                const commentList = document.getElementById('commentList');
+                
+                const commentItem = document.createElement('div');
+                commentItem.className = 'comment-item';
+                
+                const metadata = document.createElement('div');
+                metadata.className = 'comment-metadata';
+                metadata.textContent = `${comment.user} • ${new Date(comment.timestamp).toLocaleString()}`;
+                
+                const content = document.createElement('div');
+                content.className = 'comment-content';
+                content.textContent = comment.content;
+                
+                commentItem.appendChild(metadata);
+                commentItem.appendChild(content);
+                
+                // Add screenshot thumbnail if available
+                if (comment.screenshot) {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.className = 'comment-thumbnail';
+                    thumbnail.src = comment.screenshot;
+                    commentItem.appendChild(thumbnail);
+                }
+                
+                commentList.appendChild(commentItem);
+            }
+            
+            // Run authentication 
+            handleAuth();
+        });
+    </script>
 </body>
 </html> 
