@@ -30,23 +30,42 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-        /* Main content iframe */
-        .content-frame {
-            width: 100%;
+        /* Main container for review layout */
+        .review-container {
+            display: flex;
+            flex-direction: column;
             height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Content iframe with dynamic height calculation */
+        .content-frame {
+            flex: 1;
+            width: 100%;
             border: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            min-height: 0; /* Critical for flex child */
+            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-height));
+            transition: height 0.3s ease;
+        }
+
+        /* When tools are expanded */
+        .content-frame.tools-expanded {
+            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-expanded-height));
+        }
+
+        /* Ensure iframe content is responsive */
+        .content-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block; /* Remove inline spacing */
         }
 
         /* Review elements */
         .review-banner {
-            position: sticky;
-            top: 0;
-            left: 0;
-            right: 0;
+            height: var(--review-banner-height);
             background: var(--secondary);
             color: white;
             text-align: center;
@@ -54,6 +73,7 @@
             font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
             display: none; /* Hidden by default, shown when authorized */
+            flex-shrink: 0; /* Prevent banner from shrinking */
         }
 
         /* Yellow review footer */
@@ -803,266 +823,268 @@
     </style>
 </head>
 <body>
-    <div class="review-banner">Review Environment</div>
-    
-    <!-- Content iframe (loads the actual goalsetter.html) -->
-    <iframe 
-        src="goalsetter.html" 
-        class="content-frame" 
-        id="contentFrame"
-        scrolling="yes">
-    </iframe>
-    
-    <!-- Yellow review footer -->
-    <div class="review-footer" id="reviewFooter">
-        REVIEW
-    </div>
-    
-    <!-- Qipu annotation canvas -->
-    <canvas id="annotationCanvas"></canvas>
-    
-    <!-- Comment panel -->
-    <div class="comment-panel" id="commentPanel">
-        <div class="comment-header">
-            Comments
-        </div>
-        <div class="comment-list" id="commentList">
-            <!-- Comments will be dynamically added here -->
-        </div>
-        <div class="comment-input">
-            <textarea class="comment-textarea" placeholder="Add a comment..."></textarea>
-            <button class="comment-submit">Submit</button>
-        </div>
+    <div class="review-container">
+        <div class="review-banner">Review Environment</div>
+        
+        <!-- Content iframe (loads the actual goalsetter.html) -->
+        <iframe 
+            src="goalsetter.html" 
+            class="content-frame" 
+            id="contentFrame"
+            scrolling="auto">
+        </iframe>
+        
+        <!-- Yellow review footer -->
+        <div class="review-footer" id="reviewFooter">
+            REVIEW
         </div>
         
-    <!-- Authentication message -->
-    <div class="auth-message" id="authMessage">
-        <h3>Authentication Required</h3>
-        <p>You need valid credentials to access this review session.</p>
-    </div>
-    
-    <!-- Status notification -->
-    <div class="status-notification" id="statusNotification"></div>
-    
-    <!-- Token generator dialog -->
-    <div class="token-generator" id="tokenGenerator">
-        <h3>Generate Review Token</h3>
-        <div class="token-generator-form">
-            <label for="reviewerName">Reviewer Name:</label>
-            <input type="text" id="reviewerName" placeholder="Enter reviewer's name">
-            
-            <label for="reviewerEmail">Reviewer Email:</label>
-            <input type="email" id="reviewerEmail" placeholder="Enter reviewer's email">
-            
-            <label for="expiryDate">Expires On:</label>
-            <input type="date" id="expiryDate">
-            
-            <label for="accessLevel">Access Level:</label>
-            <select id="accessLevel">
-                <option value="view">View Only</option>
-                <option value="comment" selected>Comment</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
+        <!-- Qipu annotation canvas -->
+        <canvas id="annotationCanvas"></canvas>
         
-        <div class="token-result" id="tokenResult" style="display: none;">
-            <p>Share this URL with the reviewer:</p>
-            <div id="tokenUrl"></div>
-            <div class="token-actions">
-                <button id="copyToken">Copy to Clipboard</button>
+        <!-- Comment panel -->
+        <div class="comment-panel" id="commentPanel">
+            <div class="comment-header">
+                Comments
+            </div>
+            <div class="comment-list" id="commentList">
+                <!-- Comments will be dynamically added here -->
+            </div>
+            <div class="comment-input">
+                <textarea class="comment-textarea" placeholder="Add a comment..."></textarea>
+                <button class="comment-submit">Submit</button>
             </div>
         </div>
         
-        <div class="token-generator-buttons">
-            <button class="cancel" id="cancelTokenGenerator">Cancel</button>
-            <button class="generate" id="generateToken">Generate Token</button>
-        </div>
-    </div>
-    
-    <!-- Report view -->
-    <div class="report-view" id="reportView">
-        <div class="report-header">
-            <h2>Review Session Report</h2>
-            <button class="report-close" id="closeReportView">&times;</button>
+        <!-- Authentication message -->
+        <div class="auth-message" id="authMessage">
+            <h3>Authentication Required</h3>
+            <p>You need valid credentials to access this review session.</p>
         </div>
         
-        <div class="report-content">
-            <div class="report-summary">
-                <h3>Summary</h3>
-                <div class="report-summary-grid">
-                    <div class="summary-item">
-                        <div class="summary-label">Session ID</div>
-                        <div class="summary-value" id="summarySessionId">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Reviewer</div>
-                        <div class="summary-value" id="summaryReviewer">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Comments</div>
-                        <div class="summary-value" id="summaryCommentCount">0</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Date</div>
-                        <div class="summary-value" id="summaryDate">-</div>
-                    </div>
+        <!-- Status notification -->
+        <div class="status-notification" id="statusNotification"></div>
+        
+        <!-- Token generator dialog -->
+        <div class="token-generator" id="tokenGenerator">
+            <h3>Generate Review Token</h3>
+            <div class="token-generator-form">
+                <label for="reviewerName">Reviewer Name:</label>
+                <input type="text" id="reviewerName" placeholder="Enter reviewer's name">
+                
+                <label for="reviewerEmail">Reviewer Email:</label>
+                <input type="email" id="reviewerEmail" placeholder="Enter reviewer's email">
+                
+                <label for="expiryDate">Expires On:</label>
+                <input type="date" id="expiryDate">
+                
+                <label for="accessLevel">Access Level:</label>
+                <select id="accessLevel">
+                    <option value="view">View Only</option>
+                    <option value="comment" selected>Comment</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            
+            <div class="token-result" id="tokenResult" style="display: none;">
+                <p>Share this URL with the reviewer:</p>
+                <div id="tokenUrl"></div>
+                <div class="token-actions">
+                    <button id="copyToken">Copy to Clipboard</button>
                 </div>
             </div>
             
-            <h3>Session Information</h3>
-            <table class="session-info-table">
-                <thead>
-                    <tr>
-                        <th>Review Session ID</th>
-                        <th>User ID</th>
-                        <th>Scope</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Tickets Entered</th>
-                    </tr>
-                </thead>
-                <tbody id="sessionInfoTableBody">
-                    <!-- Session info will be added here -->
-                    <tr>
-                        <td id="sessionInfoId">-</td>
-                        <td id="sessionInfoUserId">-</td>
-                        <td id="sessionInfoScope">Goalsetter</td>
-                        <td id="sessionInfoStart">-</td>
-                        <td id="sessionInfoEnd">-</td>
-                        <td id="sessionInfoTickets">0</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="token-generator-buttons">
+                <button class="cancel" id="cancelTokenGenerator">Cancel</button>
+                <button class="generate" id="generateToken">Generate Token</button>
+            </div>
+        </div>
+        
+        <!-- Report view -->
+        <div class="report-view" id="reportView">
+            <div class="report-header">
+                <h2>Review Session Report</h2>
+                <button class="report-close" id="closeReportView">&times;</button>
+            </div>
             
-            <h3>QC Tickets</h3>
-            <table class="tickets-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Comment</th>
-                        <th>URL</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody id="ticketsTableBody">
-                    <!-- Tickets will be added here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Qipu toolbar -->
-    <div class="qipu-toolbar" id="qipuToolbar">
-        <button class="toggle-toolbar" id="toggleToolbar">▼</button>
-        <div class="qipu-tools">
-            <button class="tool-button paintbrush-tool" title="Draw">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
-                </svg>
-            </button>
-            <button class="tool-button text-tool" title="Add Text">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="4 7 4 4 20 4 20 7"></polyline>
-                    <line x1="9" y1="20" x2="15" y2="20"></line>
-                    <line x1="12" y1="4" x2="12" y2="20"></line>
-                </svg>
-            </button>
-            <button class="tool-button eraser-tool" title="Erase">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L21 10C21.5 10.5 21.5 11.5 21 12L11 22"></path>
-                </svg>
-            </button>
-            <button class="tool-button screenshot-tool" title="Take Screenshot">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                    <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-            </button>
-        </div>
-        <div class="color-options">
-            <div class="color-option color-green active" data-color="#4CAF50" title="Positive"></div>
-            <div class="color-option color-red" data-color="#F44336" title="Needs Change"></div>
-            <div class="color-option color-blue" data-color="#2196F3" title="Suggestion"></div>
-            <div class="color-option color-yellow" data-color="#FFC107" title="Question"></div>
-        </div>
-    </div>
-    
-    <!-- Token verification bar -->
-    <div class="token-verification-bar" id="tokenVerificationBar">
-        <svg class="callout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <path d="M50 0C22.4 0 0 22.4 0 50c0 27.6 22.4 50 50 50 27.6 0 50-22.4 50-50C100 22.4 77.6 0 50 0zm0 90c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z"/>
-            <path d="M60 30H40c-5.5 0-10 4.5-10 10v10c0 5.5 4.5 10 10 10h5l5 10 5-10h5c5.5 0 10-4.5 10-10V40c0-5.5-4.5-10-10-10z"/>
-        </svg>
-        <span class="status-text">Review Token Status</span>
-    </div>
-    
-    <!-- Token panel -->
-    <div class="token-panel" id="tokenPanel">
-        <div class="token-panel-header">
-            <h3>Active Review Tokens</h3>
-            <button class="token-close" id="closeTokenPanel">&times;</button>
-        </div>
-        <div class="token-panel-content">
-            <table class="token-table" id="tokenTable">
-                <thead>
-                    <tr>
-                        <th>Session ID</th>
-                        <th>Reviewer</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Token data will be populated here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Invalid token overlay -->
-    <div class="invalid-token-overlay" id="invalidTokenOverlay">
-        <div class="invalid-token-message">
-            <h2>Invalid Review Token</h2>
-            <p>You do not have access to this review session. Please contact your administrator for a valid token.</p>
-        </div>
-    </div>
-    
-    <!-- Toggle comment panel button -->
-    <button class="toggle-comments" id="toggleComments">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-    </button>
-    
-    <!-- Session information display -->
-    <div class="session-info-display" id="sessionInfoDisplay">
-        <h4>Session Information</h4>
-        <div class="session-info-display-grid" id="sessionInfoDisplayGrid">
-            <div class="session-info-item">
-                <span class="session-info-label">Session ID:</span>
-                <span class="session-info-value" id="infoDisplaySessionId">-</span>
+            <div class="report-content">
+                <div class="report-summary">
+                    <h3>Summary</h3>
+                    <div class="report-summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Session ID</div>
+                            <div class="summary-value" id="summarySessionId">-</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Reviewer</div>
+                            <div class="summary-value" id="summaryReviewer">-</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Comments</div>
+                            <div class="summary-value" id="summaryCommentCount">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Date</div>
+                            <div class="summary-value" id="summaryDate">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Session Information</h3>
+                <table class="session-info-table">
+                    <thead>
+                        <tr>
+                            <th>Review Session ID</th>
+                            <th>User ID</th>
+                            <th>Scope</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Tickets Entered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionInfoTableBody">
+                        <!-- Session info will be added here -->
+                        <tr>
+                            <td id="sessionInfoId">-</td>
+                            <td id="sessionInfoUserId">-</td>
+                            <td id="sessionInfoScope">Goalsetter</td>
+                            <td id="sessionInfoStart">-</td>
+                            <td id="sessionInfoEnd">-</td>
+                            <td id="sessionInfoTickets">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>QC Tickets</h3>
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Comment</th>
+                            <th>URL</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <!-- Tickets will be added here -->
+                    </tbody>
+                </table>
             </div>
-            <div class="session-info-item">
-                <span class="session-info-label">User ID:</span>
-                <span class="session-info-value" id="infoDisplayUserId">-</span>
+        </div>
+        
+        <!-- Qipu toolbar -->
+        <div class="qipu-toolbar" id="qipuToolbar">
+            <button class="toggle-toolbar" id="toggleToolbar">▼</button>
+            <div class="qipu-tools">
+                <button class="tool-button paintbrush-tool" title="Draw">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                    </svg>
+                </button>
+                <button class="tool-button text-tool" title="Add Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                        <line x1="9" y1="20" x2="15" y2="20"></line>
+                        <line x1="12" y1="4" x2="12" y2="20"></line>
+                    </svg>
+                </button>
+                <button class="tool-button eraser-tool" title="Erase">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L21 10C21.5 10.5 21.5 11.5 21 12L11 22"></path>
+                    </svg>
+                </button>
+                <button class="tool-button screenshot-tool" title="Take Screenshot">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                </button>
             </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Scope:</span>
-                <span class="session-info-value" id="infoDisplayScope">Goalsetter</span>
+            <div class="color-options">
+                <div class="color-option color-green active" data-color="#4CAF50" title="Positive"></div>
+                <div class="color-option color-red" data-color="#F44336" title="Needs Change"></div>
+                <div class="color-option color-blue" data-color="#2196F3" title="Suggestion"></div>
+                <div class="color-option color-yellow" data-color="#FFC107" title="Question"></div>
             </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Start Date:</span>
-                <span class="session-info-value" id="infoDisplayStart">-</span>
+        </div>
+        
+        <!-- Token verification bar -->
+        <div class="token-verification-bar" id="tokenVerificationBar">
+            <svg class="callout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <path d="M50 0C22.4 0 0 22.4 0 50c0 27.6 22.4 50 50 50 27.6 0 50-22.4 50-50C100 22.4 77.6 0 50 0zm0 90c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z"/>
+                <path d="M60 30H40c-5.5 0-10 4.5-10 10v10c0 5.5 4.5 10 10 10h5l5 10 5-10h5c5.5 0 10-4.5 10-10V40c0-5.5-4.5-10-10-10z"/>
+            </svg>
+            <span class="status-text">Review Token Status</span>
+        </div>
+        
+        <!-- Token panel -->
+        <div class="token-panel" id="tokenPanel">
+            <div class="token-panel-header">
+                <h3>Active Review Tokens</h3>
+                <button class="token-close" id="closeTokenPanel">&times;</button>
             </div>
-            <div class="session-info-item">
-                <span class="session-info-label">End Date:</span>
-                <span class="session-info-value" id="infoDisplayEnd">-</span>
+            <div class="token-panel-content">
+                <table class="token-table" id="tokenTable">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Reviewer</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Token data will be populated here -->
+                    </tbody>
+                </table>
             </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Tickets Entered:</span>
-                <span class="session-info-value" id="infoDisplayTickets">0</span>
+        </div>
+        
+        <!-- Invalid token overlay -->
+        <div class="invalid-token-overlay" id="invalidTokenOverlay">
+            <div class="invalid-token-message">
+                <h2>Invalid Review Token</h2>
+                <p>You do not have access to this review session. Please contact your administrator for a valid token.</p>
+            </div>
+        </div>
+        
+        <!-- Toggle comment panel button -->
+        <button class="toggle-comments" id="toggleComments">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+        
+        <!-- Session information display -->
+        <div class="session-info-display" id="sessionInfoDisplay">
+            <h4>Session Information</h4>
+            <div class="session-info-display-grid" id="sessionInfoDisplayGrid">
+                <div class="session-info-item">
+                    <span class="session-info-label">Session ID:</span>
+                    <span class="session-info-value" id="infoDisplaySessionId">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">User ID:</span>
+                    <span class="session-info-value" id="infoDisplayUserId">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Scope:</span>
+                    <span class="session-info-value" id="infoDisplayScope">Goalsetter</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Start Date:</span>
+                    <span class="session-info-value" id="infoDisplayStart">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">End Date:</span>
+                    <span class="session-info-value" id="infoDisplayEnd">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Tickets Entered:</span>
+                    <span class="session-info-value" id="infoDisplayTickets">0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1115,5 +1137,4 @@
         });
     </script>
 </body>
-</html> 
 </html> 
