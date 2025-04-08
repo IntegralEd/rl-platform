@@ -1,0 +1,95 @@
+---
+description: Build checklist for implementing Redis caching with ElastiCache for the REST API
+globs: ["/lambda/**/*.py", "/infrastructure/terraform/**/*.tf"]
+alwaysApply: false
+---
+
+# 🧱 Cached Table Stack: ElastiCache (Redis) for Context + Page Facts
+
+## Goal
+Build Redis-cached versions of the `User` and `Pages` tables to serve low-latency context and facts to the Recursive Learning Lambda REST API. This supports pydia-style reference and chat continuity across threads.
+
+---
+
+## 🧠 Key Concepts
+
+- **Redis** – A super-fast, in-memory key-value store. Think of it as a shared scratchpad for quick lookups, like "Who is this user?" or "What facts belong to this page?"
+- **TTL (Time To Live)** – Each record in Redis expires after a set time, like milk in the fridge. This keeps the cache fresh without manual cleanup.
+- **Rehydration** – If Redis doesn't have the data (a cache miss), the system falls back to Airtable, fetches the data, and puts it back in Redis for future calls.
+- **Cache key** – A unique label like `user:abc123`. This is how Redis knows which data to return.
+- **ElastiCache** – AWS's managed Redis service. It handles scaling, networking, and uptime for you.
+
+---
+
+## ✅ Setup Redis (ElastiCache)
+
+- [ ] Create Redis cluster in ElastiCache via AWS Console or Terraform
+- [ ] Configure subnet group for VPC Lambda access (not publicly exposed)
+- [ ] Store host, port, and (if applicable) auth token in AWS SSM Parameter Store
+- [ ] Tag Redis with `Project=RecursiveLearning`, `Stack=Cache`, `Env=Dev/Prod`
+
+---
+
+## ✅ Define Cache Schema
+
+- [ ] Define key structure:
+  - `user:{id}` for user records
+  - `page:{id}` for page metadata and facts
+- [ ] Define TTLs:
+  - Pages → `3600` sec (1 hr)
+  - Users → `21600` sec (6 hr)
+- [ ] Format values as JSON from Airtable response
+
+---
+
+## ✅ Write Airtable → Redis Sync Lambda
+
+- [ ] Create `make:build:cache-stack` scenario or Lambda function
+- [ ] Pull `User` and `Pages` data from Airtable
+- [ ] Format each record to match key schema
+- [ ] Upsert into Redis using `SET key value EX ttl`
+- [ ] Log sync stats: count created, updated, failed
+
+---
+
+## ✅ Integrate into rl-restapi-lambda
+
+- [ ] Add `redisClient` to `lambda_utils`, using SSM param
+- [ ] Add Redis-first fetch logic to context and page loaders
+  - Check Redis: `GET user:{id}` and `GET page:{id}`
+  - If miss, fetch from Airtable and `SET` back to Redis
+- [ ] Log cache hits and misses
+
+---
+
+## ✅ End-to-End Testing
+
+- [ ] Simulate Lambda call with known user/page ID in Redis
+- [ ] Validate Redis response speed and data structure
+- [ ] Validate fallback → Airtable → Redis rehydration
+- [ ] Set short TTL (e.g. 5s) to verify expiry behavior
+
+---
+
+## 🧪 Unit Test Cases
+
+- [ ] `getUserFromCache(id)` returns structured JSON or null
+- [ ] `getPageContext(id)` pulls from Redis or rehydrates
+- [ ] `syncUsersToCache()` upserts Redis keys with correct TTL
+- [ ] TTL expires and data is refreshed on next call
+
+---
+
+## 🛠 Infra Notes
+
+- [ ] Use non-free tier (at least 1GB) to avoid eviction
+- [ ] Add Redis CloudWatch alarms: memory, connections, eviction
+- [ ] Use `dev:` or `prod:` prefixes on keys if Redis is shared
+
+---
+
+## ⏭️ Next Up (Post MVP)
+
+- [ ] Add `Topics`, `Snippets`, `PageSections` to cache
+- [ ] Explore RedisJSON or hash storage for sub-record updates
+- [ ] Consider hybrid caching: Redis + in-memory (per function) 
