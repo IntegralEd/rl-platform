@@ -368,31 +368,3 @@ All admin pages should include:
 2. Implement card navigation system
 3. Deploy iframe preview components
 4. Enable CloudWatch monitoring 
-
-## ELPL/Merit Tree Implementation (April 2025)
-
-### Directory Structure
-```
-/admin/pages/elpl/
-└── merit_admin.html         # Admin interface for Merit System
-    ├── uses iframe-module   # Standardized iframe container
-    └── size controls        # Desktop/Tablet/Mobile views
-```
-
-### Iframe Module Features
-- Auto-scaling preview without scrollbars
-- Size presets for authentic Storyline views
-- Responsive container with transform scaling
-- Clean shadow DOM implementation
-
-### Asset Requirements
-- Minimal new assets needed
-- Uses shared iframe-module component
-- Inherits admin panel styling
-- No additional scripts required
-
-### Quality Control
-- [ ] Test all size presets
-- [ ] Verify no scrollbars in preview
-- [ ] Check Storyline authenticity
-- [ ] Validate team access 
