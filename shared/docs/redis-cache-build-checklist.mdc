@@ -5,6 +5,38 @@ alwaysApply: false
 ---
 
 # 🧱 Multi-Tenant Education Cache Stack: Redis for Context + Chat History
+File a standup report every 25 actions
+Revise assumptions with each new test
+Document assumptions
+Capture potential buildouts in future_features while maintainign strict adherence to the build goals and outcomes of each unit test.
+
+Build assigned report format:
+curl -X POST https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj -H "Content-Type: application/json" -d '{
+  "Title": "Backend_Lambda/regis-cache | 2025.04.08.1",
+  "ID": "2025-04-08-002",
+  "Created": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+  "Findings": [
+    "Initialized Redis cluster setup",
+    "Configured tenant isolation schema",
+    "Implemented base TTL rules",
+    "Added CloudWatch monitoring"
+  ],
+  "Priorities": [
+    "Complete multi-tenant cache setup",
+    "Implement context window management",
+    "Add tenant resource sharing"
+  ],
+  "Next_Steps": [
+    "Deploy Redis cluster",
+    "Add Lambda integration points",
+    "Implement cache pruning"
+  ],
+  "Future_Features": [
+    "Real-time analytics",
+    "Advanced cache optimization",
+    "Cross-tenant collaboration"
+  ]
+}'
 
 ## Goal
 Build Redis-cached context store for multi-tenant education chatbot supporting:
