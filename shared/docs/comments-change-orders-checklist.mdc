@@ -1,0 +1,321 @@
+---
+description: Build checklist for the Comments & Change Orders feature set
+globs: ["/admin/pages/**/*.html", "/shared/docs/page_ingredients/change-orders/*"]
+alwaysApply: false
+---
+
+# Recursive Learning Comments & Change Orders Feature Set Checklist
+
+This document outlines the design and implementation checklist for the Comments & Change Orders feature. The goal of this feature set is to provide a visual organizing board that allows the instructional designer to review, tag, and group reviewer comments into containerized "Change Orders." This design aims for high contrast, clear interactivity, and a frameless, modern aesthetic.
+
+**Version:** 2025.04.08.1
+
+## Overview
+
+- **Dual-Tab View:**  
+  - **Comments Tab:**  
+    - Displays comment cards detailing reviewer feedback.
+    - Provides a drag-and-drop tag library to "pin" relevant keywords onto comments.
+    - Uses high-contrast borders and placeholder text for clarity.
+  - **Change Orders Tab:**  
+    - Shows container cards representing change orders.
+    - Each card indicates linked ticket counts and visually distinct hues.
+    - Allows the grouping of comments (tickets) into change orders.
+
+- **Interactive Behavior:**  
+  - **Drag-and-Drop:** Comments are highlighted (with a dashed border) when a tag is dragged over.
+  - **Tagging:** Dropped tags appear on comment cards as "pinned" tags.
+  - **Submission:** A primary action button ([SEND UPDATED CHANGE ORDERS]) submits the new relationship mapping via a backend integration (e.g. through Make or API calls).
+  - **Tab Toggle:** Users can switch between "Comments" and "Change Orders" using clearly labeled tab buttons.
+
+- **Visual Cues & Placeholder Text:**  
+  - The system uses placeholder text (e.g. `[COMMENTS]`, `[CHANGE ORDERS]`) in place of icons to ensure clarity of interactive elements.
+  - High-contrast colors and hairline borders ensure that interaction elements are visibly distinct and accessible.
+
+## Design Guidelines & Variables
+
+- **Color Variables (from admin.css):**
+  - `--primary-color`: Base color for important labels.
+  - `--secondary-color`: Used for active states (e.g. tab buttons, active borders).
+  - `--accent-color`: Highlights interactive elements.
+  - Darker borders (e.g., `1px solid #333`) are used on cards for contrast.
+
+- **Interactivity:**
+  - **Drag Feedback:** When a tag is dragged over a comment card, the card shows a dashed outline and a subtle background change.
+  - **Tab Toggle:** The active tab is indicated by a contrasting bottom border and text color.
+  - **Container Cards:** Change order cards have distinct border colors keyed to their type (primary, secondary, accent).
+
+- **Modularity:**  
+  - The feature can be extended to support multi-tenant theming by adjusting CSS variables per client.
+  - The UI components are designed as partials, enabling reuse in embedded Softr panels or in a custom cursor instance.
+
+## Implementation Checklist
+
+### Core Structure
+
+- [ ] Create partial component in `/shared/docs/page_ingredients/change-orders/change-ticket-manager.html`
+- [ ] Implement Web Component specification using `<template>` element
+- [ ] Define component's shadow DOM with encapsulated styles
+- [ ] Register custom element `rl-change-ticket-manager`
+
+### UI Layout
+
+- [ ] Implement the dual-tab view:
+  - [ ] Tab toggle with placeholders `[COMMENTS]` and `[CHANGE ORDERS]`
+  - [ ] Separate content regions for each tab
+  - [ ] Tab state persistence using localStorage
+- [ ] Ensure the admin header is in place (50px Recursive Admin top bar placeholder)
+- [ ] Responsive layout that adapts to container width
+
+### Comments Tab
+
+- [ ] Display comment cards with high-contrast, hairline borders
+- [ ] Include placeholder for pinned tags on each comment
+- [ ] Implement a drag-and-drop tag library on the side
+- [ ] Provide clear visual feedback (dashed border, background color change) on drag over
+- [ ] Searchable/filterable comments list
+- [ ] Comments pagination or infinite scroll
+- [ ] Comment detail view with expanded information
+
+### Change Orders Tab
+
+- [ ] Display container cards for each change order with linked ticket counts
+- [ ] Use primary/secondary hue cues to differentiate containers
+- [ ] Include a submission button with label `[SEND UPDATED CHANGE ORDERS]`
+- [ ] Creation interface for new change orders
+- [ ] Editing interface for existing change orders
+- [ ] Sorting and filtering options for change orders
+- [ ] Visual indication of change order status/progress
+
+### Interactive Behavior
+
+- [ ] Wire up tab toggle logic to switch content views
+- [ ] Implement drag-and-drop functionality:
+  - [ ] Draggable tag elements with proper aria attributes
+  - [ ] Drop zones with visual feedback
+  - [ ] Keyboard navigation alternatives for accessibility
+- [ ] Create binding logic for tags to comments
+- [ ] Implement grouping of comments into change orders
+- [ ] Build confirmation dialogs for destructive actions
+- [ ] Prepare API integration for change order submissions
+
+### Data Integration
+
+- [ ] Create data model for comments and change orders
+- [ ] Define REST API endpoints for CRUD operations
+- [ ] Implement Airtable integration for QC_change_orders table
+- [ ] Implement Airtable integration for QC_Tickets table
+- [ ] Build relationships mapping between tickets and change orders
+- [ ] Implement webhook interfaces for real-time updates
+- [ ] Add caching layer for improved performance
+
+### Theming & Accessibility
+
+- [ ] Use CSS variables for dynamic theming
+- [ ] Ensure elements have sufficient contrast and clear feedback
+- [ ] Implement ARIA attributes for screen readers
+- [ ] Add keyboard navigation support
+- [ ] Ensure color choices work for color-blind users
+- [ ] Test with screen readers and keyboard-only navigation
+- [ ] Support dark/light mode toggle
+
+### Testing & Validation
+
+- [ ] Create unit tests for component logic
+- [ ] Implement integration tests with mock data
+- [ ] Perform cross-browser compatibility testing
+- [ ] Validate accessibility with automated tools
+- [ ] Conduct user testing with instructional designers
+- [ ] Performance testing with large data sets
+- [ ] Document edge cases and error handling
+
+## Component API
+
+The `rl-change-ticket-manager` component should expose the following API:
+
+```javascript
+// Attributes
+data-client="client-name"         // Client identifier
+data-project="project-name"       // Project identifier
+data-view="comments|changeOrders" // Initial view to show
+data-theme="light|dark"           // Theme option
+
+// Properties
+comments                          // Array of comment objects
+changeOrders                      // Array of change order objects
+selectedTab                       // Current active tab
+
+// Methods
+refresh()                         // Refresh data from server
+submitChanges()                   // Submit current state to server
+addComment(comment)               // Add a new comment
+addChangeOrder(changeOrder)       // Create a new change order
+linkTicketToChangeOrder(ticketId, changeOrderId) // Associate ticket with change order
+
+// Events
+'tab-changed'                     // Fired when tab is changed
+'comment-tagged'                  // Fired when a comment is tagged
+'change-order-updated'            // Fired when a change order is modified
+'data-submitted'                  // Fired when changes are submitted
+```
+
+## Sample HTML Structure
+
+```html
+<!-- Comments and Change Orders UX View -->
+<template id="change-ticket-manager-template">
+  <style>
+    :host {
+      display: block;
+      font-family: var(--font-family, system-ui, sans-serif);
+      color: var(--text-color, #333);
+    }
+    .comment-organizer { display: flex; gap: 24px; align-items: flex-start; }
+    .comment-card { background: white; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .comment-card.drag-over { outline: 2px dashed var(--accent-color, #3498db); background: #eef7ff; }
+    .tag-chip { background: var(--secondary-color, #c0392b); color: white; padding: 4px 8px; border-radius: 4px; margin: 4px; cursor: grab; }
+    .tab-toggle { display: flex; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid #333; padding: 4px; border-radius: 4px; }
+    .tab-toggle button { flex: 1; padding: 10px; border: none; border-bottom: 3px solid transparent; background: none; cursor: pointer; color: #333; }
+    .tab-toggle button.active { color: var(--accent-color, #3498db); border-bottom-color: var(--accent-color, #3498db); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .change-order-card { background: white; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .primary-button { background: var(--primary-color, #2980b9); color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; }
+  </style>
+
+  <div class="change-ticket-manager">
+    <div class="tab-toggle">
+      <button id="comments-tab" class="active">[COMMENTS]</button>
+      <button id="change-orders-tab">[CHANGE ORDERS]</button>
+    </div>
+    
+    <div id="comments-content" class="tab-content active">
+      <h3>Drag a tag onto a comment</h3>
+      <div class="comment-organizer">
+        <div class="comment-stack">
+          <!-- Comment cards will be dynamically generated here -->
+          <div class="comment-card">
+            <p><strong>"Timing seems fast on slide 3."</strong></p>
+            <p><small>From Mila · Slide 3</small></p>
+            <p>[Pinned Tags: None]</p>
+          </div>
+        </div>
+        <div class="tag-library">
+          <!-- Tags will be dynamically generated here -->
+          <div class="tag-chip" draggable="true">#Timing</div>
+          <div class="tag-chip" draggable="true">#Visual</div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="change-orders-content" class="tab-content">
+      <h3>Change Order Library</h3>
+      <!-- Change order cards will be dynamically generated here -->
+      <div class="change-order-card">
+        <strong>Update Slide 3 Timing</strong>
+        <p>Linked to: 2 tickets</p>
+        <p>[Change Order Tags: #Timing]</p>
+      </div>
+      <button class="primary-button">[SEND UPDATED CHANGE ORDERS]</button>
+    </div>
+  </div>
+</template>
+
+<script>
+class ChangeTicketManager extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    
+    const template = document.getElementById('change-ticket-manager-template');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    // Cache elements
+    this._commentsTab = this.shadowRoot.getElementById('comments-tab');
+    this._changeOrdersTab = this.shadowRoot.getElementById('change-orders-tab');
+    this._commentsContent = this.shadowRoot.getElementById('comments-content');
+    this._changeOrdersContent = this.shadowRoot.getElementById('change-orders-content');
+    
+    // Bind events
+    this._commentsTab.addEventListener('click', () => this._showTab('comments'));
+    this._changeOrdersTab.addEventListener('click', () => this._showTab('change-orders'));
+    
+    // Initialize drag and drop functionality
+    this._initDragAndDrop();
+  }
+  
+  connectedCallback() {
+    // Initialize based on attributes
+    const initialView = this.getAttribute('data-view') || 'comments';
+    this._showTab(initialView);
+    
+    // Load data
+    this._fetchData();
+  }
+  
+  _showTab(tabId) {
+    if (tabId === 'comments') {
+      this._commentsTab.classList.add('active');
+      this._changeOrdersTab.classList.remove('active');
+      this._commentsContent.classList.add('active');
+      this._changeOrdersContent.classList.remove('active');
+    } else {
+      this._commentsTab.classList.remove('active');
+      this._changeOrdersTab.classList.add('active');
+      this._commentsContent.classList.remove('active');
+      this._changeOrdersContent.classList.add('active');
+    }
+    
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('tab-changed', { 
+      detail: { tab: tabId },
+      bubbles: true,
+      composed: true
+    }));
+    
+    // Store preference
+    localStorage.setItem('change-ticket-tab', tabId);
+  }
+  
+  _initDragAndDrop() {
+    // Implementation details will go here
+  }
+  
+  _fetchData() {
+    // Implementation details will go here
+  }
+  
+  // Public API methods
+  refresh() {
+    this._fetchData();
+  }
+  
+  submitChanges() {
+    // Implementation details will go here
+  }
+}
+
+customElements.define('rl-change-ticket-manager', ChangeTicketManager);
+</script>
+```
+
+## Next Steps
+
+- **Integration:** Wire up the drag-and-drop logic to update the backend (Airtable change orders/ticket mappings).
+- **Refinement:** Enhance the visual feedback (animations, edit modals) based on user testing.
+- **Theming:** Adapt CSS variables to support organization-specific accents and ensure accessibility.
+- **Expansion:** Consider adding a full-page version of the component with expanded functionality.
+- **Analytics:** Add tracking for user interactions to inform future UX improvements.
+
+## Dependencies
+
+- **Airtable Tables:** 
+  - QC_change_orders
+  - QC_Tickets
+- **CSS Framework:** Admin styles from `/shared/assets/css/admin.css`
+- **API Endpoints:** 
+  - `/api/comments` (GET, POST)
+  - `/api/change-orders` (GET, POST, PUT)
+  - `/api/tickets` (GET, POST, PUT)
+
+This checklist provides a foundational blueprint for a modular, interactive review board. The system is designed to be flexible, extendable, and conducive to integration into the existing Recursive Learning platform. 
