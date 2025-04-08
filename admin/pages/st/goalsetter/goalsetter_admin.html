@@ -8,15 +8,17 @@
         :root {
             --primary: #004080;
             --secondary: #E87722;
+            --accent-color: #007bff;
             --primary-hover: #003366;
             --secondary-hover: #d66b1b;
-            --bg-light: #f5f5f5;
+            --bg-light: #f4f4f4;
             --bg-dark: #333;
             --text: #2b2b2b;
             --text-light: #fff;
             --card-bg: white;
-            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            --card-radius: 12px;
+            --surface: #ffffff;
+            --card-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --card-radius: 16px;
             --button-radius: 4px;
             --header-height: 50px;
             --sidebar-width: 260px;
@@ -30,7 +32,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: var(--text);
             background: var(--bg-light);
             min-height: 100vh;
@@ -90,27 +92,21 @@
         /* Module cards */
         .nav-card {
             position: relative;
-            border-radius: 12px;
+            border-radius: var(--card-radius);
             padding: 16px;
-            background: white;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            background: var(--surface);
+            box-shadow: var(--card-shadow);
             margin-bottom: 16px;
             transition: all 0.3s ease;
             overflow: hidden;
+            border-left: 6px solid var(--accent-color);
         }
         
         .nav-card.collapsed {
             height: 60px;
             padding: 12px 16px;
-        }
-        
-        .nav-card .gem-icon {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            margin-right: 8px;
-            background: var(--gem-color);
-            border-radius: 50%;
+            background: #fafafa;
+            border-left: 6px solid #ffcc00;
         }
         
         .active-gem {
@@ -120,7 +116,7 @@
             transform: translateY(-50%);
             width: 16px;
             height: 16px;
-            background: var(--gem-color);
+            background: var(--accent-color);
             border-radius: 50%;
             box-shadow: 0 0 0 4px var(--gem-shadow);
         }
@@ -134,7 +130,7 @@
             transform: translateY(-50%);
             border-top: 10px solid transparent;
             border-bottom: 10px solid transparent;
-            border-left: 12px solid var(--gem-color);
+            border-left: 12px solid var(--accent-color);
         }
         
         .feature-list {
@@ -143,41 +139,43 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
         
         .feature-list li {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            padding: 6px 8px;
+            border-radius: 8px;
             cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
         .feature-list li:hover {
-            background: rgba(0,0,0,0.05);
+            background: rgba(0,0,0,0.03);
         }
         
         .feature-list li.active {
-            background: var(--gem-shadow);
+            border-color: var(--accent-color);
+            background-color: #eef5ff;
         }
         
-        .feature-list .gem-icon {
-            width: 10px;
-            height: 10px;
-            background: var(--gem-color);
-            border-radius: 50%;
+        .feature-list img {
+            width: 18px;
+            height: 18px;
         }
         
         /* Content panel */
         .content-panel {
-            background: white;
+            background: var(--surface);
             padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            border-radius: var(--card-radius);
+            box-shadow: var(--card-shadow);
+            position: relative;
         }
         
         .tab-header {
@@ -185,42 +183,34 @@
             flex-wrap: wrap;
             gap: 12px;
             margin-bottom: 16px;
+            border-bottom: 2px solid #ddd;
         }
         
         .tab {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: #e9f2ff;
-            border-radius: 24px;
-            padding: 6px 12px;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
             font-size: 14px;
-            color: var(--gem-color);
+            color: var(--primary);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .tab:hover {
-            background: #d9eaff;
         }
         
         .tab.active {
-            background: var(--gem-color);
-            color: white;
+            border-bottom-color: var(--accent-color);
+            background-color: #eef5ff;
+            border-radius: 8px 8px 0 0;
         }
         
-        .tab.active .gem-icon {
-            background: white;
+        .tab img {
+            width: 16px;
+            height: 16px;
         }
         
-        .tab .gem-icon {
-            width: 10px;
-            height: 10px;
-            background: var(--gem-color);
-            border-radius: 50%;
-        }
-        
-        /* Tab content */
         .tab-content {
             display: none;
         }
@@ -229,21 +219,173 @@
             display: block;
         }
         
+        /* Toggle tab content */
+        .toggle-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .preview-box {
+            background: #eaeaea;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+            width: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.3s ease;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        
+        .preview-box.active {
+            outline: 3px solid var(--accent-color);
+        }
+        
+        .preview-box.swap {
+            animation: flicker 0.4s ease-in-out, scaleBig 0.4s ease-in-out;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes scaleBig {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .switch-control {
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: fit-content;
+        }
+        
+        .iframe-link {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--accent-color);
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .modal-warning {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid var(--status-warning);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 10;
+            max-width: 400px;
+            text-align: center;
+            display: none;
+        }
+        
+        .modal-warning h3 {
+            margin-top: 0;
+            color: var(--status-warning);
+        }
+        
+        .modal-warning .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .modal-warning button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .modal-warning .cancel {
+            background: #f1f1f1;
+            color: #333;
+        }
+        
+        .modal-warning .proceed {
+            background: var(--status-warning);
+            color: #fff;
+        }
+        
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .action-button {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--button-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .action-button:hover {
+            background: var(--primary-hover);
+        }
+        
+        .action-button.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .action-button.secondary:hover {
+            background: rgba(0,64,128,0.05);
+        }
+        
         /* Footer */
         .admin-footer {
             padding: 16px;
             text-align: center;
             font-size: 14px;
             color: #666;
-            background: white;
             border-top: 1px solid #ddd;
+        }
+        
+        /* Iframe tab content */
+        #iframe-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
     <header class="admin-header">
         <div class="header-left">
-            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
+            <img src="/shared/assets/images/recursive-learning.png" alt="Recursive Learning" class="header-logo">
         </div>
         <div class="header-right">
             <div class="admin-info">
@@ -258,121 +400,149 @@
         <!-- Left panel with module cards -->
         <div>
             <div class="nav-card">
-                <span class="gem-icon"></span> Goalsetter
+                <strong>Goalsetter</strong>
                 <div class="active-gem"></div>
                 <div class="callout-connector"></div>
                 <ul class="feature-list">
-                    <li data-tab="toggle" class="active"><span class="gem-icon"></span> Toggle</li>
-                    <li data-tab="iframe"><span class="gem-icon"></span> Iframe</li>
-                    <li data-tab="comments"><span class="gem-icon"></span> Comments</li>
-                    <li data-tab="change-orders"><span class="gem-icon"></span> Change Orders</li>
-                    <li data-tab="lrs"><span class="gem-icon"></span> LRS</li>
-                    <li data-tab="status"><span class="gem-icon"></span> Status</li>
+                    <li data-tab="toggle" class="active">
+                        <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle"> Toggle
+                    </li>
+                    <li data-tab="iframe">
+                        <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe"> Iframe
+                    </li>
+                    <li data-tab="comments">
+                        <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments"> Comments
+                    </li>
+                    <li data-tab="change-orders">
+                        <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change"> Change Orders
+                    </li>
+                    <li data-tab="lrs">
+                        <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS"> LRS
+                    </li>
+                    <li data-tab="status">
+                        <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status"> Status
+                    </li>
                 </ul>
             </div>
             <div class="nav-card collapsed">
-                <span class="gem-icon"></span> Continuous Improvement
+                <strong>Continuous Improvement</strong>
             </div>
             <div class="nav-card collapsed">
-                <span class="gem-icon"></span> Network Leader
+                <strong>Network Leader</strong>
             </div>
         </div>
         
         <!-- Right panel with tab content -->
         <div class="content-panel">
             <div class="tab-header">
-                <div class="tab active" data-tab="toggle"><span class="gem-icon"></span> Toggle</div>
-                <div class="tab" data-tab="iframe"><span class="gem-icon"></span> Iframe</div>
-                <div class="tab" data-tab="comments"><span class="gem-icon"></span> Comments</div>
-                <div class="tab" data-tab="change-orders"><span class="gem-icon"></span> Change</div>
-                <div class="tab" data-tab="lrs"><span class="gem-icon"></span> LRS</div>
-                <div class="tab" data-tab="status"><span class="gem-icon"></span> Status</div>
+                <button class="tab active" data-tab="toggle">
+                    <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle"> Toggle
+                </button>
+                <button class="tab" data-tab="iframe">
+                    <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe"> Iframe
+                </button>
+                <button class="tab" data-tab="comments">
+                    <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments"> Comments
+                </button>
+                <button class="tab" data-tab="change-orders">
+                    <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change"> Change
+                </button>
+                <button class="tab" data-tab="lrs">
+                    <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS"> LRS
+                </button>
+                <button class="tab" data-tab="status">
+                    <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status"> Status
+                </button>
             </div>
             
-            <h2>Goalsetter Admin</h2>
-            
             <div class="tab-content active" id="toggle-tab">
-                <div id="toggle-container">
-                    <rl-toggle 
-                        resource-path="/clients/st/goalsetter/goalsetter.html"
-                        base-url="https://recursivelearning.app"
-                        mode="temp">
-                    </rl-toggle>
+                <h2>Toggle Preview</h2>
+                <div class="toggle-panel">
+                    <div class="preview-box active swap">goalsetter_temp.html</div>
+                    <div class="preview-box">goalsetter.html</div>
+                </div>
+                <div class="switch-control">
+                    <label>Type "Switch Goalsetter_live" and press confirm to queue this change:</label>
+                    <input type="text" placeholder="Type to confirm..." style="padding: 6px; width: 280px;">
+                </div>
+                <div class="iframe-link" id="toggle-iframe-link">→ Configure iframe settings</div>
+                
+                <div class="action-buttons">
+                    <button class="action-button" id="toggle-confirm-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Confirm
+                    </button>
+                    <button class="action-button secondary" id="toggle-cancel-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        Cancel
+                    </button>
+                    <button class="action-button secondary" id="toggle-expand-btn" title="Open in full page view">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                        </svg>
+                        Expand
+                    </button>
+                </div>
+                
+                <div class="modal-warning" id="warning-modal">
+                    <h3>⚠️ Caution</h3>
+                    <p>You are attempting to promote <strong>goalsetter.html</strong> during a review period. Proceed with intention.</p>
+                    <div class="buttons">
+                        <button class="cancel">Cancel</button>
+                        <button class="proceed">Proceed</button>
+                    </div>
                 </div>
             </div>
             
             <div class="tab-content" id="iframe-tab">
-                <div id="iframe-container"></div>
+                <h2>Iframe Preview</h2>
+                <div id="iframe-container">
+                    <iframe src="/clients/st/goalsetter/goalsetter_temp.html" width="100%" height="100%" frameborder="0"></iframe>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-button">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                        </svg>
+                        Get Embed Code
+                    </button>
+                </div>
             </div>
             
             <div class="tab-content" id="comments-tab">
+                <h2>Comments</h2>
                 <p>Comments feature will be implemented in a future update.</p>
             </div>
             
             <div class="tab-content" id="change-orders-tab">
+                <h2>Change Orders</h2>
                 <p>Change Orders feature will be implemented in a future update.</p>
             </div>
             
             <div class="tab-content" id="lrs-tab">
+                <h2>Learning Record Store (LRS)</h2>
                 <p>Learning Record Store (LRS) feature will be implemented in a future update.</p>
             </div>
             
             <div class="tab-content" id="status-tab">
+                <h2>Status Monitoring</h2>
                 <p>Status monitoring feature will be implemented in a future update.</p>
             </div>
         </div>
     </div>
     
     <footer class="admin-footer">
-        <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
+        <p>© 2025 Recursive Learning. All Rights Reserved.</p>
     </footer>
     
     <script>
-        // Component loader
-        class PartialLoader {
-            constructor(baseUrl = '/shared/page_ingredients/') {
-                this.baseUrl = baseUrl;
-                this.loadedPartials = new Set();
-            }
-            
-            async load(partialName, targetElement) {
-                if (this.loadedPartials.has(partialName)) {
-                    // Component already loaded, just create and append
-                    const element = document.createElement(`rl-${partialName}`);
-                    targetElement.innerHTML = '';
-                    targetElement.appendChild(element);
-                    return element;
-                }
-                
-                // Load the component definition
-                try {
-                    const link = document.createElement('link');
-                    link.rel = 'import';
-                    link.href = `${this.baseUrl}${partialName}/${partialName}.html`;
-                    
-                    const loaded = new Promise((resolve, reject) => {
-                        link.onload = resolve;
-                        link.onerror = reject;
-                    });
-                    
-                    document.head.appendChild(link);
-                    await loaded;
-                    
-                    // Create and append the element
-                    const element = document.createElement(`rl-${partialName}`);
-                    targetElement.innerHTML = '';
-                    targetElement.appendChild(element);
-                    
-                    this.loadedPartials.add(partialName);
-                    return element;
-                } catch (error) {
-                    console.error(`Failed to load partial: ${partialName}`, error);
-                    targetElement.innerHTML = `<div class="error-message">Failed to load ${partialName} component</div>`;
-                    return null;
-                }
-            }
-        }
-        
         // Tab navigation functionality
         function initTabNavigation() {
             const tabs = document.querySelectorAll('.tab');
@@ -431,20 +601,69 @@
             }
         }
         
-        // Card expansion functionality
+        // Toggle functionality
+        function initToggleFeature() {
+            const previewBoxes = document.querySelectorAll('.preview-box');
+            const confirmBtn = document.getElementById('toggle-confirm-btn');
+            const cancelBtn = document.getElementById('toggle-cancel-btn');
+            const expandBtn = document.getElementById('toggle-expand-btn');
+            const warningModal = document.getElementById('warning-modal');
+            const modalCancelBtn = document.querySelector('.modal-warning .cancel');
+            const modalProceedBtn = document.querySelector('.modal-warning .proceed');
+            const iframeLink = document.getElementById('toggle-iframe-link');
+            
+            // Handle preview box selection
+            previewBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    previewBoxes.forEach(b => b.classList.remove('active', 'swap'));
+                    box.classList.add('active', 'swap');
+                });
+            });
+            
+            // Handle confirm button click
+            confirmBtn.addEventListener('click', () => {
+                warningModal.style.display = 'block';
+            });
+            
+            // Handle cancel button click
+            cancelBtn.addEventListener('click', () => {
+                // Reset selection
+                previewBoxes.forEach(b => b.classList.remove('active', 'swap'));
+                previewBoxes[0].classList.add('active');
+            });
+            
+            // Handle expand button click (future feature)
+            expandBtn.addEventListener('click', () => {
+                alert('Full page view feature coming soon!');
+                // Future implementation:
+                // window.location.href = '/admin/tools/toggle?client=goalsetter&mode=temp';
+            });
+            
+            // Handle modal buttons
+            modalCancelBtn.addEventListener('click', () => {
+                warningModal.style.display = 'none';
+            });
+            
+            modalProceedBtn.addEventListener('click', () => {
+                warningModal.style.display = 'none';
+                // Perform toggle action here
+                alert('Toggle action confirmed!');
+            });
+            
+            // Handle iframe link click
+            iframeLink.addEventListener('click', () => {
+                // Activate iframe tab
+                document.querySelector('.tab[data-tab="iframe"]').click();
+            });
+        }
+        
+        // Card expansion functionality for future implementation
         function initCardExpansion() {
             const cards = document.querySelectorAll('.nav-card.collapsed');
             
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    // Collapse currently expanded card
-                    const expandedCard = document.querySelector('.nav-card:not(.collapsed)');
-                    if (expandedCard) {
-                        expandedCard.classList.add('collapsed');
-                    }
-                    
-                    // Expand this card
-                    card.classList.remove('collapsed');
+                    alert('This module is not yet available.');
                 });
             });
         }
@@ -454,6 +673,9 @@
             // Initialize tab navigation
             initTabNavigation();
             
+            // Initialize toggle feature
+            initToggleFeature();
+            
             // Initialize card expansion
             initCardExpansion();
             
@@ -462,39 +684,6 @@
                 document.getElementById('dev-mode-indicator').innerHTML = 
                     '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
             }
-            
-            // Load the components
-            const loader = new PartialLoader();
-            
-            // Load toggle component
-            loader.load('toggle', document.getElementById('toggle-container'))
-                .then(element => {
-                    if (element) {
-                        element.setAttribute('resource-path', '/clients/st/goalsetter/goalsetter.html');
-                        element.setAttribute('base-url', window.location.origin);
-                        element.setAttribute('mode', 'temp');
-                        
-                        // Listen for toggle events
-                        element.addEventListener('mode-change', (e) => {
-                            console.log('Mode changed:', e.detail);
-                            
-                            // Update iframe if it exists
-                            const iframeElement = document.querySelector('rl-iframe');
-                            if (iframeElement) {
-                                iframeElement.setAttribute('src', e.detail.url);
-                            }
-                        });
-                    }
-                });
-            
-            // Load iframe component
-            loader.load('iframe', document.getElementById('iframe-container'))
-                .then(element => {
-                    if (element) {
-                        element.setAttribute('src', `${window.location.origin}/clients/st/goalsetter/goalsetter_temp.html`);
-                        element.setAttribute('title', 'Goalsetter Preview');
-                    }
-                });
         });
     </script>
 </body>

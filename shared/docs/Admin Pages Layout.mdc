@@ -188,6 +188,39 @@ function loadPartial(partialName, targetElement) {
 loadPartial('iframe', document.getElementById('preview-container'));
 ```
 
+## Future Feature Ideas
+
+### Expandable Partial Components
+- Add expand buttons to partial components for fullscreen mode
+- When expanded, show enhanced toolset and additional options
+- Implementation approaches:
+  - Modal overlay that fills viewport
+  - Toggle class to expand parent container
+  - Dynamic resizing of grid layout
+- For example, the "comments" partial could expand to show:
+  - Thread view with all historical comments
+  - Advanced filtering and sorting options
+  - Comment tagging and categorization
+  - User mention system
+  - Rich text formatting
+
+### Dedicated Tool Pages
+- Separate specialized pages for advanced tool functionality
+- Accessed via "Open in full page" button in the partial
+- Benefits:
+  - More screen real estate for complex interfaces
+  - Tailored UX for specific workflows
+  - Can include specialized controls not needed in dashboard view
+  - Potential for side-by-side comparisons and multi-view
+- Example URL structure: `/admin/tools/comments?client=goalsetter&view=thread`
+
+### Implementation Strategy
+- Shared component code between partials and full pages
+- Responsive design that adapts to available space
+- State persistence between views
+- Conditional rendering of advanced features based on context
+- Deep linking support for sharing specific tool states
+
 ## Implementation Notes
 
 ### Dynamic Module Loading
