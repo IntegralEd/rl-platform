@@ -42,7 +42,7 @@ const DEV_USER = {
 // State
 let authState = {
   authenticated: false,
-  user: null,
+    user: null,
   token: null,
   processingAuth: false,
   origin: null
