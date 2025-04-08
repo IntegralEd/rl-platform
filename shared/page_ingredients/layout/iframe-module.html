@@ -1,0 +1,155 @@
+<!-- Iframe Module v2025.04.13 -->
+<div class="iframe-module">
+    <style>
+        .iframe-module {
+            --module-height: 100%;
+            display: flex;
+            flex-direction: column;
+            height: var(--module-height);
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-light, #f9f9f9);
+            border-radius: var(--card-radius, 8px);
+        }
+
+        .iframe-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: var(--header-bg, #fff);
+            border-bottom: 1px solid var(--border-color, #eee);
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+
+        .iframe-view {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .iframe-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .iframe-button {
+            padding: 4px 8px;
+            border: 1px solid var(--border-color, #eee);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-color, #333);
+        }
+
+        .iframe-button:hover {
+            background: var(--hover-bg, #f5f5f5);
+        }
+
+        .iframe-status {
+            font-size: 12px;
+            color: var(--text-muted, #666);
+        }
+
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .iframe-header {
+                height: 32px;
+                padding: 4px 8px;
+            }
+        }
+    </style>
+
+    <div class="iframe-header">
+        <div class="iframe-status">
+            <span class="status-text">Loading...</span>
+        </div>
+        <div class="iframe-controls">
+            <button class="iframe-button refresh-btn" onclick="refreshIframe(this)">
+                Refresh
+            </button>
+            <button class="iframe-button expand-btn" onclick="toggleExpand(this)">
+                Expand
+            </button>
+        </div>
+    </div>
+
+    <div class="iframe-container">
+        <iframe 
+            class="iframe-view auto-scroll-iframe" 
+            loading="eager"
+            importance="high"
+            allow="microphone *; camera *; midi *; encrypted-media *;">
+        </iframe>
+    </div>
+
+    <script>
+        class IframeModule extends HTMLElement {
+            constructor() {
+                super();
+                this.iframe = this.querySelector('.iframe-view');
+                this.statusText = this.querySelector('.status-text');
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Handle iframe load events
+                this.iframe.addEventListener('load', () => {
+                    this.statusText.textContent = 'Ready';
+                });
+
+                // Handle resize events
+                window.addEventListener('resize', () => this.adjustSize());
+                this.adjustSize();
+
+                // Handle messages from iframe
+                window.addEventListener('message', (event) => {
+                    if (event.origin !== window.location.origin) return;
+                    if (event.data.type === 'resize') {
+                        this.iframe.style.height = `${event.data.height}px`;
+                    }
+                });
+            }
+
+            adjustSize() {
+                const container = this.querySelector('.iframe-container');
+                if (container) {
+                    this.iframe.style.height = `${container.clientHeight}px`;
+                }
+            }
+
+            setSource(url) {
+                if (url) {
+                    this.statusText.textContent = 'Loading...';
+                    this.iframe.src = url;
+                }
+            }
+        }
+
+        // Register custom element
+        customElements.define('iframe-module', IframeModule);
+
+        // Helper functions
+        function refreshIframe(btn) {
+            const module = btn.closest('.iframe-module');
+            const iframe = module.querySelector('.iframe-view');
+            iframe.src = iframe.src;
+        }
+
+        function toggleExpand(btn) {
+            const module = btn.closest('.iframe-module');
+            module.classList.toggle('expanded');
+            btn.textContent = module.classList.contains('expanded') ? 'Collapse' : 'Expand';
+        }
+    </script>
+</div> 

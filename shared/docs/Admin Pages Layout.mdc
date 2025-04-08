@@ -237,3 +237,23 @@ loadPartial('iframe', document.getElementById('preview-container'));
 - Store active module in URL parameter
 - Store active tab in localStorage
 - Enable deep linking to specific module+feature
+
+### Iframe Module Integration
+
+The iframe module (`<iframe-module>`) provides a standardized way to embed live views in the admin panel:
+
+```html
+<iframe-module></iframe-module>
+```
+
+Key features:
+- Uses Airtable URL field for source
+- Auto-resizing based on content
+- Status indicators and controls
+- Mobile responsive
+
+Usage:
+```javascript
+const module = document.querySelector('iframe-module');
+module.setSource(airtableUrl); // From Airtable URL field
+```
