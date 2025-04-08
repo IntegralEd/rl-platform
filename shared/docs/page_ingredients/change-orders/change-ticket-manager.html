@@ -1,0 +1,672 @@
+<!-- 
+  Change Ticket Manager Component v1.0.0
+  Created: 2025-04-08
+  
+  Features:
+  - Dual-tab view for Comments and Change Orders management
+  - Drag-and-drop tagging system
+  - Association of comments with change orders
+  - Integration with Airtable QC_Tickets and QC_change_orders tables
+-->
+
+<template id="change-ticket-manager-template">
+  <style>
+    :host {
+      display: block;
+      font-family: var(--font-family, 'Inter', system-ui, sans-serif);
+      color: var(--text-color, #2b2b2b);
+      --primary: var(--primary-color, #004080);
+      --secondary: var(--secondary-color, #E87722);
+      --accent: var(--accent-color, #007bff);
+      --bg-light: var(--bg-light-color, #f4f4f4);
+      --surface: var(--surface-color, #ffffff);
+      --shadow: var(--card-shadow, 0 1px 4px rgba(0,0,0,0.1));
+      --border-radius: var(--card-radius, 8px);
+      --status-active: var(--status-active-color, #4CAF50);
+      --status-warning: var(--status-warning-color, #FFC107);
+      --status-error: var(--status-error-color, #F44336);
+    }
+    
+    .manager-container {
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    .tab-toggle {
+      display: flex;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      background: var(--bg-light);
+    }
+    
+    .tab-toggle button {
+      flex: 1;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .tab-toggle button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--surface);
+    }
+    
+    .tab-toggle button:hover:not(.active) {
+      background: rgba(0,0,0,0.05);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Comments tab styles */
+    .comment-organizer {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    
+    .comment-stack {
+      flex: 1;
+    }
+    
+    .comment-card {
+      background: var(--surface);
+      border: 1px solid #333;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .comment-card.drag-over {
+      outline: 2px dashed var(--accent);
+      background: rgba(0,123,255,0.05);
+    }
+    
+    .comment-card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .comment-source {
+      font-size: 12px;
+      color: rgba(0,0,0,0.6);
+    }
+    
+    .comment-content {
+      margin-bottom: 12px;
+    }
+    
+    .comment-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    
+    .tag-library {
+      width: 200px;
+      background: var(--bg-light);
+      padding: 16px;
+      border-radius: var(--border-radius);
+    }
+    
+    .tag-library h4 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .tag-chip {
+      display: inline-block;
+      background: var(--secondary);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin: 4px;
+      font-size: 13px;
+      cursor: grab;
+      user-select: none;
+    }
+    
+    .tag-chip[data-assigned="true"] {
+      background: var(--primary);
+    }
+    
+    /* Change Orders tab styles */
+    .change-orders-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .change-order-card {
+      background: var(--surface);
+      border: 1px solid #333;
+      border-left: 4px solid var(--accent);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .change-order-card[data-type="visual"] {
+      border-left-color: #9C27B0;
+    }
+    
+    .change-order-card[data-type="content"] {
+      border-left-color: #FF9800;
+    }
+    
+    .change-order-card[data-type="timing"] {
+      border-left-color: #2196F3;
+    }
+    
+    .change-order-title {
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+    
+    .change-order-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(0,0,0,0.6);
+      margin-bottom: 8px;
+    }
+    
+    .ticket-count {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .ticket-count-badge {
+      background: var(--primary);
+      color: white;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 12px;
+    }
+    
+    .change-order-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    
+    .primary-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    .primary-button:hover {
+      background: var(--primary-hover, #003366);
+    }
+    
+    .secondary-button {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .secondary-button:hover {
+      background: rgba(0,64,128,0.05);
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+  </style>
+  
+  <div class="manager-container">
+    <div class="tab-toggle">
+      <button id="comments-tab" class="active">[COMMENTS]</button>
+      <button id="change-orders-tab">[CHANGE ORDERS]</button>
+    </div>
+    
+    <div id="comments-content" class="tab-content active">
+      <h3>Drag a tag onto a comment</h3>
+      <div class="comment-organizer">
+        <div class="comment-stack" id="comment-stack">
+          <!-- Comment cards will be dynamically generated here -->
+          <div class="comment-card" data-id="comment-1">
+            <div class="comment-card-header">
+              <strong>Comment #1</strong>
+              <span class="comment-source">From Mila · Slide 3</span>
+            </div>
+            <div class="comment-content">
+              <p>"Timing seems fast on slide 3."</p>
+            </div>
+            <div class="comment-tags" id="tags-comment-1">
+              <span class="tag-placeholder">[Pinned Tags: None]</span>
+            </div>
+          </div>
+          
+          <div class="comment-card" data-id="comment-2">
+            <div class="comment-card-header">
+              <strong>Comment #2</strong>
+              <span class="comment-source">From John · Slide 5</span>
+            </div>
+            <div class="comment-content">
+              <p>"The color of the charts don't match our brand guidelines."</p>
+            </div>
+            <div class="comment-tags" id="tags-comment-2">
+              <span class="tag-placeholder">[Pinned Tags: None]</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tag-library">
+          <h4>Available Tags</h4>
+          <div id="tag-container">
+            <div class="tag-chip" draggable="true" data-tag="timing">#Timing</div>
+            <div class="tag-chip" draggable="true" data-tag="visual">#Visual</div>
+            <div class="tag-chip" draggable="true" data-tag="content">#Content</div>
+            <div class="tag-chip" draggable="true" data-tag="activity">#Activity</div>
+            <div class="tag-chip" draggable="true" data-tag="branding">#Branding</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="change-orders-content" class="tab-content">
+      <div class="change-orders-header">
+        <h3>Change Order Library</h3>
+        <button class="secondary-button" id="add-change-order-btn">+ New Change Order</button>
+      </div>
+      
+      <div id="change-orders-container">
+        <!-- Change order cards will be dynamically generated here -->
+        <div class="change-order-card" data-id="co-1" data-type="timing">
+          <h4 class="change-order-title">Update Slide 3 Timing</h4>
+          <div class="change-order-meta">
+            <span class="ticket-count">
+              Linked tickets: <span class="ticket-count-badge">2</span>
+            </span>
+            <span class="change-order-status">Status: Draft</span>
+          </div>
+          <div class="change-order-tags">
+            <div class="tag-chip">#Timing</div>
+          </div>
+        </div>
+        
+        <div class="change-order-card" data-id="co-2" data-type="visual">
+          <h4 class="change-order-title">Update Branding Colors</h4>
+          <div class="change-order-meta">
+            <span class="ticket-count">
+              Linked tickets: <span class="ticket-count-badge">1</span>
+            </span>
+            <span class="change-order-status">Status: Draft</span>
+          </div>
+          <div class="change-order-tags">
+            <div class="tag-chip">#Visual</div>
+            <div class="tag-chip">#Branding</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-container">
+        <button class="primary-button" id="submit-changes-btn">[SEND UPDATED CHANGE ORDERS]</button>
+        <button class="secondary-button" id="reset-btn">Reset</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+class ChangeTicketManager extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    
+    const template = document.getElementById('change-ticket-manager-template');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    // Internal state
+    this._comments = [];
+    this._changeOrders = [];
+    this._commentTagMap = new Map(); // Maps comment IDs to arrays of tag IDs
+    
+    // Cache elements
+    this._commentsTab = this.shadowRoot.getElementById('comments-tab');
+    this._changeOrdersTab = this.shadowRoot.getElementById('change-orders-tab');
+    this._commentsContent = this.shadowRoot.getElementById('comments-content');
+    this._changeOrdersContent = this.shadowRoot.getElementById('change-orders-content');
+    this._commentStack = this.shadowRoot.getElementById('comment-stack');
+    this._tagContainer = this.shadowRoot.getElementById('tag-container');
+    this._changeOrdersContainer = this.shadowRoot.getElementById('change-orders-container');
+    this._submitChangesBtn = this.shadowRoot.getElementById('submit-changes-btn');
+    this._resetBtn = this.shadowRoot.getElementById('reset-btn');
+    this._addChangeOrderBtn = this.shadowRoot.getElementById('add-change-order-btn');
+    
+    // Bind event handlers
+    this._commentsTab.addEventListener('click', () => this._showTab('comments'));
+    this._changeOrdersTab.addEventListener('click', () => this._showTab('change-orders'));
+    this._submitChangesBtn.addEventListener('click', () => this._handleSubmitChanges());
+    this._resetBtn.addEventListener('click', () => this._handleReset());
+    this._addChangeOrderBtn.addEventListener('click', () => this._handleAddChangeOrder());
+    
+    // Initialize drag and drop
+    this._initDragAndDrop();
+  }
+  
+  // Lifecycle methods
+  connectedCallback() {
+    // Initialize based on attributes
+    const initialView = this.getAttribute('data-view') || 'comments';
+    this._showTab(initialView);
+    
+    // Load data from server or use placeholders
+    this._fetchData();
+  }
+  
+  disconnectedCallback() {
+    // Clean up any event listeners
+  }
+  
+  static get observedAttributes() {
+    return ['data-client', 'data-project', 'data-view', 'data-theme'];
+  }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    
+    if (name === 'data-view') {
+      this._showTab(newValue);
+    } else if (name === 'data-theme') {
+      // Update theme
+    } else {
+      // Refresh data if client or project changes
+      this._fetchData();
+    }
+  }
+  
+  // Private methods
+  _showTab(tabId) {
+    if (tabId === 'comments') {
+      this._commentsTab.classList.add('active');
+      this._changeOrdersTab.classList.remove('active');
+      this._commentsContent.classList.add('active');
+      this._changeOrdersContent.classList.remove('active');
+    } else {
+      this._commentsTab.classList.remove('active');
+      this._changeOrdersTab.classList.add('active');
+      this._commentsContent.classList.remove('active');
+      this._changeOrdersContent.classList.add('active');
+    }
+    
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('tab-changed', {
+      detail: { tab: tabId },
+      bubbles: true,
+      composed: true
+    }));
+    
+    // Store preference
+    localStorage.setItem('change-ticket-tab', tabId);
+  }
+  
+  _initDragAndDrop() {
+    // Set up drag events for tags
+    const tags = this.shadowRoot.querySelectorAll('.tag-chip[draggable="true"]');
+    
+    tags.forEach(tag => {
+      tag.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', tag.dataset.tag);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+    });
+    
+    // Set up drop events for comment cards
+    const commentCards = this.shadowRoot.querySelectorAll('.comment-card');
+    
+    commentCards.forEach(card => {
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        card.classList.add('drag-over');
+      });
+      
+      card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-over');
+      });
+      
+      card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        
+        const tagId = e.dataTransfer.getData('text/plain');
+        const commentId = card.dataset.id;
+        
+        this._assignTagToComment(tagId, commentId);
+      });
+    });
+  }
+  
+  _assignTagToComment(tagId, commentId) {
+    // Get the tag element
+    const tagChips = this.shadowRoot.querySelectorAll(`.tag-chip[data-tag="${tagId}"]`);
+    if (!tagChips.length) return;
+    
+    // Get the comment's tag container
+    const tagContainer = this.shadowRoot.getElementById(`tags-${commentId}`);
+    if (!tagContainer) return;
+    
+    // Remove placeholder if it exists
+    const placeholder = tagContainer.querySelector('.tag-placeholder');
+    if (placeholder) {
+      placeholder.remove();
+    }
+    
+    // Check if tag is already assigned
+    if (tagContainer.querySelector(`.tag-chip[data-tag="${tagId}"]`)) {
+      return; // Tag already exists
+    }
+    
+    // Create a new tag chip
+    const newTag = document.createElement('div');
+    newTag.className = 'tag-chip';
+    newTag.setAttribute('data-tag', tagId);
+    newTag.textContent = tagChips[0].textContent;
+    
+    // Add click handler to remove tag
+    newTag.addEventListener('click', () => {
+      newTag.remove();
+      
+      // If no tags left, add placeholder back
+      if (tagContainer.querySelectorAll('.tag-chip').length === 0) {
+        const newPlaceholder = document.createElement('span');
+        newPlaceholder.className = 'tag-placeholder';
+        newPlaceholder.textContent = '[Pinned Tags: None]';
+        tagContainer.appendChild(newPlaceholder);
+      }
+      
+      // Update internal mapping
+      this._updateCommentTagMap();
+      
+      // Dispatch event
+      this.dispatchEvent(new CustomEvent('comment-untagged', {
+        detail: { commentId, tagId },
+        bubbles: true,
+        composed: true
+      }));
+    });
+    
+    // Add to DOM
+    tagContainer.appendChild(newTag);
+    
+    // Update internal mapping
+    this._updateCommentTagMap();
+    
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('comment-tagged', {
+      detail: { commentId, tagId },
+      bubbles: true,
+      composed: true
+    }));
+  }
+  
+  _updateCommentTagMap() {
+    // Reset the map
+    this._commentTagMap.clear();
+    
+    // Loop through all comment cards
+    const commentCards = this.shadowRoot.querySelectorAll('.comment-card');
+    
+    commentCards.forEach(card => {
+      const commentId = card.dataset.id;
+      const tagContainer = this.shadowRoot.getElementById(`tags-${commentId}`);
+      
+      if (tagContainer) {
+        const tags = Array.from(tagContainer.querySelectorAll('.tag-chip'))
+          .map(tag => tag.dataset.tag);
+        
+        if (tags.length) {
+          this._commentTagMap.set(commentId, tags);
+        }
+      }
+    });
+  }
+  
+  _fetchData() {
+    // In a real implementation, this would fetch data from an API
+    console.log('Fetching data for client:', this.getAttribute('data-client'));
+    console.log('Fetching data for project:', this.getAttribute('data-project'));
+    
+    // For now, we'll use the hardcoded data in the HTML
+    this._updateCommentTagMap();
+  }
+  
+  _handleSubmitChanges() {
+    // Update internal state
+    this._updateCommentTagMap();
+    
+    // In a real implementation, this would send data to an API
+    const payload = {
+      client: this.getAttribute('data-client'),
+      project: this.getAttribute('data-project'),
+      commentTagMap: Object.fromEntries(this._commentTagMap),
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('Submitting changes:', payload);
+    
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('data-submitted', {
+      detail: payload,
+      bubbles: true,
+      composed: true
+    }));
+    
+    // Show success message
+    alert('Changes submitted successfully!');
+  }
+  
+  _handleReset() {
+    // Reset all tags
+    const commentCards = this.shadowRoot.querySelectorAll('.comment-card');
+    
+    commentCards.forEach(card => {
+      const commentId = card.dataset.id;
+      const tagContainer = this.shadowRoot.getElementById(`tags-${commentId}`);
+      
+      if (tagContainer) {
+        tagContainer.innerHTML = '<span class="tag-placeholder">[Pinned Tags: None]</span>';
+      }
+    });
+    
+    // Clear internal mapping
+    this._commentTagMap.clear();
+    
+    // Dispatch event
+    this.dispatchEvent(new CustomEvent('reset', {
+      bubbles: true,
+      composed: true
+    }));
+  }
+  
+  _handleAddChangeOrder() {
+    // In a real implementation, this would open a dialog to create a new change order
+    alert('New Change Order functionality coming soon!');
+  }
+  
+  // Public API
+  refresh() {
+    this._fetchData();
+  }
+  
+  submitChanges() {
+    this._handleSubmitChanges();
+  }
+  
+  get comments() {
+    return [...this._comments];
+  }
+  
+  set comments(newComments) {
+    this._comments = [...newComments];
+    // Update UI
+  }
+  
+  get changeOrders() {
+    return [...this._changeOrders];
+  }
+  
+  set changeOrders(newChangeOrders) {
+    this._changeOrders = [...newChangeOrders];
+    // Update UI
+  }
+  
+  get selectedTab() {
+    return this._commentsTab.classList.contains('active') ? 'comments' : 'change-orders';
+  }
+  
+  addComment(comment) {
+    this._comments.push(comment);
+    // Update UI
+  }
+  
+  addChangeOrder(changeOrder) {
+    this._changeOrders.push(changeOrder);
+    // Update UI
+  }
+  
+  linkTicketToChangeOrder(ticketId, changeOrderId) {
+    // Implementation would depend on data structure
+    console.log(`Linking ticket ${ticketId} to change order ${changeOrderId}`);
+  }
+}
+
+// Register the custom element
+customElements.define('rl-change-ticket-manager', ChangeTicketManager);
+</script> 
