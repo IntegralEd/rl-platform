@@ -16,11 +16,6 @@
             --card-bg: white;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
             --card-radius: 8px;
-            --status-active: #4CAF50;
-            --status-warning: #FFC107;
-            --status-error: #F44336;
-            --gem-size: 36px;
-            --gem-size-small: 24px;
         }
 
         body {
@@ -257,173 +252,76 @@
             padding: 20px;
             box-shadow: var(--card-shadow);
             display: flex;
-            flex-direction: column;
-            position: relative;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .admin-card.active {
-            box-shadow: 0 4px 12px rgba(0, 64, 128, 0.2);
-        }
-
-        .admin-card:not(.active) {
-            cursor: pointer;
-            padding-bottom: 16px;
-        }
-
-        .admin-card:not(.active):hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 64, 128, 0.15);
-        }
-
-        .card-header {
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
+            gap: 24px;
         }
 
         .card-title {
             font-size: 1.2rem;
             font-weight: 600;
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            min-width: 200px;
         }
 
         .card-status {
             display: flex;
             gap: 4px;
+            margin-bottom: 8px;
         }
 
         .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            position: relative;
         }
 
-        .status-dot[data-status="active"] { background: var(--status-active); }
-        .status-dot[data-status="warning"] { background: var(--status-warning); }
-        .status-dot[data-status="error"] { background: var(--status-error); }
-
-        .status-dot::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 150%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            z-index: 100;
+        .status-dot.active {
+            background: #4CAF50;
         }
 
-        .status-dot:hover::after {
-            opacity: 1;
+        .status-dot.warning {
+            background: #FFC107;
         }
 
-        .admin-gems {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-            display: none;
+        .status-dot.error {
+            background: #F44336;
         }
 
-        .admin-card.active .admin-gems {
-            display: flex;
-        }
-
-        .admin-gem {
+        .card-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            transition: transform 0.2s;
         }
 
-        .admin-gem:hover {
-            transform: translateY(-3px);
-        }
-
-        .admin-gem.active {
-            transform: translateY(-5px);
-        }
-
-        .gem-icon {
-            width: var(--gem-size);
-            height: var(--gem-size);
-            background: var(--primary);
-            border-radius: 50%;
+        .card-metrics {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 64, 128, 0.2);
-            transition: all 0.3s ease;
+            gap: 24px;
+            margin-bottom: 16px;
         }
 
-        .admin-gem.active .gem-icon {
-            box-shadow: 0 6px 12px rgba(0, 64, 128, 0.3);
-            background: var(--secondary);
-        }
-
-        .gem-icon svg {
-            width: 60%;
-            height: 60%;
-        }
-
-        .gem-icon svg path,
-        .gem-icon svg rect {
-            fill: white;
-        }
-
-        .gem-label {
-            font-size: 0.8rem;
-            color: var(--primary);
+        .metric {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 4px;
             text-align: center;
+            min-width: 100px;
         }
 
-        .admin-gem.active .gem-label {
+        .metric-value {
+            font-size: 1.5rem;
             font-weight: 600;
-            color: var(--secondary);
+            color: var(--primary);
         }
 
-        .gem-alert {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--status-error);
-            color: white;
-            font-size: 11px;
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .card-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .preview-panel {
-            margin-top: 16px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            height: 400px;
-            display: none;
-        }
-
-        .admin-card.active .preview-panel {
-            display: block;
+            gap: 8px;
+            margin-left: auto;
         }
 
         .action-button {
@@ -445,47 +343,35 @@
             background: #003366;
         }
 
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .admin-card:not(.active) .card-actions {
-            display: none;
-        }
-
-        /* Alert gem that appears on inactive cards */
-        .alert-gem {
-            position: absolute;
-            top: -12px;
-            right: -12px;
-            width: var(--gem-size-small);
-            height: var(--gem-size-small);
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
+        .copy-icon {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 64, 128, 0.3);
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: scale(0);
+            width: 16px;
+            height: 16px;
+            margin-left: 4px;
+            cursor: pointer;
+            color: var(--primary);
+            opacity: 0.6;
+            transition: opacity 0.2s;
         }
 
-        .admin-card:not(.active):hover .alert-gem.active {
+        .copy-icon:hover {
             opacity: 1;
-            transform: scale(1);
         }
 
-        .alert-gem svg {
-            width: 60%;
-            height: 60%;
+        .tree-file {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
         }
 
-        .alert-gem svg path,
-        .alert-gem svg rect {
-            fill: white;
+        .card-footer {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: right;
         }
 
         /* Bottom Icons */
@@ -736,11 +622,7 @@
 <body>
     <header class="admin-header">
         <div class="header-left">
-            <img src="/shared/assets/images/recursive-learning.png" alt="Recursive Learning" class="header-logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="primary-accent-icon">
-                <rect width="24" height="24" rx="4" fill="#E87722"/>
-                <path d="M7 12H17M17 12L12 7M17 12L12 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
         </div>
         <div class="header-right">
             <div class="admin-info">
@@ -982,78 +864,13 @@
             <!-- Admin Cards -->
             <div class="admin-cards">
                 <!-- GoalSetter Admin Card -->
-                <div class="admin-card active" data-client="st" data-activity="goalsetter">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 8v4l2 2" />
-                            </svg>
-                            Goal Setter
-                        </h2>
-                        <div class="card-status">
-                            <div class="status-dot" data-status="warning" data-tooltip="API Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="User Sessions"></div>
-                        </div>
+                <div class="admin-card" data-activity="goalsetter">
+                    <h2 class="card-title">Goal Setter</h2>
+                    <div class="status-indicators">
+                        <div class="status-dot" data-status="active" data-tooltip="API Connected"></div>
+                        <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
+                        <div class="status-dot" data-status="error" data-tooltip="User Sessions"></div>
                     </div>
-                    
-                    <div class="admin-gems">
-                        <div class="admin-gem active" data-tab="toggle">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/noun-toggle-switch-731364-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Toggle</span>
-                        </div>
-                        <div class="admin-gem" data-tab="iframe">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/noun-embed-6292841-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Iframe</span>
-                        </div>
-                        <div class="admin-gem" data-tab="comments">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/feedback-7281379-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Comments</span>
-                        </div>
-                        <div class="admin-gem" data-tab="change">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/change-order-6472926-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Change</span>
-                        </div>
-                        <div class="admin-gem" data-tab="lrs">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/LRS-7677811-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">LRS</span>
-                        </div>
-                        <div class="admin-gem" data-tab="status">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/Performance-3850108-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Status</span>
-                        </div>
-                    </div>
-                    
-                    <div class="preview-panel">
-                        <!-- Content loaded dynamically based on selected gem -->
-                        <iframe id="goalsetter-preview" src="/admin/pages/st/goalsetter/goalsetter_admin.html" width="100%" height="100%" frameborder="0"></iframe>
-                    </div>
-                    
                     <div class="card-actions">
                         <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -1061,65 +878,12 @@
                             </svg>
                             Open Admin
                         </button>
-                        <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
                     </div>
                 </div>
 
                 <!-- Merit System Admin Card -->
-                <div class="admin-card" data-client="elpl" data-activity="merit">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="8" r="7" />
-                                <path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12" />
-                            </svg>
-                            Merit System
-                        </h2>
-                        <div class="card-status">
-                            <div class="status-dot" data-status="warning" data-tooltip="API Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="User Sessions"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Alert gem that appears when the card is inactive -->
-                    <div class="alert-gem">
-                        <svg viewBox="0 0 24 24">
-                            <use href="/shared/assets/images/feedback-7281379-004080.svg#svg-object"></use>
-                        </svg>
-                    </div>
-                    
-                    <div class="admin-gems">
-                        <!-- Gems will be visible when card is active -->
-                        <div class="admin-gem" data-tab="toggle">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/noun-toggle-switch-731364-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Toggle</span>
-                        </div>
-                        <div class="admin-gem" data-tab="iframe">
-                            <div class="gem-icon">
-                                <svg viewBox="0 0 24 24">
-                                    <use href="/shared/assets/images/noun-embed-6292841-004080.svg#svg-object"></use>
-                                </svg>
-                            </div>
-                            <span class="gem-label">Iframe</span>
-                        </div>
-                        <!-- More gems... -->
-                    </div>
-                    
-                    <div class="preview-panel">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                    
+                <div class="admin-card" data-activity="merit">
+                    <h2 class="card-title">Merit System</h2>
                     <div class="card-actions">
                         <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -1138,30 +902,8 @@
                 </div>
 
                 <!-- BHB Admin Card -->
-                <div class="admin-card" data-client="bhb" data-activity="bhb">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <polyline points="9 22 9 12 15 12 15 22" />
-                            </svg>
-                            BHB
-                        </h2>
-                        <div class="card-status">
-                            <div class="status-dot" data-status="warning" data-tooltip="API Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
-                            <div class="status-dot" data-status="warning" data-tooltip="User Sessions"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="admin-gems">
-                        <!-- Gems will appear when card is active -->
-                    </div>
-                    
-                    <div class="preview-panel">
-                        <!-- Content loaded dynamically -->
-                    </div>
-                    
+                <div class="admin-card" data-activity="bhb">
+                    <h2 class="card-title">BHB</h2>
                     <div class="card-actions">
                         <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
@@ -1184,7 +926,7 @@
             <div class="bottom-icons">
                 <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
                     <span class="bottom-icon-tooltip">Curious Intake Form</span>
-                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                     </svg>
                 </a>
@@ -1199,7 +941,7 @@
     </div>
 
     <footer class="admin-footer">
-        <p>© 2025 Recursive Learning. All Rights Reserved.</p>
+        <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
     </footer>
 
     <!-- Active JavaScript files -->
@@ -1217,137 +959,7 @@
                 document.getElementById('dev-mode-indicator').innerHTML = 
                     '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
             }
-
-            // Initialize gem-based navigation
-            initGemNavigation();
         });
-
-        // Gem-based Navigation System
-        function initGemNavigation() {
-            const cards = document.querySelectorAll('.admin-card');
-            const gems = document.querySelectorAll('.admin-gem');
-            
-            // Card switching
-            cards.forEach(card => {
-                if (!card.classList.contains('active')) {
-                    card.addEventListener('click', () => {
-                        // Deactivate current active card
-                        document.querySelector('.admin-card.active').classList.remove('active');
-                        
-                        // Activate this card
-                        card.classList.add('active');
-                        
-                        // Save active card state
-                        localStorage.setItem('active-admin-card', card.getAttribute('data-activity'));
-                        
-                        // Activate first gem in this card
-                        const firstGem = card.querySelector('.admin-gem');
-                        if (firstGem) {
-                            activateGem(firstGem);
-                        }
-                    });
-                }
-            });
-            
-            // Gem switching
-            gems.forEach(gem => {
-                gem.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent card click when gem is clicked
-                    activateGem(gem);
-                });
-            });
-            
-            // Function to activate a gem
-            function activateGem(gem) {
-                // Get parent card
-                const card = gem.closest('.admin-card');
-                
-                // Deactivate all gems in this card
-                card.querySelectorAll('.admin-gem').forEach(g => {
-                    g.classList.remove('active');
-                });
-                
-                // Activate this gem
-                gem.classList.add('active');
-                
-                // Save active gem state for this card
-                const cardId = card.getAttribute('data-activity');
-                const tabId = gem.getAttribute('data-tab');
-                localStorage.setItem(`${cardId}-active-gem`, tabId);
-                
-                // Load content based on selected gem
-                loadTabContent(card, tabId);
-            }
-            
-            // Function to load tab content
-            function loadTabContent(card, tabId) {
-                const previewPanel = card.querySelector('.preview-panel');
-                const cardId = card.getAttribute('data-activity');
-                const clientId = card.getAttribute('data-client');
-                
-                // Define paths for different tabs
-                const tabPaths = {
-                    toggle: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#toggle`,
-                    iframe: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#iframe`,
-                    comments: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#comments`,
-                    change: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#change-orders`,
-                    lrs: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#lrs`,
-                    status: `/admin/pages/${clientId}/${cardId}/${cardId}_admin.html#status`
-                };
-                
-                // Update or create iframe
-                let iframe = previewPanel.querySelector('iframe');
-                if (!iframe) {
-                    iframe = document.createElement('iframe');
-                    iframe.width = '100%';
-                    iframe.height = '100%';
-                    iframe.frameBorder = '0';
-                    previewPanel.appendChild(iframe);
-                }
-                
-                // Set iframe source
-                const path = tabPaths[tabId] || tabPaths.toggle;
-                iframe.src = path;
-            }
-            
-            // Restore active card and gem from localStorage
-            function restoreActiveState() {
-                const activeCardId = localStorage.getItem('active-admin-card');
-                
-                if (activeCardId) {
-                    const savedCard = document.querySelector(`.admin-card[data-activity="${activeCardId}"]`);
-                    if (savedCard && !savedCard.classList.contains('active')) {
-                        // Deactivate current active card
-                        document.querySelector('.admin-card.active').classList.remove('active');
-                        
-                        // Activate saved card
-                        savedCard.classList.add('active');
-                        
-                        // Restore active gem for this card
-                        const activeGemId = localStorage.getItem(`${activeCardId}-active-gem`);
-                        if (activeGemId) {
-                            const savedGem = savedCard.querySelector(`.admin-gem[data-tab="${activeGemId}"]`);
-                            if (savedGem) {
-                                activateGem(savedGem);
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Initialize alert gems
-            function initAlertGems() {
-                // For demo purposes, add active class to the alert gem on Merit card
-                const meritAlertGem = document.querySelector('.admin-card[data-activity="merit"] .alert-gem');
-                if (meritAlertGem) {
-                    meritAlertGem.classList.add('active');
-                }
-            }
-            
-            // Call initialization functions
-            initAlertGems();
-            restoreActiveState();
-        }
     </script>
 </body>
 </html> 
