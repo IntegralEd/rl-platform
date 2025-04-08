@@ -1,0 +1,248 @@
+<!-- iframe-config.html - Configuration module for iframe sources -->
+<template id="iframe-config-template">
+  <style>
+    :host {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .config-container {
+      padding: 16px;
+      background: var(--bg-light, #f5f5f5);
+      border-radius: var(--card-radius, 8px);
+    }
+
+    .source-selector {
+      margin-bottom: 24px;
+    }
+
+    .source-type {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .source-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color, #ddd);
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .source-btn.active {
+      background: var(--primary, #004080);
+      color: white;
+      border-color: var(--primary, #004080);
+    }
+
+    .source-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .config-form {
+      background: white;
+      padding: 16px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color, #ddd);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border-color, #ddd);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary, #004080);
+    }
+
+    .preview-btn {
+      background: var(--primary, #004080);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+
+    .preview-btn:hover {
+      background: var(--primary-dark, #002040);
+    }
+
+    .url-preview {
+      margin-top: 16px;
+      padding: 12px;
+      background: var(--bg-light, #f5f5f5);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+  </style>
+
+  <div class="config-container">
+    <div class="source-selector">
+      <h3>Select Source Type</h3>
+      <div class="source-type">
+        <button class="source-btn active" data-type="live">
+          <span class="source-icon">🌐</span>
+          Live Page
+        </button>
+        <button class="source-btn" data-type="external">
+          <span class="source-icon">🔗</span>
+          External URL
+        </button>
+      </div>
+    </div>
+
+    <div class="config-form">
+      <div class="form-group" id="live-config">
+        <label class="form-label">Select Page</label>
+        <select class="form-input" id="page-select">
+          <option value="">Choose a page...</option>
+          <!-- Options populated dynamically -->
+        </select>
+      </div>
+
+      <div class="form-group" id="external-config" style="display: none;">
+        <label class="form-label">External URL</label>
+        <input type="url" class="form-input" id="external-url" 
+               placeholder="https://example.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Preview Size</label>
+        <select class="form-input" id="size-select">
+          <option value="desktop">Desktop (100%)</option>
+          <option value="tablet">Tablet (768px)</option>
+          <option value="mobile">Mobile (375px)</option>
+        </select>
+      </div>
+
+      <button class="preview-btn">Update Preview</button>
+
+      <div class="url-preview">
+        <!-- Generated URL displayed here -->
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+class IframeConfig extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    const template = document.getElementById('iframe-config-template');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    this.setupEventListeners();
+    this.loadAvailablePages();
+  }
+
+  setupEventListeners() {
+    // Source type selection
+    this.shadowRoot.querySelectorAll('.source-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.switchSourceType(btn.dataset.type));
+    });
+
+    // Preview button
+    this.shadowRoot.querySelector('.preview-btn').addEventListener('click', () => {
+      this.updatePreview();
+    });
+
+    // Form inputs
+    ['page-select', 'external-url', 'size-select'].forEach(id => {
+      const input = this.shadowRoot.getElementById(id);
+      if (input) input.addEventListener('change', () => this.updateUrlPreview());
+    });
+  }
+
+  switchSourceType(type) {
+    // Update buttons
+    this.shadowRoot.querySelectorAll('.source-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === type);
+    });
+
+    // Show/hide relevant config
+    this.shadowRoot.getElementById('live-config').style.display = 
+      type === 'live' ? 'block' : 'none';
+    this.shadowRoot.getElementById('external-config').style.display = 
+      type === 'external' ? 'block' : 'none';
+
+    this.updateUrlPreview();
+  }
+
+  async loadAvailablePages() {
+    // TODO: Load available pages from the platform
+    const select = this.shadowRoot.getElementById('page-select');
+    const pages = [
+      { value: 'goalsetter_live.html', label: 'Goalsetter Live' },
+      { value: '/clients/elpl/merit/merit_live.html', label: 'ELPL Merit System Live' }
+    ];
+
+    pages.forEach(page => {
+      const option = document.createElement('option');
+      option.value = page.value;
+      option.textContent = page.label;
+      select.appendChild(option);
+    });
+  }
+
+  updateUrlPreview() {
+    const urlPreview = this.shadowRoot.querySelector('.url-preview');
+    const type = this.shadowRoot.querySelector('.source-btn.active').dataset.type;
+    
+    let url = '';
+    if (type === 'live') {
+      const page = this.shadowRoot.getElementById('page-select').value;
+      url = page ? `/clients/st/${page}` : '';
+    } else {
+      url = this.shadowRoot.getElementById('external-url').value;
+    }
+
+    urlPreview.textContent = url || 'URL will appear here';
+  }
+
+  updatePreview() {
+    const url = this.shadowRoot.querySelector('.url-preview').textContent;
+    const size = this.shadowRoot.getElementById('size-select').value;
+    
+    // Dispatch event for iframe update
+    this.dispatchEvent(new CustomEvent('preview-update', {
+      detail: { url, size },
+      bubbles: true,
+      composed: true
+    }));
+  }
+}
+
+customElements.define('iframe-config', IframeConfig);
+</script> 
