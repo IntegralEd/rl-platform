@@ -201,13 +201,31 @@ class IframeConfig extends HTMLElement {
   }
 
   async loadAvailablePages() {
-    // TODO: Load available pages from the platform
     const select = this.shadowRoot.getElementById('page-select');
-    const pages = [
-      { value: 'goalsetter_live.html', label: 'Goalsetter Live' },
-      { value: '/clients/elpl/merit/merit_live.html', label: 'ELPL Merit System Live' }
-    ];
+    const currentPath = window.location.pathname;
+    
+    let pages = [];
+    
+    if (currentPath.includes('/elpl/merit')) {
+      pages = [
+        { value: '/clients/elpl/merit/merit_live.html', label: 'Merit System Live' },
+        { value: '/clients/elpl/merit/merit_temp.html', label: 'Merit System Development' },
+        { value: '/clients/elpl/merit/merit_review.html', label: 'Merit System Review' },
+        { value: '/clients/elpl/merit/merit_embed.html', label: 'Merit System Embed' }
+      ];
+    } else if (currentPath.includes('/st/goalsetter')) {
+      pages = [
+        { value: '/clients/st/goalsetter/goalsetter_live.html', label: 'Goalsetter Live' },
+        { value: '/clients/st/goalsetter/goalsetter_temp.html', label: 'Goalsetter Development' },
+        { value: '/clients/st/goalsetter/goalsetter_review.html', label: 'Goalsetter Review' },
+        { value: '/clients/st/goalsetter/goalsetter_embed.html', label: 'Goalsetter Embed' }
+      ];
+    }
 
+    // Clear existing options
+    select.innerHTML = '<option value="">Choose a page...</option>';
+
+    // Add new options
     pages.forEach(page => {
       const option = document.createElement('option');
       option.value = page.value;
@@ -222,8 +240,7 @@ class IframeConfig extends HTMLElement {
     
     let url = '';
     if (type === 'live') {
-      const page = this.shadowRoot.getElementById('page-select').value;
-      url = page ? `/clients/st/${page}` : '';
+      url = this.shadowRoot.getElementById('page-select').value;
     } else {
       url = this.shadowRoot.getElementById('external-url').value;
     }
