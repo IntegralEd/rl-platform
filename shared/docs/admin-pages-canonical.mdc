@@ -326,3 +326,45 @@ All admin pages should include:
 - [ ] Add user management interface
 - [ ] Create review management tools
 - [ ] Test across all supported browsers 
+
+## 🎯 Admin Interface Roadmap (April 2025)
+
+### Phase 1: Core Infrastructure & Redis Integration
+- [ ] Redis-backed session management
+- [ ] User authentication with token caching
+- [ ] Organization-level feature flag integration
+- [ ] Page context caching with 1h TTL
+
+### Phase 2: Card-Based Navigation & Modular UI
+- [ ] Gem-based navigation system
+  - Dynamic card loading from Redis cache
+  - SVG icon mapping for features
+  - Interactive preview panels
+- [ ] Iframe component integration
+  - Standardized preview containers
+  - Cross-domain auth handling
+  - State persistence
+
+### Phase 3: Accountability Features
+- [ ] Real-time Redis TTL monitoring
+- [ ] Build status indicators in cards
+- [ ] CloudWatch metrics integration
+- [ ] Agent-accessible status summaries
+
+### Implementation Details
+- Card-based layout with gem navigation
+- Standardized preview panels using `<rl-iframe>`
+- Redis-backed session and context management
+- CloudWatch integration for monitoring
+
+### Success Criteria
+- Sub-100ms navigation between admin views
+- Successful Redis cache hits > 90%
+- Zero cross-domain auth failures
+- All gem states properly persisted
+
+### Next Steps
+1. Complete Redis session integration
+2. Implement card navigation system
+3. Deploy iframe preview components
+4. Enable CloudWatch monitoring 

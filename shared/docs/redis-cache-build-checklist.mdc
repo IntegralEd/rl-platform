@@ -4,92 +4,166 @@ globs: ["/lambda/**/*.py", "/infrastructure/terraform/**/*.tf"]
 alwaysApply: false
 ---
 
-# 🧱 Cached Table Stack: ElastiCache (Redis) for Context + Page Facts
+# 🧱 Multi-Tenant Education Cache Stack: Redis for Context + Chat History
 
 ## Goal
-Build Redis-cached versions of the `User` and `Pages` tables to serve low-latency context and facts to the Recursive Learning Lambda REST API. This supports pydia-style reference and chat continuity across threads.
+Build Redis-cached context store for multi-tenant education chatbot supporting:
+- Per-tenant chat history and context
+- Shared educational resources
+- Real-time session management
+- Cross-domain preview caching
 
 ---
 
 ## 🧠 Key Concepts
 
-- **Redis** – A super-fast, in-memory key-value store. Think of it as a shared scratchpad for quick lookups, like "Who is this user?" or "What facts belong to this page?"
-- **TTL (Time To Live)** – Each record in Redis expires after a set time, like milk in the fridge. This keeps the cache fresh without manual cleanup.
-- **Rehydration** – If Redis doesn't have the data (a cache miss), the system falls back to Airtable, fetches the data, and puts it back in Redis for future calls.
-- **Cache key** – A unique label like `user:abc123`. This is how Redis knows which data to return.
-- **ElastiCache** – AWS's managed Redis service. It handles scaling, networking, and uptime for you.
+- **Redis** – In-memory store for chat context, session data, and shared resources
+- **TTL (Time To Live)** – Automatic expiry for chat sessions and preview caches
+- **Tenant Isolation** – Prefix-based separation of tenant data
+- **Context Window** – Rolling cache of recent chat messages per user/tenant
+- **ElastiCache** – AWS managed Redis with multi-AZ support
 
 ---
 
 ## ✅ Setup Redis (ElastiCache)
 
-- [ ] Create Redis cluster in ElastiCache via AWS Console or Terraform
-- [ ] Configure subnet group for VPC Lambda access (not publicly exposed)
-- [ ] Store host, port, and (if applicable) auth token in AWS SSM Parameter Store
-- [ ] Tag Redis with `Project=RecursiveLearning`, `Stack=Cache`, `Env=Dev/Prod`
+- [ ] Create Redis cluster with multi-AZ replication
+- [ ] Configure VPC security for Lambda/API access
+- [ ] Store credentials in AWS SSM Parameter Store
+- [ ] Tag: `Project=RecursiveLearning`, `Stack=Education`, `Env=Dev/Prod`
 
 ---
 
 ## ✅ Define Cache Schema
 
-- [ ] Define key structure:
-  - `user:{id}` for user records
-  - `page:{id}` for page metadata and facts
-- [ ] Define TTLs:
-  - Pages → `3600` sec (1 hr)
-  - Users → `21600` sec (6 hr)
-- [ ] Format values as JSON from Airtable response
+- [ ] Key structure:
+  - `tenant:{id}:user:{id}` → User profile
+  - `tenant:{id}:chat:{id}` → Chat history
+  - `tenant:{id}:context:{id}` → Educational context
+  - `shared:resource:{id}` → Cross-tenant resources
+- [ ] TTLs:
+  - Chat sessions → 30m
+  - User context → 6h
+  - Shared resources → 12h
+  - Preview cache → 15m
 
 ---
 
-## ✅ Write Airtable → Redis Sync Lambda
+## ✅ Chat Context Management
 
-- [ ] Create `make:build:cache-stack` scenario or Lambda function
-- [ ] Pull `User` and `Pages` data from Airtable
-- [ ] Format each record to match key schema
-- [ ] Upsert into Redis using `SET key value EX ttl`
-- [ ] Log sync stats: count created, updated, failed
-
----
-
-## ✅ Integrate into rl-restapi-lambda
-
-- [ ] Add `redisClient` to `lambda_utils`, using SSM param
-- [ ] Add Redis-first fetch logic to context and page loaders
-  - Check Redis: `GET user:{id}` and `GET page:{id}`
-  - If miss, fetch from Airtable and `SET` back to Redis
-- [ ] Log cache hits and misses
+- [ ] Implement context window management:
+  ```javascript
+  // Format: tenant:id:chat:userid:contextid
+  {
+    messages: [], // Rolling window of messages
+    metadata: {}, // Chat session metadata
+    resources: [] // Linked educational resources
+  }
+  ```
+- [ ] Add auto-pruning of old messages
+- [ ] Track context usage per tenant
 
 ---
 
-## ✅ End-to-End Testing
+## ✅ Integration Points
 
-- [ ] Simulate Lambda call with known user/page ID in Redis
-- [ ] Validate Redis response speed and data structure
-- [ ] Validate fallback → Airtable → Redis rehydration
-- [ ] Set short TTL (e.g. 5s) to verify expiry behavior
-
----
-
-## 🧪 Unit Test Cases
-
-- [ ] `getUserFromCache(id)` returns structured JSON or null
-- [ ] `getPageContext(id)` pulls from Redis or rehydrates
-- [ ] `syncUsersToCache()` upserts Redis keys with correct TTL
-- [ ] TTL expires and data is refreshed on next call
+- [ ] Add Redis client to chat Lambda
+- [ ] Implement tenant-aware context fetching
+- [ ] Add shared resource caching
+- [ ] Track cache performance per tenant
 
 ---
 
-## 🛠 Infra Notes
+## ✅ Testing Requirements
 
-- [ ] Use non-free tier (at least 1GB) to avoid eviction
-- [ ] Add Redis CloudWatch alarms: memory, connections, eviction
-- [ ] Use `dev:` or `prod:` prefixes on keys if Redis is shared
+- [ ] Multi-tenant isolation tests
+- [ ] Context window management
+- [ ] Resource sharing verification
+- [ ] Performance under tenant load
 
 ---
 
-## ⏭️ Next Up (Post MVP)
+## 🧪 Monitoring
 
-- [ ] Add `Topics`, `Snippets`, `PageSections` to cache
-- [ ] Explore RedisJSON or hash storage for sub-record updates
-- [ ] Consider hybrid caching: Redis + in-memory (per function) 
+- [ ] Per-tenant cache hit rates
+- [ ] Context window size tracking
+- [ ] Resource sharing patterns
+- [ ] Response time per tenant
+
+---
+
+## 🛠 Infrastructure
+
+- [ ] Minimum 2GB per Redis node
+- [ ] Multi-AZ replication
+- [ ] CloudWatch alerts:
+  - Memory usage per tenant
+  - Cache hit rates
+  - Error rates
+  - Latency spikes
+
+---
+
+## ⏭️ Next Phase
+
+- [ ] Add tenant resource analytics
+- [ ] Implement cross-tenant sharing rules
+- [ ] Add real-time collaboration caching
+- [ ] Optimize context pruning strategies
+
+## Cache Keys & TTLs
+```javascript
+// Tenant-specific
+tenant:{id}:user:{id} -> 6h TTL
+tenant:{id}:chat:{id} -> 30m TTL
+tenant:{id}:context:{id} -> 1h TTL
+
+// Shared resources
+shared:resource:{id} -> 12h TTL
+shared:preview:{id} -> 15m TTL
+```
+
+## Success Metrics
+- >95% cache hit rate per tenant
+- <50ms p95 response time
+- Zero cross-tenant data leaks
+- <1MB average context size per chat
+
+## Redis Cache Integration Checklist
+
+### Core Cache Setup
+- [ ] Configure Redis instance
+- [ ] Set up CloudWatch monitoring
+- [ ] Implement base TTL rules
+- [ ] Add cache invalidation hooks
+
+### Frontend Integration
+- [ ] Session management via Redis
+- [ ] Card navigation state caching
+- [ ] Preview panel context storage
+- [ ] Real-time TTL monitoring UI
+
+### Cache Keys & TTLs
+```javascript
+// User session
+user:{id} -> 6h TTL
+page:{id} -> 1h TTL
+org:{id} -> 12h TTL
+token:{value} -> 10m TTL
+
+// Frontend state
+nav:card:{id} -> 30m TTL
+preview:{id} -> 15m TTL
+```
+
+### Monitoring Requirements
+- [ ] CloudWatch dashboard integration
+- [ ] Cache hit rate tracking
+- [ ] TTL expiration alerts
+- [ ] Performance metrics logging
+
+### Success Metrics
+- >90% cache hit rate
+- <100ms average response time
+- Zero auth token conflicts
+- Successful cross-domain preview loading 

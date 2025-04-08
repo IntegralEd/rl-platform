@@ -16,6 +16,8 @@
             --card-bg: white;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
             --card-radius: 8px;
+            --primary-dark: #002040;
+            --primary-light: #0060A0;
         }
 
         body {
@@ -36,14 +38,11 @@
         }
 
         .admin-header {
-            background: var(--primary);
-            color: white;
-            padding: 0 20px;
-            height: var(--header-height);
+            padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--primary-dark);
         }
 
         .header-title {
@@ -617,6 +616,53 @@
             background: var(--card-bg);
             border-top: 1px solid #ddd;
         }
+
+        .nav-gem {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.5rem;
+        }
+
+        .tab-header {
+            background: var(--primary-dark);
+            color: #FFFFFF;
+        }
+
+        .tab-header.active {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .tab-header .nav-gem {
+            filter: brightness(0) invert(1);
+        }
+
+        .tab-header.active .nav-gem {
+            filter: brightness(0);
+        }
+
+        .modal {
+            position: fixed;
+            transition: all 0.3s ease;
+        }
+
+        .modal.expanded {
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999;
+        }
+
+        .modal-expand-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -960,6 +1006,20 @@
                     '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
             }
         });
+    </script>
+
+    <div id="previewModal" class="modal">
+        <button class="modal-expand-btn" onclick="toggleModalExpand('previewModal')">
+            <img src="/shared/assets/images/expand.svg" alt="Toggle fullscreen">
+        </button>
+        <!-- Modal content -->
+    </div>
+
+    <script>
+    function toggleModalExpand(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.toggle('expanded');
+    }
     </script>
 </body>
 </html> 
