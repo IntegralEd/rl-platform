@@ -7,6 +7,51 @@
     <title>StriveTogether Goal Setter - Review</title>
     <script src="../../../shared/assets/js/html2canvas.min.js"></script>
     <script src="../../../shared/assets/js/fabric.min.js"></script>
+    <script>
+        // Clean URL handling - direct from Airtable
+        // Format: {Review_URL}?qcid={Session_ID}
+        const params = new URLSearchParams(window.location.search);
+        const qcid = params.get('qcid');
+        
+        /* TODO: Redis Validation Requirements
+         * 1. Time Window Validation
+         *    - Check review_sessions.start_time <= current_time <= review_sessions.end_time
+         *    - Key: review:session:{qcid}:timewindow
+         *    
+         * 2. Resource Permission Validation
+         *    - Verify user can access the root resource (goalsetter.html)
+         *    - Key: review:session:{qcid}:resources
+         *    
+         * 3. Role/Permission Validation
+         *    - Check user permissions for review tools
+         *    - Controls qipu tool access
+         *    - Controls comment visibility
+         *    - Key: review:session:{qcid}:permissions
+         */
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const frame = document.querySelector('iframe');
+            
+            // TODO: Replace with Redis validation
+            // For now, load content directly
+            frame.src = 'goalsetter.html';
+
+            /* Future Implementation:
+            async function validateSession(qcid) {
+                // 1. Time Window Check
+                const timeValid = await checkTimeWindow(qcid);
+                
+                // 2. Resource Permission Check
+                const resourceValid = await checkResourceAccess(qcid);
+                
+                // 3. Role/Permission Check
+                const permissions = await getUserPermissions(qcid);
+                
+                return { timeValid, resourceValid, permissions };
+            }
+            */
+        });
+    </script>
     <style>
         :root {
             --primary: #425563; /* ST Primary */

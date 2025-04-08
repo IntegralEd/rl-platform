@@ -164,3 +164,43 @@ For clients who also have access to the Recursive Review Softr portal:
 2. Show review status and deadline
 3. Allow them to view previous feedback
 4. Provide notification when feedback has been addressed
+
+## Redis Validation Structure
+
+### Session Token (qcid) Validation
+The `qcid` parameter contains session data that maps to Redis keys:
+
+```
+review:session:{qcid}:timewindow
+review:session:{qcid}:resources
+review:session:{qcid}:permissions
+```
+
+### Validation Checks (Currently Disabled)
+
+1. **Time Window Validation**
+   - Validates if current time is within review period
+   - Redis key: `review:session:{qcid}:timewindow`
+   - Format: `{ start_time: ISO, end_time: ISO }`
+
+2. **Resource Permission**
+   - Validates access to root resource (e.g., merit.html)
+   - Redis key: `review:session:{qcid}:resources`
+   - Format: `{ root_resource: string, allowed: boolean }`
+
+3. **Role/Permission**
+   - Controls tool access and comment visibility
+   - Redis key: `review:session:{qcid}:permissions`
+   - Format: `{ qipu: boolean, comments: boolean, role: string }`
+
+### URL Format
+```
+{Review_URL}?qcid={Session_ID}
+Example: https://recursivelearning.app/clients/st/goalsetter/goalsetter_review.html?qcid=reclsM4lpZVwg7LnC
+```
+
+### Implementation Status
+- ✓ Basic URL handling
+- ✓ iframe loading
+- ⚠ Redis validation (temporarily disabled)
+- ⚠ Permission-based UI (pending)
