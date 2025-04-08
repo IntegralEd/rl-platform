@@ -18,12 +18,20 @@ The review token system allows clients and subject matter experts (SMEs) to acce
 The most reliable approach is generating tokens directly in Airtable using formulas:
 
 ```
-=CONCATENATE({Resource_HTML},"_review.html/?qcid=",Session_ID)
+=SUBSTITUTE(
+  CONCATENATE(
+    LEFT({Resource_HTML}, FIND(".html", {Resource_HTML}) - 1),
+    "_review.html/?qcid=",
+    Session_ID
+  ),
+  ".html.html",
+  ".html"
+)
 ```
 
 This produces a URL in the format:
 ```
-https://recursivelearning.app/clients/st/goalsetter/goalsetter.html_review.html/?qcid=reclsM4lpZVwg7LnC
+https://recursivelearning.app/clients/st/goalsetter/goalsetter_review.html/?qcid=reclsM4lpZVwg7LnC
 ```
 
 Key benefits:
@@ -34,7 +42,17 @@ Key benefits:
 
 For additional security, you can include a second parameter for validation:
 ```
-=CONCATENATE({Resource_HTML},"_review.html/?qcid=",Session_ID,"&reviewer=",SUBSTITUTE(Reviewer_Email,"@","-at-"))
+=SUBSTITUTE(
+  CONCATENATE(
+    LEFT({Resource_HTML}, FIND(".html", {Resource_HTML}) - 1),
+    "_review.html/?qcid=",
+    Session_ID,
+    "&reviewer=",
+    SUBSTITUTE(Reviewer_Email,"@","-at-")
+  ),
+  ".html.html",
+  ".html"
+)
 ```
 
 ### Via the Admin Panel (Legacy)
@@ -86,7 +104,7 @@ When a client clicks a review link:
 ## Review URL Format
 
 ```
-https://recursivelearning.app/clients/st/goalsetter/goalsetter.html_review.html/?qcid=reclsM4lpZVwg7LnC
+https://recursivelearning.app/clients/st/goalsetter/goalsetter_review.html/?qcid=reclsM4lpZVwg7LnC
 ```
 
 ## Qipu Comment Integration
