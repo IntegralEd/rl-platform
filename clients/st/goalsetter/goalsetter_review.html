@@ -1,9 +1,5 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <!-- Review Version: 2025-04-13 -->
-=======
-<!-- Review Version: 2024-04-08 -->
->>>>>>> admin-tree
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -34,7 +30,6 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
 
-<<<<<<< HEAD
         /* Main content iframe */
         .content-frame {
             width: 100%;
@@ -47,14 +42,6 @@
         }
 
         /* Review elements */
-=======
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        
->>>>>>> admin-tree
         .review-banner {
             position: sticky;
             top: 0;
@@ -66,7 +53,6 @@
             padding: 8px;
             font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
-<<<<<<< HEAD
             display: none; /* Hidden by default, shown when authorized */
         }
 
@@ -691,63 +677,11 @@
             padding: 20px;
             height: calc(100% - 60px);
             overflow: auto;
-=======
-            height: var(--review-banner-height);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .content-frame {
-            flex: 1;
-            border: none;
-            width: 100%;
-            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-height) - var(--token-panel-height));
-            transition: height 0.3s ease;
-        }
-        
-        .qipu-bar {
-            height: var(--qipu-bar-height);
-            background: #f0f0f0;
-            border-top: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            transition: height 0.3s ease;
-            position: relative;
-        }
-        
-        .qipu-bar.expanded {
-            height: var(--qipu-bar-expanded-height);
-        }
-        
-        .qipu-toggle {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .token-validation-panel {
-            height: var(--token-panel-height);
-            background: #f8f8f8;
-            border-top: 1px solid #ddd;
-            overflow: hidden;
-            transition: height 0.3s ease;
-        }
-        
-        .token-validation-panel.expanded {
-            height: var(--token-panel-expanded-height);
->>>>>>> admin-tree
         }
         
         .token-table {
             width: 100%;
             border-collapse: collapse;
-<<<<<<< HEAD
         }
         
         .token-table th {
@@ -865,88 +799,10 @@
         
         .session-info-value {
             color: #333;
-=======
-            font-size: 14px;
-        }
-        
-        .token-table th, 
-        .token-table td {
-            padding: 8px 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .token-table th {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .token-table tr:nth-child(even) {
-            background: #f2f2f2;
-        }
-        
-        .token-toggle {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .comment-tools {
-            display: flex;
-            gap: 15px;
-            margin-left: 20px;
-        }
-        
-        .tool-button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .invalid-token {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            color: #d32f2f;
-            font-size: 18px;
-            text-align: center;
-        }
-        
-        .invalid-container {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            max-width: 600px;
->>>>>>> admin-tree
         }
     </style>
 </head>
 <body>
-<<<<<<< HEAD
     <div class="review-banner">Review Environment</div>
     
     <!-- Content iframe (loads the actual goalsetter.html) -->
@@ -1208,78 +1064,10 @@
                 <span class="session-info-label">Tickets Entered:</span>
                 <span class="session-info-value" id="infoDisplayTickets">0</span>
             </div>
-=======
-    <div class="main-content">
-        <div class="review-banner">Review Environment</div>
-        
-        <iframe 
-            id="content-frame"
-            src="goalsetter.html" 
-            class="content-frame"
-            frameborder="0"
-            allow="microphone *;">
-        </iframe>
-        
-        <div class="qipu-bar" id="qipu-bar">
-            <button class="qipu-toggle" id="qipu-toggle">Expand Comment Tools</button>
-            
-            <div class="comment-tools">
-                <button class="tool-button">Add Comment</button>
-                <button class="tool-button">View All Comments</button>
-                <button class="tool-button">Export Comments</button>
-            </div>
-            
-            <button class="token-toggle" id="token-toggle">?</button>
-        </div>
-        
-        <div class="token-validation-panel" id="token-panel">
-            <div style="padding: 15px;">
-                <h3>Active Review Tokens</h3>
-                <table class="token-table">
-                    <thead>
-                        <tr>
-                            <th>Session ID</th>
-                            <th>Reviewer</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Hardcoded tokens for initial testing -->
-                        <tr>
-                            <td>reclsM4lpZVwg7LnC</td>
-                            <td>Cara</td>
-                            <td>2025-04-07</td>
-                            <td>2025-04-11</td>
-                            <td>Active</td>
-                        </tr>
-                        <tr>
-                            <td>recgL7pIF0tNooOEC</td>
-                            <td>Mike</td>
-                            <td>2025-04-01</td>
-                            <td>2025-04-04</td>
-                            <td>Expired</td>
-                        </tr>
-                        <!-- Additional tokens would be populated by the admin panel -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Token validation container (initially hidden) -->
-    <div class="invalid-token" id="invalid-token" style="display:none">
-        <div class="invalid-container">
-            <h2>Invalid Review Session</h2>
-            <p>This review link is either expired or invalid.</p>
-            <p>Please contact your administrator for a valid review link.</p>
->>>>>>> admin-tree
         </div>
     </div>
 
     <script>
-<<<<<<< HEAD
         document.addEventListener('DOMContentLoaded', function() {
             // Get query parameters for token-based auth
             const urlParams = new URLSearchParams(window.location.search);
@@ -2155,92 +1943,6 @@
             // Run authentication
             handleAuth();
         });
-=======
-        // Token validation configuration
-        const validTokens = [
-            {
-                sessionId: 'reclsM4lpZVwg7LnC',
-                reviewer: 'Cara',
-                startDate: '2025-04-07',
-                endDate: '2025-04-11',
-                status: 'Active'
-            },
-            {
-                sessionId: 'recgL7pIF0tNooOEC',
-                reviewer: 'Mike',
-                startDate: '2025-04-01',
-                endDate: '2025-04-04',
-                status: 'Expired'
-            }
-        ];
-        
-        // Function to extract URL parameters
-        function getUrlParameter(name) {
-            const url = window.location.href;
-            name = name.replace(/[\[\]]/g, '\\$&');
-            const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-            const results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
-        
-        // Get the qcid parameter from URL
-        const qcid = getUrlParameter('qcid');
-        
-        // Check if token is valid
-        function validateToken(tokenId) {
-            if (!tokenId) return false;
-            
-            const token = validTokens.find(t => t.sessionId === tokenId);
-            if (!token) return false;
-            
-            // Check if token is within valid date range
-            const today = new Date();
-            const startDate = new Date(token.startDate);
-            const endDate = new Date(token.endDate);
-            
-            return today >= startDate && today <= endDate;
-        }
-        
-        // Show invalid token message if token is not valid
-        if (!validateToken(qcid)) {
-            document.getElementById('invalid-token').style.display = 'flex';
-        }
-        
-        // UI interactions
-        document.getElementById('qipu-toggle').addEventListener('click', function() {
-            const qipuBar = document.getElementById('qipu-bar');
-            qipuBar.classList.toggle('expanded');
-            this.textContent = qipuBar.classList.contains('expanded') ? 'Collapse Comment Tools' : 'Expand Comment Tools';
-            
-            // Adjust iframe height
-            adjustContentHeight();
-        });
-        
-        document.getElementById('token-toggle').addEventListener('click', function() {
-            const tokenPanel = document.getElementById('token-panel');
-            tokenPanel.classList.toggle('expanded');
-            
-            // Adjust iframe height
-            adjustContentHeight();
-        });
-        
-        function adjustContentHeight() {
-            const qipuBarHeight = document.getElementById('qipu-bar').classList.contains('expanded') 
-                ? getComputedStyle(document.documentElement).getPropertyValue('--qipu-bar-expanded-height')
-                : getComputedStyle(document.documentElement).getPropertyValue('--qipu-bar-height');
-                
-            const tokenPanelHeight = document.getElementById('token-panel').classList.contains('expanded')
-                ? getComputedStyle(document.documentElement).getPropertyValue('--token-panel-expanded-height')
-                : getComputedStyle(document.documentElement).getPropertyValue('--token-panel-height');
-                
-            const reviewBannerHeight = getComputedStyle(document.documentElement).getPropertyValue('--review-banner-height');
-            
-            const totalHeight = `calc(100vh - ${reviewBannerHeight} - ${qipuBarHeight} - ${tokenPanelHeight})`;
-            document.getElementById('content-frame').style.height = totalHeight;
-        }
->>>>>>> admin-tree
     </script>
 </body>
 </html> 
