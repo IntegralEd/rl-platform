@@ -1,1 +1,121 @@
- 
+---
+description: Standardizes how rules are written and structured in the codebase
+globs: ["**/*.mdc"]
+alwaysApply: true
+---
+
+# Rule Writing Conventions (April 9, 2025)
+
+## Rule File Structure
+```markdown
+---
+description: Brief description of what the rule enforces
+globs: ["pattern/to/match/*.ext"]
+alwaysApply: true/false
+---
+
+# Rule Title (Date)
+
+## Critical Rules
+- ⚠️ Critical restrictions/warnings
+- ✅ Approved actions/paths
+
+## Implementation Details
+- Key requirements
+- Specific guidelines
+```
+
+## Standard Sections
+1. **YAML Frontmatter** (Required)
+   - `description`: One-line summary
+   - `globs`: File patterns this rule applies to
+   - `alwaysApply`: Whether rule should always be checked
+
+2. **Title Block** (Required)
+   - Rule name
+   - Date of last update
+   - Brief overview
+
+3. **Critical Rules** (Required)
+   - Use ⚠️ for warnings/restrictions
+   - Use ✅ for approved actions
+   - Keep points concise and clear
+
+4. **Implementation Details** (Required)
+   - Specific guidelines
+   - Technical requirements
+   - Code examples if needed
+
+5. **Reference Documents** (Optional)
+   - Link related docs with @ syntax
+   - Example: @url-alignment-rules.mdc
+
+## Formatting Conventions
+1. **File Names**
+   - Use kebab-case: `rule-name.mdc`
+   - End with `.mdc` extension
+   - Be descriptive but concise
+
+2. **Markdown Usage**
+   - Use ATX headers (#)
+   - Use bullet points for lists
+   - Use backticks for code/paths
+   - Use blockquotes for notes
+
+3. **Cross References**
+   - Use @ syntax for files
+   - Use relative paths
+   - Link to specific sections if needed
+
+4. **Code Examples**
+   - Use triple backticks
+   - Specify language
+   - Keep examples minimal
+
+## Rule Types
+1. **Directory Rules**
+   - Restrict file locations
+   - Define structure
+
+2. **Content Rules**
+   - Code style
+   - Documentation requirements
+
+3. **Process Rules**
+   - Workflow requirements
+   - Review processes
+
+4. **Security Rules**
+   - Access controls
+   - Authentication requirements
+
+## Example Rule
+```markdown
+---
+description: Controls access to production files
+globs: ["**/prod/**/*.html"]
+alwaysApply: true
+---
+
+# Production Access Control
+
+## Critical Rules
+- ⚠️ NO direct edits to prod
+- ✅ Use staging first
+
+## Implementation
+1. Create staging copy
+2. Test thoroughly
+3. Use deployment process
+```
+
+## Validation
+- Rules must have frontmatter
+- Rules must have critical section
+- Rules must be dated
+- Rules must reference related docs
+
+## Reference Documents
+- @frontend-implementation-guide.mdc
+- @development-cycle-rhythm.mdc
+- @cursor-rules.mdc 
