@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Client Review Token System
 
 This guide explains how to create and use tokenized review links for client SMEs in the Recursive Learning platform.
