@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- TODO: Icons will be moved to shared/assets/images/qipu/*
+     Current emoji icons will be replaced with proper SVG assets:
+     - Main toggle: shared/assets/images/qipu/qipu_paintbrush.svg
+     - Tools: qipu_screenshot.svg, qipu_draw.svg, etc.
+     This change will provide consistent styling and better accessibility
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -33,14 +39,10 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: var(--qipu-secondary);
+            background: var(--qipu-secondary) url('/shared/assets/images/qipu/qipu_paintbrush.svg') center/50% no-repeat;
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             cursor: pointer;
             z-index: 10001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
         }
 
         /* Review Bar */
@@ -71,9 +73,11 @@
             height: 36px;
             border-radius: 50%;
             border: none;
-            background: #f0f0f0;
+            background-color: #f0f0f0;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 50%;
             cursor: pointer;
-            font-size: 18px;
             transition: all 0.2s;
         }
 
@@ -81,6 +85,13 @@
             background: #e0e0e0;
             transform: scale(1.1);
         }
+
+        .qipu-tool[title="Screenshot"] { background-image: url('/shared/assets/images/qipu/qipu_screenshot.svg'); }
+        .qipu-tool[title="Draw"] { background-image: url('/shared/assets/images/qipu/qipu_draw.svg'); }
+        .qipu-tool[title="Text"] { background-image: url('/shared/assets/images/qipu/qipu_text.svg'); }
+        .qipu-tool[title="Arrow"] { background-image: url('/shared/assets/images/qipu/qipu_arrow.svg'); }
+        .qipu-tool[title="Erase"] { background-image: url('/shared/assets/images/qipu/qipu_erase.svg'); }
+        .qipu-tool[title="Comment"] { background-image: url('/shared/assets/images/qipu/qipu_comment.svg'); }
 
         /* Canvas Container */
         #qipu-canvas-container {

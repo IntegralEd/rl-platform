@@ -1,5 +1,11 @@
 <!DOCTYPE html>
 <!-- Review Version: 2024-04-03 -->
+<!-- TODO: Icons will be moved to shared/assets/images/qipu/*
+     Current emoji icons will be replaced with proper SVG assets:
+     - Main toggle: shared/assets/images/qipu/qipu_paintbrush.svg
+     - Tools: qipu_screenshot.svg, qipu_draw.svg, etc.
+     This change will provide consistent styling and better accessibility
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -82,14 +88,10 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: var(--qipu-secondary);
+            background: var(--qipu-secondary) url('/shared/assets/images/qipu/qipu_paintbrush.svg') center/50% no-repeat;
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             cursor: pointer;
             z-index: 10001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
         }
     </style>
 </head>
