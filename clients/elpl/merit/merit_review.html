@@ -5,111 +5,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merit System Review</title>
-    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/merit.css">
+    <script src="/shared/assets/js/html2canvas.min.js"></script>
     <style>
+        :root {
+            --review-banner-height: 40px;
+            --qipu-bar-height: 60px;
+            --comment-panel-width: 300px;
+        }
+        
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
             overflow: hidden;
-        }
-        
-        .chatbot-container {
-            width: 100%;
-            height: 100vh;
-            border: none;
-            display: block;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
+        /* Main container for review layout */
+        .review-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Review banner */
         .review-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            height: var(--review-banner-height);
             background: #FF9800;
             color: white;
             text-align: center;
             padding: 8px;
             font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
+            display: none; /* Hidden by default, shown when authorized */
         }
 
-        .comment-overlay {
+        /* Content iframe with dynamic height calculation */
+        .content-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            min-height: 0;
+            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-height));
+        }
+
+        /* Comment panel */
+        .comment-panel {
             position: fixed;
-            bottom: 0;
-            left: 0;
             right: 0;
+            top: var(--review-banner-height);
+            bottom: var(--qipu-bar-height);
+            width: var(--comment-panel-width);
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 990;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comment-panel.visible {
+            transform: translateX(0);
+        }
+
+        /* Status notification */
+        .status-notification {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 16px;
-            font-family: system-ui, -apple-system, sans-serif;
-            z-index: 1000;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .comment-input {
-            flex: 1;
-            padding: 8px;
-            border: none;
+            padding: 10px 15px;
             border-radius: 4px;
             font-size: 14px;
+            z-index: 1500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .status-notification.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .comment-button {
-            padding: 8px 16px;
-            background: #4CAF50;
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .comment-button:hover {
-            background: #45a049;
-        }
-
-        /* Ensure space for comment bar */
-        body {
-            margin-bottom: 60px;
+            font-size: 12px;
+            opacity: 0.8;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div class="review-banner">Review Environment</div>
-    
-    <div class="comment-overlay">
-        <input type="text" class="comment-input" placeholder="Add a comment or feedback...">
-        <button class="comment-button" onclick="submitComment()">Submit Comment</button>
+    <div class="review-container">
+        <div class="review-banner">Review Environment</div>
+        
+        <!-- Content iframe (loads merit.html) -->
+        <iframe 
+            src="merit.html" 
+            class="content-frame" 
+            id="contentFrame"
+            scrolling="auto">
+        </iframe>
+        
+        <!-- Include Qipu Comment Bar -->
+        <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
+
+        <!-- Status notification -->
+        <div class="status-notification" id="statusNotification"></div>
     </div>
 
-    <!-- Include Qipu Comment Bar -->
-    <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
+    <div class="watermark">
+        Version: 2024-04-03 | URL: https://recursivelearning.app/clients/elpl/merit/merit_review.html
+    </div>
 
     <script>
-        function submitComment() {
-            const input = document.querySelector('.comment-input');
-            const comment = input.value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get query parameters for token-based auth
+            const urlParams = new URLSearchParams(window.location.search);
+            const qcid = urlParams.get('qcid');
             
-            if (comment) {
-                // Here you would typically send the comment to your feedback system
-                console.log('Comment submitted:', comment);
-                input.value = '';
-                alert('Comment submitted successfully!');
-            }
-        }
+            // Show review banner by default since auth is commented out
+            document.querySelector('.review-banner').style.display = 'block';
 
-        // Listen for messages from comment bar
-        window.addEventListener('message', (event) => {
-            // Verify origin
-            if (event.origin !== window.location.origin) return;
-            
-            if (event.data.type === 'START_REVIEW') {
-                // Handle review start
-                window.location.href = event.data.url;
-            }
+            // Listen for messages from qipu bar
+            window.addEventListener('message', (event) => {
+                // Verify origin
+                if (event.origin !== window.location.origin) return;
+                
+                if (event.data.type === 'START_REVIEW') {
+                    // Handle review start
+                    window.location.href = event.data.url;
+                }
+            });
         });
     </script>
 </body>
