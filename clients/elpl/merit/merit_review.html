@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
+            --qipu-secondary: #f2b632;
             --review-banner-height: 40px;
             --qipu-bar-height: 60px;
             --comment-panel-width: 300px;
@@ -72,6 +73,24 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Qipu Toggle Button */
+        #qipu-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--qipu-secondary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            cursor: pointer;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +104,9 @@
             scrolling="auto">
         </iframe>
         
+        <!-- Qipu Toggle Button -->
+        <div id="qipu-toggle">🖌️</div>
+        
         <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
 
         <div class="status-notification" id="statusNotification"></div>
@@ -94,6 +116,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const qcid = urlParams.get('qcid');
+            
+            // Setup Qipu toggle behavior
+            const toggle = document.getElementById('qipu-toggle');
+            const qipuBar = document.querySelector('iframe[src*="qipu_comment_bar.html"]');
+            
+            toggle.onclick = () => {
+                const isVisible = qipuBar.style.display === 'block';
+                qipuBar.style.display = isVisible ? 'none' : 'block';
+                toggle.style.display = isVisible ? 'block' : 'none';
+            };
             
             window.addEventListener('message', (event) => {
                 if (event.origin !== window.location.origin) return;
