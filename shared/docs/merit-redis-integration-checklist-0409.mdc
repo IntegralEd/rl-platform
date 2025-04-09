@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Merit Redis Integration Checklist (2024.04.08)
+# Merit Redis Integration Checklist (2025.04.09)
 
 ## Critical Rules & Restrictions
 - ⚠️ DO NOT edit `merit_live.html` or `merit_temp.html` without explicit authorization
@@ -74,4 +74,63 @@ alwaysApply: false
 2. Update API integration in `merit.html`
 3. Implement chat system enhancements
 4. Conduct thorough testing
-5. Document all changes and configurations 
+5. Document all changes and configurations
+
+## Redis Access Configuration
+
+### Backend Access (Verified)
+- [x] Endpoint: `rl-platform-cache-2wqhx1.serverless.use2.cache.amazonaws.com:6379`
+- [x] User ARN: `arn:aws:elasticache:us-east-2:559050208320:user:recursive-backend`
+- [x] User credentials in SSM
+- [ ] Lambda functions configured with VPC access
+- [ ] Security group rules verified
+
+### Frontend Access (To Be Implemented)
+- [ ] Create frontend-specific Redis user
+- [ ] Store credentials in SSM
+- [ ] Configure API Gateway endpoints
+- [ ] Implement frontend Redis client
+- [ ] Add connection pooling
+- [ ] Implement retry logic
+
+### Access Patterns
+```javascript
+// Backend (Lambda) Access
+const redis = new Redis({
+  host: process.env.REDIS_ENDPOINT,
+  port: 6379,
+  username: 'recursive-backend',
+  password: process.env.REDIS_PASSWORD,
+  tls: {}
+});
+
+// Frontend (API) Access
+const cache = {
+  async get(key) {
+    const response = await fetch('/api/v1/cache/' + key, {
+      headers: {
+        'X-API-Key': process.env.API_KEY
+      }
+    });
+    return response.json();
+  },
+  
+  async set(key, value, ttl = 3600) {
+    await fetch('/api/v1/cache', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': process.env.API_KEY
+      },
+      body: JSON.stringify({ key, value, ttl })
+    });
+  }
+};
+```
+
+### Security Requirements
+- [ ] All Redis access through API Gateway
+- [ ] Rate limiting implemented
+- [ ] Request validation
+- [ ] Error handling
+- [ ] Monitoring and alerts 
