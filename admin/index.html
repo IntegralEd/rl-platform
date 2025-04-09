@@ -910,21 +910,10 @@
             <!-- Admin Cards -->
             <div class="admin-cards">
                 <!-- GoalSetter Admin Card -->
-                <div class="admin-card" data-activity="goalsetter">
-                    <h2 class="card-title">Goal Setter</h2>
-                    <div class="status-indicators">
-                        <div class="status-dot" data-status="active" data-tooltip="API Connected"></div>
-                        <div class="status-dot" data-status="warning" data-tooltip="Cache Status"></div>
-                        <div class="status-dot" data-status="error" data-tooltip="User Sessions"></div>
-                    </div>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                    </div>
+                <div class="admin-card" id="goalsetter-admin">
+                    <h2>GoalSetter Admin</h2>
+                    <p>Manage GoalSetter versions and review tokens</p>
+                    <button onclick="window.location.href='/shared/page_ingredients/layout/goalsetter_admin.html'">Open Admin Panel</button>
                 </div>
 
                 <!-- Merit System Admin Card -->
