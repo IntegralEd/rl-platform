@@ -910,49 +910,71 @@
             <!-- Admin Cards -->
             <div class="admin-cards">
                 <!-- GoalSetter Admin Card -->
-                <div class="admin-card" id="goalsetter-admin">
-                    <h2>GoalSetter Admin</h2>
-                    <p>Manage GoalSetter versions and review tokens</p>
-                    <button onclick="window.location.href='/shared/page_ingredients/layout/goalsetter_admin.html'">Open Admin Panel</button>
-                </div>
-
-                <!-- Merit System Admin Card -->
-                <div class="admin-card" data-activity="merit">
-                    <h2 class="card-title">Merit System</h2>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                        <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
+                <div class="admin-card">
+                    <div class="card-content">
+                        <h2 class="card-title">GoalSetter Admin</h2>
+                        <p class="card-description">Manage GoalSetter versions and review tokens</p>
+                        <div class="card-actions">
+                            <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                                </svg>
+                                Open Admin
+                            </button>
+                            <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View Live
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- BHB Admin Card -->
+                <!-- Merit Admin Card -->
+                <div class="admin-card" data-activity="merit">
+                    <div class="card-content">
+                        <h2 class="card-title">Merit</h2>
+                        <p class="card-description">Manage Merit versions and review tokens</p>
+                        <div class="card-actions">
+                            <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                                </svg>
+                                Open Admin
+                            </button>
+                            <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View Live
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B'more Healthy Babies Admin Card -->
                 <div class="admin-card" data-activity="bhb">
-                    <h2 class="card-title">BHB</h2>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                        <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
+                    <div class="card-content">
+                        <h2 class="card-title">B'more Healthy Babies</h2>
+                        <p class="card-description">Manage B'more Healthy Babies versions and review tokens</p>
+                        <div class="card-actions">
+                            <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                                </svg>
+                                Open Admin
+                            </button>
+                            <button class="action-button" onclick="window.location.href='/clients/bhb/bmore/bmore_live.html'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View Live
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
