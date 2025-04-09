@@ -6,11 +6,8 @@
  * for the admin interface.
  */
 
-// Ensure RecursiveAdmin namespace exists
-if (typeof RecursiveAdmin === 'undefined') {
-    console.error('RecursiveAdmin namespace not found. Please load admin-common.js first');
-    var RecursiveAdmin = {};
-}
+// Extend RecursiveAdmin namespace if it exists, create if it doesn't
+window.RecursiveAdmin = window.RecursiveAdmin || {};
 
 // Navigation namespace
 RecursiveAdmin.nav = {
