@@ -1,0 +1,484 @@
+<!-- 
+  Toggle Component v1.0.0
+  Created: 2024-03-30
+  
+  Features:
+  - Toggles between different HTML files
+  - Visual preview of options
+  - Animation effects for selection
+  - Confirmation modal for important changes
+-->
+
+<template id="toggle-component">
+  <style>
+    :host {
+      --primary-color: #004080;
+      --secondary-color: #E87722;
+      --accent-color: #007bff;
+      --bg-color: #f4f4f4;
+      --surface-color: #ffffff;
+      --text-color: #2b2b2b;
+      --border-color: #ddd;
+      --status-active: #4CAF50;
+      --status-warning: #FFC107;
+      --status-error: #F44336;
+      --shadow: 0 1px 4px rgba(0,0,0,0.1);
+      --border-radius: 12px;
+      display: block;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text-color);
+    }
+
+    .toggle-container {
+      width: 100%;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+      color: var(--primary-color);
+    }
+
+    .toggle-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .preview-box {
+      background: #eaeaea;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      width: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.3s ease;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .preview-box.active {
+      outline: 3px solid var(--accent-color);
+    }
+
+    .preview-box.swap {
+      animation: flicker 0.4s ease-in-out, scaleBig 0.4s ease-in-out;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes scaleBig {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .preview-box-label {
+      position: relative;
+      z-index: 2;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .switch-control {
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: fit-content;
+    }
+
+    .switch-control label {
+      font-size: 14px;
+      color: var(--text-color);
+    }
+
+    .switch-control input[type="text"] {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      width: 280px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .switch-control input.valid {
+      border-color: var(--status-active);
+      background-color: rgba(76, 175, 80, 0.05);
+    }
+
+    .iframe-link {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--accent-color);
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .action-button {
+      padding: 8px 16px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .action-button:hover {
+      background: #003366;
+    }
+
+    .action-button.secondary {
+      background: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .action-button.secondary:hover {
+      background: rgba(0,64,128,0.05);
+    }
+
+    .action-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .modal-warning {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid var(--status-warning);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+
+    .modal-warning h3 {
+      margin-top: 0;
+      color: var(--status-warning);
+    }
+
+    .modal-warning .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .modal-warning button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .modal-warning .cancel {
+      background: #f1f1f1;
+      color: #333;
+    }
+
+    .modal-warning .proceed {
+      background: var(--status-warning);
+      color: #fff;
+    }
+
+    .status-message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status-message.success {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: var(--status-active);
+      border: 1px solid var(--status-active);
+    }
+
+    .status-message.error {
+      background-color: rgba(244, 67, 54, 0.1);
+      color: var(--status-error);
+      border: 1px solid var(--status-error);
+    }
+  </style>
+
+  <div class="toggle-container">
+    <h2>Toggle Preview</h2>
+    
+    <div class="toggle-panel">
+      <div class="preview-box" data-file="temp">
+        <span class="preview-box-label">_temp.html</span>
+      </div>
+      <div class="preview-box" data-file="live">
+        <span class="preview-box-label">_live.html</span>
+      </div>
+    </div>
+    
+    <div class="switch-control">
+      <label>Type "Switch to <span id="target-file-name">_live</span>" and press confirm:</label>
+      <input type="text" id="confirmation-input" placeholder="Type to confirm..." />
+    </div>
+    
+    <div class="action-buttons">
+      <button class="action-button" id="confirm-btn" disabled>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Confirm
+      </button>
+      <button class="action-button secondary" id="cancel-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Cancel
+      </button>
+    </div>
+    
+    <div class="status-message" id="status-message"></div>
+    
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-warning" id="warning-modal">
+      <h3>⚠️ Caution</h3>
+      <p>You are attempting to change the active file during a review period. Proceed with intention.</p>
+      <div class="buttons">
+        <button class="cancel" id="modal-cancel-btn">Cancel</button>
+        <button class="proceed" id="modal-proceed-btn">Proceed</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+class ToggleComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    
+    const template = document.getElementById('toggle-component');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    // Resource path is expected to be something like "/clients/org/project/project.html"
+    this._resourcePath = this.getAttribute('resource-path') || '';
+    this._baseUrl = this.getAttribute('base-url') || window.location.origin;
+    this._mode = this.getAttribute('mode') || 'temp'; // 'temp' or 'live'
+    
+    this._basePath = this._resourcePath.substring(0, this._resourcePath.lastIndexOf('/') + 1);
+    this._baseName = this._resourcePath.substring(this._resourcePath.lastIndexOf('/') + 1).replace('.html', '');
+    
+    this._tempUrl = `${this._baseUrl}${this._basePath}${this._baseName}_temp.html`;
+    this._liveUrl = `${this._baseUrl}${this._basePath}${this._baseName}_live.html`;
+    
+    this._targetMode = this._mode === 'temp' ? 'live' : 'temp';
+    this._confirmationPhrase = `Switch to _${this._targetMode}`;
+    
+    this._previewBoxes = this.shadowRoot.querySelectorAll('.preview-box');
+    this._confirmationInput = this.shadowRoot.getElementById('confirmation-input');
+    this._confirmBtn = this.shadowRoot.getElementById('confirm-btn');
+    this._cancelBtn = this.shadowRoot.getElementById('cancel-btn');
+    this._warningModal = this.shadowRoot.getElementById('warning-modal');
+    this._modalOverlay = this.shadowRoot.getElementById('modal-overlay');
+    this._modalCancelBtn = this.shadowRoot.getElementById('modal-cancel-btn');
+    this._modalProceedBtn = this.shadowRoot.getElementById('modal-proceed-btn');
+    this._statusMessage = this.shadowRoot.getElementById('status-message');
+    this._targetFileName = this.shadowRoot.getElementById('target-file-name');
+    
+    // Set target file name in the confirmation message
+    this._targetFileName.textContent = `_${this._targetMode}`;
+  }
+  
+  connectedCallback() {
+    // Initialize based on current mode
+    this._previewBoxes.forEach(box => {
+      const fileType = box.getAttribute('data-file');
+      if (fileType === this._mode) {
+        box.classList.add('active', 'swap');
+      }
+      
+      // Set preview box labels
+      const label = box.querySelector('.preview-box-label');
+      label.textContent = `${this._baseName}_${fileType}.html`;
+      
+      // Add click handlers
+      box.addEventListener('click', () => this._handlePreviewClick(fileType));
+    });
+    
+    // Confirmation input handler
+    this._confirmationInput.addEventListener('input', () => this._validateConfirmation());
+    
+    // Button handlers
+    this._confirmBtn.addEventListener('click', () => this._showWarningModal());
+    this._cancelBtn.addEventListener('click', () => this._resetSelection());
+    
+    // Modal handlers
+    this._modalCancelBtn.addEventListener('click', () => this._hideWarningModal());
+    this._modalProceedBtn.addEventListener('click', () => this._performToggle());
+    this._modalOverlay.addEventListener('click', () => this._hideWarningModal());
+  }
+  
+  _handlePreviewClick(fileType) {
+    if (fileType === this._mode) return; // Already active
+    
+    this._targetMode = fileType;
+    this._confirmationPhrase = `Switch to _${this._targetMode}`;
+    this._targetFileName.textContent = `_${this._targetMode}`;
+    
+    // Update preview boxes
+    this._previewBoxes.forEach(box => {
+      box.classList.remove('active', 'swap');
+      if (box.getAttribute('data-file') === fileType) {
+        box.classList.add('active', 'swap');
+      }
+    });
+    
+    // Reset confirmation
+    this._confirmationInput.value = '';
+    this._validateConfirmation();
+  }
+  
+  _validateConfirmation() {
+    const value = this._confirmationInput.value.trim();
+    const isValid = value === this._confirmationPhrase;
+    
+    this._confirmBtn.disabled = !isValid;
+    
+    if (isValid) {
+      this._confirmationInput.classList.add('valid');
+    } else {
+      this._confirmationInput.classList.remove('valid');
+    }
+  }
+  
+  _showWarningModal() {
+    this._warningModal.style.display = 'block';
+    this._modalOverlay.style.display = 'block';
+  }
+  
+  _hideWarningModal() {
+    this._warningModal.style.display = 'none';
+    this._modalOverlay.style.display = 'none';
+  }
+  
+  _resetSelection() {
+    // Reset to current mode
+    this._previewBoxes.forEach(box => {
+      box.classList.remove('active', 'swap');
+      if (box.getAttribute('data-file') === this._mode) {
+        box.classList.add('active');
+      }
+    });
+    
+    // Clear confirmation
+    this._confirmationInput.value = '';
+    this._confirmationInput.classList.remove('valid');
+    this._confirmBtn.disabled = true;
+    
+    // Hide status message
+    this._statusMessage.style.display = 'none';
+  }
+  
+  _performToggle() {
+    this._hideWarningModal();
+    
+    // Update mode
+    this._mode = this._targetMode;
+    this.setAttribute('mode', this._mode);
+    
+    // Show success message
+    this._statusMessage.textContent = `Successfully switched to ${this._baseName}_${this._mode}.html`;
+    this._statusMessage.className = 'status-message success';
+    this._statusMessage.style.display = 'block';
+    
+    // Dispatch change event
+    const detail = {
+      mode: this._mode,
+      url: this._mode === 'temp' ? this._tempUrl : this._liveUrl
+    };
+    
+    this.dispatchEvent(new CustomEvent('mode-change', { detail }));
+    
+    // Reset confirmation
+    this._confirmationInput.value = '';
+    this._confirmationInput.classList.remove('valid');
+    this._confirmBtn.disabled = true;
+  }
+  
+  static get observedAttributes() {
+    return ['resource-path', 'base-url', 'mode'];
+  }
+  
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue === newValue) return;
+    
+    switch (name) {
+      case 'resource-path':
+        this._resourcePath = newValue;
+        break;
+      case 'base-url':
+        this._baseUrl = newValue;
+        break;
+      case 'mode':
+        this._mode = newValue;
+        break;
+    }
+  }
+}
+
+customElements.define('rl-toggle', ToggleComponent);
+</script>
+
+<!-- Usage Example:
+<rl-toggle 
+  resource-path="/clients/st/goalsetter/goalsetter.html"
+  base-url="https://recursivelearning.app"
+  mode="temp">
+</rl-toggle>
+--> 

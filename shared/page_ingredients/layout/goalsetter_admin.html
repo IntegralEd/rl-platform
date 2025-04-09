@@ -149,36 +149,6 @@
 
         .status-active { background: #28a745; }
         .status-expired { background: #dc3545; }
-
-        /* Preview Panel */
-        .preview-panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .preview-header {
-            padding: 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--admin-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .preview-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .preview-status {
-            font-size: 14px;
-            color: #666;
-        }
     </style>
 </head>
 <body>
@@ -231,12 +201,6 @@
 
         <!-- Right Panel -->
         <div class="preview-panel">
-            <div class="preview-header">
-                <h2 class="preview-title">Live Preview</h2>
-                <div class="preview-status">
-                    Source: <code>/clients/st/goalsetter/goalsetter.html</code>
-                </div>
-            </div>
             <iframe src="/clients/st/goalsetter/goalsetter.html" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
@@ -277,7 +241,6 @@
             document.getElementById('current-mode').textContent = 'Production';
             document.getElementById('switch-to-prod').disabled = true;
             document.getElementById('switch-to-temp').disabled = false;
-            updatePreviewSource('prod');
         });
 
         document.getElementById('switch-to-temp').addEventListener('click', () => {
@@ -285,18 +248,7 @@
             document.getElementById('current-mode').textContent = 'Temporary';
             document.getElementById('switch-to-temp').disabled = true;
             document.getElementById('switch-to-prod').disabled = false;
-            updatePreviewSource('temp');
         });
-
-        function updatePreviewSource(version) {
-            const previewFrame = document.querySelector('.preview-panel iframe');
-            const previewStatus = document.querySelector('.preview-status code');
-            const baseUrl = '/clients/st/goalsetter/';
-            const file = version === 'prod' ? 'goalsetter.html' : 'goalsetter_temp.html';
-            
-            previewFrame.src = baseUrl + file;
-            previewStatus.textContent = baseUrl + file;
-        }
 
         // Initialize based on stored version
         document.addEventListener('DOMContentLoaded', () => {

@@ -1,0 +1,126 @@
+<!-- iframe-module.html - Standardized iframe container with size controls -->
+<template id="iframe-module-template">
+  <style>
+    :host {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .iframe-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transform-origin: top left;
+    }
+
+    .size-controls {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 8px;
+      background: rgba(255,255,255,0.9);
+      padding: 4px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .size-btn {
+      padding: 4px 8px;
+      border: none;
+      background: #f0f0f0;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .size-btn.active {
+      background: #003366;
+      color: white;
+    }
+
+    /* Preset sizes for authentic preview */
+    .size-desktop { width: 100%; height: 100%; }
+    .size-tablet { width: 768px; height: 1024px; }
+    .size-mobile { width: 375px; height: 667px; }
+  </style>
+
+  <div class="iframe-container">
+    <iframe class="content-frame" loading="eager" importance="high"></iframe>
+    <div class="size-controls">
+      <button class="size-btn active" data-size="desktop">Desktop</button>
+      <button class="size-btn" data-size="tablet">Tablet</button>
+      <button class="size-btn" data-size="mobile">Mobile</button>
+    </div>
+  </div>
+</template>
+
+<script>
+class IframeModule extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    const template = document.getElementById('iframe-module-template');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    this.frame = this.shadowRoot.querySelector('.content-frame');
+    this.container = this.shadowRoot.querySelector('.iframe-container');
+    
+    // Setup size controls
+    this.shadowRoot.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.setSize(btn.dataset.size));
+    });
+
+    // Initial source if provided
+    if (this.hasAttribute('src')) {
+      this.frame.src = this.getAttribute('src');
+    }
+
+    // Handle resize
+    new ResizeObserver(() => this.updateScale()).observe(this.container);
+  }
+
+  setSize(size) {
+    // Update buttons
+    this.shadowRoot.querySelectorAll('.size-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.size === size);
+    });
+
+    // Apply size class
+    this.container.className = 'iframe-container size-' + size;
+    this.updateScale();
+  }
+
+  updateScale() {
+    const container = this.container.getBoundingClientRect();
+    const frame = this.frame.getBoundingClientRect();
+    
+    if (container.width < frame.width || container.height < frame.height) {
+      const scale = Math.min(
+        container.width / frame.width,
+        container.height / frame.height
+      );
+      this.frame.style.transform = `scale(${scale})`;
+    } else {
+      this.frame.style.transform = 'none';
+    }
+  }
+
+  setSource(url) {
+    this.frame.src = url;
+  }
+}
+
+customElements.define('iframe-module', IframeModule);
+</script>

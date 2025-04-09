@@ -1,0 +1,201 @@
+---
+description: Build checklist for implementing Redis caching with ElastiCache for the REST API
+globs: ["/lambda/**/*.py", "/infrastructure/terraform/**/*.tf"]
+alwaysApply: false
+---
+
+# 🧱 Multi-Tenant Education Cache Stack: Redis for Context + Chat History
+File a standup report every 25 actions
+Revise assumptions with each new test
+Document assumptions
+Capture potential buildouts in future_features while maintainign strict adherence to the build goals and outcomes of each unit test.
+
+Build assigned report format:
+curl -X POST https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj -H "Content-Type: application/json" -d '{
+  "Title": "Backend_Lambda/regis-cache | 2025.04.08.1",
+  "ID": "2025-04-08-002",
+  "Created": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+  "Findings": [
+    "Initialized Redis cluster setup",
+    "Configured tenant isolation schema",
+    "Implemented base TTL rules",
+    "Added CloudWatch monitoring"
+  ],
+  "Priorities": [
+    "Complete multi-tenant cache setup",
+    "Implement context window management",
+    "Add tenant resource sharing"
+  ],
+  "Next_Steps": [
+    "Deploy Redis cluster",
+    "Add Lambda integration points",
+    "Implement cache pruning"
+  ],
+  "Future_Features": [
+    "Real-time analytics",
+    "Advanced cache optimization",
+    "Cross-tenant collaboration"
+  ]
+}'
+
+## Goal
+Build Redis-cached context store for multi-tenant education chatbot supporting:
+- Per-tenant chat history and context
+- Shared educational resources
+- Real-time session management
+- Cross-domain preview caching
+
+---
+
+## 🧠 Key Concepts
+
+- **Redis** – In-memory store for chat context, session data, and shared resources
+- **TTL (Time To Live)** – Automatic expiry for chat sessions and preview caches
+- **Tenant Isolation** – Prefix-based separation of tenant data
+- **Context Window** – Rolling cache of recent chat messages per user/tenant
+- **ElastiCache** – AWS managed Redis with multi-AZ support
+
+---
+
+## ✅ Setup Redis (ElastiCache)
+
+- [ ] Create Redis cluster with multi-AZ replication
+- [ ] Configure VPC security for Lambda/API access
+- [ ] Store credentials in AWS SSM Parameter Store
+- [ ] Tag: `Project=RecursiveLearning`, `Stack=Education`, `Env=Dev/Prod`
+
+---
+
+## ✅ Define Cache Schema
+
+- [ ] Key structure:
+  - `tenant:{id}:user:{id}` → User profile
+  - `tenant:{id}:chat:{id}` → Chat history
+  - `tenant:{id}:context:{id}` → Educational context
+  - `shared:resource:{id}` → Cross-tenant resources
+- [ ] TTLs:
+  - Chat sessions → 30m
+  - User context → 6h
+  - Shared resources → 12h
+  - Preview cache → 15m
+
+---
+
+## ✅ Chat Context Management
+
+- [ ] Implement context window management:
+  ```javascript
+  // Format: tenant:id:chat:userid:contextid
+  {
+    messages: [], // Rolling window of messages
+    metadata: {}, // Chat session metadata
+    resources: [] // Linked educational resources
+  }
+  ```
+- [ ] Add auto-pruning of old messages
+- [ ] Track context usage per tenant
+
+---
+
+## ✅ Integration Points
+
+- [ ] Add Redis client to chat Lambda
+- [ ] Implement tenant-aware context fetching
+- [ ] Add shared resource caching
+- [ ] Track cache performance per tenant
+
+---
+
+## ✅ Testing Requirements
+
+- [ ] Multi-tenant isolation tests
+- [ ] Context window management
+- [ ] Resource sharing verification
+- [ ] Performance under tenant load
+
+---
+
+## 🧪 Monitoring
+
+- [ ] Per-tenant cache hit rates
+- [ ] Context window size tracking
+- [ ] Resource sharing patterns
+- [ ] Response time per tenant
+
+---
+
+## 🛠 Infrastructure
+
+- [ ] Minimum 2GB per Redis node
+- [ ] Multi-AZ replication
+- [ ] CloudWatch alerts:
+  - Memory usage per tenant
+  - Cache hit rates
+  - Error rates
+  - Latency spikes
+
+---
+
+## ⏭️ Next Phase
+
+- [ ] Add tenant resource analytics
+- [ ] Implement cross-tenant sharing rules
+- [ ] Add real-time collaboration caching
+- [ ] Optimize context pruning strategies
+
+## Cache Keys & TTLs
+```javascript
+// Tenant-specific
+tenant:{id}:user:{id} -> 6h TTL
+tenant:{id}:chat:{id} -> 30m TTL
+tenant:{id}:context:{id} -> 1h TTL
+
+// Shared resources
+shared:resource:{id} -> 12h TTL
+shared:preview:{id} -> 15m TTL
+```
+
+## Success Metrics
+- >95% cache hit rate per tenant
+- <50ms p95 response time
+- Zero cross-tenant data leaks
+- <1MB average context size per chat
+
+## Redis Cache Integration Checklist
+
+### Core Cache Setup
+- [ ] Configure Redis instance
+- [ ] Set up CloudWatch monitoring
+- [ ] Implement base TTL rules
+- [ ] Add cache invalidation hooks
+
+### Frontend Integration
+- [ ] Session management via Redis
+- [ ] Card navigation state caching
+- [ ] Preview panel context storage
+- [ ] Real-time TTL monitoring UI
+
+### Cache Keys & TTLs
+```javascript
+// User session
+user:{id} -> 6h TTL
+page:{id} -> 1h TTL
+org:{id} -> 12h TTL
+token:{value} -> 10m TTL
+
+// Frontend state
+nav:card:{id} -> 30m TTL
+preview:{id} -> 15m TTL
+```
+
+### Monitoring Requirements
+- [ ] CloudWatch dashboard integration
+- [ ] Cache hit rate tracking
+- [ ] TTL expiration alerts
+- [ ] Performance metrics logging
+
+### Success Metrics
+- >90% cache hit rate
+- <100ms average response time
+- Zero auth token conflicts
+- Successful cross-domain preview loading 

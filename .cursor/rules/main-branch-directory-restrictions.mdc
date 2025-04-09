@@ -21,7 +21,7 @@ This rule enforces that when working on the main branch, modifications should ON
    - `/scripts/**` - Limited script modifications (see guidelines)
 
 2. **Restricted Directories:**
-   - `/admin/**` - Admin tree is restricted on main branch
+   - `/admin/**` - Admin tree is restricted on main branch unless you are working on an _admin related feature
    - `/.github/**` - GitHub configuration
    - `/tools/**` - Development tools
    - Any other directories not explicitly allowed

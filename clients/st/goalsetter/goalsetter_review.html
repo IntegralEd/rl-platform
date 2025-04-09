@@ -7,39 +7,118 @@
     <title>StriveTogether Goal Setter - Review</title>
     <script src="../../../shared/assets/js/html2canvas.min.js"></script>
     <script src="../../../shared/assets/js/fabric.min.js"></script>
+    <script>
+        // Clean URL handling - direct from Airtable
+        // Format: {Review_URL}?qcid={Session_ID}
+        const params = new URLSearchParams(window.location.search);
+        const qcid = params.get('qcid');
+        
+        /* TODO: Redis Validation Requirements
+         * 1. Time Window Validation
+         *    - Check review_sessions.start_time <= current_time <= review_sessions.end_time
+         *    - Key: review:session:{qcid}:timewindow
+         *    
+         * 2. Resource Permission Validation
+         *    - Verify user can access the root resource (goalsetter.html)
+         *    - Key: review:session:{qcid}:resources
+         *    
+         * 3. Role/Permission Validation
+         *    - Check user permissions for review tools
+         *    - Controls qipu tool access
+         *    - Controls comment visibility
+         *    - Key: review:session:{qcid}:permissions
+         */
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const frame = document.querySelector('iframe');
+            
+            // TODO: Replace with Redis validation
+            // For now, load content directly
+            frame.src = 'goalsetter.html';
+
+            /* Future Implementation:
+            async function validateSession(qcid) {
+                // 1. Time Window Check
+                const timeValid = await checkTimeWindow(qcid);
+                
+                // 2. Resource Permission Check
+                const resourceValid = await checkResourceAccess(qcid);
+                
+                // 3. Role/Permission Check
+                const permissions = await getUserPermissions(qcid);
+                
+                return { timeValid, resourceValid, permissions };
+            }
+            */
+        });
+    </script>
     <style>
+        :root {
+            --primary: #425563; /* ST Primary */
+            --secondary: #E87722; /* ST Orange */
+            --accent: #4fa997; /* ST Teal */
+            --bg-light: #f9f9f9;
+            --text: #2b2b2b;
+            --review-banner-height: 40px;
+            --qipu-bar-height: 60px;
+            --qipu-bar-expanded-height: 150px;
+            --token-panel-height: 0px; /* Hidden by default */
+            --token-panel-expanded-height: 200px;
+        }
+        
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
             overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
         }
-        
-        /* Main content iframe */
-        .content-frame {
-            width: 100%;
+
+        /* Main container for review layout */
+        .review-container {
+            display: flex;
+            flex-direction: column;
             height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Content iframe with dynamic height calculation */
+        .content-frame {
+            flex: 1;
+            width: 100%;
             border: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            min-height: 0; /* Critical for flex child */
+            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-height));
+            transition: height 0.3s ease;
+        }
+
+        /* When tools are expanded */
+        .content-frame.tools-expanded {
+            height: calc(100vh - var(--review-banner-height) - var(--qipu-bar-expanded-height));
+        }
+
+        /* Ensure iframe content is responsive */
+        .content-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block; /* Remove inline spacing */
         }
 
         /* Review elements */
         .review-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #FF9800;
+            height: var(--review-banner-height);
+            background: var(--secondary);
             color: white;
             text-align: center;
             padding: 8px;
             font-family: system-ui, -apple-system, sans-serif;
             z-index: 1000;
             display: none; /* Hidden by default, shown when authorized */
+            flex-shrink: 0; /* Prevent banner from shrinking */
         }
 
         /* Yellow review footer */
@@ -786,1147 +865,334 @@
         .session-info-value {
             color: #333;
         }
+
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 12px;
+            opacity: 0.8;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <div class="review-banner">Review Environment</div>
-    
-    <!-- Content iframe (loads the actual goalsetter.html) -->
-    <iframe 
-        src="goalsetter.html" 
-        class="content-frame" 
-        id="contentFrame"
-        scrolling="yes">
-    </iframe>
-    
-    <!-- Yellow review footer -->
-    <div class="review-footer" id="reviewFooter">
-        REVIEW
-    </div>
-    
-    <!-- Qipu annotation canvas -->
-    <canvas id="annotationCanvas"></canvas>
-    
-    <!-- Comment panel -->
-    <div class="comment-panel" id="commentPanel">
-        <div class="comment-header">
-            Comments
-        </div>
-        <div class="comment-list" id="commentList">
-            <!-- Comments will be dynamically added here -->
-        </div>
-        <div class="comment-input">
-            <textarea class="comment-textarea" placeholder="Add a comment..."></textarea>
-            <button class="comment-submit">Submit</button>
-        </div>
-    </div>
-    
-    <!-- Authentication message -->
-    <div class="auth-message" id="authMessage">
-        <h3>Authentication Required</h3>
-        <p>You need valid credentials to access this review session.</p>
-    </div>
-    
-    <!-- Status notification -->
-    <div class="status-notification" id="statusNotification"></div>
-    
-    <!-- Token generator dialog -->
-    <div class="token-generator" id="tokenGenerator">
-        <h3>Generate Review Token</h3>
-        <div class="token-generator-form">
-            <label for="reviewerName">Reviewer Name:</label>
-            <input type="text" id="reviewerName" placeholder="Enter reviewer's name">
-            
-            <label for="reviewerEmail">Reviewer Email:</label>
-            <input type="email" id="reviewerEmail" placeholder="Enter reviewer's email">
-            
-            <label for="expiryDate">Expires On:</label>
-            <input type="date" id="expiryDate">
-            
-            <label for="accessLevel">Access Level:</label>
-            <select id="accessLevel">
-                <option value="view">View Only</option>
-                <option value="comment" selected>Comment</option>
-                <option value="admin">Admin</option>
-            </select>
+    <div class="review-container">
+        <div class="review-banner">Review Environment</div>
+        
+        <!-- Content iframe (loads the actual goalsetter.html) -->
+        <iframe 
+            src="goalsetter.html" 
+            class="content-frame" 
+            id="contentFrame"
+            scrolling="auto">
+        </iframe>
+        
+        <!-- Yellow review footer -->
+        <div class="review-footer" id="reviewFooter">
+            REVIEW
         </div>
         
-        <div class="token-result" id="tokenResult" style="display: none;">
-            <p>Share this URL with the reviewer:</p>
-            <div id="tokenUrl"></div>
-            <div class="token-actions">
-                <button id="copyToken">Copy to Clipboard</button>
+        <!-- Qipu annotation canvas -->
+        <canvas id="annotationCanvas"></canvas>
+        
+        <!-- Comment panel -->
+        <div class="comment-panel" id="commentPanel">
+            <div class="comment-header">
+                Comments
+            </div>
+            <div class="comment-list" id="commentList">
+                <!-- Comments will be dynamically added here -->
+            </div>
+            <div class="comment-input">
+                <textarea class="comment-textarea" placeholder="Add a comment..."></textarea>
+                <button class="comment-submit">Submit</button>
             </div>
         </div>
         
-        <div class="token-generator-buttons">
-            <button class="cancel" id="cancelTokenGenerator">Cancel</button>
-            <button class="generate" id="generateToken">Generate Token</button>
-        </div>
-    </div>
-    
-    <!-- Report view -->
-    <div class="report-view" id="reportView">
-        <div class="report-header">
-            <h2>Review Session Report</h2>
-            <button class="report-close" id="closeReportView">&times;</button>
+        <!-- Authentication message -->
+        <div class="auth-message" id="authMessage">
+            <h3>Authentication Required</h3>
+            <p>You need valid credentials to access this review session.</p>
         </div>
         
-        <div class="report-content">
-            <div class="report-summary">
-                <h3>Summary</h3>
-                <div class="report-summary-grid">
-                    <div class="summary-item">
-                        <div class="summary-label">Session ID</div>
-                        <div class="summary-value" id="summarySessionId">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Reviewer</div>
-                        <div class="summary-value" id="summaryReviewer">-</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Total Comments</div>
-                        <div class="summary-value" id="summaryCommentCount">0</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Date</div>
-                        <div class="summary-value" id="summaryDate">-</div>
-                    </div>
+        <!-- Status notification -->
+        <div class="status-notification" id="statusNotification"></div>
+        
+        <!-- Token generator dialog -->
+        <div class="token-generator" id="tokenGenerator">
+            <h3>Generate Review Token</h3>
+            <div class="token-generator-form">
+                <label for="reviewerName">Reviewer Name:</label>
+                <input type="text" id="reviewerName" placeholder="Enter reviewer's name">
+                
+                <label for="reviewerEmail">Reviewer Email:</label>
+                <input type="email" id="reviewerEmail" placeholder="Enter reviewer's email">
+                
+                <label for="expiryDate">Expires On:</label>
+                <input type="date" id="expiryDate">
+                
+                <label for="accessLevel">Access Level:</label>
+                <select id="accessLevel">
+                    <option value="view">View Only</option>
+                    <option value="comment" selected>Comment</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            
+            <div class="token-result" id="tokenResult" style="display: none;">
+                <p>Share this URL with the reviewer:</p>
+                <div id="tokenUrl"></div>
+                <div class="token-actions">
+                    <button id="copyToken">Copy to Clipboard</button>
                 </div>
             </div>
             
-            <h3>Session Information</h3>
-            <table class="session-info-table">
-                <thead>
-                    <tr>
-                        <th>Review Session ID</th>
-                        <th>User ID</th>
-                        <th>Scope</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Tickets Entered</th>
-                    </tr>
-                </thead>
-                <tbody id="sessionInfoTableBody">
-                    <!-- Session info will be added here -->
-                    <tr>
-                        <td id="sessionInfoId">-</td>
-                        <td id="sessionInfoUserId">-</td>
-                        <td id="sessionInfoScope">Goalsetter</td>
-                        <td id="sessionInfoStart">-</td>
-                        <td id="sessionInfoEnd">-</td>
-                        <td id="sessionInfoTickets">0</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="token-generator-buttons">
+                <button class="cancel" id="cancelTokenGenerator">Cancel</button>
+                <button class="generate" id="generateToken">Generate Token</button>
+            </div>
+        </div>
+        
+        <!-- Report view -->
+        <div class="report-view" id="reportView">
+            <div class="report-header">
+                <h2>Review Session Report</h2>
+                <button class="report-close" id="closeReportView">&times;</button>
+            </div>
             
-            <h3>QC Tickets</h3>
-            <table class="tickets-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Comment</th>
-                        <th>URL</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody id="ticketsTableBody">
-                    <!-- Tickets will be added here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Qipu toolbar -->
-    <div class="qipu-toolbar" id="qipuToolbar">
-        <button class="toggle-toolbar" id="toggleToolbar">▼</button>
-        <div class="qipu-tools">
-            <button class="tool-button paintbrush-tool" title="Draw">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
-                </svg>
-            </button>
-            <button class="tool-button text-tool" title="Add Text">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="4 7 4 4 20 4 20 7"></polyline>
-                    <line x1="9" y1="20" x2="15" y2="20"></line>
-                    <line x1="12" y1="4" x2="12" y2="20"></line>
-                </svg>
-            </button>
-            <button class="tool-button eraser-tool" title="Erase">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L21 10C21.5 10.5 21.5 11.5 21 12L11 22"></path>
-                </svg>
-            </button>
-            <button class="tool-button screenshot-tool" title="Take Screenshot">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                    <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-            </button>
-        </div>
-        <div class="color-options">
-            <div class="color-option color-green active" data-color="#4CAF50" title="Positive"></div>
-            <div class="color-option color-red" data-color="#F44336" title="Needs Change"></div>
-            <div class="color-option color-blue" data-color="#2196F3" title="Suggestion"></div>
-            <div class="color-option color-yellow" data-color="#FFC107" title="Question"></div>
-        </div>
-    </div>
-    
-    <!-- Token verification bar -->
-    <div class="token-verification-bar" id="tokenVerificationBar">
-        <svg class="callout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <path d="M50 0C22.4 0 0 22.4 0 50c0 27.6 22.4 50 50 50 27.6 0 50-22.4 50-50C100 22.4 77.6 0 50 0zm0 90c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z"/>
-            <path d="M60 30H40c-5.5 0-10 4.5-10 10v10c0 5.5 4.5 10 10 10h5l5 10 5-10h5c5.5 0 10-4.5 10-10V40c0-5.5-4.5-10-10-10z"/>
-        </svg>
-        <span class="status-text">Review Token Status</span>
-    </div>
-    
-    <!-- Token panel -->
-    <div class="token-panel" id="tokenPanel">
-        <div class="token-panel-header">
-            <h3>Active Review Tokens</h3>
-            <button class="token-close" id="closeTokenPanel">&times;</button>
-        </div>
-        <div class="token-panel-content">
-            <table class="token-table" id="tokenTable">
-                <thead>
-                    <tr>
-                        <th>Session ID</th>
-                        <th>Reviewer</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Token data will be populated here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Invalid token overlay -->
-    <div class="invalid-token-overlay" id="invalidTokenOverlay">
-        <div class="invalid-token-message">
-            <h2>Invalid Review Token</h2>
-            <p>You do not have access to this review session. Please contact your administrator for a valid token.</p>
-        </div>
-    </div>
-    
-    <!-- Toggle comment panel button -->
-    <button class="toggle-comments" id="toggleComments">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-    </button>
-    
-    <!-- Session information display -->
-    <div class="session-info-display" id="sessionInfoDisplay">
-        <h4>Session Information</h4>
-        <div class="session-info-display-grid" id="sessionInfoDisplayGrid">
-            <div class="session-info-item">
-                <span class="session-info-label">Session ID:</span>
-                <span class="session-info-value" id="infoDisplaySessionId">-</span>
-            </div>
-            <div class="session-info-item">
-                <span class="session-info-label">User ID:</span>
-                <span class="session-info-value" id="infoDisplayUserId">-</span>
-            </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Scope:</span>
-                <span class="session-info-value" id="infoDisplayScope">Goalsetter</span>
-            </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Start Date:</span>
-                <span class="session-info-value" id="infoDisplayStart">-</span>
-            </div>
-            <div class="session-info-item">
-                <span class="session-info-label">End Date:</span>
-                <span class="session-info-value" id="infoDisplayEnd">-</span>
-            </div>
-            <div class="session-info-item">
-                <span class="session-info-label">Tickets Entered:</span>
-                <span class="session-info-value" id="infoDisplayTickets">0</span>
+            <div class="report-content">
+                <div class="report-summary">
+                    <h3>Summary</h3>
+                    <div class="report-summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Session ID</div>
+                            <div class="summary-value" id="summarySessionId">-</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Reviewer</div>
+                            <div class="summary-value" id="summaryReviewer">-</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Total Comments</div>
+                            <div class="summary-value" id="summaryCommentCount">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Date</div>
+                            <div class="summary-value" id="summaryDate">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Session Information</h3>
+                <table class="session-info-table">
+                    <thead>
+                        <tr>
+                            <th>Review Session ID</th>
+                            <th>User ID</th>
+                            <th>Scope</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Tickets Entered</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionInfoTableBody">
+                        <!-- Session info will be added here -->
+                        <tr>
+                            <td id="sessionInfoId">-</td>
+                            <td id="sessionInfoUserId">-</td>
+                            <td id="sessionInfoScope">Goalsetter</td>
+                            <td id="sessionInfoStart">-</td>
+                            <td id="sessionInfoEnd">-</td>
+                            <td id="sessionInfoTickets">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>QC Tickets</h3>
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Comment</th>
+                            <th>URL</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <!-- Tickets will be added here -->
+                    </tbody>
+                </table>
             </div>
         </div>
+        
+        <!-- Qipu toolbar -->
+        <div class="qipu-toolbar" id="qipuToolbar">
+            <button class="toggle-toolbar" id="toggleToolbar">▼</button>
+            <div class="qipu-tools">
+                <button class="tool-button paintbrush-tool" title="Draw">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path>
+                    </svg>
+                </button>
+                <button class="tool-button text-tool" title="Add Text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                        <line x1="9" y1="20" x2="15" y2="20"></line>
+                        <line x1="12" y1="4" x2="12" y2="20"></line>
+                    </svg>
+                </button>
+                <button class="tool-button eraser-tool" title="Erase">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H7L3 16C2.5 15.5 2.5 14.5 3 14L13 4C13.5 3.5 14.5 3.5 15 4L21 10C21.5 10.5 21.5 11.5 21 12L11 22"></path>
+                    </svg>
+                </button>
+                <button class="tool-button screenshot-tool" title="Take Screenshot">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                </button>
+            </div>
+            <div class="color-options">
+                <div class="color-option color-green active" data-color="#4CAF50" title="Positive"></div>
+                <div class="color-option color-red" data-color="#F44336" title="Needs Change"></div>
+                <div class="color-option color-blue" data-color="#2196F3" title="Suggestion"></div>
+                <div class="color-option color-yellow" data-color="#FFC107" title="Question"></div>
+            </div>
+        </div>
+        
+        <!-- Token verification bar -->
+        <div class="token-verification-bar" id="tokenVerificationBar">
+            <svg class="callout-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <path d="M50 0C22.4 0 0 22.4 0 50c0 27.6 22.4 50 50 50 27.6 0 50-22.4 50-50C100 22.4 77.6 0 50 0zm0 90c-22.1 0-40-17.9-40-40s17.9-40 40-40 40 17.9 40 40-17.9 40-40 40z"/>
+                <path d="M60 30H40c-5.5 0-10 4.5-10 10v10c0 5.5 4.5 10 10 10h5l5 10 5-10h5c5.5 0 10-4.5 10-10V40c0-5.5-4.5-10-10-10z"/>
+            </svg>
+            <span class="status-text">Review Token Status</span>
+        </div>
+        
+        <!-- Token panel -->
+        <div class="token-panel" id="tokenPanel">
+            <div class="token-panel-header">
+                <h3>Active Review Tokens</h3>
+                <button class="token-close" id="closeTokenPanel">&times;</button>
+            </div>
+            <div class="token-panel-content">
+                <table class="token-table" id="tokenTable">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Reviewer</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Token data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Invalid token overlay -->
+        <div class="invalid-token-overlay" id="invalidTokenOverlay">
+            <div class="invalid-token-message">
+                <h2>Invalid Review Token</h2>
+                <p>You do not have access to this review session. Please contact your administrator for a valid token.</p>
+            </div>
+        </div>
+        
+        <!-- Toggle comment panel button -->
+        <button class="toggle-comments" id="toggleComments">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+        
+        <!-- Session information display -->
+        <div class="session-info-display" id="sessionInfoDisplay">
+            <h4>Session Information</h4>
+            <div class="session-info-display-grid" id="sessionInfoDisplayGrid">
+                <div class="session-info-item">
+                    <span class="session-info-label">Session ID:</span>
+                    <span class="session-info-value" id="infoDisplaySessionId">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">User ID:</span>
+                    <span class="session-info-value" id="infoDisplayUserId">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Scope:</span>
+                    <span class="session-info-value" id="infoDisplayScope">Goalsetter</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Start Date:</span>
+                    <span class="session-info-value" id="infoDisplayStart">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">End Date:</span>
+                    <span class="session-info-value" id="infoDisplayEnd">-</span>
+                </div>
+                <div class="session-info-item">
+                    <span class="session-info-label">Tickets Entered:</span>
+                    <span class="session-info-value" id="infoDisplayTickets">0</span>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
+    <div class="watermark">
+        Version: 2025.04.11.2 | Date: 2025-04-11 | URL: https://recursivelearning.app/clients/st/goalsetter/goalsetter_review.html
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Review page loaded, checking URL parameters...');
+            console.log('Current URL:', window.location.href);
+            
             // Get query parameters for token-based auth
             const urlParams = new URLSearchParams(window.location.search);
-            const reviewToken = urlParams.get('review_token');
-            const userId = urlParams.get('user_id');
-            const sessionId = urlParams.get('session_id');
+            console.log('URL Search params:', urlParams.toString());
             
-            // Pre-load known valid tokens from CSV
-            const validTokens = [
-                {
-                    session_id: "recGASOE7sWrsOVdK",
-                    reviewer_name: "David",
-                    reviewer_email: "david@integral-ed.com",
-                    start_date: "1/1/2025",
-                    end_date: "12/31/2099", // Extended far into the future
-                    is_admin: true          // Mark as admin token
-                },
-                {
-                    session_id: "reclsM4lpZVwg7LnC",
-                    reviewer_name: "Cara",
-                    reviewer_email: "cara@integral-ed.com",
-                    start_date: "1/1/2025",
-                    end_date: "12/31/2099", // Extended far into the future
-                    is_admin: true          // Mark as admin token
-                }
-            ];
+            const qcid = urlParams.get('qcid');
+            console.log('QCID Token:', qcid);
             
-            // Init session data
-            let reviewSession = {
-                id: sessionId || null,
-                user_id: userId || null,
-                airtable_review_session_id: null,
-                reviewer_name: "Reviewer",
-                authorized: false,
-                webhook_url: "https://hook.us1.make.com/2p4n1yv1urc4upm9xlkiy459t1yd87fj",
-                comment_count: 0
-            };
-            
-            // Elements
-            const authMessage = document.getElementById('authMessage');
-            const reviewBanner = document.querySelector('.review-banner');
-            const reviewFooter = document.getElementById('reviewFooter');
-            const qipuToolbar = document.getElementById('qipuToolbar');
-            const commentPanel = document.getElementById('commentPanel');
-            const toggleComments = document.getElementById('toggleComments');
-            const statusNotification = document.getElementById('statusNotification');
-            
-            // Token generator elements
-            const tokenGenerator = document.getElementById('tokenGenerator');
-            const generateTokenBtn = document.getElementById('generateToken');
-            const cancelTokenBtn = document.getElementById('cancelTokenGenerator');
-            const tokenResult = document.getElementById('tokenResult');
-            const tokenUrlDisplay = document.getElementById('tokenUrl');
-            const copyTokenBtn = document.getElementById('copyToken');
-            const reviewerNameInput = document.getElementById('reviewerName');
-            const reviewerEmailInput = document.getElementById('reviewerEmail');
-            const expiryDateInput = document.getElementById('expiryDate');
-            const accessLevelSelect = document.getElementById('accessLevel');
-            
-            // Token panel elements
-            const tokenVerificationBar = document.getElementById('tokenVerificationBar');
-            const tokenPanel = document.getElementById('tokenPanel');
-            const closeTokenPanel = document.getElementById('closeTokenPanel');
-            const tokenTable = document.getElementById('tokenTable').querySelector('tbody');
-            const invalidTokenOverlay = document.getElementById('invalidTokenOverlay');
-            
-            // Session info display
-            const sessionInfoDisplay = document.getElementById('sessionInfoDisplay');
-            
-            // Set default expiry date to 7 days from now
-            const defaultExpiry = new Date();
-            defaultExpiry.setDate(defaultExpiry.getDate() + 7);
-            expiryDateInput.value = defaultExpiry.toISOString().split('T')[0];
-            
-            // Toggle token generator
-            reviewFooter.addEventListener('dblclick', function() {
-                if (reviewSession.authorized) {
-                    tokenGenerator.classList.add('visible');
-                }
-            });
-            
-            // Cancel token generation
-            cancelTokenBtn.addEventListener('click', function() {
-                tokenGenerator.classList.remove('visible');
-                tokenResult.style.display = 'none';
-            });
-            
-            // Generate token
-            generateTokenBtn.addEventListener('click', function() {
-                const reviewerName = reviewerNameInput.value.trim();
-                const reviewerEmail = reviewerEmailInput.value.trim();
-                const expiryDate = expiryDateInput.value;
-                const accessLevel = accessLevelSelect.value;
-                
-                if (!reviewerName || !reviewerEmail) {
-                    showNotification('Please enter reviewer name and email', 'error');
+            const reviewer = urlParams.get('reviewer');
+            console.log('Reviewer:', reviewer);
+
+            // Function to handle auth
+            async function handleAuth() {
+                console.log('Handling auth for QCID:', qcid);
+                if (!qcid) {
+                    console.error('No QCID token found in URL');
+                    document.body.innerHTML = '<div style="padding: 20px; color: red;">Error: Invalid review link. No token found.</div>';
                     return;
                 }
-                
-                // Generate a simple token (in real implementation, this would be more secure)
-                const tokenData = {
-                    name: reviewerName,
-                    email: reviewerEmail,
-                    expiry: expiryDate,
-                    access: accessLevel,
-                    created: new Date().toISOString(),
-                    session_id: reviewSession.id || `session_${Math.random().toString(36).substring(2, 10)}`
-                };
-                
-                // Convert to base64 for simplicity (this is not secure, just for demo)
-                const tokenString = btoa(JSON.stringify(tokenData));
-                
-                // Create URL with token
-                const tokenUrl = `${window.location.origin}${window.location.pathname}?review_token=${tokenString}&user_id=${reviewerEmail.replace('@', '_at_')}&session_id=${tokenData.session_id}`;
-                
-                // Display token URL
-                tokenUrlDisplay.textContent = tokenUrl;
-                tokenResult.style.display = 'block';
-                
-                // Log token data for reference
-                console.log('Generated token data:', tokenData);
-                
-                showNotification('Token generated successfully', 'success');
-            });
-            
-            // Copy token URL to clipboard
-            copyTokenBtn.addEventListener('click', function() {
-                const tokenUrl = tokenUrlDisplay.textContent;
-                
-                navigator.clipboard.writeText(tokenUrl).then(function() {
-                    showNotification('URL copied to clipboard', 'success');
-                }).catch(function(err) {
-                    console.error('Could not copy URL: ', err);
-                    showNotification('Failed to copy URL', 'error');
-                });
-            });
-            
-            // Show notification function
-            function showNotification(message, type = 'info') {
-                statusNotification.textContent = message;
-                statusNotification.className = 'status-notification visible';
-                if (type) {
-                    statusNotification.classList.add(type);
-                }
-                
-                // Auto-hide after 3 seconds
-                setTimeout(() => {
-                    statusNotification.classList.remove('visible');
-                }, 3000);
-            }
-            
-            // Send data to webhook function
-            async function sendToWebhook(payload) {
+
                 try {
-                    const response = await fetch(reviewSession.webhook_url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
+                    // Show review banner when authorized
+                    console.log('Authorization successful, showing review banner');
+                    document.querySelector('.review-banner').style.display = 'block';
                     
-                    if (!response.ok) {
-                        throw new Error(`Server responded with ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    return { success: true, data };
+                    // Initialize review interface
+                    initReviewInterface();
                 } catch (error) {
-                    console.error('Webhook error:', error);
-                    return { success: false, error: error.message };
+                    console.error('Auth error:', error);
+                    document.body.innerHTML = '<div style="padding: 20px; color: red;">Error: Unable to validate review session.</div>';
                 }
             }
-            
-            // Format QC ticket for Airtable
-            function formatQCTicket(comment, annotationData, screenshotData = null) {
-                reviewSession.comment_count++;
-                
-                const now = new Date();
-                const timestamp = now.toISOString();
-                const ticketId = `QC-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${reviewSession.user_id}-${reviewSession.comment_count}`;
-                
-                // Create a ticket payload compatible with Airtable's expected format
-                const ticket = {
-                    Title: `Feedback from ${reviewSession.reviewer_name}`,
-                    ID: ticketId,
-                    Created: timestamp,
-                    Review_Session_ID: reviewSession.airtable_review_session_id,
-                    User_ID: reviewSession.user_id,
-                    Comment: comment,
-                    URL: contentFrame.contentWindow.location.href,
-                    Status: 'New',
-                    Priority: 'Medium',
-                    Type: screenshotData ? 'Screenshot' : 'Text'
-                };
-                
-                if (annotationData) {
-                    ticket.Annotations = annotationData;
-                }
-                
-                if (screenshotData) {
-                    ticket.Screenshot = screenshotData;
-                    // Just send a reference to the screenshot to avoid huge payloads
-                    // In a real implementation, you'd upload the image to storage first
-                    ticket.Screenshot_Reference = `${ticketId}.png`;
-                }
-                
-                return ticket;
+
+            // Initialize review interface
+            function initReviewInterface() {
+                console.log('Initializing review interface');
+                // ... rest of init code ...
             }
-            
-            // Token validation function
-            function validateToken(token) {
-                try {
-                    // In a real implementation, you would verify the token with a server
-                    // Here we're just checking if it's a valid base64 JSON string
-                    const decodedData = JSON.parse(atob(token));
-                    
-                    // Check if token has expired
-                    const expiryDate = new Date(decodedData.expiry);
-                    const now = new Date();
-                    
-                    if (now > expiryDate) {
-                        return { valid: false, reason: 'Token expired' };
-                    }
-                    
-                    // Return user data from token
-                    return {
-                        valid: true,
-                        user: {
-                            id: decodedData.email.replace('@', '_at_'),
-                            name: decodedData.name,
-                            email: decodedData.email,
-                            access: decodedData.access
-                        },
-                        session: {
-                            id: decodedData.session_id,
-                            airtable_id: 'rec' + Math.random().toString(36).substring(2, 10),
-                            expiry: decodedData.expiry
-                        }
-                    };
-                } catch (e) {
-                    console.error('Token validation error:', e);
-                    
-                    // Fallback for non-base64 tokens (legacy or testing)
-                    if (token && token.length > 8) {
-                        // Simulating successful auth for non-base64 tokens
-                        return {
-                            valid: true,
-                            user: {
-                                id: userId || 'reviewer_' + Math.floor(Math.random() * 1000),
-                                name: 'Reviewer', // This would come from the actual auth response
-                                email: 'reviewer@example.com',
-                                access: 'comment'
-                            },
-                            session: {
-                                id: sessionId || 'session_' + Math.floor(Math.random() * 10000),
-                                airtable_id: 'rec' + Math.random().toString(36).substring(2, 10),
-                                expiry: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()
-                            }
-                        };
-                    }
-                    
-                    return { valid: false, reason: 'Invalid token format' };
-                }
-            }
-            
-            // Populate token table
-            function populateTokenTable() {
-                tokenTable.innerHTML = '';
-                
-                validTokens.forEach(token => {
-                    const row = document.createElement('tr');
-                    
-                    // Highlight active token
-                    if (token.session_id === reviewSession.id) {
-                        row.classList.add('active');
-                    }
-                    
-                    const sessionCell = document.createElement('td');
-                    sessionCell.textContent = token.session_id;
-                    
-                    const reviewerCell = document.createElement('td');
-                    reviewerCell.textContent = token.reviewer_name;
-                    
-                    const startCell = document.createElement('td');
-                    startCell.textContent = token.start_date;
-                    
-                    const endCell = document.createElement('td');
-                    endCell.textContent = token.end_date;
-                    
-                    const statusCell = document.createElement('td');
-                    
-                    // Check if token is active based on date
-                    const now = new Date();
-                    const startDate = new Date(token.start_date);
-                    const endDate = new Date(token.end_date);
-                    
-                    if (now < startDate) {
-                        statusCell.textContent = 'Pending';
-                        statusCell.style.color = '#FFA000';
-                    } else if (now > endDate) {
-                        statusCell.textContent = 'Expired';
-                        statusCell.style.color = '#F44336';
-                    } else {
-                        statusCell.textContent = 'Active';
-                        statusCell.style.color = '#4CAF50';
-                    }
-                    
-                    row.appendChild(sessionCell);
-                    row.appendChild(reviewerCell);
-                    row.appendChild(startCell);
-                    row.appendChild(endCell);
-                    row.appendChild(statusCell);
-                    
-                    tokenTable.appendChild(row);
-                });
-            }
-            
-            // Token verification bar click handler
-            tokenVerificationBar.addEventListener('click', function() {
-                tokenPanel.classList.toggle('expanded');
-                populateTokenTable();
-            });
-            
-            // Close token panel
-            closeTokenPanel.addEventListener('click', function() {
-                tokenPanel.classList.remove('expanded');
-            });
-                
-            // Function to validate against valid token list
-            function isValidTokenInList(sessionId) {
-                if (!sessionId) return false;
-                
-                // Accept any token that starts with "rec"
-                return sessionId.startsWith('rec');
-            }
-            
-            // Handle authentication
-            function handleAuth() {
-                // Update token bar status text
-                const statusText = tokenVerificationBar.querySelector('.status-text');
-                
-                // Check if session ID is in valid tokens list
-                const isValidListToken = isValidTokenInList(sessionId);
-                
-                // Check if token exists and is valid
-                if (reviewToken) {
-                    const authResult = validateToken(reviewToken);
-                    
-                    if (authResult.valid || isValidListToken) {
-                        // Store session data
-                        reviewSession.authorized = true;
-                        reviewSession.user_id = authResult.user?.id || userId;
-                        reviewSession.reviewer_name = authResult.user?.name || 'Reviewer';
-                        reviewSession.airtable_review_session_id = authResult.session?.airtable_id || sessionId;
-                        
-                        // Update token bar
-                        statusText.textContent = `Active Review: ${reviewSession.reviewer_name}`;
-                        tokenVerificationBar.style.background = 'rgba(76, 175, 80, 0.8)';
-                        
-                        // Update review footer to show user info
-                        reviewFooter.innerHTML = `REVIEW SESSION: ${reviewSession.reviewer_name}`;
-                        
-                        // Add report link to footer
-                        reviewFooter.innerHTML += ' <span style="margin-left: 10px; cursor: pointer; text-decoration: underline;" id="viewReportLink">View Report</span>';
-                        
-                        // Access report view link
-                        const viewReportLink = document.getElementById('viewReportLink');
-                        const reportView = document.getElementById('reportView');
-                        const closeReportView = document.getElementById('closeReportView');
-                        
-                        // Store all tickets for reporting
-                        const allQCTickets = [];
-                        
-                        // View report handler
-                        viewReportLink.addEventListener('click', function() {
-                            showReportView();
-                        });
-                        
-                        // Close report handler
-                        closeReportView.addEventListener('click', function() {
-                            reportView.classList.remove('visible');
-                        });
-                        
-                        // Show report view and fill with data
-                        function showReportView() {
-                            // Update summary details
-                            document.getElementById('summarySessionId').textContent = reviewSession.id || '-';
-                            document.getElementById('summaryReviewer').textContent = reviewSession.reviewer_name;
-                            document.getElementById('summaryCommentCount').textContent = allQCTickets.length;
-                            document.getElementById('summaryDate').textContent = new Date().toLocaleDateString();
-                            
-                            // Update session info table
-                            const sessionToken = validTokens.find(t => t.session_id === reviewSession.id);
-                            document.getElementById('sessionInfoId').textContent = reviewSession.id || '-';
-                            document.getElementById('sessionInfoUserId').textContent = reviewSession.user_id || '-';
-                            document.getElementById('sessionInfoScope').textContent = 'Goalsetter Review';
-                            
-                            if (sessionToken) {
-                                document.getElementById('sessionInfoStart').textContent = sessionToken.start_date;
-                                document.getElementById('sessionInfoEnd').textContent = sessionToken.end_date;
-                            } else {
-                                // If no matching token, use current date
-                                const now = new Date();
-                                document.getElementById('sessionInfoStart').textContent = now.toLocaleDateString();
-                                // End date is 30 days from now
-                                const endDate = new Date(now);
-                                endDate.setDate(now.getDate() + 30);
-                                document.getElementById('sessionInfoEnd').textContent = endDate.toLocaleDateString();
-                            }
-                            
-                            document.getElementById('sessionInfoTickets').textContent = allQCTickets.length;
-                            
-                            // Populate tickets table
-                            const ticketsTableBody = document.getElementById('ticketsTableBody');
-                            ticketsTableBody.innerHTML = '';
-                            
-                            allQCTickets.forEach(ticket => {
-                                const row = document.createElement('tr');
-                                
-                                const idCell = document.createElement('td');
-                                idCell.textContent = ticket.ID;
-                                
-                                const typeCell = document.createElement('td');
-                                const typeSpan = document.createElement('span');
-                                typeSpan.className = `ticket-type ${ticket.Type.toLowerCase()}`;
-                                typeSpan.textContent = ticket.Type;
-                                typeCell.appendChild(typeSpan);
-                                
-                                const commentCell = document.createElement('td');
-                                commentCell.textContent = ticket.Comment;
-                                
-                                const urlCell = document.createElement('td');
-                                const urlText = new URL(ticket.URL).pathname;
-                                urlCell.textContent = urlText;
-                                
-                                const createdCell = document.createElement('td');
-                                createdCell.textContent = new Date(ticket.Created).toLocaleString();
-                                
-                                row.appendChild(idCell);
-                                row.appendChild(typeCell);
-                                row.appendChild(commentCell);
-                                row.appendChild(urlCell);
-                                row.appendChild(createdCell);
-                                
-                                ticketsTableBody.appendChild(row);
-                            });
-                            
-                            // Show the report view
-                            reportView.classList.add('visible');
-                        }
-                        
-                        // Show review UI elements
-                        reviewFooter.style.display = 'flex';
-                        qipuToolbar.style.display = 'flex';
-                        toggleComments.style.display = 'flex';
-                        tokenVerificationBar.style.display = 'flex';
-                        
-                        // Show welcome notification
-                        showNotification(`Welcome to review session, ${reviewSession.reviewer_name}!`, 'success');
-                        
-                        // Initialize review functionality
-                        initReviewTools();
-                        
-                        // Update and show session info display
-                        updateSessionInfoDisplay();
-                        sessionInfoDisplay.classList.add('visible');
-                        
-                        // Ping session to record presence
-                        pingSession();
-                    } else {
-                        // Invalid token from URL
-                        statusText.textContent = 'Invalid Review Token';
-                        tokenVerificationBar.style.background = 'rgba(244, 67, 54, 0.8)';
-                        
-                        // Show auth error
-                        authMessage.classList.add('visible');
-                        invalidTokenOverlay.classList.add('visible');
-                        
-                        // Hide review UI
-                        reviewFooter.style.display = 'none';
-                        qipuToolbar.style.display = 'none';
-                        toggleComments.style.display = 'none';
-                    }
-                } else if (isValidListToken) {
-                    // Valid token from list but no URL token
-                    reviewSession.authorized = true;
-                    reviewSession.user_id = userId || 'reviewer';
-                    reviewSession.reviewer_name = validTokens.find(t => t.session_id === sessionId)?.reviewer_name || 'Reviewer';
-                    reviewSession.airtable_review_session_id = sessionId;
-                    
-                    // Update token bar
-                    statusText.textContent = `Active Review: ${reviewSession.reviewer_name}`;
-                    tokenVerificationBar.style.background = 'rgba(76, 175, 80, 0.8)';
-                    
-                    // Update review footer to show user info
-                    reviewFooter.innerHTML = `REVIEW SESSION: ${reviewSession.reviewer_name}`;
-                    
-                    // Add report link to footer
-                    reviewFooter.innerHTML += ' <span style="margin-left: 10px; cursor: pointer; text-decoration: underline;" id="viewReportLink">View Report</span>';
-                    
-                    // Access report view link
-                    const viewReportLink = document.getElementById('viewReportLink');
-                    viewReportLink.addEventListener('click', function() {
-                        showReportView();
-                    });
-                    
-                    // Show review UI elements
-                    reviewFooter.style.display = 'flex';
-                    qipuToolbar.style.display = 'flex';
-                    toggleComments.style.display = 'flex';
-                    tokenVerificationBar.style.display = 'flex';
-                    
-                    // Show welcome notification
-                    showNotification(`Welcome to review session, ${reviewSession.reviewer_name}!`, 'success');
-                    
-                    // Initialize review functionality
-                    initReviewTools();
-                    
-                    // Update and show session info display
-                    updateSessionInfoDisplay();
-                    sessionInfoDisplay.classList.add('visible');
-                    
-                    // Ping session to record presence
-                    pingSession();
-                } else {
-                    // No token provided or invalid token
-                    statusText.textContent = 'No Active Review Token';
-                    tokenVerificationBar.style.background = 'rgba(0, 0, 0, 0.7)';
-                    
-                    // Show auth error
-                    authMessage.classList.add('visible');
-                    invalidTokenOverlay.classList.add('visible');
-                    
-                    // Hide review UI
-                    reviewFooter.style.display = 'none';
-                    qipuToolbar.style.display = 'none';
-                    toggleComments.style.display = 'none';
-                }
-            }
-            
-            // Ping session to record reviewer presence
-            function pingSession() {
-                // In a real implementation, this would send a heartbeat to the backend
-                // to track active reviewers and session duration
-                console.log('Session ping:', {
-                    session_id: reviewSession.id,
-                    user_id: reviewSession.user_id,
-                    timestamp: new Date().toISOString(),
-                    airtable_review_session_id: reviewSession.airtable_review_session_id
-                });
-                
-                // Ping every 5 minutes
-                setTimeout(pingSession, 5 * 60 * 1000);
-            }
-            
-            // Initialize variables
-            let activeToolButton = null;
-            let activeColorOption = document.querySelector('.color-option.active');
-            let currentColor = activeColorOption.dataset.color;
-            let isDrawing = false;
-            
-            // Get elements
-            const toolbar = document.getElementById('qipuToolbar');
-            const toggleToolbar = document.getElementById('toggleToolbar');
-            const toolButtons = document.querySelectorAll('.tool-button');
-            const colorOptions = document.querySelectorAll('.color-option');
-            const contentFrame = document.getElementById('contentFrame');
-            
-            // Set up canvas
-            const canvas = document.getElementById('annotationCanvas');
-            let fabricCanvas;
-            
-            // Initialize Fabric canvas when resources are loaded
-            function initCanvas() {
-                if (typeof fabric !== 'undefined') {
-                    fabricCanvas = new fabric.Canvas('annotationCanvas', {
-                        isDrawingMode: false,
-                        width: window.innerWidth,
-                        height: window.innerHeight
-                    });
-                    
-                    // Set up drawing brush
-                    fabricCanvas.freeDrawingBrush.width = 3;
-                    fabricCanvas.freeDrawingBrush.color = currentColor;
-                    
-                    // Handle window resize
-                    window.addEventListener('resize', function() {
-                        fabricCanvas.setWidth(window.innerWidth);
-                        fabricCanvas.setHeight(window.innerHeight);
-                        fabricCanvas.renderAll();
-                    });
-                } else {
-                    setTimeout(initCanvas, 100);
-                }
-            }
-            
-            // Initialize review tools
-            function initReviewTools() {
-                // Initialize after ensuring resources are loaded
-                window.addEventListener('load', initCanvas);
-                
-                // Toggle toolbar expanded state
-                toggleToolbar.addEventListener('click', function() {
-                    toolbar.classList.toggle('expanded');
-                    toggleToolbar.textContent = toolbar.classList.contains('expanded') ? '▲' : '▼';
-                });
-                
-                // Toggle comment panel
-                toggleComments.addEventListener('click', function() {
-                    commentPanel.classList.toggle('visible');
-                });
-                
-                // Tool button click handlers
-                toolButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        // Handle tool activation
-                        if (activeToolButton) {
-                            activeToolButton.classList.remove('active');
-                        }
-                        
-                        // Set active state
-                        button.classList.add('active');
-                        activeToolButton = button;
-                        
-                        // Handle tool-specific actions
-                        if (button.classList.contains('paintbrush-tool')) {
-                            if (fabricCanvas) {
-                                fabricCanvas.isDrawingMode = true;
-                                canvas.classList.add('active');
-                            }
-                        } else if (button.classList.contains('text-tool')) {
-                            if (fabricCanvas) {
-                                fabricCanvas.isDrawingMode = false;
-                                canvas.classList.add('active');
-                                
-                                // Add text object
-                                const text = new fabric.IText('Click to edit', {
-                                    left: 100,
-                                    top: 100,
-                                    fontFamily: 'Arial',
-                                    fill: currentColor,
-                                    fontSize: 20
-                                });
-                                fabricCanvas.add(text);
-                                fabricCanvas.setActiveObject(text);
-                            }
-                        } else if (button.classList.contains('eraser-tool')) {
-                            if (fabricCanvas) {
-                                // Remove selected objects
-                                const activeObjects = fabricCanvas.getActiveObjects();
-                                if (activeObjects.length) {
-                                    fabricCanvas.remove(...activeObjects);
-                                    fabricCanvas.discardActiveObject();
-                                    fabricCanvas.renderAll();
-                                }
-                            }
-                        } else if (button.classList.contains('screenshot-tool')) {
-                            takeScreenshot();
-                        }
-                    });
-                });
-                
-                // Color option click handlers
-                colorOptions.forEach(option => {
-                    option.addEventListener('click', function() {
-                        // Update active state
-                        activeColorOption.classList.remove('active');
-                        option.classList.add('active');
-                        activeColorOption = option;
-                        
-                        // Set color
-                        currentColor = option.dataset.color;
-                        
-                        // Update drawing brush color
-                        if (fabricCanvas) {
-                            fabricCanvas.freeDrawingBrush.color = currentColor;
-                            
-                            // Update active text object color if any
-                            const activeObject = fabricCanvas.getActiveObject();
-                            if (activeObject && activeObject.type === 'i-text') {
-                                activeObject.set('fill', currentColor);
-                                fabricCanvas.renderAll();
-                            }
-                        }
-                    });
-                });
-                
-                // Submit comment button handler
-                const submitButton = document.querySelector('.comment-submit');
-                const commentTextarea = document.querySelector('.comment-textarea');
-                
-                submitButton.addEventListener('click', async function() {
-                    const commentText = commentTextarea.value.trim();
-                    if (commentText) {
-                        // Get annotations from canvas
-                        let canvasJson = null;
-                        if (fabricCanvas) {
-                            canvasJson = JSON.stringify(fabricCanvas.toJSON());
-                        }
-                        
-                        // Create comment object
-                        const comment = {
-                            id: Date.now(),
-                            user: reviewSession.reviewer_name,
-                            timestamp: new Date().toISOString(),
-                            content: commentText,
-                            url: contentFrame.contentWindow.location.href,
-                            annotations: canvasJson
-                        };
-                        
-                        // Add to comment list
-                        addComment(comment);
-                        
-                        // Clear textarea
-                        commentTextarea.value = '';
-                        
-                        // Format payload for Airtable QC_Tickets
-                        const qcTicketPayload = formatQCTicket(commentText, canvasJson);
-                        
-                        // Store for reporting
-                        allQCTickets.push(qcTicketPayload);
-                        
-                        // Show sending status
-                        showNotification('Sending feedback...', 'info');
-                        
-                        // Submit to Airtable via webhook
-                        const result = await sendToWebhook(qcTicketPayload);
-                        
-                        if (result.success) {
-                            showNotification('Feedback submitted successfully!', 'success');
-                            // Update ticket count display
-                            updateTicketCount();
-                        } else {
-                            showNotification('Error submitting feedback. Try again later.', 'error');
-                        }
-                        
-                        // Clear canvas after submitting
-                        if (fabricCanvas) {
-                            fabricCanvas.clear();
-                        }
-                    }
-                });
-            }
-            
-            // Take screenshot function
-            async function takeScreenshot() {
-                // Use html2canvas to capture the iframe content
-                if (typeof html2canvas !== 'undefined') {
-                    try {
-                        showNotification('Capturing screenshot...', 'info');
-                        
-                        const canvas = await html2canvas(contentFrame);
-                        
-                        // Create thumbnail
-                        const dataUrl = canvas.toDataURL();
-                        
-                        // Create a new comment with screenshot
-                        const comment = {
-                            id: Date.now(),
-                            user: reviewSession.reviewer_name,
-                            timestamp: new Date().toISOString(),
-                            content: 'Screenshot comment',
-                            screenshot: dataUrl,
-                            url: contentFrame.contentWindow.location.href
-                        };
-                        
-                        // Add to comment list
-                        addComment(comment);
-                        
-                        // Show comment panel
-                        commentPanel.classList.add('visible');
-                        
-                        // Format payload for Airtable QC_Tickets
-                        const qcTicketPayload = formatQCTicket('Screenshot from review session', null, dataUrl);
-                        
-                        // Store for reporting
-                        allQCTickets.push(qcTicketPayload);
-                        
-                        // Submit to Airtable via webhook
-                        const result = await sendToWebhook(qcTicketPayload);
-                        
-                        if (result.success) {
-                            showNotification('Screenshot submitted successfully!', 'success');
-                            // Update ticket count display
-                            updateTicketCount();
-                        } else {
-                            showNotification('Error submitting screenshot. Try again later.', 'error');
-                        }
-                    } catch (error) {
-                        console.error('Screenshot error:', error);
-                        showNotification('Error capturing screenshot', 'error');
-                    }
-                } else {
-                    console.error('html2canvas not loaded');
-                    showNotification('Screenshot tool not available', 'error');
-                }
-            }
-            
-            // Add comment to the list
-            function addComment(comment) {
-                const commentList = document.getElementById('commentList');
-                
-                const commentItem = document.createElement('div');
-                commentItem.className = 'comment-item';
-                
-                const metadata = document.createElement('div');
-                metadata.className = 'comment-metadata';
-                metadata.textContent = `${comment.user} • ${new Date(comment.timestamp).toLocaleString()}`;
-                
-                const content = document.createElement('div');
-                content.className = 'comment-content';
-                content.textContent = comment.content;
-                
-                commentItem.appendChild(metadata);
-                commentItem.appendChild(content);
-                
-                // Add screenshot thumbnail if available
-                if (comment.screenshot) {
-                    const thumbnail = document.createElement('img');
-                    thumbnail.className = 'comment-thumbnail';
-                    thumbnail.src = comment.screenshot;
-                    commentItem.appendChild(thumbnail);
-                }
-                
-                commentList.appendChild(commentItem);
-            }
-            
-            // Update session info display
-            function updateSessionInfoDisplay() {
-                // Get session token information
-                const sessionToken = validTokens.find(t => t.session_id === reviewSession.id);
-                
-                // Set session ID and user ID
-                document.getElementById('infoDisplaySessionId').textContent = reviewSession.id || '-';
-                document.getElementById('infoDisplayUserId').textContent = reviewSession.user_id || '-';
-                document.getElementById('infoDisplayScope').textContent = 'Goalsetter Review';
-                document.getElementById('infoDisplayTickets').textContent = reviewSession.comment_count || '0';
-                
-                // Set dates based on token if available
-                if (sessionToken) {
-                    document.getElementById('infoDisplayStart').textContent = sessionToken.start_date;
-                    document.getElementById('infoDisplayEnd').textContent = sessionToken.end_date;
-                    
-                    // Store dates in session object for consistency
-                    reviewSession.start_date = sessionToken.start_date;
-                    reviewSession.end_date = sessionToken.end_date;
-                } else {
-                    // If no matching token, use current date
-                    const now = new Date();
-                    const nowString = now.toLocaleDateString();
-                    document.getElementById('infoDisplayStart').textContent = nowString;
-                    
-                    // End date is 30 days from now
-                    const endDate = new Date(now);
-                    endDate.setDate(now.getDate() + 30);
-                    const endDateString = endDate.toLocaleDateString();
-                    document.getElementById('infoDisplayEnd').textContent = endDateString;
-                    
-                    // Store dates in session object
-                    reviewSession.start_date = nowString;
-                    reviewSession.end_date = endDateString;
-                }
-            }
-            
-            // Update ticket count in session info display
-            function updateTicketCount() {
-                document.getElementById('infoDisplayTickets').textContent = reviewSession.comment_count || '0';
-                document.getElementById('sessionInfoTickets').textContent = reviewSession.comment_count || '0';
-                document.getElementById('summaryCommentCount').textContent = reviewSession.comment_count || '0';
-            }
-            
-            // Run authentication
+
+            // Start auth process
             handleAuth();
         });
     </script>

@@ -342,9 +342,9 @@ function renderPermissionBasedUI() {
     
     document.querySelectorAll('[data-user-role]').forEach(element => {
       element.textContent = userData.role || 'User';
-    });
-  }
-}
+            });
+        }
+    }
 
 // Initialize authentication on script load
 document.addEventListener('DOMContentLoaded', () => {

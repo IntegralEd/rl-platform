@@ -1,124 +1,141 @@
 <!DOCTYPE html>
 <!-- Review Version: 2024-04-03 -->
+<!-- TODO: Icons will be moved to shared/assets/images/qipu/*
+     Current emoji icons will be replaced with proper SVG assets:
+     - Main toggle: shared/assets/images/qipu/qipu_paintbrush.svg
+     - Tools: qipu_screenshot.svg, qipu_draw.svg, etc.
+     This change will provide consistent styling and better accessibility
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merit System Review</title>
-    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/merit.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root {
+            --qipu-secondary: #f2b632;
+            --review-banner-height: 40px;
+            --qipu-bar-height: 60px;
+            --comment-panel-width: 300px;
+        }
+        
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
             overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
         }
-        
-        .chatbot-container {
-            width: 100%;
+
+        .review-container {
+            display: flex;
+            flex-direction: column;
             height: 100vh;
-            border: none;
-            display: block;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
 
         .review-banner {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #FF9800;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 12px;
+            background: rgba(255, 152, 0, 0.8);
             color: white;
-            text-align: center;
-            padding: 8px;
-            font-family: system-ui, -apple-system, sans-serif;
+            border-radius: 4px;
+            font-size: 12px;
             z-index: 1000;
+            pointer-events: none;
         }
 
-        .comment-overlay {
+        .content-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            min-height: 0;
+            height: 100vh;
+        }
+
+        .status-notification {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 80px;
+            right: 20px;
             background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 16px;
-            font-family: system-ui, -apple-system, sans-serif;
-            z-index: 1000;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .comment-input {
-            flex: 1;
-            padding: 8px;
-            border: none;
+            padding: 10px 15px;
             border-radius: 4px;
             font-size: 14px;
+            z-index: 1500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .status-notification.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .comment-button {
-            padding: 8px 16px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
+        /* Qipu Toggle Button */
+        #qipu-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--qipu-secondary) url('/shared/assets/images/qipu/qipu_paintbrush.svg') center/50% no-repeat;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             cursor: pointer;
-        }
-
-        .comment-button:hover {
-            background: #45a049;
-        }
-
-        /* Ensure space for comment bar */
-        body {
-            margin-bottom: 60px;
+            z-index: 10001;
         }
     </style>
 </head>
 <body>
-    <div class="review-banner">Review Environment</div>
-    
-    <iframe
-        src="https://www.chatbase.co/chatbot-iframe/5qqQasv1fDxQQONBMuxJZ-review"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        class="chatbot-container"
-        allow="microphone *;"
-    ></iframe>
+    <div class="review-container">
+        <div class="review-banner">Review Environment | ELPL Merit System</div>
+        
+        <iframe 
+            src="merit.html" 
+            class="content-frame" 
+            id="contentFrame"
+            scrolling="auto">
+        </iframe>
+        
+        <!-- Qipu Toggle Button -->
+        <div id="qipu-toggle">🖌️</div>
+        
+        <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
 
-    <div class="comment-overlay">
-        <input type="text" class="comment-input" placeholder="Add a comment or feedback...">
-        <button class="comment-button" onclick="submitComment()">Submit Comment</button>
+        <div class="status-notification" id="statusNotification"></div>
     </div>
 
-    <!-- Include Qipu Comment Bar -->
-    <iframe src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none;"></iframe>
-
     <script>
-        function submitComment() {
-            const input = document.querySelector('.comment-input');
-            const comment = input.value.trim();
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const qcid = urlParams.get('qcid');
             
-            if (comment) {
-                // Here you would typically send the comment to your feedback system
-                console.log('Comment submitted:', comment);
-                input.value = '';
-                alert('Comment submitted successfully!');
-            }
-        }
-
-        // Listen for messages from comment bar
-        window.addEventListener('message', (event) => {
-            // Verify origin
-            if (event.origin !== window.location.origin) return;
+            // Setup Qipu toggle behavior
+            const toggle = document.getElementById('qipu-toggle');
+            const qipuBar = document.querySelector('iframe[src*="qipu_comment_bar.html"]');
             
-            if (event.data.type === 'START_REVIEW') {
-                // Handle review start
-                window.location.href = event.data.url;
-            }
+            toggle.onclick = () => {
+                const isVisible = qipuBar.style.display === 'block';
+                qipuBar.style.display = isVisible ? 'none' : 'block';
+                toggle.style.display = isVisible ? 'block' : 'none';
+            };
+            
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
+                
+                if (event.data.type === 'START_REVIEW') {
+                    window.location.href = event.data.url;
+                }
+            });
         });
     </script>
 </body>
