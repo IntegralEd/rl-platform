@@ -1,14 +1,46 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 
-# April 9 only edit merit_admin and merit_review...
+# Your rule content
 
+- You can @ files here
+- You can use markdown but dont have to
+
+# Live File Edit Restrictions (April 9, 2025)
+
+## Critical Rules
 - ⚠️ DO NOT edit `merit_live.html` or `merit_temp.html` without explicit authorization
+- ⚠️ DO NOT modify any live files directly in production environments
+
+## Approved Development Paths
+- ✅ Focus admin panel behaviors on `/admin/pages/elpl/merit/merit_admin.html`
 - ✅ Focus automation and enhancements on `/clients/elpl/merit/merit.html`
-- ✅ Focus admin panel behaviors on `/admin/pages/elpl/merit/elpl/merit_admin.html`
-- ✅ Focus automation and enhancements on `/clients/elpl/merit/merit.html`
-- ✅ All changes must follow style for admin pages [Admin Pages Layout.mdc](mdc:shared/docs/Admin Pages Layout.mdc)
-- ✅ Maintain our URL conventions [url-alignment-rules.mdc](mdc:shared/docs/url-alignment-rules.mdc)
+- ✅ All changes must follow style guide in @Admin Pages Layout.mdc
+- ✅ Maintain URL conventions as per @url-alignment-rules.mdc
+
+## Implementation Guidelines
+1. Always work on development versions first
+2. Use proper branching strategy for changes
+3. Test thoroughly in development environment
+4. Get explicit approval before touching live files
+5. Document all changes in standup reports
+
+## Affected Files
+- `merit_live.html`
+- `merit_temp.html`
+- Any production-serving files
+
+## Review Process
+1. Changes must be reviewed before deployment
+2. Use proper change order documentation
+3. Follow the gem-based navigation system
+4. Maintain multitenant architecture
+5. Preserve existing client functionality
+
+## Reference Documents
+- @Admin Pages Layout.mdc
+- @url-alignment-rules.mdc
+- @frontend-implementation-guide.mdc
