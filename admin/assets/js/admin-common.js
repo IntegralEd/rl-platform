@@ -11,8 +11,7 @@ const RecursiveAdmin = {
     // Environment detection
     env: {
         isDev: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
-        isProd: window.location.hostname === 'recursivelearning.app' || 
-                window.location.hostname === 'integral-mothership.softr.app',
+        isProd: true, // Temporarily always true
         getBaseUrl: function() {
             return this.isDev ? 'http://localhost:8080' : 'https://recursivelearning.app';
         }
@@ -239,14 +238,7 @@ const RecursiveAdmin = {
         // Development bypass for local testing
         if (this.env.isDev) {
             console.log('Development mode: Authentication bypassed');
-            // Set admin user role for testing
             localStorage.setItem('userRole', 'admin');
-            
-            // Add dev mode indicator if not already present
-            if (!document.querySelector('.dev-mode-indicator')) {
-                document.querySelector('.admin-header')?.insertAdjacentHTML('beforeend', 
-                    '<div class="dev-mode-indicator" style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 10px;">DEV MODE</div>');
-            }
         }
         
         // Initialize collapsible sections

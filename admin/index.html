@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
-    <script src="/shared/assets/js/admin.js"></script>
+    <script src="/admin/assets/js/admin.js"></script>
     <script src="/admin/assets/js/admin-common.js"></script>
     <script src="/admin/assets/js/admin-nav.js"></script>
     <style>
@@ -516,6 +516,104 @@
             padding: 4px;
             cursor: pointer;
         }
+
+        /* Merit System specific styles */
+        .merit-nav-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .merit-card-header {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .merit-feature-list {
+            padding: 8px 0;
+        }
+
+        .merit-feature-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .merit-feature-item:hover {
+            background: var(--bg-light);
+        }
+
+        .merit-feature-item.active {
+            background: var(--bg-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .merit-content-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+        }
+
+        .merit-tab-header {
+            background: var(--primary-dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0;
+        }
+
+        .merit-tab-header .nav-gem {
+            width: 24px;
+            height: 24px;
+        }
+
+        .merit-tab {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .merit-tab.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .merit-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .merit-feature-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .merit-feature-item.active .nav-gem {
+            filter: brightness(0) invert(1);
+        }
     </style>
 </head>
 <body>
@@ -534,10 +632,12 @@
 
     <div class="admin-container">
         <div class="dos-tree">
-            <!-- Tree structure will be populated by JavaScript -->
+            <!-- Client navigation cards will be dynamically populated -->
         </div>
         <div class="admin-cards">
-            <!-- Cards will be populated by JavaScript -->
+            <div id="admin-content-area">
+                <!-- Dynamic content area for loaded admin pages -->
+            </div>
         </div>
     </div>
 
@@ -552,6 +652,127 @@
             const admin = new AdminPanel();
             admin.init().catch(console.error);
             
+            // Platform resources data structure
+            const platformResources = [
+                {
+                    id: 'recNk82unZItJLAhp',
+                    name: 'StriveTogether',
+                    abbrev: 'ST',
+                    resource: 'goalsetter',
+                    status: 'Live',
+                    features: ['Toggle', 'Iframe', 'Comments', 'Change Orders', 'LRS', 'Status']
+                },
+                {
+                    id: 'rec4lTKL079rgwcjV',
+                    name: 'EL Education',
+                    abbrev: 'EL',
+                    resource: 'merit',
+                    status: 'Live',
+                    features: ['Toggle', 'Iframe', 'Comments', 'Change Orders', 'LRS', 'Status']
+                },
+                {
+                    id: 'recEOiSL1skoBNolu',
+                    name: 'B\'More Healthy Babies',
+                    abbrev: 'BHB',
+                    resource: 'bmore',
+                    status: 'Draft',
+                    features: ['Toggle', 'Iframe', 'Comments', 'Status']
+                }
+            ];
+
+            // Function to get gem icon path
+            function getGemIcon(feature, isActive = false) {
+                const suffix = isActive ? '-FFFFFF' : '-004080';
+                const iconMappings = {
+                    'toggle': `noun-toggle-switch-731364${suffix}.svg`,
+                    'iframe': `noun-embed-6292841${suffix}.svg`,
+                    'comments': `feedback-7281379${suffix}.svg`,
+                    'change orders': `change-order-6472926${suffix}.svg`,
+                    'lrs': `LRS-7677811${suffix}.svg`,
+                    'status': `Performance-3850108${suffix}.svg`
+                };
+                return `/shared/assets/images/${iconMappings[feature.toLowerCase()]}`;
+            }
+
+            // Function to create navigation cards
+            function createNavigationCards() {
+                const treeContainer = document.querySelector('.dos-tree');
+                platformResources.forEach(resource => {
+                    const card = document.createElement('div');
+                    card.className = 'merit-nav-card';
+                    card.innerHTML = `
+                        <div class="merit-card-header">
+                            <strong>${resource.name} (${resource.abbrev})</strong>
+                            <span class="status-dot" data-status="${resource.status.toLowerCase()}" 
+                                  data-tooltip="Status: ${resource.status}"></span>
+                        </div>
+                        <div class="merit-feature-list">
+                            ${resource.features.map(feature => `
+                                <a class="merit-feature-item" 
+                                   data-resource="${resource.resource}"
+                                   data-feature="${feature.toLowerCase()}"
+                                   data-client="${resource.abbrev}">
+                                    <img src="${getGemIcon(feature)}" 
+                                         class="nav-gem" alt="${feature}">
+                                    ${feature}
+                                </a>
+                            `).join('')}
+                        </div>
+                    `;
+                    treeContainer.appendChild(card);
+                });
+            }
+
+            // Function to load admin page content
+            async function loadAdminContent(client, resource, feature) {
+                const contentArea = document.getElementById('admin-content-area');
+                try {
+                    const response = await fetch(`/admin/pages/${client}/${resource}_${feature}.html`);
+                    if (!response.ok) throw new Error('Failed to load content');
+                    const content = await response.text();
+                    contentArea.innerHTML = content;
+                    
+                    // Update tab header with active gem
+                    const tabHeader = document.createElement('div');
+                    tabHeader.className = 'merit-tab-header active';
+                    tabHeader.innerHTML = `
+                        <img src="${getGemIcon(feature, true)}" class="nav-gem" alt="${feature}">
+                        ${feature.charAt(0).toUpperCase() + feature.slice(1)}
+                    `;
+                    contentArea.insertBefore(tabHeader, contentArea.firstChild);
+                } catch (error) {
+                    console.error('Error loading admin content:', error);
+                    contentArea.innerHTML = `<div class="error-message">Failed to load ${client}/${resource}/${feature}</div>`;
+                }
+            }
+
+            // Event listeners for navigation
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.merit-feature-item')) {
+                    const item = e.target.closest('.merit-feature-item');
+                    const resource = item.dataset.resource;
+                    const feature = item.dataset.feature;
+                    const client = item.dataset.client;
+                    
+                    // Update active states and icons
+                    document.querySelectorAll('.merit-feature-item').forEach(i => {
+                        i.classList.remove('active');
+                        const img = i.querySelector('.nav-gem');
+                        const feat = i.dataset.feature;
+                        img.src = getGemIcon(feat);
+                    });
+                    item.classList.add('active');
+                    const activeImg = item.querySelector('.nav-gem');
+                    activeImg.src = getGemIcon(feature, true);
+                    
+                    // Load content
+                    loadAdminContent(client, resource, feature);
+                }
+            });
+
+            // Initialize navigation
+            createNavigationCards();
+
             // Function to update version time
             function updateVersionTime() {
                 const versionInfo = document.querySelector('.version-info');
