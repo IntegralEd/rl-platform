@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <script src="/shared/assets/js/admin.js"></script>
     <script src="/admin/assets/js/admin-common.js"></script>
     <script src="/admin/assets/js/admin-nav.js"></script>
-    <script src="/admin/assets/js/admin.js"></script>
     <style>
         :root {
             --primary: #004080;
@@ -551,6 +551,21 @@
             // Initialize admin panel
             const admin = new AdminPanel();
             admin.init().catch(console.error);
+            
+            // Function to update version time
+            function updateVersionTime() {
+                const versionInfo = document.querySelector('.version-info');
+                if (versionInfo) {
+                    const now = new Date();
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    versionInfo.textContent = `v2024.04.09 ${hours}:${minutes}`;
+                }
+            }
+            
+            // Update immediately and then every minute
+            updateVersionTime();
+            setInterval(updateVersionTime, 60000);
         });
     </script>
 </body>
