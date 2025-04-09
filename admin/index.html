@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
+    <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <script src="/admin/assets/js/admin-common.js"></script>
+    <script src="/admin/assets/js/admin-nav.js"></script>
+    <script src="/admin/assets/js/admin.js"></script>
     <style>
         :root {
             --primary: #004080;
@@ -248,129 +252,91 @@
         .admin-card {
             background: var(--card-bg);
             border-radius: var(--card-radius);
-            padding: 20px;
             box-shadow: var(--card-shadow);
-            display: flex;
-            align-items: center;
-            gap: 24px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card-title {
+        .admin-card h2 {
+            margin: 0 0 16px 0;
             font-size: 1.2rem;
-            font-weight: 600;
             color: var(--primary);
-            min-width: 200px;
         }
 
-        .card-status {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 8px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .status-dot.active {
-            background: #4CAF50;
-        }
-
-        .status-dot.warning {
-            background: #FFC107;
-        }
-
-        .status-dot.error {
-            background: #F44336;
-        }
-
-        .card-content {
-            flex: 1;
+        .admin-card-content {
             display: flex;
             flex-direction: column;
+            gap: 12px;
         }
 
-        .card-metrics {
-            display: flex;
-            gap: 24px;
-            margin-bottom: 16px;
-        }
-
-        .metric {
-            background: var(--bg-light);
-            padding: 12px;
-            border-radius: 4px;
-            text-align: center;
-            min-width: 100px;
-        }
-
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .metric-label {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .card-actions {
+        .admin-card-actions {
             display: flex;
             gap: 8px;
-            margin-left: auto;
+            margin-top: 16px;
         }
 
-        .action-button {
-            padding: 8px 12px;
+        .admin-button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
             background: var(--primary);
             color: white;
-            border: none;
-            border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: background 0.2s;
-            white-space: nowrap;
+        }
+
+        .admin-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .admin-button.secondary {
+            background: var(--bg-light);
+            color: var(--text);
+            border: 1px solid #ddd;
+        }
+
+        .admin-button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Loading and Error States */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
             display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .action-button:hover {
-            background: #003366;
-        }
-
-        .copy-icon {
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 16px;
-            height: 16px;
-            margin-left: 4px;
-            cursor: pointer;
-            color: var(--primary);
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            z-index: 1000;
         }
 
-        .copy-icon:hover {
-            opacity: 1;
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        .tree-file {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            position: relative;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .card-footer {
-            margin-top: 16px;
-            font-size: 0.8rem;
-            color: #666;
-            text-align: right;
+        #error-message {
+            display: none;
+            padding: 16px;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: var(--card-radius);
+            margin: 20px;
+            text-align: center;
         }
 
         /* Bottom Icons */
@@ -504,119 +470,6 @@
             opacity: 1;
         }
 
-        /* Loading indicator */
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            margin-top: 20px;
-            font-size: 18px;
-            color: var(--primary);
-        }
-        
-        /* Error message */
-        #error-message {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-            text-align: center;
-            color: #d32f2f;
-            font-size: 18px;
-        }
-        
-        .error-container {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            max-width: 600px;
-        }
-        
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 16px;
-            border-radius: 4px;
-            color: white;
-            font-size: 14px;
-            z-index: 1001;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .toast-info {
-            background-color: #2196F3;
-        }
-        
-        .toast-success {
-            background-color: #4CAF50;
-        }
-        
-        .toast-warning {
-            background-color: #FF9800;
-        }
-        
-        .toast-error {
-            background-color: #F44336;
-        }
-        
-        .toast-content {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .admin-footer {
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            background: var(--card-bg);
-            border-top: 1px solid #ddd;
-        }
-
         .nav-gem {
             width: 24px;
             height: 24px;
@@ -666,371 +519,39 @@
     </style>
 </head>
 <body>
-    <header class="admin-header">
+    <div class="admin-header">
         <div class="header-left">
-            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
+            <img src="/shared/assets/images/lockup_white_logo.png" alt="Recursive Learning" class="header-logo">
+            <span class="header-title">Admin Panel</span>
         </div>
         <div class="header-right">
             <div class="admin-info">
-                <span>Admin: David</span>
-                <span class="version-info">Version 04.07.2025.16:11pm</span>
-            </div>
-            <div id="dev-mode-indicator"></div>
-        </div>
-    </header>
-    
-    <!-- Admin content -->
-    <div id="admin-content">
-        <div class="admin-container">
-            <!-- DOS Tree -->
-            <div class="dos-tree">
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle open"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>clients</span>
-                </div>
-                <div class="tree-children expanded">
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle open"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>elpl</span>
-                    </div>
-                    <div class="tree-children expanded">
-                        <div class="tree-item tree-folder">
-                            <span class="tree-toggle open"></span>
-                            <span class="tree-icon">📁</span>
-                            <span>merit</span>
-                        </div>
-                        <div class="tree-children expanded">
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit.html</span>
-                                </div>
-                            </div>
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_live.html</span>
-                                    <div class="tree-file-actions">
-                                        <button class="tree-action" onclick="RecursiveAdmin.ui.clipboard.copy(window.location.origin + '/clients/elpl/merit/merit_live.html')" title="Copy URL">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_review.html</span>
-                                </div>
-                            </div>
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_embed.html</span>
-                                </div>
-                            </div>
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_chat.html</span>
-                                </div>
-                            </div>
-                            <div class="tree-item tree-file">
-                                <div class="tree-content">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_temp.html</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>st</span>
-                </div>
-                <div class="tree-children">
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle open"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>goalsetter</span>
-                    </div>
-                    <div class="tree-children expanded">
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>goalsetter.html</span>
-                            </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>goalsetter_live.html</span>
-                                <div class="tree-file-actions">
-                                    <button class="tree-action" onclick="RecursiveAdmin.ui.clipboard.copy(window.location.origin + '/clients/st/goalsetter/goalsetter_live.html')" title="Copy URL">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>goalsetter_review.html</span>
-                            </div>
-                        </div>
-                        <div class="tree-item tree-file">
-                            <div class="tree-content">
-                                <span class="tree-icon">📄</span>
-                                <span>goalsetter_temp.html</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>bhb</span>
-                </div>
-                <div class="tree-children">
-                    <div class="tree-item tree-file">
-                        <span class="tree-icon">📄</span>
-                        <span>bmorehealthybabies.html</span>
-                    </div>
-                </div>
-                
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle open"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>admin</span>
-                </div>
-                <div class="tree-children expanded">
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle open"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>pages</span>
-                    </div>
-                    <div class="tree-children expanded">
-                        <div class="tree-item tree-folder">
-                            <span class="tree-toggle open"></span>
-                            <span class="tree-icon">📁</span>
-                            <span>elpl</span>
-                        </div>
-                        <div class="tree-children expanded">
-                            <div class="tree-item tree-folder">
-                                <span class="tree-toggle open"></span>
-                                <span class="tree-icon">📁</span>
-                                <span>merit</span>
-                            </div>
-                            <div class="tree-children expanded">
-                                <div class="tree-item tree-file">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_admin.html</span>
-                                </div>
-                                <div class="tree-item tree-file">
-                                    <span class="tree-icon">📄</span>
-                                    <span>merit_review.html</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item tree-folder">
-                            <span class="tree-toggle open"></span>
-                            <span class="tree-icon">📁</span>
-                            <span>st</span>
-                        </div>
-                        <div class="tree-children expanded">
-                            <div class="tree-item tree-folder">
-                                <span class="tree-toggle open"></span>
-                                <span class="tree-icon">📁</span>
-                                <span>goalsetter</span>
-                            </div>
-                            <div class="tree-children expanded">
-                                <div class="tree-item tree-file">
-                                    <span class="tree-icon">📄</span>
-                                    <span>goalsetter_admin.html</span>
-                                </div>
-                                <div class="tree-item tree-file">
-                                    <span class="tree-icon">📄</span>
-                                    <span>goalsetter_review.html</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tree-item tree-folder">
-                            <span class="tree-toggle"></span>
-                            <span class="tree-icon">📁</span>
-                            <span>bhb</span>
-                        </div>
-                        <div class="tree-children">
-                            <div class="tree-item tree-file">
-                                <span class="tree-icon">📄</span>
-                                <span>admin.html</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tree-item tree-folder">
-                    <span class="tree-toggle"></span>
-                    <span class="tree-icon">📁</span>
-                    <span>shared</span>
-                </div>
-                <div class="tree-children">
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>admin</span>
-                    </div>
-                    <div class="tree-children">
-                        <div class="tree-item tree-folder">
-                            <span class="tree-toggle"></span>
-                            <span class="tree-icon">📁</span>
-                            <span>assets</span>
-                        </div>
-                        <div class="tree-children">
-                            <div class="tree-item tree-folder">
-                                <span class="tree-toggle"></span>
-                                <span class="tree-icon">📁</span>
-                                <span>images</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tree-item tree-folder">
-                        <span class="tree-toggle"></span>
-                        <span class="tree-icon">📁</span>
-                        <span>docs</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Admin Cards -->
-            <div class="admin-cards">
-                <!-- GoalSetter Admin Card -->
-                <div class="admin-card">
-                    <div class="card-content">
-                        <h2 class="card-title">GoalSetter Admin</h2>
-                        <p class="card-description">Manage GoalSetter versions and review tokens</p>
-                        <div class="card-actions">
-                            <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                                </svg>
-                                Open Admin
-                            </button>
-                            <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                View Live
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Merit Admin Card -->
-                <div class="admin-card" data-activity="merit">
-                    <div class="card-content">
-                        <h2 class="card-title">Merit</h2>
-                        <p class="card-description">Manage Merit versions and review tokens</p>
-                        <div class="card-actions">
-                            <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                                </svg>
-                                Open Admin
-                            </button>
-                            <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                View Live
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- B'more Healthy Babies Admin Card -->
-                <div class="admin-card" data-activity="bhb">
-                    <div class="card-content">
-                        <h2 class="card-title">B'more Healthy Babies</h2>
-                        <p class="card-description">Manage B'more Healthy Babies versions and review tokens</p>
-                        <div class="card-actions">
-                            <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                                </svg>
-                                Open Admin
-                            </button>
-                            <button class="action-button" onclick="window.location.href='/clients/bhb/bmore/bmore_live.html'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                </svg>
-                                View Live
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Bottom Icons -->
-            <div class="bottom-icons">
-                <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
-                    <span class="bottom-icon-tooltip">Curious Intake Form</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                    </svg>
-                </a>
-                <a href="https://integral-mothership.softr.app/recursive-admin-dashboard" class="bottom-icon" title="Admin Panel">
-                    <span class="bottom-icon-tooltip">Admin Panel</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                    </svg>
-                </a>
+                <span id="user-name"></span>
+                <span class="version-info">v2024.04.09</span>
             </div>
         </div>
     </div>
 
-    <footer class="admin-footer">
-        <p>© 2025 Recursive Learning, LLC. All rights reserved.</p>
-    </footer>
+    <div class="admin-container">
+        <div class="dos-tree">
+            <!-- Tree structure will be populated by JavaScript -->
+        </div>
+        <div class="admin-cards">
+            <!-- Cards will be populated by JavaScript -->
+        </div>
+    </div>
 
-    <!-- Active JavaScript files -->
-    <script src="assets/js/admin-common.js"></script>
+    <div id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    <div id="error-message"></div>
+
     <script>
-        // Fix for RecursiveAdmin variable conflict
-        // Ensure admin-nav.js doesn't redeclare the RecursiveAdmin variable
         document.addEventListener('DOMContentLoaded', function() {
-            const script = document.createElement('script');
-            script.src = 'assets/js/admin-nav.js';
-            document.body.appendChild(script);
-            
-            // Add dev mode indicator
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                document.getElementById('dev-mode-indicator').innerHTML = 
-                    '<div style="background: #ffaa00; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px;">DEV MODE</div>';
-            }
+            // Initialize admin panel
+            const admin = new AdminPanel();
+            admin.init().catch(console.error);
         });
-    </script>
-
-    <div id="previewModal" class="modal">
-        <button class="modal-expand-btn" onclick="toggleModalExpand('previewModal')">
-            <img src="/shared/assets/images/expand.svg" alt="Toggle fullscreen">
-        </button>
-        <!-- Modal content -->
-    </div>
-
-    <script>
-    function toggleModalExpand(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.toggle('expanded');
-    }
     </script>
 </body>
 </html> 
