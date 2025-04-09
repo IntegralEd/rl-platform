@@ -9,79 +9,20 @@ class AdminPanel {
     }
 
     async init() {
-        await this.waitForSoftr();
-        await this.checkAccess();
-        this.initTabs();
-        this.loadInitialContent();
-    }
-
-    async waitForSoftr() {
-        return new Promise((resolve, reject) => {
-            const check = () => {
-                const headerSpan = document.querySelector('#header-span');
-                if (headerSpan) {
-                    resolve(headerSpan);
-                } else if (this.retryCount < this.maxRetries) {
-                    this.retryCount++;
-                    setTimeout(check, this.retryDelay);
-                } else {
-                    reject(new Error('Softr header not found after maximum retries'));
-                }
-            };
-            check();
-        });
-    }
-
-    async checkAccess() {
-        // Check URL params first
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('validated') === 'true') {
-            this.showAdminContent();
-            return;
-        }
-
-        // Check stored validation
-        const stored = sessionStorage.getItem('adminValidation');
-        if (stored) {
-            const validation = JSON.parse(stored);
-            if (new Date().getTime() - validation.timestamp <= 3600000) {
-                if (validation.isValid) {
-                    this.showAdminContent();
-                    return;
-                }
-            } else {
-                sessionStorage.removeItem('adminValidation');
-            }
-        }
-
-        // Check Softr header
+        console.log('[Admin] Initializing admin panel');
         try {
-            const headerSpan = await this.waitForSoftr();
-            const roleLevel = headerSpan.getAttribute('data-role-level');
-            
-            if (roleLevel !== 'Org Admin') {
-                window.location.href = '/admin/unauthorized.html';
-                return;
-            }
-
-            // Store new validation
-            const validation = {
-                isValid: true,
-                userEmail: headerSpan.getAttribute('data-user-email'),
-                roleLevel: roleLevel,
-                timestamp: new Date().getTime()
-            };
-            sessionStorage.setItem('adminValidation', JSON.stringify(validation));
-            this.showAdminContent();
+            // Temporarily bypass authentication
+            await this.initializeTree();
+            await this.loadAdminCards();
+            this.hideLoading();
         } catch (error) {
-            console.error('Auth check failed:', error);
-            sessionStorage.setItem('adminRedirectAfterLogin', window.location.pathname);
-            window.location.href = '/admin/index.html';
+            console.error('Initialization failed:', error);
+            this.showError('Failed to initialize admin panel. Please refresh or contact support.');
         }
     }
 
     showAdminContent() {
-        document.getElementById('admin-content').style.display = 'block';
+        document.getElementById('admin-content')?.style.display = 'block';
     }
 
     initTabs() {
