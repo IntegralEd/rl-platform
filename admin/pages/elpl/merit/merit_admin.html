@@ -3,399 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELPL Merit System Admin</title>
+    <title>Merit System Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
     <script src="/admin/assets/js/admin-common.js"></script>
+    <script src="/admin/assets/js/admin-nav.js"></script>
     <script src="/admin/assets/js/admin.js"></script>
     <style>
         :root {
             --header-height: 50px;
-            --admin-bg: #f5f7f9;
-            --admin-text: #2c3e50;
-            --admin-border: #e1e4e8;
-            --qipu-bar-height: 60px;
-            --qipu-bar-expanded-height: 200px;
-            --token-panel-height: 40px;
-            --token-panel-expanded-height: 300px;
-            --review-banner-height: 40px;
+            --nav-width: 260px;
+            --primary-color: #004080;
+            --secondary-color: #0060A0;
+            --bg-light: #f5f5f5;
+            --text-color: #2b2b2b;
+            --border-color: #dcdde1;
         }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            background: var(--admin-bg);
-            color: var(--admin-text);
-        }
-
-        .admin-container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-            padding: 20px;
-            height: calc(100vh - var(--header-height));
-            box-sizing: border-box;
-        }
-
-        .admin-nav {
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
+        .admin-header {
             height: var(--header-height);
-            background: white;
-            border-bottom: 1px solid var(--admin-border);
-        }
-
-        .admin-nav-links {
-            display: flex;
-            gap: 20px;
-            margin-left: auto;
-        }
-
-        .admin-nav-link {
-            padding: 8px 16px;
-            color: var(--admin-text);
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-
-        .admin-nav-link:hover {
-            background: var(--admin-bg);
-        }
-
-        .admin-nav-link.active {
-            background: var(--admin-bg);
-            font-weight: 500;
-        }
-
-        .control-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .preview-panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .collapsible-section {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .section-header {
-            padding: 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--admin-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .section-content {
-            padding: 16px;
-        }
-
-        .token-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .token-item {
-            padding: 12px;
-            border-bottom: 1px solid var(--admin-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .token-item:last-child {
-            border-bottom: none;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        .status-active { background: #28a745; }
-        .status-expired { background: #dc3545; }
-
-        button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background: #0052cc;
+            background: var(--primary-color);
             color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        button:not(:disabled):hover {
-            background: #0047b3;
-        }
-
-        #loading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            gap: 16px;
         }
 
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .header-logo {
+            height: 30px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
         }
 
-        #error-message {
-            display: none;
+        .admin-layout {
+            display: grid;
+            grid-template-columns: var(--nav-width) 1fr;
+            gap: 20px;
+            padding: 20px;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            background: var(--bg-light);
+        }
+
+        .nav-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             padding: 16px;
-            background: #ffebee;
-            color: #c62828;
-            border-radius: var(--card-radius);
-            margin: 20px;
-            text-align: center;
+        }
+
+        .nav-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .feature-list {
+            padding: 8px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .feature-item:hover {
+            background: var(--bg-light);
+        }
+
+        .feature-item.active {
+            background: var(--bg-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .content-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .tab-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
         }
     </style>
 </head>
 <body>
-    <nav class="admin-nav">
-        <h1>Merit System Admin</h1>
-        <div class="admin-nav-links">
-            <a href="/admin/pages/elpl/merit/merit_admin.html" class="admin-nav-link active">Merit Admin</a>
-            <a href="/admin/pages/st/goalsetter/goalsetter_admin.html" class="admin-nav-link">Goalsetter Admin</a>
-            <a href="/admin/index.html" class="admin-nav-link">Main Admin</a>
+    <header class="admin-header">
+        <div class="header-left">
+            <img src="/shared/assets/images/lockup_white_logo.png" alt="Recursive Learning" class="header-logo">
+            <h1>Merit System Admin</h1>
         </div>
-    </nav>
+        <div class="header-right">
+            <span>Admin: David</span>
+            <span>Version 04.09.2025.16:11pm</span>
+        </div>
+    </header>
 
-    <div class="admin-container">
-        <div class="control-panel">
-            <div class="collapsible-section" id="version-switcher">
-                <div class="section-header">
-                    <h2>Version Control</h2>
-                    <span class="carrot">▼</span>
+    <div class="admin-layout">
+        <div class="nav-panel">
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Version Control</strong>
                 </div>
-                <div class="section-content">
-                    <p>Current Version: <span id="current-version">Production</span></p>
-                    <button id="switch-version" onclick="switchVersion()">Switch to Development</button>
+                <div class="feature-list">
+                    <a class="feature-item active">Production</a>
+                    <a class="feature-item">Development</a>
                 </div>
             </div>
 
-            <div class="collapsible-section" id="token-manager">
-                <div class="section-header">
-                    <h2>Review Tokens</h2>
-                    <span class="carrot">▼</span>
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Review Tokens</strong>
                 </div>
-                <div class="section-content">
-                    <ul class="token-list">
-                        <li class="token-item">
-                            <span><span class="status-dot status-active"></span>Active Token</span>
-                            <button onclick="copyReviewLink(this)">Copy Link</button>
-                        </li>
-                    </ul>
-                    <button onclick="generateToken()">Generate New Token</button>
+                <div class="feature-list">
+                    <a class="feature-item">Active Tokens</a>
+                    <a class="feature-item">Generate Token</a>
                 </div>
             </div>
 
-            <div class="collapsible-section" id="chat-config">
-                <div class="section-header">
-                    <h2>Chat Configuration</h2>
-                    <span class="carrot">▼</span>
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Chat Configuration</strong>
                 </div>
-                <div class="section-content">
-                    <div class="config-group">
-                        <label for="assistant-id">Assistant ID</label>
-                        <input type="text" id="assistant-id" value="asst_IA5PsJxdShVPTAv2xeXTr4Ma" readonly>
-                    </div>
-                    <div class="config-group">
-                        <label for="model-version">Model Version</label>
-                        <select id="model-version">
-                            <option value="gpt-4-turbo-preview" selected>GPT-4 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                        </select>
-                    </div>
-                    <div class="config-group">
-                        <label for="thread-ttl">Thread TTL (hours)</label>
-                        <input type="number" id="thread-ttl" value="24" min="1" max="72">
-                    </div>
-                    <button onclick="saveConfig()">Save Configuration</button>
+                <div class="feature-list">
+                    <a class="feature-item">Settings</a>
+                    <a class="feature-item">Logs</a>
                 </div>
             </div>
         </div>
 
-        <div class="preview-panel">
-            <iframe id="preview-frame" style="width: 100%; height: 100%; border: none;"></iframe>
+        <div class="content-panel">
+            <div class="tab-header">
+                <button class="tab active">Toggle</button>
+                <button class="tab">Iframe</button>
+                <button class="tab">Comments</button>
+                <button class="tab">Change Orders</button>
+                <button class="tab">LRS</button>
+                <button class="tab">Status</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Content will be loaded dynamically -->
+                <div id="toggle-content" class="active">
+                    <h2>Toggle Configuration</h2>
+                    <p>Configure toggle settings and options here.</p>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div id="loading">
-        <div class="loading-spinner"></div>
-    </div>
-    <div id="error-message"></div>
 
     <script>
-        // Initialize admin panel
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Hide loading initially
-            document.getElementById('loading').style.display = 'none';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize admin panel
+            const admin = new AdminPanel();
+            admin.init().catch(console.error);
 
-            // Initialize preview frame
-            const previewFrame = document.getElementById('preview-frame');
-            previewFrame.src = '/clients/elpl/merit/merit.html';
-
-            // Toggle sections
-            document.querySelectorAll('.section-header').forEach(header => {
-                header.addEventListener('click', () => {
-                    const content = header.nextElementSibling;
-                    const carrot = header.querySelector('.carrot');
-                    
-                    if (content.style.display === 'none') {
-                        content.style.display = 'block';
-                        carrot.textContent = '▼';
-                    } else {
-                        content.style.display = 'none';
-                        carrot.textContent = '▶';
-                    }
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
                 });
             });
 
-            // Initialize version state
-            const storedVersion = localStorage.getItem('merit_version') || 'prod';
-            updateVersionDisplay(storedVersion);
+            // Feature item selection
+            document.querySelectorAll('.feature-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const card = item.closest('.nav-card');
+                    card.querySelectorAll('.feature-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
         });
-
-        function switchVersion() {
-            const btn = document.getElementById('switch-version');
-            const version = document.getElementById('current-version');
-            const frame = document.getElementById('preview-frame');
-            
-            const currentVersion = version.textContent;
-            const newVersion = currentVersion === 'Production' ? 'Development' : 'Production';
-            
-            // Show loading
-            document.getElementById('loading').style.display = 'flex';
-            
-            // Update version display
-            version.textContent = newVersion;
-            btn.textContent = `Switch to ${currentVersion}`;
-            
-            // Update preview frame
-            const newUrl = newVersion === 'Production' ? 
-                '/clients/elpl/merit/merit.html' : 
-                '/clients/elpl/merit/merit_temp.html';
-            
-            // Update frame source
-            frame.src = newUrl;
-            
-            // Store version preference
-            localStorage.setItem('merit_version', newVersion === 'Production' ? 'prod' : 'temp');
-            
-            // Hide loading when frame loads
-            frame.onload = () => {
-                document.getElementById('loading').style.display = 'none';
-            };
-            
-            // Handle load error
-            frame.onerror = () => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-message').textContent = 'Failed to load preview. Please try again.';
-                document.getElementById('error-message').style.display = 'block';
-            };
-        }
-
-        function updateVersionDisplay(version) {
-            const btn = document.getElementById('switch-version');
-            const versionText = document.getElementById('current-version');
-            const frame = document.getElementById('preview-frame');
-            
-            if (version === 'prod') {
-                versionText.textContent = 'Production';
-                btn.textContent = 'Switch to Development';
-                frame.src = '/clients/elpl/merit/merit.html';
-            } else {
-                versionText.textContent = 'Development';
-                btn.textContent = 'Switch to Production';
-                frame.src = '/clients/elpl/merit/merit_temp.html';
-            }
-        }
-
-        function generateToken() {
-            const token = Math.random().toString(36).substring(2);
-            const list = document.querySelector('.token-list');
-            const item = document.createElement('li');
-            item.className = 'token-item';
-            item.innerHTML = `
-                <span><span class="status-dot status-active"></span>Token: ${token}</span>
-                <button onclick="copyReviewLink(this)">Copy Link</button>
-            `;
-            list.appendChild(item);
-        }
-
-        function copyReviewLink(btn) {
-            const token = btn.parentElement.querySelector('span').textContent.split('Token: ')[1];
-            const link = `${window.location.origin}/clients/elpl/merit/merit_review.html?token=${token}`;
-            navigator.clipboard.writeText(link);
-            btn.textContent = 'Copied!';
-            setTimeout(() => btn.textContent = 'Copy Link', 2000);
-        }
-
-        function saveConfig() {
-            const config = {
-                assistantId: document.getElementById('assistant-id').value,
-                modelVersion: document.getElementById('model-version').value,
-                threadTTL: parseInt(document.getElementById('thread-ttl').value) * 3600
-            };
-            
-            localStorage.setItem('merit_chat_config', JSON.stringify(config));
-            
-            // Show success message
-            const message = document.createElement('div');
-            message.textContent = 'Configuration saved successfully!';
-            message.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #4caf50;
-                color: white;
-                padding: 10px 20px;
-                border-radius: 4px;
-                animation: fadeOut 3s forwards;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => message.remove(), 3000);
-        }
     </script>
 </body>
-</html> 
 </html> 
