@@ -1,10 +1,14 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: true
 ---
 
-# Your rule content
+# April 9 only edit merit_admin and merit_review...
 
-- You can @ files here
-- You can use markdown but dont have to
+- ⚠️ DO NOT edit `merit_live.html` or `merit_temp.html` without explicit authorization
+- ✅ Focus automation and enhancements on `/clients/elpl/merit/merit.html`
+- ✅ Focus admin panel behaviors on `/admin/pages/elpl/merit/elpl/merit_admin.html`
+- ✅ Focus automation and enhancements on `/clients/elpl/merit/merit.html`
+- ✅ All changes must follow style for admin pages [Admin Pages Layout.mdc](mdc:shared/docs/Admin Pages Layout.mdc)
+- ✅ Maintain our URL conventions [url-alignment-rules.mdc](mdc:shared/docs/url-alignment-rules.mdc)
