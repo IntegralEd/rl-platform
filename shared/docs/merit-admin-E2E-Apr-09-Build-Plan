@@ -129,3 +129,194 @@ const cache = {
 - [ ] Request validation
 - [ ] Error handling
 - [ ] Monitoring and alerts 
+
+# Merit Admin E2E Build Plan - April 9 Update
+
+## Critical Layout Issues (Priority Fix)
+
+### 1. Admin Header Implementation
+- [ ] Add fixed 50px admin header across all admin pages
+- [ ] Implement consistent branding with Recursive Learning logo
+- [ ] Add user info display (Admin: Name)
+- [ ] Add version info display (Version YYYY.MM.DD.HH:MMam/pm)
+
+### 2. Left Navigation Panel Fixes
+- [ ] Convert to card-based vertical navigation (260-300px width)
+- [ ] Implement proper spacing between nav cards
+- [ ] Add gem icons for feature indicators
+- [ ] Structure navigation hierarchy:
+  ```html
+  <div class="nav-card">
+    <strong>Goalsetter</strong>
+    <!-- Gem indicator -->
+    <div class="feature-list">
+      <!-- Features -->
+    </div>
+  </div>
+  ```
+
+### 3. Feature Tabs Implementation
+- [ ] Add gem-based tab navigation
+- [ ] Implement proper tab headers:
+  - Toggle
+  - Iframe
+  - Comments
+  - Change Orders
+  - LRS
+  - Status
+- [ ] Add tab content areas with proper grid layout
+- [ ] Ensure tab state persistence
+
+### 4. Grid Layout Restoration
+- [ ] Implement two-column grid structure:
+  ```css
+  .admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 16px;
+    padding: 24px;
+  }
+  ```
+- [ ] Fix content overlap issues
+- [ ] Ensure proper spacing between components
+
+### 5. Module Organization
+- [ ] Separate system-level controls (version, tokens) into Quick Actions section
+- [ ] Move chat configuration to proper admin module
+- [ ] Implement proper hierarchy for admin controls
+
+## Implementation Steps
+
+1. **Base Layout Structure**
+```html
+<header class="admin-header">
+  <!-- 50px header content -->
+</header>
+
+<div class="admin-layout">
+  <div class="nav-panel">
+    <!-- Card-based navigation -->
+  </div>
+  <div class="content-panel">
+    <!-- Tab system -->
+  </div>
+</div>
+```
+
+2. **Navigation Cards**
+```html
+<div class="nav-card">
+  <div class="card-header">
+    <strong>Module Name</strong>
+    <span class="gem-indicator"></span>
+  </div>
+  <div class="feature-list">
+    <a class="feature-item">Feature 1</a>
+    <a class="feature-item">Feature 2</a>
+  </div>
+</div>
+```
+
+3. **Tab System**
+```html
+<div class="tab-container">
+  <div class="tab-header">
+    <button class="tab active">
+      <span class="gem"></span>
+      <span class="label">Toggle</span>
+    </button>
+    <!-- More tabs -->
+  </div>
+  <div class="tab-content">
+    <!-- Content for active tab -->
+  </div>
+</div>
+```
+
+## CSS Requirements
+
+1. **Core Layout**
+```css
+:root {
+  --header-height: 50px;
+  --nav-width: 260px;
+  --primary-color: #004080;
+  --secondary-color: #0060A0;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: var(--nav-width) 1fr;
+  min-height: calc(100vh - var(--header-height));
+}
+```
+
+2. **Navigation Cards**
+```css
+.nav-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 16px;
+}
+```
+
+3. **Gem Styling**
+```css
+.gem-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary-color);
+}
+```
+
+## Validation Checklist
+
+- [ ] Header maintains 50px height across all pages
+- [ ] Navigation cards properly contain their content
+- [ ] Gems correctly indicate active states
+- [ ] Tab system properly manages content switching
+- [ ] Grid layout maintains proper spacing
+- [ ] No content overflow or overlap issues
+- [ ] Proper module hierarchy maintained
+- [ ] Consistent styling across all admin pages
+
+## Dependencies
+
+1. CSS Files:
+   - `/admin/assets/css/admin.css`
+   - `/shared/assets/css/variables.css`
+
+2. JavaScript Files:
+   - `/admin/assets/js/admin.js`
+   - `/admin/assets/js/admin-nav.js`
+   - `/admin/assets/js/admin-common.js`
+
+## Testing Requirements
+
+1. Layout Integrity:
+   - Verify grid structure maintains alignment
+   - Check responsive behavior
+   - Test tab switching
+   - Validate gem state management
+
+2. Navigation:
+   - Test card expansion/collapse
+   - Verify feature list visibility
+   - Check gem indicator states
+
+3. Content Management:
+   - Verify tab content loading
+   - Test module interactions
+   - Validate state persistence
+
+## Next Steps
+
+1. Implement base layout structure
+2. Add navigation card system
+3. Implement gem-based tabs
+4. Add content management
+5. Style and polish
+6. Test and validate
+7. Document changes 
