@@ -239,13 +239,15 @@
         const REDIS_CONFIG = {
             endpoint: '/integraled/redis/endpoint',
             ttl: 3600, // 1 hour cache TTL
-            retryAttempts: 3
+            retryAttempts: 3,
+            cachePrefix: 'merit_chat'
         };
 
         // OpenAI configuration
         const OPENAI_CONFIG = {
             assistantId: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
-            model: 'gpt-4-turbo-preview'
+            model: 'gpt-4-turbo-preview',
+            threadTTL: 86400 // 24 hours
         };
 
         let messageThread = null;
@@ -257,15 +259,11 @@
             const message = input.value.trim();
             if (!message) return;
 
-            // Clear input
             input.value = '';
-
-            // Add user message to UI
             addMessageToUI('user', message);
 
             try {
-                // Try to get from cache first
-                const cacheKey = `merit_chat_${messageThread || 'new'}_${message}`;
+                const cacheKey = `${REDIS_CONFIG.cachePrefix}:${messageThread || 'new'}:${Date.now()}`;
                 const cachedResponse = await checkCache(cacheKey);
 
                 if (cachedResponse) {
@@ -278,36 +276,34 @@
                 cacheMisses++;
                 updateCacheStatus();
 
-                // Make API call
                 const response = await fetch('https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Cache-Strategy': 'redis-preferred'
+                        'X-Cache-Strategy': 'redis-preferred',
+                        'X-Thread-ID': messageThread || ''
                     },
                     body: JSON.stringify({
                         message,
                         threadId: messageThread,
-                        assistantId: OPENAI_CONFIG.assistantId
+                        assistantId: OPENAI_CONFIG.assistantId,
+                        model: OPENAI_CONFIG.model
                     })
                 });
 
                 const data = await response.json();
                 
-                // Store in cache
-                await setCache(cacheKey, data.response);
-
-                // Update UI
-                addMessageToUI('assistant', data.response);
-
-                // Store thread ID if new
                 if (data.threadId && !messageThread) {
                     messageThread = data.threadId;
+                    localStorage.setItem('merit_thread_id', messageThread);
                 }
+
+                await setCache(cacheKey, data.response);
+                addMessageToUI('assistant', data.response);
 
             } catch (error) {
                 console.error('Error:', error);
-                addMessageToUI('assistant', 'Sorry, there was an error processing your message.');
+                addMessageToUI('assistant', 'Sorry, there was an error processing your message. Please try again.');
             }
         }
 
@@ -315,7 +311,8 @@
             try {
                 const response = await fetch(`${REDIS_CONFIG.endpoint}/get/${key}`);
                 if (response.ok) {
-                    return await response.text();
+                    const data = await response.text();
+                    return data;
                 }
             } catch (error) {
                 console.warn('Cache miss:', error);
@@ -329,7 +326,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'text/plain',
-                        'X-Cache-TTL': REDIS_CONFIG.ttl
+                        'X-Cache-TTL': REDIS_CONFIG.ttl.toString()
                     },
                     body: value
                 });
@@ -349,7 +346,9 @@
 
         function updateCacheStatus() {
             const status = document.getElementById('cache-status');
-            status.textContent = `Cache Hits: ${cacheHits} | Misses: ${cacheMisses}`;
+            const ratio = cacheHits + cacheMisses > 0 ? 
+                Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) : 0;
+            status.textContent = `Cache: ${ratio}% hit rate (${cacheHits}/${cacheHits + cacheMisses})`;
             status.style.display = 'block';
         }
 
@@ -360,7 +359,9 @@
             const loadingOverlay = document.getElementById('loading-overlay');
             const chatInput = document.getElementById('chat-input');
             
-            // Add keyboard handlers
+            // Restore thread if exists
+            messageThread = localStorage.getItem('merit_thread_id');
+            
             chatInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -368,23 +369,19 @@
                 }
             });
 
-            // Check header data
             let checkCount = 0;
             const maxChecks = 20;
             
             function checkHeaderData() {
                 const userEmail = headerSpan.getAttribute('data-user-email');
                 if (userEmail) {
-                    // Store user data
                     localStorage.setItem('merit_user_email', userEmail);
                     localStorage.setItem('merit_user_name', headerSpan.getAttribute('data-user-name'));
                     localStorage.setItem('merit_user_id', headerSpan.getAttribute('data-user-id'));
                     
-                    // Show content
                     loadingOverlay.style.display = 'none';
                     chatbotContainer.classList.add('loaded');
                     
-                    // Add welcome message
                     addMessageToUI('assistant', 'Welcome to the ELPL Merit System. How can I help you today?');
                 } else if (checkCount < maxChecks) {
                     checkCount++;

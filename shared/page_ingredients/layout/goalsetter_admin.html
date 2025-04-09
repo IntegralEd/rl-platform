@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELPL Merit System Admin</title>
+    <title>Goalsetter Admin Panel</title>
     <link rel="stylesheet" href="/shared/assets/css/admin.css">
     <script src="/shared/assets/js/admin.js" defer></script>
     <style>
@@ -149,59 +149,6 @@
 
         .status-active { background: #28a745; }
         .status-expired { background: #dc3545; }
-
-        /* Preview Panel */
-        .preview-panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .preview-header {
-            padding: 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--admin-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .preview-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .preview-status {
-            font-size: 14px;
-            color: #666;
-        }
-
-        /* Chat Config Section */
-        .chat-config {
-            margin-top: 20px;
-        }
-
-        .config-group {
-            margin-bottom: 16px;
-        }
-
-        .config-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .config-group input,
-        .config-group select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--admin-border);
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -217,8 +164,8 @@
                 <div class="section-content">
                     <p>Currently Serving: <span id="current-mode">Production</span></p>
                     <div class="preview-container">
-                        <iframe src="/clients/elpl/merit/merit.html" class="preview-frame"></iframe>
-                        <iframe src="/clients/elpl/merit/merit_temp.html" class="preview-frame"></iframe>
+                        <iframe src="/clients/st/goalsetter/goalsetter.html" class="preview-frame"></iframe>
+                        <iframe src="/clients/st/goalsetter/goalsetter_temp.html" class="preview-frame"></iframe>
                     </div>
                     <button id="switch-to-prod" disabled>Switch to Production</button>
                     <button id="switch-to-temp">Switch to Temp</button>
@@ -236,57 +183,25 @@
                         <div class="token-item">
                             <div>
                                 <span class="status-dot status-active"></span>
-                                <span>Jamie (Active)</span>
+                                <span>Cara (Active)</span>
                             </div>
-                            <button onclick="copyReviewLink('rec4lTKL079rgwcjV')">Copy Link</button>
+                            <button onclick="copyReviewLink('reclsM4lpZVwg7LnC')">Copy Link</button>
                         </div>
                         <div class="token-item">
                             <div>
                                 <span class="status-dot status-expired"></span>
-                                <span>Alex (Expired)</span>
+                                <span>Mike (Expired)</span>
                             </div>
-                            <button onclick="copyReviewLink('recEOiSL1skoBNolu')" disabled>Copy Link</button>
+                            <button onclick="copyReviewLink('recgL7pIF0tNooOEC')" disabled>Copy Link</button>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Chat Configuration -->
-            <div class="collapsible-section" id="chat-config">
-                <div class="section-header">
-                    <h1>Chat Configuration</h1>
-                    <span class="carrot">▼</span>
-                </div>
-                <div class="section-content">
-                    <div class="config-group">
-                        <label for="assistant-id">Assistant ID</label>
-                        <input type="text" id="assistant-id" value="asst_IA5PsJxdShVPTAv2xeXTr4Ma" readonly>
-                    </div>
-                    <div class="config-group">
-                        <label for="model-version">Model Version</label>
-                        <select id="model-version">
-                            <option value="gpt-4-turbo-preview" selected>GPT-4 Turbo</option>
-                            <option value="gpt-4">GPT-4</option>
-                        </select>
-                    </div>
-                    <div class="config-group">
-                        <label for="thread-ttl">Thread TTL (hours)</label>
-                        <input type="number" id="thread-ttl" value="24" min="1" max="72">
-                    </div>
-                    <button onclick="saveConfig()">Save Configuration</button>
                 </div>
             </div>
         </div>
 
         <!-- Right Panel -->
         <div class="preview-panel">
-            <div class="preview-header">
-                <h2 class="preview-title">Live Preview</h2>
-                <div class="preview-status">
-                    Source: <code>/clients/elpl/merit/merit.html</code>
-                </div>
-            </div>
-            <iframe src="/clients/elpl/merit/merit.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            <iframe src="/clients/st/goalsetter/goalsetter.html" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
 
@@ -310,7 +225,7 @@
         // Copy review link
         function copyReviewLink(sessionId) {
             const baseUrl = window.location.origin;
-            const reviewUrl = `${baseUrl}/clients/elpl/merit/merit_review.html?qcid=${sessionId}`;
+            const reviewUrl = `${baseUrl}/clients/st/goalsetter/goalsetter_review.html?qcid=${sessionId}`;
             
             navigator.clipboard.writeText(reviewUrl)
                 .then(() => alert('Review link copied!'))
@@ -322,60 +237,26 @@
 
         // Version switching
         document.getElementById('switch-to-prod').addEventListener('click', () => {
-            localStorage.setItem('merit_version', 'prod');
+            localStorage.setItem('goalsetter_version', 'prod');
             document.getElementById('current-mode').textContent = 'Production';
             document.getElementById('switch-to-prod').disabled = true;
             document.getElementById('switch-to-temp').disabled = false;
-            updatePreviewSource('prod');
         });
 
         document.getElementById('switch-to-temp').addEventListener('click', () => {
-            localStorage.setItem('merit_version', 'temp');
+            localStorage.setItem('goalsetter_version', 'temp');
             document.getElementById('current-mode').textContent = 'Temporary';
             document.getElementById('switch-to-temp').disabled = true;
             document.getElementById('switch-to-prod').disabled = false;
-            updatePreviewSource('temp');
         });
 
-        function updatePreviewSource(version) {
-            const previewFrame = document.querySelector('.preview-panel iframe');
-            const previewStatus = document.querySelector('.preview-status code');
-            const baseUrl = '/clients/elpl/merit/';
-            const file = version === 'prod' ? 'merit.html' : 'merit_temp.html';
-            
-            previewFrame.src = baseUrl + file;
-            previewStatus.textContent = baseUrl + file;
-        }
-
-        // Save chat configuration
-        function saveConfig() {
-            const config = {
-                assistantId: document.getElementById('assistant-id').value,
-                modelVersion: document.getElementById('model-version').value,
-                threadTTL: parseInt(document.getElementById('thread-ttl').value) * 3600 // Convert to seconds
-            };
-            
-            localStorage.setItem('merit_chat_config', JSON.stringify(config));
-            alert('Configuration saved successfully!');
-        }
-
-        // Initialize based on stored version and config
+        // Initialize based on stored version
         document.addEventListener('DOMContentLoaded', () => {
-            // Version
-            const version = localStorage.getItem('merit_version') || 'temp';
+            const version = localStorage.getItem('goalsetter_version') || 'temp';
             if (version === 'prod') {
                 document.getElementById('switch-to-prod').click();
             } else {
                 document.getElementById('switch-to-temp').click();
-            }
-
-            // Chat config
-            const storedConfig = localStorage.getItem('merit_chat_config');
-            if (storedConfig) {
-                const config = JSON.parse(storedConfig);
-                document.getElementById('assistant-id').value = config.assistantId;
-                document.getElementById('model-version').value = config.modelVersion;
-                document.getElementById('thread-ttl').value = Math.floor(config.threadTTL / 3600);
             }
         });
     </script>
