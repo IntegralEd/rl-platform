@@ -162,4 +162,4 @@ Interactive goal-setting tool that guides educators through a structured process
 - Welcome form now uses simplified fields with better UX
 - Layout follows learning-layout.mdc specifications
 - Auth logic handles both No/No quick path and Yes with validation
-- All UI elements use CSS variables for consistent theming 
+- All UI elements use CSS variables for consistent theming

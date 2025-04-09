@@ -3,7 +3,79 @@ description:
 globs: 
 alwaysApply: false
 ---
+<<<<<<< HEAD
 # Goalsetter Build Checklist (Updated April 7, 2025)
+=======
+# Goalsetter Build Checklist (Updated April 08, 2025)
+
+## 🎯 Current Priority: Qipu Comment Overlay
+```javascript
+// Qipu Comment Integration
+const QipuComments = {
+    overlay: {
+        show: (screenshot) => {},
+        capture: () => {},
+        submit: async () => {}
+    },
+    review: {
+        display: () => {},
+        interact: () => {}
+    }
+}
+```
+
+### Today's Focus (goalsetter_review.html)
+- [ ] Implement screenshot capture for qipu comments
+- [ ] Add comment overlay positioning system
+- [ ] Create comment submission flow
+- [ ] Integrate with review panel
+- [ ] Add visual feedback system
+- [ ] Implement comment threading
+
+### Technical Requirements
+```javascript
+// Comment Overlay Structure
+{
+    position: {x: number, y: number},
+    screenshot: Base64String,
+    comment: string,
+    thread: CommentThread[],
+    status: 'draft' | 'submitted' | 'resolved'
+}
+```
+
+### Implementation Steps
+1. Screenshot Capture
+   - [ ] Add capture button to review toolbar
+   - [ ] Implement screenshot region selection
+   - [ ] Add visual feedback during capture
+   - [ ] Save screenshot to temp storage
+
+2. Comment Overlay
+   - [ ] Create floating overlay component
+   - [ ] Add positioning system
+   - [ ] Implement drag-and-drop
+   - [ ] Add resize handles
+
+3. Comment Integration
+   - [ ] Create comment input interface
+   - [ ] Add threading support
+   - [ ] Implement status management
+   - [ ] Add notification system
+
+4. Review Panel
+   - [ ] Create comment list view
+   - [ ] Add filtering options
+   - [ ] Implement sorting
+   - [ ] Add bulk actions
+
+### Success Metrics
+- Screenshot capture < 500ms
+- Overlay positioning accuracy 100%
+- Comment submission < 200ms
+- Zero UI glitches
+- All tests passing
+>>>>>>> Merit-April-09
 
 ## 🎯 Current State
 ```

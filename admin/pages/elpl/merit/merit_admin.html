@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merit System Admin</title>
+    <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <script src="/admin/assets/js/admin-common.js"></script>
+    <script src="/admin/assets/js/admin-nav.js"></script>
+    <script src="/admin/assets/js/admin.js"></script>
+    <style>
+        :root {
+            --header-height: 50px;
+            --nav-width: 260px;
+            --primary-color: #004080;
+            --secondary-color: #0060A0;
+            --bg-light: #f5f5f5;
+            --text-color: #2b2b2b;
+            --border-color: #dcdde1;
+        }
+
+        .admin-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            height: 30px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: var(--nav-width) 1fr;
+            gap: 20px;
+            padding: 20px;
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            background: var(--bg-light);
+        }
+
+        .nav-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px;
+        }
+
+        .nav-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .feature-list {
+            padding: 8px 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .feature-item:hover {
+            background: var(--bg-light);
+        }
+
+        .feature-item.active {
+            background: var(--bg-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .content-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .tab-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="header-left">
+            <img src="/shared/assets/images/lockup_white_logo.png" alt="Recursive Learning" class="header-logo">
+            <h1>Merit System Admin</h1>
+        </div>
+        <div class="header-right">
+            <span>Admin: David</span>
+            <span>Version 04.09.2025.16:11pm</span>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <div class="nav-panel">
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Version Control</strong>
+                </div>
+                <div class="feature-list">
+                    <a class="feature-item active">Production</a>
+                    <a class="feature-item">Development</a>
+                </div>
+            </div>
+
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Review Tokens</strong>
+                </div>
+                <div class="feature-list">
+                    <a class="feature-item">Active Tokens</a>
+                    <a class="feature-item">Generate Token</a>
+                </div>
+            </div>
+
+            <div class="nav-card">
+                <div class="card-header">
+                    <strong>Chat Configuration</strong>
+                </div>
+                <div class="feature-list">
+                    <a class="feature-item">Settings</a>
+                    <a class="feature-item">Logs</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="tab-header">
+                <button class="tab active">Toggle</button>
+                <button class="tab">Iframe</button>
+                <button class="tab">Comments</button>
+                <button class="tab">Change Orders</button>
+                <button class="tab">LRS</button>
+                <button class="tab">Status</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Content will be loaded dynamically -->
+                <div id="toggle-content" class="active">
+                    <h2>Toggle Configuration</h2>
+                    <p>Configure toggle settings and options here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize admin panel
+            const admin = new AdminPanel();
+            admin.init().catch(console.error);
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+
+            // Feature item selection
+            document.querySelectorAll('.feature-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const card = item.closest('.nav-card');
+                    card.querySelectorAll('.feature-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

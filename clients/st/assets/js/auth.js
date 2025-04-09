@@ -1,7 +1,6 @@
 // StriveTogether Authentication Configuration
 const AUTH_CONFIG = {
     clientId: 'st',
-    authEndpoint: 'https://auth.strivetogether.org',
     redirectUri: window.location.origin + '/clients/st/'
 };
 
