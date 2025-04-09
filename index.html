@@ -81,6 +81,7 @@
             margin: 0 auto;
             width: 100%;
             box-sizing: border-box;
+            text-align: center;
         }
 
         .content-card {
@@ -90,17 +91,71 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
+
+        .bottom-icons {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .bottom-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            color: white;
+            text-decoration: none;
+        }
+
+        .bottom-icon:hover {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .bottom-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .bottom-icon-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .bottom-icon:hover .bottom-icon-tooltip {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <header class="platform-header">
         <div class="header-left">
             <h1 class="header-title">Recursive Learning Platform</h1>
-            <img src="/admin/assets/images/rl-logo-white.png" alt="Recursive Learning" class="header-logo">
+            <img src="/shared/assets/images/recursive-learning-logo.svg" alt="Recursive Learning" class="header-logo">
         </div>
         <div class="header-right">
             <div class="platform-info">
-                <span class="version-info">v2025.04.08</span>
+                <span class="version-info">v2025.04.09</span>
             </div>
         </div>
     </header>
@@ -108,9 +163,23 @@
     <main class="main-content">
         <div class="content-card">
             <h2>Welcome to Recursive Learning</h2>
-            <p>Access your resources through the appropriate portal:</p>
-            <!-- Content will be added here -->
+            <p>A context-aware learning environment for personalized education.</p>
         </div>
     </main>
+
+    <div class="bottom-icons">
+        <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
+            <span class="bottom-icon-tooltip">Curious Intake Form</span>
+            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                <use href="/shared/assets/images/noun-curious-41307-FFFFFF.svg#icon"/>
+            </svg>
+        </a>
+        <a href="/admin/index.html" class="bottom-icon" title="Admin Panel">
+            <span class="bottom-icon-tooltip">Admin Panel</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+            </svg>
+        </a>
+    </div>
 </body>
 </html> 
