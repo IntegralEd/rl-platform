@@ -1,51 +1,188 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 
-# 🧱 Admin Layout: Structure & Behavior
+# Admin Layout Structure & Behavior Rules
 
-## Top Banner
-- [ ] Exists on all pages with class `admin-banner`
-- [ ] Height is exactly 50px
-- [ ] Background is admin blue `#003366`
-- [ ] Includes logo left, user/account info right
-- [ ] Bottom-right contains version indicator
+## Overview
+These rules define the standard structure and behavior for admin pages across the Recursive Learning platform. They ensure consistency, maintainability, and proper functionality of admin interfaces.
 
-## Left Panel (Module Card System)
-- [ ] Fixed width of 260px
-- [ ] Modules are listed as cards with `module-card` class
-- [ ] Active card has `expanded` class and shows gems and features
-- [ ] Inactive cards collapse to 60px and only show name + status gems
-- [ ] Status gems use `gem-dot` indicators per system service
+## Always Apply
+- [ ] All admin pages must follow these structural and behavioral patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled and communicated
 
-## Right Panel (Dynamic Content)
-- [ ] Uses `.tab-container` to control tab views
-- [ ] Must include iFrame or dynamic panel render
-- [ ] Content area must resize with browser window
+## Directory Structure
+- [ ] Admin-specific assets must be in `/admin/assets/`
+  - JS files in `/admin/assets/js/`
+  - CSS files in `/admin/assets/css/`
+  - Images in `/admin/assets/images/`
+- [ ] Admin components must be in `/admin/components/`
+- [ ] Admin pages must be in `/admin/pages/{client}/{project}/`
 
-## Status Tabs (Live/Temp)
-- [ ] `_live.html` must include a status panel labeled "Live"
-- [ ] `_temp.html` must show "Temporary Review" state label
-- [ ] No edits permitted in these files without explicit override flag
+## File Naming
+- [ ] Admin JavaScript files must be prefixed with `admin-`
+  - Example: `admin-component-loader.js`, `admin-auth.js`
+- [ ] Component files must use kebab-case
+  - Example: `overview-component.html`, `settings-panel.html`
+- [ ] Page files must include client and feature
+  - Example: `goalsetter-admin.html`, `merit-admin.html`
 
-## URL & File Structure Rules
-- [ ] Pages must live in `/admin/pages/{client}/{activity}/{page}_admin.html`
-- [ ] No nested subdirectories beyond `{client}/{activity}`
-- [ ] All asset references must point to `/admin/assets/` or `/shared/assets/`
-- [ ] JS and CSS files in `/admin/assets/` must follow naming conventions:
-  - [ ] JS files must be prefixed with `admin-`, e.g., `admin-auth.js`, `admin-nav.js`
-  - [ ] CSS files must reflect scope or layout role, e.g., `admin.css`, `header.css`, `sidebar.css`
-- [ ] Pages must live in `/admin/pages/{client}/{activity}/{page}_admin.html`
-- [ ] No nested subdirectories beyond `{client}/{activity}`
-- [ ] All asset references must point to `/admin/assets/` or `/shared/assets/`
+## Layout Structure
+- [ ] Admin pages must use the standard grid layout:
+```html
+<div class="admin-layout">
+  <nav class="admin-nav">...</nav>
+  <main class="admin-content">...</main>
+</div>
+```
+- [ ] Navigation must include:
+  - Header with title
+  - Version display
+  - Navigation links
+- [ ] Content area must use component loading system
 
-## Compliance Hooks
-- [ ] Each module card includes `data-test-id="module-{name}"`
-- [ ] Each tab has a `data-tab-id` attribute
-- [ ] Version text is exposed with `data-version` attribute for testing
+## Component System
+- [ ] Components must be loaded via `admin-component-loader.js`
+- [ ] Components must use `data-admin-component` attribute
+- [ ] Components must handle their own loading states
+- [ ] Components must implement error boundaries
 
-# ✅ Validation Strategy
-- Use this file for automated pre-deploy layout checks
-- Break build if any unchecked items remain
+## JavaScript Modules
+- [ ] Use ES6 modules with type="module"
+- [ ] Import from absolute paths starting with `/admin/`
+- [ ] Keep module dependencies explicit
+- [ ] Use consistent import ordering
+
+## Styling
+- [ ] Use CSS variables for theming
+- [ ] Follow BEM naming convention
+- [ ] Maintain responsive design
+- [ ] Use grid/flexbox for layouts
+
+## Required CSS Variables
+```css
+:root {
+  --header-height: 50px;
+  --admin-bg: #f5f7f9;
+  --admin-text: #2c3e50;
+  --admin-border: #e1e4e8;
+  --nav-width: 260px;
+}
+```
+
+## Required Meta Tags
+```html
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+## Required Scripts
+```html
+<script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+<script type="module" src="/admin/assets/js/admin-auth.js"></script>
+<script type="module" src="/admin/assets/js/admin-common.js"></script>
+```
+
+## Version Display
+- [ ] Must show version number
+- [ ] Must show current date/time
+- [ ] Must update every minute
+- [ ] Format: `v1.0.0 (MM/DD/YYYY HH:mm)`
+
+## Navigation
+- [ ] Must highlight active section
+- [ ] Must update URL hash
+- [ ] Must preserve state on refresh
+- [ ] Must handle invalid routes
+
+## Component Loading
+- [ ] Must show loading states
+- [ ] Must handle errors gracefully
+- [ ] Must support dynamic imports
+- [ ] Must cache loaded components
+
+## Error Handling
+- [ ] Must show user-friendly error messages
+- [ ] Must log errors to console
+- [ ] Must provide recovery options
+- [ ] Must preserve navigation state
+
+## Performance
+- [ ] Must lazy load components
+- [ ] Must cache appropriate resources
+- [ ] Must debounce frequent updates
+- [ ] Must optimize reflows/repaints
+
+## Accessibility
+- [ ] Must use semantic HTML
+- [ ] Must include ARIA labels
+- [ ] Must support keyboard navigation
+- [ ] Must maintain focus management
+
+## Security
+- [ ] Must validate component sources
+- [ ] Must sanitize dynamic content
+- [ ] Must verify permissions
+- [ ] Must protect against XSS
+
+## State Management
+- [ ] Must use consistent state patterns
+- [ ] Must handle component lifecycle
+- [ ] Must clean up resources
+- [ ] Must preserve necessary state
+
+## Testing Requirements
+- [ ] Must include component tests
+- [ ] Must verify error states
+- [ ] Must test accessibility
+- [ ] Must validate performance
+
+## Documentation
+- [ ] Must include JSDoc comments
+- [ ] Must document component API
+- [ ] Must maintain changelog
+- [ ] Must update README
+
+## Validation
+These rules are enforced through:
+1. Pre-commit hooks
+2. CI/CD pipeline checks
+3. Code review requirements
+4. Automated testing
+
+## Implementation Example
+```javascript
+// Example of proper component implementation
+class AdminComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.state = new Map();
+    this.setupErrorBoundary();
+  }
+
+  connectedCallback() {
+    this.render();
+    this.attachEventListeners();
+  }
+
+  disconnectedCallback() {
+    this.cleanup();
+  }
+
+  setupErrorBoundary() {
+    this.addEventListener('error', this.handleError);
+  }
+
+  handleError(error) {
+    console.error('Component error:', error);
+    this.showErrorState();
+  }
+
+  render() {
+    // Implementation
+  }
+}
+```
