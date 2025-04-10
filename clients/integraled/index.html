@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning</title>
-    <link rel="stylesheet" href="/shared/admin/css/admin.css">
     <style>
         :root {
             --primary-color: #007BFF;
@@ -119,7 +118,7 @@
             cursor: not-allowed;
         }
 
-        #tree-icon {
+        #menu-icon {
             position: fixed;
             top: 20px;
             left: 20px;
@@ -127,7 +126,7 @@
             z-index: 1000;
         }
 
-        #tree-menu {
+        #client-menu {
             position: fixed;
             top: 60px;
             left: 20px;
@@ -138,22 +137,22 @@
             display: none;
         }
 
-        #tree-menu a {
+        #client-menu a {
             display: block;
             padding: 5px 10px;
             color: var(--dark-text-color);
             text-decoration: none;
         }
 
-        #tree-menu a:hover {
+        #client-menu a:hover {
             background: var(--primary-color);
             color: white;
         }
     </style>
 </head>
 <body>
-    <img id="tree-icon" src="/shared/admin/assets/images/tree-icon.png" alt="Tree Menu" width="32" height="32">
-    <div id="tree-menu">
+    <img id="menu-icon" src="/shared/assets/images/menu-icon.png" alt="Menu" width="32" height="32">
+    <div id="client-menu">
         <a href="/clients/st/goalsetter/goalsetter.html">GoalSetter</a>
         <a href="/clients/bhb/bmorehealthybabies.html">B'more Healthy Babies</a>
         <a href="/clients/elpl/index.html">ELPL</a>
@@ -209,9 +208,9 @@
     </div>
 
     <script>
-        // Tree menu toggle
-        document.getElementById('tree-icon').addEventListener('click', () => {
-            const menu = document.getElementById('tree-menu');
+        // Menu toggle
+        document.getElementById('menu-icon').addEventListener('click', () => {
+            const menu = document.getElementById('client-menu');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         });
 
