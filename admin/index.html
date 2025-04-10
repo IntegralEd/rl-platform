@@ -56,8 +56,8 @@
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            padding: 0.5rem;
+            gap: 1rem;
+            padding: 1rem;
         }
 
         .content-panel {
@@ -65,6 +65,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            background: var(--bg-light);
         }
 
         .module-card {
@@ -72,26 +73,26 @@
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
             transition: all 0.3s ease;
-            overflow: hidden;
         }
 
         .module-header {
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-light);
-            border-bottom: 1px solid #ddd;
+            cursor: pointer;
         }
 
         .module-header h3 {
             margin: 0;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
         }
 
         .module-content {
-            padding: 0.5rem;
             display: none;
+            border-top: 1px solid #eee;
         }
 
         .module-card.expanded .module-content {
@@ -100,12 +101,13 @@
 
         .status-gems {
             display: flex;
-            gap: 4px;
+            gap: 6px;
+            align-items: center;
         }
 
         .gem-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             display: inline-block;
         }
@@ -368,15 +370,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize admin panel
+            // Initialize admin panel with first card expanded by default
             const moduleCards = document.querySelectorAll('.module-card');
             
+            // Expand first card by default
+            if (moduleCards.length > 0) {
+                moduleCards[0].classList.add('expanded');
+            }
+            
             moduleCards.forEach(card => {
-                card.addEventListener('click', (e) => {
-                    // Don't toggle if clicking a nav item
-                    if (e.target.closest('.module-nav-item')) return;
-                    
-                    // Toggle expanded state
+                const header = card.querySelector('.module-header');
+                header.addEventListener('click', (e) => {
+                    // Toggle expanded state only when clicking header
                     const wasExpanded = card.classList.contains('expanded');
                     
                     // Collapse all cards first
@@ -389,47 +394,35 @@
                 });
             });
 
-            // Tab handling
-            const tabButtons = document.querySelectorAll('[data-tab-id]');
-            const contentFrame = document.querySelector('.content-frame');
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-tab-id');
-                    
-                    // Update active tab
-                    tabButtons.forEach(b => b.classList.remove('active'));
-                    button.classList.add('active');
-                    
-                    // Load content based on tab
-                    contentFrame.src = `/admin/pages/goalsetter/${tabId}_admin.html`;
+            // Prevent click propagation from nav items and buttons
+            document.querySelectorAll('.module-nav-item, .action-button').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
                 });
             });
 
-            // Module navigation
-            document.querySelectorAll('.module-nav-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const page = item.getAttribute('data-page');
-                    
-                    // Find and click corresponding tab
-                    const tab = document.querySelector(`[data-tab-id="${page}"]`);
-                    if (tab) tab.click();
-                });
-            });
-
-            // Update version display
+            // Update version display with current date/time
             function updateVersion() {
                 const now = new Date();
                 const version = document.querySelector('[data-version]');
+                const formattedDate = now.toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: 'numeric'
+                });
                 const hours = now.getHours().toString().padStart(2, '0');
                 const minutes = now.getMinutes().toString().padStart(2, '0');
-                const date = now.toLocaleDateString();
-                version.textContent = `v1.0.0 (${date} ${hours}:${minutes})`;
+                version.textContent = `v1.0.0 (${formattedDate} ${hours}:${minutes})`;
             }
+            
             updateVersion();
-            // Update time every minute
             setInterval(updateVersion, 60000);
+
+            // Initialize content frame with overview
+            const contentFrame = document.querySelector('.content-frame');
+            if (contentFrame) {
+                contentFrame.src = '/admin/pages/overview.html';
+            }
         });
     </script>
 </body>
