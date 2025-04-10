@@ -170,6 +170,52 @@
             font-size: 0.8rem;
             opacity: 0.8;
         }
+
+        .module-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .module-nav-item {
+            text-decoration: none;
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .module-nav-item:hover {
+            background: var(--bg-light);
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .action-button:hover {
+            opacity: 0.9;
+        }
+
+        .action-button svg {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 <body>
@@ -187,6 +233,7 @@
     <div class="admin-layout">
         <!-- Left Panel - Module Cards -->
         <aside class="module-panel">
+            <!-- GoalSetter Module Card -->
             <div class="module-card" data-test-id="module-goalsetter">
                 <div class="module-header">
                     <h3>GoalSetter</h3>
@@ -201,6 +248,105 @@
                         <a href="#" class="module-nav-item" data-page="settings">Settings</a>
                         <a href="#" class="module-nav-item" data-page="logs">Logs</a>
                     </nav>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                        <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Live
+                        </button>
+                        <button class="action-button" onclick="shareUrl('/clients/st/goalsetter/goalsetter_live.html', 'GoalSetter')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EL Education Module Card -->
+            <div class="module-card" data-test-id="module-merit">
+                <div class="module-header">
+                    <h3>EL Education</h3>
+                    <div class="status-gems">
+                        <span class="gem-dot active" title="API Status"></span>
+                        <span class="gem-dot active" title="Cache Status"></span>
+                    </div>
+                </div>
+                <div class="module-content">
+                    <nav class="module-nav">
+                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
+                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
+                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
+                    </nav>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                        <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Live
+                        </button>
+                        <button class="action-button" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BHB Module Card -->
+            <div class="module-card" data-test-id="module-bhb">
+                <div class="module-header">
+                    <h3>B'More Healthy Babies</h3>
+                    <div class="status-gems">
+                        <span class="gem-dot warning" title="API Status"></span>
+                        <span class="gem-dot" title="Cache Status"></span>
+                    </div>
+                </div>
+                <div class="module-content">
+                    <nav class="module-nav">
+                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
+                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
+                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
+                    </nav>
+                    <div class="card-actions">
+                        <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
+                            </svg>
+                            Open Admin
+                        </button>
+                        <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            View Live
+                        </button>
+                        <button class="action-button" onclick="shareUrl('/clients/bhb/bmorehealthybabies_live.html', 'BHB')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Share
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
