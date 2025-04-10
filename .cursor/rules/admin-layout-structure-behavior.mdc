@@ -21,14 +21,33 @@ These rules define the standard structure and behavior for admin pages across th
   - Images in `/admin/assets/images/`
 - [ ] Admin components must be in `/admin/components/`
 - [ ] Admin pages must be in `/admin/pages/{client}/{project}/`
+- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
+  - Each ingredient in its own directory
+  - Must include README.md with usage instructions
+  - Must use consistent file naming within ingredient directory
+  - Example: `/shared/page_ingredients/toggle/toggle.js`
 
 ## File Naming
 - [ ] Admin JavaScript files must be prefixed with `admin-`
   - Example: `admin-component-loader.js`, `admin-auth.js`
 - [ ] Component files must use kebab-case
-  - Example: `overview-component.html`, `settings-panel.html`
+  - Example: `page-nav.html`, `ingredient-preview.html`
 - [ ] Page files must include client and feature
   - Example: `goalsetter-admin.html`, `merit-admin.html`
+- [ ] Ingredient files must match directory name
+  - Example: `toggle/toggle.js`, `iframe/iframe.js`
+
+## Page Ingredients
+- [ ] All ingredients must be in `/shared/page_ingredients/`
+- [ ] Each ingredient must be self-contained in its directory
+- [ ] Must include:
+  - README.md with usage instructions
+  - Main implementation file matching directory name
+  - Any additional resources (CSS, assets, etc.)
+- [ ] Must support both admin and client usage
+- [ ] Must implement standard ingredient interface
+- [ ] Must handle their own loading states
+- [ ] Must implement error boundaries
 
 ## Layout Structure
 - [ ] Admin pages must use the standard grid layout:
@@ -41,8 +60,8 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Navigation must include:
   - Header with title
   - Version display
-  - Navigation links
-- [ ] Content area must use component loading system
+  - Page navigation cards
+- [ ] Content area must use ingredient loading system
 
 ## Component System
 - [ ] Components must be loaded via `admin-component-loader.js`
@@ -50,10 +69,16 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Components must handle their own loading states
 - [ ] Components must implement error boundaries
 
+## Page Navigation
+- [ ] Use `<admin-page-nav>` component for navigation
+- [ ] Each page card contains its available ingredients
+- [ ] Ingredients are loaded dynamically in preview area
+- [ ] Support collapsible page cards
+
 ## JavaScript Modules
 - [ ] Use ES6 modules with type="module"
 - [ ] Import from absolute paths starting with `/admin/`
-- [ ] Keep module dependencies explicit
+- [ ] Keep dependencies explicit
 - [ ] Use consistent import ordering
 
 ## Styling
@@ -92,17 +117,17 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Must update every minute
 - [ ] Format: `v1.0.0 (MM/DD/YYYY HH:mm)`
 
-## Navigation
-- [ ] Must highlight active section
+## Page Navigation
+- [ ] Must highlight active ingredient
 - [ ] Must update URL hash
 - [ ] Must preserve state on refresh
 - [ ] Must handle invalid routes
 
-## Component Loading
+## Ingredient Loading
 - [ ] Must show loading states
 - [ ] Must handle errors gracefully
 - [ ] Must support dynamic imports
-- [ ] Must cache loaded components
+- [ ] Must cache loaded ingredients
 
 ## Error Handling
 - [ ] Must show user-friendly error messages
@@ -111,7 +136,7 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Must preserve navigation state
 
 ## Performance
-- [ ] Must lazy load components
+- [ ] Must lazy load ingredients
 - [ ] Must cache appropriate resources
 - [ ] Must debounce frequent updates
 - [ ] Must optimize reflows/repaints
@@ -123,7 +148,7 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Must maintain focus management
 
 ## Security
-- [ ] Must validate component sources
+- [ ] Must validate ingredient sources
 - [ ] Must sanitize dynamic content
 - [ ] Must verify permissions
 - [ ] Must protect against XSS
@@ -155,8 +180,8 @@ These rules are enforced through:
 
 ## Implementation Example
 ```javascript
-// Example of proper component implementation
-class AdminComponent extends HTMLElement {
+// Example of proper page ingredient implementation
+class AdminIngredient extends HTMLElement {
   constructor() {
     super();
     this.state = new Map();
@@ -177,7 +202,7 @@ class AdminComponent extends HTMLElement {
   }
 
   handleError(error) {
-    console.error('Component error:', error);
+    console.error('Ingredient error:', error);
     this.showErrorState();
   }
 
