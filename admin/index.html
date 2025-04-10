@@ -46,6 +46,7 @@
             gap: 24px;
             padding: 24px;
             overflow: hidden;
+            margin-top: var(--header-height);
         }
 
         .module-panel {
@@ -53,6 +54,7 @@
             flex-direction: column;
             gap: 16px;
             overflow-y: auto;
+            height: calc(100vh - var(--header-height) - 48px);
         }
 
         .module-card {
@@ -133,10 +135,11 @@
             gap: 10px;
             font-size: 15px;
             font-weight: 500;
-            padding: 6px 8px;
+            padding: 8px 12px;
             border-radius: 8px;
             border-left: 3px solid transparent;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .feature-list li:hover {
@@ -160,6 +163,7 @@
             box-shadow: var(--shadow);
             position: relative;
             overflow-y: auto;
+            height: calc(100vh - var(--header-height) - 48px);
         }
 
         .tab-header {
@@ -227,6 +231,13 @@
 
         .module-card.expanded .callout-connector {
             display: block;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: var(--border-radius);
         }
     </style>
 </head>
@@ -341,6 +352,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Module card handling
             const moduleCards = document.querySelectorAll('.module-card');
+            const contentFrame = document.querySelector('.content-frame');
             
             moduleCards.forEach(card => {
                 const header = card.querySelector('.module-header');
@@ -372,6 +384,12 @@
                 feature.addEventListener('click', () => {
                     features.forEach(f => f.classList.remove('active'));
                     feature.classList.add('active');
+                    
+                    // Load corresponding content
+                    const module = feature.closest('.module-card').dataset.module;
+                    const action = feature.textContent.trim().toLowerCase();
+                    const url = `/admin/pages/${module}/${action}.html`;
+                    contentFrame.src = url;
                 });
             });
 
