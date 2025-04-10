@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <script type="module" src="/admin/components/page-cards.html"></script>
     <script src="/admin/assets/js/admin-common.js"></script>
     <script src="/admin/assets/js/admin-nav.js"></script>
     <style>
@@ -242,173 +243,55 @@
     </style>
 </head>
 <body>
-    <!-- Top Banner -->
     <header class="admin-banner">
-        <div class="logo-container">
-            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="logo">
+        <div class="brand">
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" height="30">
         </div>
-        <div class="user-info">
-            <span id="user-name"></span>
-            <span class="version-indicator" data-version="1.0.0">v1.0.0</span>
-        </div>
+        <div class="version" id="version-display">v1.0.0</div>
     </header>
 
     <div class="admin-layout">
-        <div class="module-panel">
-            <div class="module-card expanded" data-module="goalsetter">
-                <div class="module-header">
-                    <h3>Goalsetter</h3>
-                    <div class="status-gems">
-                        <span class="gem-dot active" title="API Status"></span>
-                        <span class="gem-dot active" title="Cache Status"></span>
-                    </div>
-                </div>
-                <div class="callout-connector"></div>
-                <div class="module-content">
-                    <ul class="feature-list">
-                        <li class="active">
-                            <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle">
-                            Toggle
-                        </li>
-                        <li>
-                            <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe">
-                            Iframe
-                        </li>
-                        <li>
-                            <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments">
-                            Comments
-                        </li>
-                        <li>
-                            <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change">
-                            Change Orders
-                        </li>
-                        <li>
-                            <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS">
-                            LRS
-                        </li>
-                        <li>
-                            <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status">
-                            Status
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <!-- Left Panel - Navigation -->
+        <nav class="module-panel">
+            <page-cards></page-cards>
+        </nav>
 
-            <div class="module-card collapsed" data-module="ci">
-                <div class="module-header">
-                    <h3>Continuous Improvement</h3>
-                    <div class="status-gems">
-                        <span class="gem-dot warning" title="API Status"></span>
-                        <span class="gem-dot" title="Cache Status"></span>
-                    </div>
-                </div>
+        <!-- Right Panel - Content -->
+        <main class="content-panel">
+            <div id="ingredient-preview">
+                Select a page ingredient to preview
             </div>
-
-            <div class="module-card collapsed" data-module="network">
-                <div class="module-header">
-                    <h3>Network Leader</h3>
-                    <div class="status-gems">
-                        <span class="gem-dot active" title="API Status"></span>
-                        <span class="gem-dot active" title="Cache Status"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="content-panel">
-            <div class="tab-header">
-                <button class="tab active">
-                    <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle">
-                    Toggle
-                </button>
-                <button class="tab">
-                    <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe">
-                    Iframe
-                </button>
-                <button class="tab">
-                    <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments">
-                    Comments
-                </button>
-                <button class="tab">
-                    <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change">
-                    Change Orders
-                </button>
-                <button class="tab">
-                    <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS">
-                    LRS
-                </button>
-                <button class="tab">
-                    <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status">
-                    Status
-                </button>
-            </div>
-            <div class="tab-content">
-                <iframe class="content-frame" src="/admin/pages/overview.html"></iframe>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Module card handling
-            const moduleCards = document.querySelectorAll('.module-card');
-            const contentFrame = document.querySelector('.content-frame');
+        // Update version display with current time
+        function updateVersionDisplay() {
+            const now = new Date();
+            const date = now.toLocaleDateString();
+            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('version-display').textContent = `v1.0.0 (${date} ${time})`;
+        }
+
+        // Update version every minute
+        updateVersionDisplay();
+        setInterval(updateVersionDisplay, 60000);
+
+        // Handle ingredient selection
+        document.addEventListener('ingredient-selected', (e) => {
+            const { page, ingredient } = e.detail;
+            const preview = document.getElementById('ingredient-preview');
             
-            moduleCards.forEach(card => {
-                const header = card.querySelector('.module-header');
-                header.addEventListener('click', () => {
-                    const wasExpanded = card.classList.contains('expanded');
-                    moduleCards.forEach(c => {
-                        c.classList.remove('expanded');
-                        c.classList.add('collapsed');
-                    });
-                    if (!wasExpanded) {
-                        card.classList.remove('collapsed');
-                        card.classList.add('expanded');
-                    }
+            // Load the ingredient component
+            import(`/admin/components/ingredients/${ingredient}.js`)
+                .then(module => {
+                    const IngredientComponent = module.default;
+                    preview.innerHTML = '';
+                    new IngredientComponent(page);
+                })
+                .catch(error => {
+                    preview.innerHTML = `Error loading ${ingredient} ingredient: ${error.message}`;
                 });
-            });
-
-            // Tab handling
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                });
-            });
-
-            // Feature list item handling
-            const features = document.querySelectorAll('.feature-list li');
-            features.forEach(feature => {
-                feature.addEventListener('click', () => {
-                    features.forEach(f => f.classList.remove('active'));
-                    feature.classList.add('active');
-                    
-                    // Load corresponding content
-                    const module = feature.closest('.module-card').dataset.module;
-                    const action = feature.textContent.trim().toLowerCase();
-                    const url = `/admin/pages/${module}/${action}.html`;
-                    contentFrame.src = url;
-                });
-            });
-
-            // Version display
-            function updateVersion() {
-                const now = new Date();
-                const version = document.querySelector('[data-version]');
-                const formattedDate = now.toLocaleDateString('en-US', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    year: 'numeric'
-                });
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                version.textContent = `v1.0.0 (${formattedDate} ${hours}:${minutes})`;
-            }
-            
-            updateVersion();
-            setInterval(updateVersion, 60000);
         });
     </script>
 </body>
