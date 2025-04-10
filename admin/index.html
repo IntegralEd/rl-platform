@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
-    <script type="module" src="/admin/components/page-cards.html"></script>
+    <script type="module" src="/admin/components/admin-page-nav.js"></script>
     <script src="/admin/assets/js/admin-common.js"></script>
     <script src="/admin/assets/js/admin-nav.js"></script>
     <style>
@@ -50,7 +50,7 @@
             margin-top: var(--header-height);
         }
 
-        .module-panel {
+        .page-panel {
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -58,7 +58,7 @@
             height: calc(100vh - var(--header-height) - 48px);
         }
 
-        .module-card {
+        .page-card {
             position: relative;
             border-radius: var(--border-radius);
             padding: 16px;
@@ -69,21 +69,21 @@
             border-left: 6px solid var(--accent-color);
         }
 
-        .module-card.collapsed {
+        .page-card.collapsed {
             height: 60px;
             padding: 12px 16px;
             background: #fafafa;
             border-left: 6px solid #ffcc00;
         }
 
-        .module-header {
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
 
-        .module-header h3 {
+        .page-header h3 {
             margin: 0;
             font-size: 15px;
             font-weight: 500;
@@ -112,12 +112,12 @@
             box-shadow: 0 0 0 2px rgba(243,156,18,0.2);
         }
 
-        .module-content {
+        .page-content {
             margin-top: 12px;
             display: none;
         }
 
-        .module-card.expanded .module-content {
+        .page-card.expanded .page-content {
             display: block;
         }
 
@@ -230,7 +230,7 @@
             display: none;
         }
 
-        .module-card.expanded .callout-connector {
+        .page-card.expanded .callout-connector {
             display: block;
         }
 
@@ -239,6 +239,22 @@
             height: 100%;
             border: none;
             border-radius: var(--border-radius);
+        }
+
+        #ingredient-preview {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .brand img {
+            height: 30px;
+        }
+
+        .version {
+            color: white;
+            font-size: 14px;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -252,8 +268,8 @@
 
     <div class="admin-layout">
         <!-- Left Panel - Navigation -->
-        <nav class="module-panel">
-            <page-cards></page-cards>
+        <nav class="page-panel">
+            <admin-page-nav></admin-page-nav>
         </nav>
 
         <!-- Right Panel - Content -->
@@ -292,6 +308,13 @@
                 .catch(error => {
                     preview.innerHTML = `Error loading ${ingredient} ingredient: ${error.message}`;
                 });
+        });
+
+        // Initialize admin navigation after DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.RecursiveAdmin && window.RecursiveAdmin.nav) {
+                window.RecursiveAdmin.nav.init();
+            }
         });
     </script>
 </body>
