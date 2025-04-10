@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## URL Conventions
+- `_admin.html` pages should not be placed within the client tree.
+- All admin pages must reside in the `/admin/pages/` directory structure to maintain a clear separation between client-specific and admin interfaces. 
+
+auth.js 
+admin.js
+sidebar.js and all scripts relating to admin tree assets shoudl come from 
+/Users/Shared/Repositories/rl-platform/admin/assets/js
+
+all auth scrits 
+ [url-alignment-rules.mdc](mdc:shared/docs/url-alignment-rules.mdc)
