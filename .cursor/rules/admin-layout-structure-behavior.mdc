@@ -1,10 +1,51 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: true
 ---
 
-# Your rule content
+# 🧱 Admin Layout: Structure & Behavior
 
-- You can @ files here
-- You can use markdown but dont have to
+## Top Banner
+- [ ] Exists on all pages with class `admin-banner`
+- [ ] Height is exactly 50px
+- [ ] Background is admin blue `#003366`
+- [ ] Includes logo left, user/account info right
+- [ ] Bottom-right contains version indicator
+
+## Left Panel (Module Card System)
+- [ ] Fixed width of 260px
+- [ ] Modules are listed as cards with `module-card` class
+- [ ] Active card has `expanded` class and shows gems and features
+- [ ] Inactive cards collapse to 60px and only show name + status gems
+- [ ] Status gems use `gem-dot` indicators per system service
+
+## Right Panel (Dynamic Content)
+- [ ] Uses `.tab-container` to control tab views
+- [ ] Must include iFrame or dynamic panel render
+- [ ] Content area must resize with browser window
+
+## Status Tabs (Live/Temp)
+- [ ] `_live.html` must include a status panel labeled "Live"
+- [ ] `_temp.html` must show "Temporary Review" state label
+- [ ] No edits permitted in these files without explicit override flag
+
+## URL & File Structure Rules
+- [ ] Pages must live in `/admin/pages/{client}/{activity}/{page}_admin.html`
+- [ ] No nested subdirectories beyond `{client}/{activity}`
+- [ ] All asset references must point to `/admin/assets/` or `/shared/assets/`
+- [ ] JS and CSS files in `/admin/assets/` must follow naming conventions:
+  - [ ] JS files must be prefixed with `admin-`, e.g., `admin-auth.js`, `admin-nav.js`
+  - [ ] CSS files must reflect scope or layout role, e.g., `admin.css`, `header.css`, `sidebar.css`
+- [ ] Pages must live in `/admin/pages/{client}/{activity}/{page}_admin.html`
+- [ ] No nested subdirectories beyond `{client}/{activity}`
+- [ ] All asset references must point to `/admin/assets/` or `/shared/assets/`
+
+## Compliance Hooks
+- [ ] Each module card includes `data-test-id="module-{name}"`
+- [ ] Each tab has a `data-tab-id` attribute
+- [ ] Version text is exposed with `data-version` attribute for testing
+
+# ✅ Validation Strategy
+- Use this file for automated pre-deploy layout checks
+- Break build if any unchecked items remain

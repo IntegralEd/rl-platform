@@ -1,0 +1,170 @@
+<!-- 
+  Iframe Component v1.0.0
+  Created: 2024-04-05
+  
+  Features:
+  - Responsive iframe container
+  - Loading state handling
+  - Error state handling
+  - Accessibility support
+  - Cross-origin security controls
+  - Auto-resize capability
+-->
+
+<template id="iframe-component">
+  <style>
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+      border: 1px solid var(--border-color, #e0e0e0);
+      border-radius: var(--border-radius, 4px);
+      overflow: hidden;
+    }
+
+    .iframe-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-color, #ffffff);
+      z-index: 1;
+    }
+
+    .iframe-error {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-color, #ffffff);
+      color: var(--error-color, #dc3545);
+      z-index: 2;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .iframe-container {
+        --border-color: #404040;
+        --bg-color: #1a1a1a;
+      }
+    }
+  </style>
+
+  <div class="iframe-container">
+    <div class="iframe-loading" aria-live="polite">
+      <div role="status">Loading...</div>
+    </div>
+    <div class="iframe-error" aria-live="assertive">
+      <div role="alert"></div>
+    </div>
+    <iframe title="Content Frame" loading="lazy"></iframe>
+  </div>
+</template>
+
+<script>
+class IframeComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  static get observedAttributes() {
+    return ['src', 'title', 'sandbox'];
+  }
+
+  connectedCallback() {
+    const template = document.getElementById('iframe-component');
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
+    
+    this.iframe = this.shadowRoot.querySelector('iframe');
+    this.loadingEl = this.shadowRoot.querySelector('.iframe-loading');
+    this.errorEl = this.shadowRoot.querySelector('.iframe-error');
+    
+    this.setupIframe();
+  }
+
+  setupIframe() {
+    // Set attributes
+    if (this.hasAttribute('src')) {
+      this.iframe.src = this.getAttribute('src');
+    }
+    if (this.hasAttribute('title')) {
+      this.iframe.title = this.getAttribute('title');
+    }
+    if (this.hasAttribute('sandbox')) {
+      this.iframe.sandbox = this.getAttribute('sandbox');
+    }
+
+    // Event listeners
+    this.iframe.addEventListener('load', () => {
+      this.loadingEl.style.display = 'none';
+    });
+
+    this.iframe.addEventListener('error', () => {
+      this.showError('Failed to load content');
+    });
+
+    // Auto-resize observer
+    if ('ResizeObserver' in window) {
+      const resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const height = entry.contentRect.height;
+          this.style.height = `${height}px`;
+        }
+      });
+      resizeObserver.observe(this.iframe);
+    }
+  }
+
+  showError(message) {
+    this.errorEl.querySelector('[role="alert"]').textContent = message;
+    this.errorEl.style.display = 'flex';
+    this.loadingEl.style.display = 'none';
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.iframe) return;
+    
+    switch (name) {
+      case 'src':
+        this.iframe.src = newValue;
+        this.loadingEl.style.display = 'flex';
+        this.errorEl.style.display = 'none';
+        break;
+      case 'title':
+        this.iframe.title = newValue;
+        break;
+      case 'sandbox':
+        this.iframe.sandbox = newValue;
+        break;
+    }
+  }
+}
+
+customElements.define('rl-iframe', IframeComponent);
+</script>
+
+<!-- Usage Example:
+<rl-iframe 
+  src="https://example.com" 
+  title="Example Content"
+  sandbox="allow-scripts allow-same-origin">
+</rl-iframe>
+--> 

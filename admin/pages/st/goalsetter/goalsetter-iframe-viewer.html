@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RL Platform Iframe Viewer</title>
+  <link rel="stylesheet" href="/admin/assets/css/admin.css">
+  <style>
+    :root {
+      --sidebar-width: 320px;
+      --border-color: #ccc;
+      --bg-color: #f8f9fa;
+      --error-color: #dc3545;
+      --primary-color: #0052CC;
+      --primary-hover: #003d99;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --border-color: #404040;
+        --bg-color: #1a1a1a;
+        --primary-color: #2684FF;
+        --primary-hover: #0052CC;
+      }
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      max-width: 1200px;
+      max-height: 900px;
+      display: flex;
+      font-family: var(--font-family, system-ui);
+      background: var(--bg-color);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #app-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      padding: 1.5rem;
+      box-sizing: border-box;
+      border-right: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      overflow-y: auto;
+    }
+
+    .sidebar label,
+    .sidebar input[type="text"] {
+      width: 100%;
+      margin-bottom: 1rem;
+      display: block;
+      font-size: 14px;
+    }
+
+    .sidebar input[type="text"] {
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      transition: border-color 0.3s;
+      background: var(--bg-input);
+      color: var(--text-color);
+    }
+
+    .sidebar input.invalid {
+      border-color: var(--error-color);
+      background: #ffe6e6;
+    }
+
+    .main-panel {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      box-sizing: border-box;
+    }
+
+    #iframe-container {
+      flex-grow: 1;
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    #iframe-code-block {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    #iframe-code {
+      width: 100%;
+      height: 100px;
+      font-family: monospace;
+      resize: none;
+      margin-top: 0.5rem;
+      background: var(--bg-code);
+      color: var(--text-code);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0.5rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    button, 
+    a.button-link {
+      padding: 0.5rem 1rem;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    button:hover, 
+    a.button-link:hover {
+      background: var(--primary-hover);
+    }
+
+    .url-validation {
+      display: none;
+      color: var(--error-color);
+      font-size: 12px;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .url-validation.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container">
+    <div class="sidebar">
+      <h3>🧩 Iframe Viewer</h3>
+
+      <label>
+        <input type="radio" name="src_mode" value="preset" checked onchange="IframeViewer.updateIframe()">
+        Use default live file
+      </label>
+
+      <label>
+        <input type="radio" name="src_mode" value="custom" onchange="IframeViewer.updateIframe()">
+        Custom URL
+      </label>
+      
+      <input type="text" 
+        id="custom_url" 
+        placeholder="https://..." 
+        oninput="IframeViewer.validateAndUpdate(this)"
+        aria-label="Custom URL input">
+      
+      <div id="url-validation" class="url-validation">
+        Please enter a valid URL starting with http:// or https://
+      </div>
+    </div>
+
+    <div class="main-panel">
+      <rl-iframe id="iframe-container"></rl-iframe>
+
+      <div id="iframe-code-block">
+        <label><strong>Iframe Embed Code:</strong></label>
+        <textarea id="iframe-code" readonly aria-label="Iframe embed code"></textarea>
+
+        <div class="toolbar">
+          <button onclick="IframeViewer.copyCode()" aria-label="Copy code to clipboard">
+            Copy to Clipboard
+          </button>
+          <button onclick="IframeViewer.emailCode()" aria-label="Email code">
+            Email Code
+          </button>
+          <a id="popout-link" class="button-link" target="_blank" rel="noopener">
+            Popout View
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const IframeViewer = {
+      init() {
+        // Import our custom iframe component
+        const link = document.createElement('link');
+        link.rel = 'import';
+        link.href = '/shared/page_ingredients/iframe/iframe.html';
+        document.head.appendChild(link);
+
+        // Set initial state
+        this.updateIframe();
+      },
+
+      validateAndUpdate(input) {
+        const url = input.value.trim();
+        const validation = document.getElementById('url-validation');
+        
+        if (url && !url.match(/^https?:\/\//)) {
+          input.classList.add('invalid');
+          validation.classList.add('visible');
+          return false;
+        }
+        
+        input.classList.remove('invalid');
+        validation.classList.remove('visible');
+        this.updateIframe();
+        return true;
+      },
+
+      updateIframe() {
+        const mode = document.querySelector('input[name="src_mode"]:checked').value;
+        const customInput = document.getElementById('custom_url');
+        let url = '';
+
+        if (mode === 'preset') {
+          const pathname = window.location.pathname;
+          const segments = pathname.split('/');
+          const filename = segments[segments.length - 1].replace('_admin.html', '');
+          url = `https://recursivelearning.app/clients/st/${filename}_live.html`;
+          customInput.classList.remove('invalid');
+        } else {
+          url = customInput.value.trim();
+          if (!this.validateAndUpdate(customInput)) {
+            return;
+          }
+        }
+
+        const iframeCode = `<iframe 
+  src="${url}" 
+  width="100%" 
+  height="600" 
+  frameborder="0"
+  title="Content Preview"
+  loading="lazy">
+</iframe>`;
+
+        const container = document.getElementById('iframe-container');
+        container.setAttribute('src', url);
+        container.setAttribute('title', 'Content Preview');
+        container.style.display = 'block';
+
+        document.getElementById('iframe-code').value = iframeCode;
+        document.getElementById('popout-link').href = url;
+        document.getElementById('iframe-code-block').style.display = 'flex';
+      },
+
+      copyCode() {
+        const codeField = document.getElementById('iframe-code');
+        codeField.select();
+        document.execCommand('copy');
+        
+        // Visual feedback
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      },
+
+      emailCode() {
+        const iframeCode = document.getElementById('iframe-code').value;
+        const subject = 'Recursive Learning - Iframe Embed Code';
+        const body = `Here's the iframe embed code for your page:\n\n${iframeCode}`;
+        const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailto;
+      }
+    };
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => IframeViewer.init());
+  </script>
+</body>
+</html> 
