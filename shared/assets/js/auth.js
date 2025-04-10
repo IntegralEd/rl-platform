@@ -5,15 +5,81 @@
 
 import { secureFetch, getClientIdFromUrl, getPageType } from './api-client.js';
 
-// Configuration
-const AUTH_CONFIG = {
-  TOKEN_REFRESH_BUFFER: 5 * 60 * 1000, // Refresh token 5 minutes before expiration
-  AUTH_ENDPOINT: '/api/v1/auth',
-  LOGIN_URL: '/login.html',
-  PERMISSIONS_KEY: 'userPermissions',
-  SESSION_TOKEN_KEY: 'sessionToken',
-  USER_DATA_KEY: 'userData',
+// Shared authentication utilities
+export const AUTH_CONFIG = {
+    authEndpoint: '/api/auth',
+    tokenExpiryBuffer: 300000 // 5 minutes in milliseconds
 };
+
+// Generate authentication headers
+export function getAuthHeaders(token) {
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+}
+
+// Validate token structure and expiry
+export function isTokenValid(token) {
+    if (!token) return false;
+    try {
+        const parsed = parseToken(token);
+        const now = Date.now() / 1000;
+        return parsed.exp > now;
+    } catch (error) {
+        console.error('Token validation error:', error);
+        return false;
+    }
+}
+
+// Parse JWT token
+export function parseToken(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Token parsing error:', error);
+        throw error;
+    }
+}
+
+// Handle authentication errors
+export function handleAuthError(error) {
+    console.error('Authentication error:', error);
+    return false;
+}
+
+// Refresh token if needed
+export async function refreshTokenIfNeeded(token) {
+    if (!token) return null;
+    
+    try {
+        const parsed = parseToken(token);
+        const now = Date.now() / 1000;
+        
+        // Check if token needs refresh (within buffer time)
+        if (parsed.exp - now < AUTH_CONFIG.tokenExpiryBuffer / 1000) {
+            const response = await fetch(`${AUTH_CONFIG.authEndpoint}/refresh`, {
+                method: 'POST',
+                headers: getAuthHeaders(token)
+            });
+            
+            if (!response.ok) throw new Error('Token refresh failed');
+            
+            const { token: newToken } = await response.json();
+            return newToken;
+        }
+        
+        return token;
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        return null;
+    }
+}
 
 /**
  * Initialize authentication on page load

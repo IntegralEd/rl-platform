@@ -54,8 +54,10 @@ export function getPermissions() {
     return [];
 }
 
-// Placeholder for future authentication implementation
-export const AUTH_CONFIG = {
-    authEndpoint: '/api/auth',
-    adminTokenStorageKey: 'admin_token'
+// Admin configuration
+export const ADMIN_CONFIG = {
+    authEndpoint: '/api/auth/admin',
+    tokenStorageKey: 'admin_token',
+    assetsPath: '/admin/assets',
+    pagesPath: '/admin/pages'
 }; 
