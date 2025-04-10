@@ -9,23 +9,20 @@
     <script src="/admin/assets/js/admin-nav.js"></script>
     <style>
         :root {
-            --admin-blue: #003366;
-            --primary: #004080;
-            --secondary: #E87722;
-            --bg-light: #f5f5f5;
-            --text: #2b2b2b;
-            --tree-width: 260px;
-            --content-width: calc(100% - 260px);
+            --brand-color: #004080;
+            --accent-color: #007bff;
+            --surface: #ffffff;
+            --bg: #f4f4f4;
+            --border-radius: 16px;
+            --shadow: 0 1px 4px rgba(0,0,0,0.06);
             --header-height: 50px;
-            --card-bg: white;
-            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            --card-radius: 8px;
         }
 
         body {
             margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: #222;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -34,8 +31,8 @@
 
         .admin-banner {
             height: var(--header-height);
-            background: var(--admin-blue);
-            padding: 0 1rem;
+            background: var(--brand-color);
+            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -44,39 +41,39 @@
 
         .admin-layout {
             flex: 1;
-            display: flex;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 24px;
+            padding: 24px;
             overflow: hidden;
         }
 
         .module-panel {
-            width: var(--tree-width);
-            background: var(--card-bg);
-            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             overflow-y: auto;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1rem;
-        }
-
-        .content-panel {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-light);
         }
 
         .module-card {
-            background: var(--card-bg);
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
+            position: relative;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
             transition: all 0.3s ease;
+            overflow: hidden;
+            border-left: 6px solid var(--accent-color);
+        }
+
+        .module-card.collapsed {
+            height: 60px;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-left: 6px solid #ffcc00;
         }
 
         .module-header {
-            padding: 0.75rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -85,18 +82,8 @@
 
         .module-header h3 {
             margin: 0;
-            font-size: 0.9rem;
+            font-size: 15px;
             font-weight: 500;
-            color: var(--text);
-        }
-
-        .module-content {
-            display: none;
-            border-top: 1px solid #eee;
-        }
-
-        .module-card.expanded .module-content {
-            display: block;
         }
 
         .status-gems {
@@ -106,55 +93,107 @@
         }
 
         .gem-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             display: inline-block;
         }
 
-        .gem-dot.active { background: #27ae60; }
-        .gem-dot.warning { background: #f39c12; }
-        .gem-dot.error { background: #e74c3c; }
+        .gem-dot.active {
+            background: #27ae60;
+            box-shadow: 0 0 0 2px rgba(39,174,96,0.2);
+        }
 
-        .tab-container {
+        .gem-dot.warning {
+            background: #f39c12;
+            box-shadow: 0 0 0 2px rgba(243,156,18,0.2);
+        }
+
+        .module-content {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .module-card.expanded .module-content {
+            display: block;
+        }
+
+        .feature-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            background: var(--bg-light);
+            gap: 8px;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .feature-list li:hover {
+            background: #f8f9fa;
+        }
+
+        .feature-list li.active {
+            border-color: var(--accent-color);
+            background-color: #eef5ff;
+        }
+
+        .feature-list img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .content-panel {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow-y: auto;
         }
 
         .tab-header {
-            padding: 1rem;
             display: flex;
-            gap: 1rem;
-            background: white;
-            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
         }
 
-        .tab-button {
-            padding: 0.5rem 1rem;
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
             border: none;
-            background: none;
+            padding: 6px 14px;
+            font-size: 14px;
+            color: var(--brand-color);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
             cursor: pointer;
-            font-size: 1rem;
-            color: var(--text);
-            border-radius: 4px;
+            border-radius: 8px 8px 0 0;
         }
 
-        .tab-button.active {
-            background: var(--primary);
-            color: white;
+        .tab.active {
+            border-bottom-color: var(--accent-color);
+            background-color: #eef5ff;
         }
 
-        .tab-content {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .content-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .tab img {
+            width: 16px;
+            height: 16px;
         }
 
         .logo {
@@ -173,50 +212,21 @@
             opacity: 0.8;
         }
 
-        .module-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .callout-connector {
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 12px solid var(--accent-color);
+            display: none;
         }
 
-        .module-nav-item {
-            text-decoration: none;
-            color: var(--text);
-            padding: 0.5rem;
-            border-radius: 4px;
-        }
-
-        .module-nav-item:hover {
-            background: var(--bg-light);
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            border-top: 1px solid #ddd;
-        }
-
-        .action-button {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border: none;
-            background: var(--primary);
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .action-button:hover {
-            opacity: 0.9;
-        }
-
-        .action-button svg {
-            width: 16px;
-            height: 16px;
+        .module-card.expanded .callout-connector {
+            display: block;
         }
     </style>
 </head>
@@ -233,175 +243,139 @@
     </header>
 
     <div class="admin-layout">
-        <!-- Left Panel - Module Cards -->
-        <aside class="module-panel">
-            <!-- GoalSetter Module Card -->
-            <div class="module-card" data-test-id="module-goalsetter">
+        <div class="module-panel">
+            <div class="module-card expanded" data-module="goalsetter">
                 <div class="module-header">
-                    <h3>GoalSetter</h3>
-                    <div class="status-gems">
-                        <span class="gem-dot active" title="API Status"></span>
-                        <span class="gem-dot" title="Cache Status"></span>
-                    </div>
-                </div>
-                <div class="module-content">
-                    <nav class="module-nav">
-                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
-                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
-                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
-                    </nav>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/st/goalsetter/goalsetter_admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                        <button class="action-button" onclick="window.location.href='/clients/st/goalsetter/goalsetter_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
-                        <button class="action-button" onclick="shareUrl('/clients/st/goalsetter/goalsetter_live.html', 'GoalSetter')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                            </svg>
-                            Share
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- EL Education Module Card -->
-            <div class="module-card" data-test-id="module-merit">
-                <div class="module-header">
-                    <h3>EL Education</h3>
+                    <h3>Goalsetter</h3>
                     <div class="status-gems">
                         <span class="gem-dot active" title="API Status"></span>
                         <span class="gem-dot active" title="Cache Status"></span>
                     </div>
                 </div>
+                <div class="callout-connector"></div>
                 <div class="module-content">
-                    <nav class="module-nav">
-                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
-                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
-                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
-                    </nav>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/elpl/merit/merit_admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                        <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
-                        <button class="action-button" onclick="shareUrl('/clients/elpl/merit/merit_live.html', 'Merit System')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                            </svg>
-                            Share
-                        </button>
-                    </div>
+                    <ul class="feature-list">
+                        <li class="active">
+                            <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle">
+                            Toggle
+                        </li>
+                        <li>
+                            <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe">
+                            Iframe
+                        </li>
+                        <li>
+                            <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments">
+                            Comments
+                        </li>
+                        <li>
+                            <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change">
+                            Change Orders
+                        </li>
+                        <li>
+                            <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS">
+                            LRS
+                        </li>
+                        <li>
+                            <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status">
+                            Status
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- BHB Module Card -->
-            <div class="module-card" data-test-id="module-bhb">
+            <div class="module-card collapsed" data-module="ci">
                 <div class="module-header">
-                    <h3>B'More Healthy Babies</h3>
+                    <h3>Continuous Improvement</h3>
                     <div class="status-gems">
                         <span class="gem-dot warning" title="API Status"></span>
                         <span class="gem-dot" title="Cache Status"></span>
                     </div>
                 </div>
-                <div class="module-content">
-                    <nav class="module-nav">
-                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
-                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
-                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
-                    </nav>
-                    <div class="card-actions">
-                        <button class="action-button" onclick="window.location.href='/admin/pages/bhb/admin.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-6m-1.5-9l-9 9M16 4h4v4m-4-4l4 4"/>
-                            </svg>
-                            Open Admin
-                        </button>
-                        <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            View Live
-                        </button>
-                        <button class="action-button" onclick="shareUrl('/clients/bhb/bmorehealthybabies_live.html', 'BHB')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                            </svg>
-                            Share
-                        </button>
+            </div>
+
+            <div class="module-card collapsed" data-module="network">
+                <div class="module-header">
+                    <h3>Network Leader</h3>
+                    <div class="status-gems">
+                        <span class="gem-dot active" title="API Status"></span>
+                        <span class="gem-dot active" title="Cache Status"></span>
                     </div>
                 </div>
             </div>
-        </aside>
+        </div>
 
-        <!-- Right Panel - Dynamic Content -->
-        <main class="content-panel">
-            <div class="tab-container">
-                <div class="tab-header">
-                    <button data-tab-id="overview" class="tab-button active">Overview</button>
-                    <button data-tab-id="settings" class="tab-button">Settings</button>
-                    <button data-tab-id="logs" class="tab-button">Logs</button>
-                </div>
-                <div class="tab-content">
-                    <iframe class="content-frame" src="about:blank"></iframe>
-                </div>
+        <div class="content-panel">
+            <div class="tab-header">
+                <button class="tab active">
+                    <img src="/shared/assets/images/noun-toggle-switch-731364-004080.svg" alt="Toggle">
+                    Toggle
+                </button>
+                <button class="tab">
+                    <img src="/shared/assets/images/noun-embed-6292841-004080.svg" alt="Iframe">
+                    Iframe
+                </button>
+                <button class="tab">
+                    <img src="/shared/assets/images/feedback-7281379-004080.svg" alt="Comments">
+                    Comments
+                </button>
+                <button class="tab">
+                    <img src="/shared/assets/images/change-order-6472926-004080.svg" alt="Change">
+                    Change Orders
+                </button>
+                <button class="tab">
+                    <img src="/shared/assets/images/LRS-7677811-004080.svg" alt="LRS">
+                    LRS
+                </button>
+                <button class="tab">
+                    <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Status">
+                    Status
+                </button>
             </div>
-        </main>
+            <div class="tab-content">
+                <iframe class="content-frame" src="/admin/pages/overview.html"></iframe>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize admin panel with first card expanded by default
+            // Module card handling
             const moduleCards = document.querySelectorAll('.module-card');
-            
-            // Expand first card by default
-            if (moduleCards.length > 0) {
-                moduleCards[0].classList.add('expanded');
-            }
             
             moduleCards.forEach(card => {
                 const header = card.querySelector('.module-header');
-                header.addEventListener('click', (e) => {
-                    // Toggle expanded state only when clicking header
+                header.addEventListener('click', () => {
                     const wasExpanded = card.classList.contains('expanded');
-                    
-                    // Collapse all cards first
-                    moduleCards.forEach(c => c.classList.remove('expanded'));
-                    
-                    // Expand clicked card if it wasn't expanded
+                    moduleCards.forEach(c => {
+                        c.classList.remove('expanded');
+                        c.classList.add('collapsed');
+                    });
                     if (!wasExpanded) {
+                        card.classList.remove('collapsed');
                         card.classList.add('expanded');
                     }
                 });
             });
 
-            // Prevent click propagation from nav items and buttons
-            document.querySelectorAll('.module-nav-item, .action-button').forEach(element => {
-                element.addEventListener('click', (e) => {
-                    e.stopPropagation();
+            // Tab handling
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
                 });
             });
 
-            // Update version display with current date/time
+            // Feature list item handling
+            const features = document.querySelectorAll('.feature-list li');
+            features.forEach(feature => {
+                feature.addEventListener('click', () => {
+                    features.forEach(f => f.classList.remove('active'));
+                    feature.classList.add('active');
+                });
+            });
+
+            // Version display
             function updateVersion() {
                 const now = new Date();
                 const version = document.querySelector('[data-version]');
@@ -417,12 +391,6 @@
             
             updateVersion();
             setInterval(updateVersion, 60000);
-
-            // Initialize content frame with overview
-            const contentFrame = document.querySelector('.content-frame');
-            if (contentFrame) {
-                contentFrame.src = '/admin/pages/overview.html';
-            }
         });
     </script>
 </body>
