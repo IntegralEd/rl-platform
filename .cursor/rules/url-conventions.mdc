@@ -1,8 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-## URL Conventions
-- `_admin.html` pages should not be placed within the client tree.
-- All admin pages must reside in the `/admin/pages/` directory structure to maintain a clear separation between client-specific and admin interfaces. 
