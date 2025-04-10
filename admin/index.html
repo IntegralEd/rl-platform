@@ -5,614 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
-    <script src="/admin/assets/js/admin.js"></script>
     <script src="/admin/assets/js/admin-common.js"></script>
     <script src="/admin/assets/js/admin-nav.js"></script>
     <style>
         :root {
+            --admin-blue: #003366;
             --primary: #004080;
             --secondary: #E87722;
             --bg-light: #f5f5f5;
             --text: #2b2b2b;
-            --tree-width: 280px;
-            --content-width: calc(100% - 280px);
-            --header-height: 60px;
+            --tree-width: 260px;
+            --content-width: calc(100% - 260px);
+            --header-height: 50px;
             --card-bg: white;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
             --card-radius: 8px;
-            --primary-dark: #002040;
-            --primary-light: #0060A0;
         }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-light);
-        }
-
-        .admin-container {
-            display: flex;
-            height: calc(100vh - var(--header-height));
-            position: relative;
-        }
-
-        .admin-header {
-            padding: 0.5rem 1rem;
+        .admin-banner {
+            height: var(--header-height);
+            background: var(--admin-blue);
+            padding: 0 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--primary-dark);
         }
 
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            display: none; /* Hide the text title */
-        }
-        
-        .header-logo {
-            height: 40px;
-            padding: 5px;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .admin-info {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .version-info {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-
-        /* DOS Tree Styles */
-        .dos-tree {
+        .module-panel {
             width: var(--tree-width);
             background: var(--card-bg);
-            padding: 20px;
-            overflow-y: auto;
             border-right: 1px solid #ddd;
-            box-shadow: var(--card-shadow);
-            flex-shrink: 0;
-        }
-
-        .tree-item {
-            display: flex;
-            align-items: center;
-            padding: 4px 0;
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
-
-        .tree-item:hover {
-            background: rgba(0,0,0,0.05);
-        }
-
-        .tree-item:hover .share-button {
-            opacity: 1;
-        }
-
-        .tree-content {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .share-button {
-            opacity: 0;
-            position: absolute;
-            right: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: var(--primary);
-            color: white;
-            font-size: 0.8rem;
-            transition: opacity 0.2s;
-            cursor: pointer;
-        }
-
-        .share-actions {
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            padding: 8px;
-            display: none;
-            gap: 8px;
-            margin-right: 8px;
-            z-index: 100;
-        }
-
-        .share-button:hover .share-actions {
-            display: flex;
-        }
-
-        .share-action {
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: var(--bg-light);
-            color: var(--text);
-            font-size: 0.8rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-
-        .share-action:hover {
-            background: #e0e0e0;
-        }
-
-        .share-action svg {
-            width: 12px;
-            height: 12px;
-            margin-right: 4px;
-        }
-
-        .share-tooltip {
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            margin-right: 8px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-
-        .share-button:hover .share-tooltip {
-            opacity: 1;
-        }
-
-        .tree-folder {
-            font-weight: 500;
-        }
-
-        .tree-file {
-            color: var(--text);
-        }
-
-        .tree-icon {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tree-toggle {
-            width: 16px;
-            height: 16px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .tree-toggle::before {
-            content: '+';
-            font-weight: bold;
-        }
-
-        .tree-toggle.open::before {
-            content: '-';
-        }
-
-        .tree-children {
-            margin-left: 24px;
-            display: none;
-        }
-
-        .tree-children.expanded {
-            display: block;
-        }
-
-        /* Admin Cards Styles */
-        .admin-cards {
-            width: var(--content-width);
-            padding: 20px;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
 
-        .admin-card {
+        .module-card {
             background: var(--card-bg);
+            margin: 0.5rem;
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
-            padding: 20px;
-            position: relative;
+            transition: height 0.3s ease;
+            height: 60px;
             overflow: hidden;
         }
 
-        .admin-card h2 {
-            margin: 0 0 16px 0;
-            font-size: 1.2rem;
-            color: var(--primary);
+        .module-card.expanded {
+            height: auto;
         }
 
-        .admin-card-content {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .admin-card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .admin-button {
-            padding: 8px 16px;
-            border-radius: 4px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-
-        .admin-button:hover {
-            background: var(--primary-dark);
-        }
-
-        .admin-button.secondary {
-            background: var(--bg-light);
-            color: var(--text);
-            border: 1px solid #ddd;
-        }
-
-        .admin-button.secondary:hover {
-            background: #e0e0e0;
-        }
-
-        /* Loading and Error States */
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #error-message {
-            display: none;
-            padding: 16px;
-            background: #ffebee;
-            color: #c62828;
-            border-radius: var(--card-radius);
-            margin: 20px;
-            text-align: center;
-        }
-
-        /* Bottom Icons */
-        .bottom-icons {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-        }
-
-        .bottom-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            color: white;
-            text-decoration: none;
-        }
-
-        .bottom-icon:hover {
-            transform: scale(1.1);
-            background: #003366;
-        }
-
-        .bottom-icon svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .bottom-icon-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            margin-bottom: 8px;
-        }
-
-        .bottom-icon:hover .bottom-icon-tooltip {
-            opacity: 1;
-        }
-
-        /* Tree File Actions */
-        .tree-file-actions {
-            display: flex;
-            gap: 8px;
-            margin-left: auto;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .tree-item:hover .tree-file-actions {
-            opacity: 1;
-        }
-
-        .tree-action {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            color: var(--primary);
-            opacity: 0.6;
-            transition: opacity 0.2s;
-            padding: 2px;
-            background: none;
-            border: none;
-        }
-
-        .tree-action:hover {
-            opacity: 1;
-        }
-
-        .tree-action svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Status Indicators */
-        .status-indicators {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-left: 24px;
-        }
-
-        .status-dot {
+        .gem-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #ccc;
-            position: relative;
+            display: inline-block;
+            margin: 0 2px;
         }
 
-        .status-dot[data-status="active"] { background: #4CAF50; }
-        .status-dot[data-status="warning"] { background: #FFC107; }
-        .status-dot[data-status="error"] { background: #F44336; }
-
-        .status-dot::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            margin-bottom: 8px;
+        .gem-dot.active {
+            background: #27ae60;
         }
 
-        .status-dot:hover::after {
-            opacity: 1;
+        .gem-dot.warning {
+            background: #f39c12;
         }
 
-        .nav-gem {
-            width: 24px;
-            height: 24px;
-            margin-right: 0.5rem;
+        .gem-dot.error {
+            background: #e74c3c;
         }
 
-        .tab-header {
-            background: var(--primary-dark);
-            color: #FFFFFF;
-        }
-
-        .tab-header.active {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-        }
-
-        .tab-header .nav-gem {
-            filter: brightness(0) invert(1);
-        }
-
-        .tab-header.active .nav-gem {
-            filter: brightness(0);
-        }
-
-        .modal {
-            position: fixed;
-            transition: all 0.3s ease;
-        }
-
-        .modal.expanded {
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999;
-        }
-
-        .modal-expand-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 4px;
-            cursor: pointer;
-        }
-
-        /* Merit System specific styles */
-        .merit-nav-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .merit-card-header {
-            padding: 12px 16px;
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--border-color);
+        .tab-container {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            height: 100%;
         }
 
-        .merit-feature-list {
-            padding: 8px 0;
-        }
-
-        .merit-feature-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 16px;
-            color: var(--text);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .merit-feature-item:hover {
-            background: var(--bg-light);
-        }
-
-        .merit-feature-item.active {
-            background: var(--bg-light);
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .merit-content-panel {
-            background: white;
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-            padding: 20px;
-        }
-
-        .merit-tab-header {
-            background: var(--primary-dark);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 0;
-        }
-
-        .merit-tab-header .nav-gem {
-            width: 24px;
-            height: 24px;
-        }
-
-        .merit-tab {
-            padding: 8px 16px;
+        .content-frame {
+            flex: 1;
             border: none;
-            background: none;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 14px;
-            position: relative;
-        }
-
-        .merit-tab.active {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .merit-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -9px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-        }
-
-        .merit-feature-item.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .merit-feature-item.active .nav-gem {
-            filter: brightness(0) invert(1);
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -620,7 +90,7 @@
     <!-- Top Banner -->
     <header class="admin-banner">
         <div class="logo-container">
-            <img src="/admin/assets/images/logo.png" alt="Recursive Learning" class="logo">
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="logo">
         </div>
         <div class="user-info">
             <span id="user-name"></span>
@@ -661,158 +131,50 @@
         </main>
     </div>
 
-    <!-- Status Tabs -->
-    <div class="status-tabs">
-        <div class="tab live" data-status="live">Live</div>
-        <div class="tab temp" data-status="temp">Temporary Review</div>
-    </div>
-
-    <div id="loading">
-        <div class="loading-spinner"></div>
-    </div>
-    <div id="error-message"></div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize admin panel
-            const admin = new AdminPanel();
-            admin.init().catch(console.error);
+            const moduleCards = document.querySelectorAll('.module-card');
             
-            // Platform resources data structure
-            const platformResources = [
-                {
-                    id: 'recNk82unZItJLAhp',
-                    name: 'StriveTogether',
-                    abbrev: 'ST',
-                    resource: 'goalsetter',
-                    status: 'Live',
-                    features: ['Toggle', 'Iframe', 'Comments', 'Change Orders', 'LRS', 'Status']
-                },
-                {
-                    id: 'rec4lTKL079rgwcjV',
-                    name: 'EL Education',
-                    abbrev: 'EL',
-                    resource: 'merit',
-                    status: 'Live',
-                    features: ['Toggle', 'Iframe', 'Comments', 'Change Orders', 'LRS', 'Status']
-                },
-                {
-                    id: 'recEOiSL1skoBNolu',
-                    name: 'B\'More Healthy Babies',
-                    abbrev: 'BHB',
-                    resource: 'bmore',
-                    status: 'Draft',
-                    features: ['Toggle', 'Iframe', 'Comments', 'Status']
-                }
-            ];
-
-            // Function to get gem icon path
-            function getGemIcon(feature, isActive = false) {
-                const suffix = isActive ? '-FFFFFF' : '-004080';
-                const iconMappings = {
-                    'toggle': `noun-toggle-switch-731364${suffix}.svg`,
-                    'iframe': `noun-embed-6292841${suffix}.svg`,
-                    'comments': `feedback-7281379${suffix}.svg`,
-                    'change orders': `change-order-6472926${suffix}.svg`,
-                    'lrs': `LRS-7677811${suffix}.svg`,
-                    'status': `Performance-3850108${suffix}.svg`
-                };
-                return `/shared/assets/images/${iconMappings[feature.toLowerCase()]}`;
-            }
-
-            // Function to create navigation cards
-            function createNavigationCards() {
-                const treeContainer = document.querySelector('.dos-tree');
-                platformResources.forEach(resource => {
-                    const card = document.createElement('div');
-                    card.className = 'merit-nav-card';
-                    card.innerHTML = `
-                        <div class="merit-card-header">
-                            <strong>${resource.name} (${resource.abbrev})</strong>
-                            <span class="status-dot" data-status="${resource.status.toLowerCase()}" 
-                                  data-tooltip="Status: ${resource.status}"></span>
-                        </div>
-                        <div class="merit-feature-list">
-                            ${resource.features.map(feature => `
-                                <a class="merit-feature-item" 
-                                   data-resource="${resource.resource}"
-                                   data-feature="${feature.toLowerCase()}"
-                                   data-client="${resource.abbrev}">
-                                    <img src="${getGemIcon(feature)}" 
-                                         class="nav-gem" alt="${feature}">
-                                    ${feature}
-                                </a>
-                            `).join('')}
-                        </div>
-                    `;
-                    treeContainer.appendChild(card);
+            moduleCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Toggle expanded state
+                    const wasExpanded = card.classList.contains('expanded');
+                    
+                    // Collapse all cards first
+                    moduleCards.forEach(c => c.classList.remove('expanded'));
+                    
+                    // Expand clicked card if it wasn't expanded
+                    if (!wasExpanded) {
+                        card.classList.add('expanded');
+                    }
                 });
-            }
-
-            // Function to load admin page content
-            async function loadAdminContent(client, resource, feature) {
-                const contentArea = document.getElementById('admin-content-area');
-                try {
-                    const response = await fetch(`/admin/pages/${client}/${resource}_${feature}.html`);
-                    if (!response.ok) throw new Error('Failed to load content');
-                    const content = await response.text();
-                    contentArea.innerHTML = content;
-                    
-                    // Update tab header with active gem
-                    const tabHeader = document.createElement('div');
-                    tabHeader.className = 'merit-tab-header active';
-                    tabHeader.innerHTML = `
-                        <img src="${getGemIcon(feature, true)}" class="nav-gem" alt="${feature}">
-                        ${feature.charAt(0).toUpperCase() + feature.slice(1)}
-                    `;
-                    contentArea.insertBefore(tabHeader, contentArea.firstChild);
-                } catch (error) {
-                    console.error('Error loading admin content:', error);
-                    contentArea.innerHTML = `<div class="error-message">Failed to load ${client}/${resource}/${feature}</div>`;
-                }
-            }
-
-            // Event listeners for navigation
-            document.addEventListener('click', (e) => {
-                if (e.target.closest('.merit-feature-item')) {
-                    const item = e.target.closest('.merit-feature-item');
-                    const resource = item.dataset.resource;
-                    const feature = item.dataset.feature;
-                    const client = item.dataset.client;
-                    
-                    // Update active states and icons
-                    document.querySelectorAll('.merit-feature-item').forEach(i => {
-                        i.classList.remove('active');
-                        const img = i.querySelector('.nav-gem');
-                        const feat = i.dataset.feature;
-                        img.src = getGemIcon(feat);
-                    });
-                    item.classList.add('active');
-                    const activeImg = item.querySelector('.nav-gem');
-                    activeImg.src = getGemIcon(feature, true);
-                    
-                    // Load content
-                    loadAdminContent(client, resource, feature);
-                }
             });
 
-            // Initialize navigation
-            createNavigationCards();
+            // Tab handling
+            const tabButtons = document.querySelectorAll('[data-tab-id]');
+            const contentFrame = document.querySelector('.content-frame');
 
-            // Function to update version time
-            function updateVersionTime() {
-                const versionInfo = document.querySelector('.version-info');
-                if (versionInfo) {
-                    const now = new Date();
-                    const hours = now.getHours().toString().padStart(2, '0');
-                    const minutes = now.getMinutes().toString().padStart(2, '0');
-                    versionInfo.textContent = `v2024.04.09 ${hours}:${minutes}`;
-                }
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab-id');
+                    
+                    // Update active tab
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Load content based on tab
+                    contentFrame.src = `/admin/pages/goalsetter/${tabId}_admin.html`;
+                });
+            });
+
+            // Update version display
+            function updateVersion() {
+                const now = new Date();
+                const version = document.querySelector('[data-version]');
+                version.textContent = `v1.0.0 (${now.toLocaleDateString()})`;
             }
-            
-            // Update immediately and then every minute
-            updateVersionTime();
-            setInterval(updateVersionTime, 60000);
+            updateVersion();
         });
     </script>
 </body>
