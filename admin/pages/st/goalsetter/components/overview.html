@@ -1,0 +1,182 @@
+<!-- Overview Component -->
+<div class="admin-component overview-component">
+    <h2>Goalsetter Overview</h2>
+    
+    <!-- Live Switcher -->
+    <section class="live-switcher-section">
+        <h3>Live Environment Control</h3>
+        <div class="environment-status">
+            <p>Currently Serving: <span id="current-mode" class="status-badge">Production</span></p>
+        </div>
+        
+        <div class="preview-container">
+            <div class="preview-frame">
+                <h4>Production</h4>
+                <iframe src="/clients/st/goalsetter/goalsetter.html" class="preview-iframe"></iframe>
+            </div>
+            <div class="preview-frame">
+                <h4>Temporary</h4>
+                <iframe src="/clients/st/goalsetter/goalsetter_temp.html" class="preview-iframe"></iframe>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="switch-to-prod" class="btn btn-primary" disabled>Switch to Production</button>
+            <button id="switch-to-temp" class="btn btn-secondary">Switch to Temporary</button>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="quick-stats">
+        <h3>Quick Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Active Sessions</h4>
+                <p class="stat-value">12</p>
+            </div>
+            <div class="stat-card">
+                <h4>Review Tokens</h4>
+                <p class="stat-value">5</p>
+            </div>
+            <div class="stat-card">
+                <h4>Total Goals</h4>
+                <p class="stat-value">156</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    class OverviewComponent extends HTMLElement {
+        constructor() {
+            super();
+            this.initializeSwitcher();
+            this.loadStats();
+        }
+
+        initializeSwitcher() {
+            const switchToProd = document.getElementById('switch-to-prod');
+            const switchToTemp = document.getElementById('switch-to-temp');
+            const currentMode = document.getElementById('current-mode');
+
+            switchToProd.addEventListener('click', () => this.switchEnvironment('production'));
+            switchToTemp.addEventListener('click', () => this.switchEnvironment('temporary'));
+        }
+
+        async switchEnvironment(mode) {
+            try {
+                // TODO: Implement actual environment switching logic
+                const currentMode = document.getElementById('current-mode');
+                currentMode.textContent = mode === 'production' ? 'Production' : 'Temporary';
+                
+                document.getElementById('switch-to-prod').disabled = mode === 'production';
+                document.getElementById('switch-to-temp').disabled = mode === 'temporary';
+            } catch (error) {
+                console.error('Failed to switch environment:', error);
+            }
+        }
+
+        async loadStats() {
+            try {
+                // TODO: Implement actual stats loading logic
+                // For now using placeholder data
+                const stats = {
+                    activeSessions: 12,
+                    reviewTokens: 5,
+                    totalGoals: 156
+                };
+                
+                // Update stats display
+                document.querySelectorAll('.stat-value').forEach(el => {
+                    const statType = el.parentElement.querySelector('h4').textContent.toLowerCase();
+                    if (statType.includes('sessions')) el.textContent = stats.activeSessions;
+                    else if (statType.includes('tokens')) el.textContent = stats.reviewTokens;
+                    else if (statType.includes('goals')) el.textContent = stats.totalGoals;
+                });
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+    }
+
+    customElements.define('overview-component', OverviewComponent);
+</script>
+
+<style>
+    .overview-component {
+        padding: 20px;
+    }
+
+    .live-switcher-section {
+        background: var(--surface-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .preview-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    .preview-frame {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .preview-frame h4 {
+        margin: 0;
+        padding: 10px;
+        background: var(--surface-color-alt);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .preview-iframe {
+        width: 100%;
+        height: 300px;
+        border: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .stat-card {
+        background: var(--surface-color);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .stat-card h4 {
+        margin: 0;
+        color: var(--text-color-secondary);
+    }
+
+    .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        margin: 10px 0 0;
+        color: var(--text-color-primary);
+    }
+
+    .status-badge {
+        background: var(--success-color);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+</style> 

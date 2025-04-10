@@ -8,4 +8,8 @@ node_modules/
 .DS_Store
 **/.DS_Store
 
-# Existing ignore patterns... 
+# Existing ignore patterns...
+
+# Airtable exports
+*-Grid view.csv
+QC_Review_Session-*.csv 
