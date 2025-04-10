@@ -822,4 +822,84 @@ body {
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: flex-end;
+}
+
+.admin-banner {
+    height: 50px;
+    background: #003366;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.admin-banner .logo {
+    height: 30px;
+}
+
+.admin-banner .user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.version-indicator {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-left: 10px;
+}
+
+/* Left Panel Module Card System */
+.module-card {
+    width: 260px;
+    transition: height 0.3s ease;
+    background: white;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.module-card:not(.expanded) {
+    height: 60px;
+    overflow: hidden;
+}
+
+.module-card.expanded {
+    height: auto;
+}
+
+.gem-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+/* Right Panel Dynamic Content */
+.tab-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tab-content {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+iframe.content-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
 } 

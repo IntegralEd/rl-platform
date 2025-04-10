@@ -617,28 +617,54 @@
     </style>
 </head>
 <body>
-    <div class="admin-header">
-        <div class="header-left">
-            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="header-logo">
-            <span class="header-title">Admin Panel</span>
+    <!-- Top Banner -->
+    <header class="admin-banner">
+        <div class="logo-container">
+            <img src="/admin/assets/images/logo.png" alt="Recursive Learning" class="logo">
         </div>
-        <div class="header-right">
-            <div class="admin-info">
-                <span id="user-name"></span>
-                <span class="version-info">v2024.04.09</span>
+        <div class="user-info">
+            <span id="user-name"></span>
+            <span class="version-indicator" data-version="1.0.0">v1.0.0</span>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- Left Panel - Module Cards -->
+        <aside class="module-panel">
+            <div class="module-card" data-test-id="module-goalsetter">
+                <div class="module-header">
+                    <h3>GoalSetter</h3>
+                    <div class="status-gems">
+                        <span class="gem-dot" title="API Status"></span>
+                        <span class="gem-dot" title="Cache Status"></span>
+                    </div>
+                </div>
+                <div class="module-content">
+                    <!-- Module features when expanded -->
+                </div>
             </div>
-        </div>
+            <!-- Additional module cards -->
+        </aside>
+
+        <!-- Right Panel - Dynamic Content -->
+        <main class="content-panel">
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button data-tab-id="overview" class="tab-button active">Overview</button>
+                    <button data-tab-id="settings" class="tab-button">Settings</button>
+                    <button data-tab-id="logs" class="tab-button">Logs</button>
+                </div>
+                <div class="tab-content">
+                    <iframe class="content-frame" src="about:blank"></iframe>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div class="admin-container">
-        <div class="dos-tree">
-            <!-- Client navigation cards will be dynamically populated -->
-        </div>
-        <div class="admin-cards">
-            <div id="admin-content-area">
-                <!-- Dynamic content area for loaded admin pages -->
-            </div>
-        </div>
+    <!-- Status Tabs -->
+    <div class="status-tabs">
+        <div class="tab live" data-status="live">Live</div>
+        <div class="tab temp" data-status="temp">Temporary Review</div>
     </div>
 
     <div id="loading">

@@ -421,4 +421,115 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('RecursiveAdmin not properly initialized. Please check admin-common.js');
     }
+});
+
+class AdminNavigation {
+    constructor() {
+        this.initModuleCards();
+        this.initTabBehavior();
+        this.setupEventListeners();
+    }
+
+    initModuleCards() {
+        document.querySelectorAll('.module-card').forEach(card => {
+            // Add click handler for expansion
+            card.querySelector('.module-header').addEventListener('click', () => {
+                const wasExpanded = card.classList.contains('expanded');
+                // Collapse all cards first
+                document.querySelectorAll('.module-card').forEach(c => {
+                    c.classList.remove('expanded');
+                });
+                // Expand clicked card if it wasn't expanded
+                if (!wasExpanded) {
+                    card.classList.add('expanded');
+                }
+            });
+
+            // Initialize status gems
+            this.updateStatusGems(card);
+        });
+    }
+
+    initTabBehavior() {
+        document.querySelectorAll('[data-tab-id]').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab-id');
+                this.switchTab(tabId);
+            });
+        });
+    }
+
+    setupEventListeners() {
+        // Handle iframe resizing
+        window.addEventListener('resize', () => {
+            this.resizeContentFrame();
+        });
+
+        // Handle status tab changes
+        document.querySelectorAll('.status-tabs .tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const status = tab.getAttribute('data-status');
+                this.switchStatus(status);
+            });
+        });
+    }
+
+    updateStatusGems(card) {
+        const gems = card.querySelectorAll('.gem-dot');
+        // Fetch actual service statuses here
+        const statuses = this.fetchServiceStatuses(card.getAttribute('data-test-id'));
+        gems.forEach((gem, index) => {
+            gem.style.backgroundColor = statuses[index] ? '#00ff00' : '#ff0000';
+        });
+    }
+
+    fetchServiceStatuses(moduleId) {
+        // Placeholder - replace with actual status checks
+        return [true, true];
+    }
+
+    switchTab(tabId) {
+        // Update tab buttons
+        document.querySelectorAll('[data-tab-id]').forEach(tab => {
+            tab.classList.toggle('active', tab.getAttribute('data-tab-id') === tabId);
+        });
+
+        // Load tab content
+        const frame = document.querySelector('.content-frame');
+        if (frame) {
+            frame.src = `/admin/pages/tabs/${tabId}.html`;
+        }
+    }
+
+    switchStatus(status) {
+        document.querySelectorAll('.status-tabs .tab').forEach(tab => {
+            tab.classList.toggle('active', tab.getAttribute('data-status') === status);
+        });
+        // Update content based on status
+        this.loadStatusContent(status);
+    }
+
+    loadStatusContent(status) {
+        const frame = document.querySelector('.content-frame');
+        if (frame) {
+            const currentPath = frame.src;
+            const newPath = currentPath.replace(/_live\.html|_temp\.html/, `_${status}.html`);
+            if (currentPath !== newPath) {
+                frame.src = newPath;
+            }
+        }
+    }
+
+    resizeContentFrame() {
+        const frame = document.querySelector('.content-frame');
+        if (frame) {
+            const container = frame.parentElement;
+            frame.style.height = `${container.clientHeight}px`;
+        }
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.adminNav = new AdminNavigation();
 }); 
