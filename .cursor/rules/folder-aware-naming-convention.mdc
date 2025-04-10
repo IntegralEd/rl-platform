@@ -3,14 +3,36 @@ description:
 globs: 
 alwaysApply: true
 ---
-## URL Conventions
-- `_admin.html` pages should not be placed within the client tree.
-- All admin pages must reside in the `/admin/pages/` directory structure to maintain a clear separation between client-specific and admin interfaces. 
+# 📁 Folder-Aware Naming Convention
 
-auth.js 
-admin.js
-sidebar.js and all scripts relating to admin tree assets shoudl come from 
-/Users/Shared/Repositories/rl-platform/admin/assets/js
+## General
+- [ ] All filenames must include a scope prefix: `admin-`, `client-`, `shared-`, or org slug like `elpl-`, `bhb-`
+- [ ] Avoid `index.html`, `main.css`, or `auth.js` unless scoped (e.g., `admin-auth.js`)
+- [ ] Replace underscores `_` with hyphens `-` in all new filenames
+- [ ] No duplicate filenames across trees (e.g., `auth.js` should only appear once per scope)
 
-all auth scrits 
- [url-alignment-rules.mdc](mdc:shared/docs/url-alignment-rules.mdc)
+## HTML Pages
+- [ ] Include function in filename: `goalsetter-live.html`, `review-session.html`
+- [ ] Use suffixes to clarify page type: `-temp`, `-review`, `-live`, `-embed`
+- [ ] Nested paths (e.g. `elpl/merit/`) should be reflected in file name when flattened
+
+## JS/CSS Files
+- [ ] Use `{tree}-{feature}.js`, e.g., `client-chat-loader.js`, `admin-review-session.js`
+- [ ] Shared logic should always start with `shared-`
+- [ ] Avoid generic names like `main.js`, `utils.js`—make scope and purpose clear
+- [ ] **Authorization files must follow:** `{org}-auth.js`, `{org}-user-auth.js`, `{org}-admin-auth.js`
+  - Examples: `elpl-auth.js`, `elpl-user-auth.js`, `elpl-admin-auth.js`
+  - This convention distinguishes base, user, and admin authentication layers by site
+- [ ] Use `{tree}-{feature}.js`, e.g., `client-chat-loader.js`, `admin-review-session.js`
+- [ ] Shared logic should always start with `shared-`
+- [ ] Avoid generic names like `main.js`, `utils.js`—make scope and purpose clear
+
+## Page Ingredients & Components
+- [ ] All partials in `page_ingredients/` must include their type and purpose
+- [ ] Match JavaScript with component HTML: `toggle.html` ⇨ `toggle.js`
+- [ ] Prefix component files by type if reused globally (e.g. `shared-form-welcome.html`)
+
+# 🧪 Validation
+- [ ] Include naming check in pre-deploy script
+- [ ] Rename legacy files before major version bump
+- [ ] Spot check file tree weekly during sprint QA
