@@ -198,19 +198,19 @@ class AdminPanel {
             {
                 title: 'GoalSetter Admin',
                 description: 'Manage GoalSetter versions and review tokens',
-                adminUrl: '/admin/pages/st/goalsetter/goalsetter_admin.html',
+                adminUrl: '/admin/pages/clients/st/goalsetter_admin.html',
                 liveUrl: '/clients/st/goalsetter/goalsetter_live.html'
             },
             {
                 title: 'Merit',
                 description: 'Manage Merit versions and review tokens',
-                adminUrl: '/admin/pages/elpl/merit/merit_admin.html',
+                adminUrl: '/admin/pages/clients/elpl/merit_admin.html',
                 liveUrl: '/clients/elpl/merit/merit_live.html'
             },
             {
                 title: 'B\'more Healthy Babies',
                 description: 'Manage B\'more Healthy Babies versions and review tokens',
-                adminUrl: '/admin/pages/bhb/admin.html',
+                adminUrl: '/admin/pages/clients/bhb/admin.html',
                 liveUrl: '/clients/bhb/bmore/bmore_live.html'
             }
         ];
