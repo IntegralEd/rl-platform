@@ -22,6 +22,16 @@
             --card-radius: 8px;
         }
 
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .admin-banner {
             height: var(--header-height);
             background: var(--admin-blue);
@@ -29,6 +39,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .admin-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
         }
 
         .module-panel {
@@ -36,20 +53,54 @@
             background: var(--card-bg);
             border-right: 1px solid #ddd;
             overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .content-panel {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .module-card {
             background: var(--card-bg);
-            margin: 0.5rem;
             border-radius: var(--card-radius);
             box-shadow: var(--card-shadow);
-            transition: height 0.3s ease;
-            height: 60px;
+            transition: all 0.3s ease;
             overflow: hidden;
         }
 
-        .module-card.expanded {
-            height: auto;
+        .module-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-light);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .module-header h3 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .module-content {
+            padding: 0.5rem;
+            display: none;
+        }
+
+        .module-card.expanded .module-content {
+            display: block;
+        }
+
+        .status-gems {
+            display: flex;
+            gap: 4px;
         }
 
         .gem-dot {
@@ -57,32 +108,67 @@
             height: 8px;
             border-radius: 50%;
             display: inline-block;
-            margin: 0 2px;
         }
 
-        .gem-dot.active {
-            background: #27ae60;
-        }
-
-        .gem-dot.warning {
-            background: #f39c12;
-        }
-
-        .gem-dot.error {
-            background: #e74c3c;
-        }
+        .gem-dot.active { background: #27ae60; }
+        .gem-dot.warning { background: #f39c12; }
+        .gem-dot.error { background: #e74c3c; }
 
         .tab-container {
             display: flex;
             flex-direction: column;
             height: 100%;
+            background: var(--bg-light);
+        }
+
+        .tab-header {
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            background: white;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text);
+            border-radius: 4px;
+        }
+
+        .tab-button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
         }
 
         .content-frame {
-            flex: 1;
-            border: none;
             width: 100%;
             height: 100%;
+            border: none;
+        }
+
+        .logo {
+            height: 30px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+        }
+
+        .version-indicator {
+            font-size: 0.8rem;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -105,15 +191,18 @@
                 <div class="module-header">
                     <h3>GoalSetter</h3>
                     <div class="status-gems">
-                        <span class="gem-dot" title="API Status"></span>
+                        <span class="gem-dot active" title="API Status"></span>
                         <span class="gem-dot" title="Cache Status"></span>
                     </div>
                 </div>
                 <div class="module-content">
-                    <!-- Module features when expanded -->
+                    <nav class="module-nav">
+                        <a href="#" class="module-nav-item" data-page="overview">Overview</a>
+                        <a href="#" class="module-nav-item" data-page="settings">Settings</a>
+                        <a href="#" class="module-nav-item" data-page="logs">Logs</a>
+                    </nav>
                 </div>
             </div>
-            <!-- Additional module cards -->
         </aside>
 
         <!-- Right Panel - Dynamic Content -->
@@ -137,7 +226,10 @@
             const moduleCards = document.querySelectorAll('.module-card');
             
             moduleCards.forEach(card => {
-                card.addEventListener('click', () => {
+                card.addEventListener('click', (e) => {
+                    // Don't toggle if clicking a nav item
+                    if (e.target.closest('.module-nav-item')) return;
+                    
                     // Toggle expanded state
                     const wasExpanded = card.classList.contains('expanded');
                     
@@ -165,6 +257,18 @@
                     
                     // Load content based on tab
                     contentFrame.src = `/admin/pages/goalsetter/${tabId}_admin.html`;
+                });
+            });
+
+            // Module navigation
+            document.querySelectorAll('.module-nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = item.getAttribute('data-page');
+                    
+                    // Find and click corresponding tab
+                    const tab = document.querySelector(`[data-tab-id="${page}"]`);
+                    if (tab) tab.click();
                 });
             });
 
