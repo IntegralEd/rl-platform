@@ -27,6 +27,24 @@ class AdminTree {
                 /_temp\.html$/
             ]
         };
+
+        // Admin page patterns
+        this.patterns = {
+            admin: /.*_admin\.html$/,
+            review: /.*_review\.html$/
+        };
+
+        // URL validation patterns
+        this.urlPatterns = [
+            {
+                pattern: /^\/admin\/pages\/clients\/[^\/]+\/[^\/]+_admin\.html$/,
+                message: 'Admin pages must be in /admin/pages/clients/{client}/{project}_admin.html'
+            },
+            {
+                pattern: /^\/admin\/pages\/(reviews|settings)\/.*\.html$/,
+                message: 'Support pages must be in /admin/pages/{category}/'
+            }
+        ];
     }
 
     /**
