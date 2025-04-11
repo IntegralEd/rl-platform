@@ -1,11 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
-description:
-globs:
+description: Rules for admin layout structure and behavior
+globs: ["admin/**/*.html", "admin/**/*.js", "admin/**/*.css"]
 alwaysApply: true
 ---
 
@@ -17,7 +12,7 @@ These rules define the standard structure and behavior for admin pages across th
 ## Always Apply
 - [ ] All admin pages must follow these structural and behavioral patterns
 - [ ] Deviations require explicit documentation and approval
-- [ ] Changes to these rules must be version controlled and communicated
+- [ ] Changes to these rules must be version controlled
 
 ## Directory Structure
 - [ ] Admin-specific assets must be in `/admin/assets/`
@@ -34,10 +29,10 @@ These rules define the standard structure and behavior for admin pages across th
 
 ## File Naming
 - [ ] Admin JavaScript files must be prefixed with `admin-`
-  - Example: `admin-component-loader.js`, `admin-auth.js`
+  - Example: `admin-auth.js`, `admin-router.js`
 - [ ] Component files must use kebab-case
-  - Example: `page-nav.html`, `ingredient-preview.html`
-- [ ] Page files must include client and feature
+  - Example: `page-nav.js`, `content-editor.js`
+- [ ] Page files must include project and admin suffix
   - Example: `goalsetter-admin.html`, `merit-admin.html`
 - [ ] Ingredient files must match directory name
   - Example: `toggle/toggle.js`, `iframe/iframe.js`
@@ -58,7 +53,8 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Admin pages must use the standard grid layout:
 ```html
 <div class="admin-layout">
-  <nav class="admin-nav">...</nav>
+  <header class="admin-header">...</header>
+  <nav class="admin-page-nav">...</nav>
   <main class="admin-content">...</main>
 </div>
 ```
@@ -75,10 +71,10 @@ These rules define the standard structure and behavior for admin pages across th
 - [ ] Components must implement error boundaries
 
 ## Page Navigation
-- [ ] Use `<admin-page-nav>` component for navigation
-- [ ] Each page card contains its available ingredients
-- [ ] Ingredients are loaded dynamically in preview area
-- [ ] Support collapsible page cards
+- [ ] Use consistent URL patterns
+- [ ] Support deep linking
+- [ ] Handle browser navigation
+- [ ] Preserve scroll position
 
 ## JavaScript Modules
 - [ ] Use ES6 modules with type="module"
@@ -95,11 +91,12 @@ These rules define the standard structure and behavior for admin pages across th
 ## Required CSS Variables
 ```css
 :root {
-  --header-height: 50px;
-  --admin-bg: #f5f7f9;
+  --header-height: 60px;
+  --nav-width: 260px;
+  --admin-bg: #f4f5f7;
   --admin-text: #2c3e50;
   --admin-border: #e1e4e8;
-  --nav-width: 260px;
+  --content-width: 1200px;
 }
 ```
 
@@ -113,106 +110,5 @@ These rules define the standard structure and behavior for admin pages across th
 ```html
 <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
 <script type="module" src="/admin/assets/js/admin-auth.js"></script>
-<script type="module" src="/admin/assets/js/admin-common.js"></script>
-```
-
-## Version Display
-- [ ] Must show version number
-- [ ] Must show current date/time
-- [ ] Must update every minute
-- [ ] Format: `v1.0.0 (MM/DD/YYYY HH:mm)`
-
-## Page Navigation
-- [ ] Must highlight active ingredient
-- [ ] Must update URL hash
-- [ ] Must preserve state on refresh
-- [ ] Must handle invalid routes
-
-## Ingredient Loading
-- [ ] Must show loading states
-- [ ] Must handle errors gracefully
-- [ ] Must support dynamic imports
-- [ ] Must cache loaded ingredients
-
-## Error Handling
-- [ ] Must show user-friendly error messages
-- [ ] Must log errors to console
-- [ ] Must provide recovery options
-- [ ] Must preserve navigation state
-
-## Performance
-- [ ] Must lazy load ingredients
-- [ ] Must cache appropriate resources
-- [ ] Must debounce frequent updates
-- [ ] Must optimize reflows/repaints
-
-## Accessibility
-- [ ] Must use semantic HTML
-- [ ] Must include ARIA labels
-- [ ] Must support keyboard navigation
-- [ ] Must maintain focus management
-
-## Security
-- [ ] Must validate ingredient sources
-- [ ] Must sanitize dynamic content
-- [ ] Must verify permissions
-- [ ] Must protect against XSS
-
-## State Management
-- [ ] Must use consistent state patterns
-- [ ] Must handle component lifecycle
-- [ ] Must clean up resources
-- [ ] Must preserve necessary state
-
-## Testing Requirements
-- [ ] Must include component tests
-- [ ] Must verify error states
-- [ ] Must test accessibility
-- [ ] Must validate performance
-
-## Documentation
-- [ ] Must include JSDoc comments
-- [ ] Must document component API
-- [ ] Must maintain changelog
-- [ ] Must update README
-
-## Validation
-These rules are enforced through:
-1. Pre-commit hooks
-2. CI/CD pipeline checks
-3. Code review requirements
-4. Automated testing
-
-## Implementation Example
-```javascript
-// Example of proper page ingredient implementation
-class AdminIngredient extends HTMLElement {
-  constructor() {
-    super();
-    this.state = new Map();
-    this.setupErrorBoundary();
-  }
-
-  connectedCallback() {
-    this.render();
-    this.attachEventListeners();
-  }
-
-  disconnectedCallback() {
-    this.cleanup();
-  }
-
-  setupErrorBoundary() {
-    this.addEventListener('error', this.handleError);
-  }
-
-  handleError(error) {
-    console.error('Ingredient error:', error);
-    this.showErrorState();
-  }
-
-  render() {
-    // Implementation
-  }
-}
+<script type="module" src="/admin/assets/js/admin-router.js"></script>
 ```

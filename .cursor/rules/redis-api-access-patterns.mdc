@@ -1,177 +1,73 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
- ---
-description:
-globs:
+description: Rules for Redis API access patterns
+globs: ["**/*.js", "**/*.ts"]
 alwaysApply: true
 ---
 
 # Redis API Access Patterns
 
-## Key Patterns & TTL Rules
+## Overview
+These rules define the standard patterns for accessing Redis in the Recursive Learning platform. They ensure consistent, performant, and secure data access across all components.
 
-### User Session Keys
-```
-user:session:{id} -> TTL: 6h
-user:token:{token} -> TTL: 10m
-user:preferences:{id} -> TTL: 24h
-```
-
-### Page State Keys
-```
-page:state:{id} -> TTL: 1h
-page:version:{id} -> TTL: 24h
-page:content:{id} -> TTL: 1h
-```
-
-### Review Token Keys
-```
-review:token:{token} -> TTL: 10m
-review:session:{id} -> TTL: 1h
-review:comments:{id} -> TTL: 24h
-```
-
-### Organization Keys
-```
-org:config:{id} -> TTL: 12h
-org:members:{id} -> TTL: 12h
-org:settings:{id} -> TTL: 12h
-```
+## Always Apply
+- [ ] All Redis access must follow these patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled
 
 ## Access Patterns
+- [ ] Use consistent key naming convention:
+  - `{client}:{project}:{type}:{id}`
+  - Example: `st:goalsetter:user:123`
+- [ ] Implement proper key expiration
+  - Session data: 24 hours
+  - Cache data: 1 hour
+  - Temp data: 15 minutes
+- [ ] Use appropriate data structures:
+  - Strings for simple values
+  - Hashes for object data
+  - Sets for collections
+  - Sorted sets for ranked data
+  - Lists for queues
 
-### Frontend Access
-- Use `/api/redis/{entity}/{action}` endpoints
-- Never access Redis directly from frontend
-- Always include `org_id` and `user_id` in requests
-- Handle cache misses gracefully with fallback to Airtable
+## Caching Rules
+- [ ] Cache expensive computations
+- [ ] Cache frequently accessed data
+- [ ] Implement cache invalidation strategy
+- [ ] Use cache versioning for updates
+- [ ] Handle cache misses gracefully
 
-### Backend Access
-- Use `ioredis` client in Lambda functions
-- Pull credentials from SSM parameter store
-- Log all cache misses for monitoring
-- Implement retry with exponential backoff
+## Performance
+- [ ] Use pipelining for multiple operations
+- [ ] Batch related operations
+- [ ] Monitor memory usage
+- [ ] Implement proper error handling
+- [ ] Use appropriate serialization
 
-## Key Value Structure
+## Security
+- [ ] No sensitive data in keys
+- [ ] Encrypt sensitive values
+- [ ] Use role-based access control
+- [ ] Implement rate limiting
+- [ ] Monitor access patterns
 
-### Session Data
-```json
-{
-  "user_id": "string",
-  "org_id": "string",
-  "permissions": ["array"],
-  "last_access": "timestamp",
-  "features": {
-    "chat": true,
-    "review": true
-  }
-}
-```
-
-### Page State
-```json
-{
-  "version": "string",
-  "content_hash": "string",
-  "last_modified": "timestamp",
-  "editor": "user_id",
-  "components": {
-    "chat": { "enabled": true },
-    "review": { "enabled": true }
-  }
-}
-```
-
-### Review Tokens
-```json
-{
-  "token": "string",
-  "user_id": "string",
-  "org_id": "string",
-  "expires_at": "timestamp",
-  "permissions": ["array"],
-  "target_page": "string"
-}
-```
-
-## Error Handling
-
-### Cache Miss
-1. Log miss event
-2. Attempt Airtable fallback
-3. Rehydrate cache if successful
-4. Return error if both fail
-
-### Stale Data
-1. Return stale data with warning header
-2. Trigger background refresh
-3. Update on next write
-
-## Monitoring
-
-### Key Metrics
-- Cache hit rate by key pattern
-- Average TTL by key type
-- Rehydration success rate
-- API latency with/without cache
-
-### Alerts
-- Cache miss rate > 10%
-- Rehydration failures
-- High latency events
-- Redis memory usage > 80%
-
-## Implementation Rules
-
-### 1. Key Creation
-- Always include entity type prefix
-- Use colon delimiter between segments
-- Include org_id for multi-tenant data
-- Add TTL on creation
-
-### 2. Value Storage
-- Store as JSON strings
-- Include metadata (created_at, updated_at)
-- Compress values > 1KB
-- Validate schema before storage
-
-### 3. Access Control
-- Check user permissions before access
-- Validate org_id matches session
-- Log all write operations
-- Enforce rate limits per client
-
-### 4. Cache Invalidation
-- Delete on direct updates
-- Queue background refresh for related keys
-- Notify connected clients
-- Log invalidation events
-
-## Integration Points
-
-### Frontend
+## Implementation
 ```javascript
-// Use API wrapper
-const api = new RedisApiClient();
-await api.getPageState(pageId);
-await api.setUserPreferences(userId, prefs);
+// Example key naming
+const keyPattern = `${client}:${project}:${type}:${id}`;
+
+// Example caching with expiration
+await redis.set(key, value, 'EX', 3600); // 1 hour
+
+// Example batch operations
+const pipeline = redis.pipeline();
+pipeline.hset(key1, field1, value1);
+pipeline.hset(key2, field2, value2);
+await pipeline.exec();
 ```
 
-### Backend
-```javascript
-// Use Redis client
-const redis = new Redis(config);
-await redis.set(key, value, 'EX', ttl);
-await redis.get(key);
-```
-
-## Validation Rules
-
-1. Key names must match pattern: `{entity}:{type}:{id}`
-2. TTLs must be set according to entity type
-3. Values must be valid JSON
-4. All operations must include org_id
-5. All writes must include user_id
+## Validation
+These rules are enforced through:
+1. Pre-commit hooks
+2. CI/CD pipeline checks
+3. Code review requirements
+4. Automated testing 
