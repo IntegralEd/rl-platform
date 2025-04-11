@@ -1,56 +1,138 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
- ---
-description: 
-globs: 
-alwaysApply: true
----
----
-description: Client-facing layout and embedding rules for Recursive Platform
-globs: ["/clients/**/*.html"]
+description: Rules for client layout structure and behavior
+globs: ["clients/**/*.html", "clients/**/*.js", "clients/**/*.css"]
 alwaysApply: true
 ---
 
-# CLIENT LAYOUT RULESET (IFRAME-READY PAGES)
+# Client Layout Structure & Behavior Rules
 
-## Core File Rules
-- [ ] Each activity must include: `goalsetter.html`, `goalsetter_live.html`, `goalsetter_temp.html`
-- [ ] Only one canonical file may omit suffix (e.g. `goalsetter.html`)
-- [ ] Variant naming must follow: `_live`, `_temp`, `_embed`, `_chat`, `_review`
-- [ ] File path must match pattern: `/clients/{org}/{activity}/{variant}.html`
-- [ ] `{org}` and `{activity}` segments must use kebab-case (no underscores)
+## Overview
+These rules define the standard structure and behavior for client pages across the Recursive Learning platform. They ensure consistency, maintainability, and proper functionality of client interfaces.
 
-## DOM & Accessibility
-- [ ] Use `<rl-iframe>` or native `<iframe>` inside `.iframe-container`
-- [ ] Must include: `title`, `loading="lazy"`, and `aria-live` for loading states
-- [ ] Provide `.iframe-loading` and `.iframe-error` overlays
+## Always Apply
+- [ ] All client pages must follow these structural and behavioral patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled
 
-## Layout Compliance
-- [ ] Max page container: `1200px x 900px`
-- [ ] Use CSS variables for layout sizing:
-  - `--sidebar-width`, `--content-padding`, `--bg-color`, etc.
-- [ ] Must support dark mode media query
+## Directory Structure
+- [ ] Client-specific assets must be in `/clients/{client}/assets/`
+  - JS files in `/assets/js/`
+  - CSS files in `/assets/css/`
+  - Images in `/assets/images/`
+- [ ] Client pages must be in `/clients/{client}/{project}/`
+- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
 
-## Component & Asset Behavior
-- [ ] JS modules must import from `/shared/page_ingredients/`
-- [ ] Assets loaded from `/shared/assets/` or `/clients/{org}/assets/`
-- [ ] No CDN dependencies without explicit approval
+## File Naming
+- [ ] Client JavaScript files must be prefixed with `client-`
+  - Example: `client-auth.js`, `client-router.js`
+- [ ] Component files must use kebab-case
+  - Example: `page-viewer.html`, `content-loader.html`
+- [ ] Page files must include project and type
+  - Example: `goalsetter-live.html`, `merit-review.html`
 
-## Embed Builder Requirements
-- [ ] Iframe builders must validate URLs (`https://` required)
-- [ ] Must expose copyable embed snippet via `#iframe-code`
-- [ ] Optional: support email/share via `mailto:` with encoded snippet
+## Layout Structure
+- [ ] Client pages must use the standard grid layout:
+```html
+<div class="client-layout">
+  <header class="client-header">...</header>
+  <main class="client-content">...</main>
+  <footer class="client-footer">...</footer>
+</div>
+```
 
-## API & Redis Access
-- [ ] All Redis-backed requests must include:
-  - `user_id`, `org_id`, `assistant_id`, `thread_id`
-  - `user_type: "frontend_user"`
-- [ ] All dynamic embeds must respect Redis caching headers
-- [ ] Fallbacks must be Airtable or local cache (never `localStorage`)
+## Component System
+- [ ] Components must be loaded via `client-component-loader.js`
+- [ ] Components must use `data-client-component` attribute
+- [ ] Components must handle their own loading states
+- [ ] Components must implement error boundaries
 
-## Test & Validation Attributes
-- [ ] Each interactive element (tabs, modals, buttons) must have `data-test-id`
-- [ ] Top-level container must expose a unique `data-test-id`
+## Page Navigation
+- [ ] Use consistent URL patterns
+- [ ] Support deep linking
+- [ ] Handle browser navigation
+- [ ] Preserve scroll position
+
+## Required CSS Variables
+```css
+:root {
+  --header-height: 60px;
+  --footer-height: 40px;
+  --client-bg: #ffffff;
+  --client-text: #2c3e50;
+  --client-border: #e1e4e8;
+  --content-width: 1200px;
+}
+```
+
+## Required Meta Tags
+```html
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+## Required Scripts
+```html
+<script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+<script type="module" src="/shared/assets/js/client-auth.js"></script>
+<script type="module" src="/shared/assets/js/client-router.js"></script>
+```
+
+## Version Display
+- [ ] Must show version number
+- [ ] Must show environment (live/review/temp)
+- [ ] Format: `v1.0.0 (live)`
+
+## Content Loading
+- [ ] Must show loading states
+- [ ] Must handle errors gracefully
+- [ ] Must support dynamic imports
+- [ ] Must cache loaded content
+
+## Error Handling
+- [ ] Must show user-friendly error messages
+- [ ] Must log errors to console
+- [ ] Must provide recovery options
+- [ ] Must preserve navigation state
+
+## Performance
+- [ ] Must lazy load content
+- [ ] Must cache appropriate resources
+- [ ] Must optimize images
+- [ ] Must minimize reflows/repaints
+
+## Accessibility
+- [ ] Must use semantic HTML
+- [ ] Must include ARIA labels
+- [ ] Must support keyboard navigation
+- [ ] Must maintain focus management
+
+## Security
+- [ ] Must validate content sources
+- [ ] Must sanitize dynamic content
+- [ ] Must verify permissions
+- [ ] Must protect against XSS
+
+## State Management
+- [ ] Must use consistent state patterns
+- [ ] Must handle component lifecycle
+- [ ] Must clean up resources
+- [ ] Must preserve necessary state
+
+## Testing Requirements
+- [ ] Must include component tests
+- [ ] Must verify error states
+- [ ] Must test accessibility
+- [ ] Must validate performance
+
+## Documentation
+- [ ] Must include JSDoc comments
+- [ ] Must document component API
+- [ ] Must maintain changelog
+- [ ] Must update README
+
+## Validation
+These rules are enforced through:
+1. Pre-commit hooks
+2. CI/CD pipeline checks
+3. Code review requirements
+4. Automated testing 
