@@ -14,13 +14,27 @@ These rules define the standard structure and behavior for client pages across t
 - [ ] Deviations require explicit documentation and approval
 - [ ] Changes to these rules must be version controlled
 
-## Directory Structure
-- [ ] Client-specific assets must be in `/clients/{client}/assets/`
-  - JS files in `/assets/js/`
-  - CSS files in `/assets/css/`
-  - Images in `/assets/images/`
-- [ ] Client pages must be in `/clients/{client}/{project}/`
-- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
+- Location: `/shared/assets/js/`
+   - Naming: `{feature}.js`
+   - Example: `component-loader.js` 
+
+## Directory Structure Rules Clarification
+
+### Page-Specific Files
+- Page-specific JavaScript files MUST stay with their HTML page:
+  ```
+  /clients/elpl/merit/
+    ├── merit.html
+    └── assets/
+        └── js/
+            └── client-merit-logic.js  # Controls merit.html specifically
+  ```
+
+- [ ] Shared client assets must be in `/clients/{client}/assets/` for reuse:
+  - JS files in `/assets/js/` (auth, routing, shared utilities)
+  - CSS files in `/assets/css/` (shared styles)
+  - Images in `/assets/images/` (shared icons, logos, SVGs)
+  - Variables in `/assets/variables.css` (client-wide variables)
 
 ## File Naming
 - [ ] Client JavaScript files must be prefixed with `client-`

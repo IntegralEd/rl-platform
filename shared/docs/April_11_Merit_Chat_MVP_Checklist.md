@@ -92,12 +92,12 @@ This document outlines the MVP requirements for implementing the Merit chat inte
   - [ ] Ensure proper responsive behavior
 
 #### 2. Footer Implementation
-- [ ] Add consistent footer div
-  - [ ] Implement chatbar for chat tab
-  - [ ] Implement playbar for welcome tab
-  - [ ] Add proper positioning and styling
-  - [ ] Ensure footer stays at bottom
-  - [ ] Add dynamic switching based on active tab
+- [T] Add consistent footer div
+  - [T] Implement chatbar for chat tab
+  - [T] Implement playbar for welcome tab
+  - [T] Add proper positioning and styling
+  - [T] Ensure footer stays at bottom
+  - [T] Add dynamic switching based on active tab
 
 #### 3. Button Visibility and Styling
 - [ ] Fix "Next" button visibility
@@ -133,6 +133,63 @@ This document outlines the MVP requirements for implementing the Merit chat inte
 3. Button Visibility
 4. Header and Logo
 5. Color Scheme
+
+## Phase 1.5: Rule Validation Infrastructure
+
+### Husky Git Hooks Setup
+- [ ] Install and configure Husky
+  ```bash
+  npm install husky --save-dev
+  npx husky install
+  ```
+- [ ] Create pre-commit hook structure
+  ```bash
+  .husky/
+    ├── pre-commit                 # Main hook runner
+    └── scripts/
+        ├── check-rules.js        # Rule validation
+        ├── lint-rules.js         # Rule file linting
+        └── enforce-structure.js  # Directory structure
+  ```
+
+### Rule Validation Implementation
+- [ ] Basic Rule Checking
+  - [ ] Parse MDC frontmatter
+  - [ ] Match files against globs
+  - [ ] Log validation attempts
+  - [ ] Report violations
+
+- [ ] Directory Structure Validation
+  - [ ] Verify page-specific JS location
+  - [ ] Check shared asset placement
+  - [ ] Validate file naming conventions
+  - [ ] Ensure proper imports
+
+- [ ] Style Rule Validation
+  - [ ] Check CSS variable usage
+  - [ ] Verify color values
+  - [ ] Validate layout structure
+  - [ ] Check responsive patterns
+
+### Automated Testing Integration
+- [ ] Pre-commit Validation
+  - [ ] Block commits with violations
+  - [ ] Show helpful error messages
+  - [ ] Provide fix suggestions
+  - [ ] Allow manual override with reason
+
+- [ ] CI/CD Pipeline
+  - [ ] Add rule validation step
+  - [ ] Generate compliance reports
+  - [ ] Track violation trends
+  - [ ] Alert on pattern changes
+
+### Documentation
+- [ ] Rule Validation Guide
+  - [ ] Setup instructions
+  - [ ] Override procedures
+  - [ ] Common fixes
+  - [ ] Best practices
 
 ## Phase 2: Assistant Integration
 
@@ -333,3 +390,168 @@ For questions or issues:
     ├── images/         # Shared images, icons, SVGs
     └── variables.css   # Client-wide variables
   ``` 
+
+## Phase 2.5: Rule Validation & Page Tree Templating
+
+### Husky Git Hooks Setup
+- [ ] Install and configure Husky
+  ```bash
+  npm install husky --save-dev
+  npx husky install
+  ```
+- [ ] Create hook structure
+  ```bash
+  .husky/
+    ├── pre-commit                    # Main hook runner
+    ├── scripts/
+    │   ├── check-rules.js           # Rule validation
+    │   ├── lint-rules.js            # Rule file linting
+    │   ├── enforce-structure.js      # Directory structure
+    │   └── template-tools/          # Page templating tools
+    │       ├── create-page-tree.js  # Page tree generator
+    │       └── validate-tree.js     # Tree structure checker
+    ```
+
+### Page Tree Templating Script
+```javascript
+// .husky/scripts/template-tools/create-page-tree.js
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const PAGE_VARIANTS = ['admin', 'review', 'live', 'temp'];
+const REQUIRED_STRUCTURE = {
+  assets: {
+    js: ['client-{page}-logic.js'],
+    css: ['{page}-theme.css'],
+    images: []
+  }
+};
+
+async function createPageTree(sourcePage, targetName, clientId) {
+  const sourceDir = path.dirname(sourcePage);
+  const pageName = path.basename(sourcePage, '.html');
+  
+  // Create base directories for each variant
+  for (const variant of PAGE_VARIANTS) {
+    const targetPath = path.join(
+      'clients',
+      clientId,
+      targetName,
+      `${targetName}-${variant}`
+    );
+
+    // Create directory structure
+    execSync(`mkdir -p ${targetPath}/assets/{js,css,images}`);
+
+    // Copy and rename files
+    for (const [dir, files] of Object.entries(REQUIRED_STRUCTURE)) {
+      for (const file of files) {
+        const sourceFile = path.join(
+          sourceDir,
+          'assets',
+          dir,
+          file.replace('{page}', pageName)
+        );
+        const targetFile = path.join(
+          targetPath,
+          'assets',
+          dir,
+          file.replace('{page}', `${targetName}-${variant}`)
+        );
+        
+        if (fs.existsSync(sourceFile)) {
+          // Copy and rename file
+          fs.copyFileSync(sourceFile, targetFile);
+          
+          // Update imports and references in the file
+          let content = fs.readFileSync(targetFile, 'utf8');
+          content = content.replace(
+            new RegExp(pageName, 'g'),
+            `${targetName}-${variant}`
+          );
+          fs.writeFileSync(targetFile, content);
+        }
+      }
+    }
+
+    // Copy and modify HTML
+    const targetHtml = path.join(targetPath, `${targetName}-${variant}.html`);
+    let htmlContent = fs.readFileSync(sourcePage, 'utf8');
+    
+    // Update paths and references
+    htmlContent = htmlContent
+      .replace(
+        new RegExp(`/${clientId}/${pageName}/`, 'g'),
+        `/${clientId}/${targetName}/${targetName}-${variant}/`
+      )
+      .replace(
+        new RegExp(pageName, 'g'),
+        `${targetName}-${variant}`
+      );
+    
+    fs.writeFileSync(targetHtml, htmlContent);
+  }
+
+  // Create shared assets at client level if they don't exist
+  const sharedAssetPath = path.join('clients', clientId, 'assets');
+  execSync(`mkdir -p ${sharedAssetPath}/{js,css,images}`);
+
+  console.log(`
+✅ Created page tree for ${targetName}:
+   - Admin:  clients/${clientId}/${targetName}/${targetName}-admin
+   - Review: clients/${clientId}/${targetName}/${targetName}-review
+   - Live:   clients/${clientId}/${targetName}/${targetName}-live
+   - Temp:   clients/${clientId}/${targetName}/${targetName}-temp
+  `);
+}
+
+// Example usage:
+// node create-page-tree.js \
+//   clients/elpl/merit/merit.html \
+//   goalsetter \
+//   elpl
+```
+
+### Rule Validation Implementation
+- [ ] Basic Rule Checking
+  - [ ] Parse MDC frontmatter
+  - [ ] Match files against globs
+  - [ ] Log validation attempts
+  - [ ] Report violations
+
+- [ ] Directory Structure Validation
+  - [ ] Verify page-specific JS location
+  - [ ] Check shared asset placement
+  - [ ] Validate file naming conventions
+  - [ ] Ensure proper imports
+
+- [ ] Style Rule Validation
+  - [ ] Check CSS variable usage
+  - [ ] Verify color values
+  - [ ] Validate layout structure
+  - [ ] Check responsive patterns
+
+### Usage Example
+```bash
+# Create new page tree from merit template
+node .husky/scripts/template-tools/create-page-tree.js \
+  clients/elpl/merit/merit.html \
+  goalsetter \
+  elpl
+
+# This creates:
+clients/elpl/goalsetter/
+  ├── goalsetter-admin/
+  │   ├── goalsetter-admin.html
+  │   └── assets/
+  │       ├── js/
+  │       │   └── client-goalsetter-admin-logic.js
+  │       ├── css/
+  │       │   └── goalsetter-admin-theme.css
+  │       └── images/
+  ├── goalsetter-review/
+  ├── goalsetter-live/
+  └── goalsetter-temp/
+``` 
