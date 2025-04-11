@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merit Admin - Recursive Learning</title>
+
+    <!-- Base variables and custom styles -->
+    <link rel="stylesheet" href="/clients/elpl/assets/variables.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/elpl.custom.css">
+    
+    <!-- Merit admin specific styles -->
+    <style>
+        :root {
+            /* Layout - using standard client variables */
+            --header-height: 60px;
+            --footer-height: 40px;
+            --sidebar-width: 250px;
+            --content-width: 1200px;
+            --content-padding: var(--client-spacing-medium, 20px);
+            
+            /* Card system from index */
+            --card-bg: white;
+            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --card-radius: var(--client-card-border-radius, 8px);
+        }
+
+        .client-layout {
+            width: 100%;
+            max-width: var(--content-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            background: var(--client-bg);
+        }
+
+        .client-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--content-padding);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--client-spacing-small);
+        }
+
+        .header-logo {
+            height: 40px;
+            padding: 5px;
+        }
+
+        .header-title {
+            color: var(--cta-text-color);
+            font-family: var(--client-font-h1);
+            font-size: var(--client-font-size-h2);
+        }
+
+        .version-info {
+            color: var(--cta-text-color);
+            font-size: var(--client-font-size-small);
+            opacity: 0.8;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: var(--card-radius);
+            box-shadow: var(--card-shadow);
+            padding: var(--content-padding);
+            margin-bottom: var(--client-spacing-medium);
+        }
+
+        .admin-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .action-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: var(--cta-text-color);
+            border: none;
+        }
+
+        .action-button:hover {
+            transform: scale(1.1);
+            background: var(--primary-color);
+        }
+
+        .action-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-color);
+            color: var(--cta-text-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: var(--client-font-size-small);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .action-button:hover .action-tooltip {
+            opacity: 1;
+        }
+    </style>
+
+    <!-- Merit admin specific logic -->
+    <script src="assets/js/client-merit-admin-logic.js" type="module"></script>
+</head>
+<body>
+    <div class="client-layout">
+        <header class="client-header">
+            <div class="header-left">
+                <img src="/clients/elpl/assets/images/logo.svg" alt="EL Education" class="header-logo">
+                <h1 class="header-title">Merit Admin</h1>
+            </div>
+            <div class="version-info">v1.0.0</div>
+        </header>
+
+        <main class="client-content">
+            <div class="content-card">
+                <h2>Merit Configuration</h2>
+                <!-- Admin configuration form will go here -->
+            </div>
+        </main>
+
+        <div class="admin-actions">
+            <button class="action-button" title="Save Changes">
+                <span class="action-tooltip">Save Changes</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                </svg>
+            </button>
+            <button class="action-button" title="Preview Changes">
+                <span class="action-tooltip">Preview Changes</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</body>
+</html> 
