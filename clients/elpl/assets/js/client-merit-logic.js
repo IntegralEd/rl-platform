@@ -6,29 +6,21 @@ class MeritIntakeForm {
         this.form = document.querySelector('.welcome-form');
         this.gradeLevelInput = document.getElementById('grade-level');
         this.curriculumInput = document.getElementById('curriculum');
-        this.nextButton = document.querySelector('.next-button');
         this.contentArea = document.querySelector('.content');
         
         // Initialize
         this.setupEventListeners();
-        this.checkPreviousResponses();
     }
 
     setupEventListeners() {
-        this.nextButton.addEventListener('click', () => this.handleNextClick());
+        // Handle form submission
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleFormSubmit();
+        });
     }
 
-    checkPreviousResponses() {
-        // If user already answered questions, show chat
-        const gradeLevel = localStorage.getItem('merit_grade_level');
-        const curriculum = localStorage.getItem('merit_curriculum');
-        
-        if (gradeLevel && curriculum) {
-            this.showChatInterface();
-        }
-    }
-
-    handleNextClick() {
+    handleFormSubmit() {
         const gradeLevel = this.gradeLevelInput.value;
         const curriculum = this.curriculumInput.value;
         
@@ -38,45 +30,54 @@ class MeritIntakeForm {
             return;
         }
         
-        // Store responses
-        localStorage.setItem('merit_grade_level', gradeLevel);
-        localStorage.setItem('merit_curriculum', curriculum);
-        
         // Show chat interface
-        this.showChatInterface();
+        this.showChatInterface(gradeLevel, curriculum);
     }
 
-    showChatInterface() {
+    showChatInterface(gradeLevel, curriculum) {
+        // Replace form with chat interface
         this.contentArea.innerHTML = `
-            <div class="chat-container">
-                <div class="chat-messages">
-                    <div class="message assistant">
-                        Welcome! I see you teach ${localStorage.getItem('merit_grade_level')}. 
-                        How can I help you today?
+            <div class="chat-container" role="region" aria-label="Chat interface">
+                <div class="chat-messages" role="log" aria-label="Chat messages">
+                    <div class="message assistant" role="status" aria-label="Assistant message">
+                        Welcome! I see you teach ${gradeLevel}. How can I help you today?
                     </div>
                 </div>
-                <div class="chat-input-container">
+                <div class="chat-input-container" role="form" aria-label="Chat input form">
                     <textarea 
                         class="chat-input" 
                         placeholder="Type your message here..."
                         rows="3"
+                        aria-label="Type your message"
+                        role="textbox"
                     ></textarea>
-                    <button class="send-button">Send</button>
+                    <button 
+                        class="send-button" 
+                        aria-label="Send message"
+                        role="button"
+                    ></button>
                 </div>
             </div>
         `;
 
         // Setup chat handlers
+        this.setupChatHandlers();
+    }
+
+    setupChatHandlers() {
         const input = document.querySelector('.chat-input');
         const sendButton = document.querySelector('.send-button');
         const messagesContainer = document.querySelector('.chat-messages');
 
-        sendButton.addEventListener('click', () => {
+        // Send message function
+        const sendMessage = () => {
             const message = input.value.trim();
             if (message) {
                 // Add user message
                 const userMessage = document.createElement('div');
                 userMessage.className = 'message user';
+                userMessage.setAttribute('role', 'status');
+                userMessage.setAttribute('aria-label', 'Your message');
                 userMessage.textContent = message;
                 messagesContainer.appendChild(userMessage);
 
@@ -86,6 +87,8 @@ class MeritIntakeForm {
                 // Show typing indicator
                 const typingIndicator = document.createElement('div');
                 typingIndicator.className = 'message assistant typing';
+                typingIndicator.setAttribute('role', 'status');
+                typingIndicator.setAttribute('aria-label', 'Assistant is typing');
                 typingIndicator.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
                 messagesContainer.appendChild(typingIndicator);
 
@@ -97,18 +100,23 @@ class MeritIntakeForm {
                     typingIndicator.remove();
                     const response = document.createElement('div');
                     response.className = 'message assistant';
+                    response.setAttribute('role', 'status');
+                    response.setAttribute('aria-label', 'Assistant response');
                     response.textContent = 'I understand. Let me help you with that...';
                     messagesContainer.appendChild(response);
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 }, 2000);
             }
-        });
+        };
 
-        // Handle enter key
+        // Click handler
+        sendButton.addEventListener('click', sendMessage);
+
+        // Enter key handler
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendButton.click();
+                sendMessage();
             }
         });
     }
