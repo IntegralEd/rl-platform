@@ -5,6 +5,7 @@ This document outlines the MVP requirements for implementing the Merit chat inte
 
 ## Critical Rules & Restrictions
 - ⚠️ DO NOT modify production files without authorization
+- ⚠️ DO NOT create new assets or files before asking - they exist on another path
 - ✅ Development focused on `/clients/elpl/merit/merit.html`
 - ✅ Follow client layout structure rules
 - ✅ Maintain consistent UX patterns
@@ -185,30 +186,25 @@ eslint clients/elpl/assets/js/*.js
 - [x] Client-wide asset organization
 - [x] JavaScript modularization
 - [x] Assistant ID configuration (asst_9GkHpGa5t50Yw74uzonh6FAz)
-- [ ] CSS implementation
+- [x] CSS implementation and paths
 - [ ] Assistant integration
 - [ ] Error handling
 - [ ] Full testing
 
 ## Next Steps
-1. Create client-wide CSS files
-   - Create `/clients/elpl/assets/css/elpl.custom.css` for shared styles
-   - Create `/clients/elpl/assets/css/elpl.variables.css` for brand variables
-   - Move chat and form styles to client-wide CSS
+1. Implement Assistant Integration
+   - Connect to assistant API
+   - Add proper error handling
+   - Implement loading states
+   - Add console logging for debugging
 
-2. Update HTML Files
-   - Update `merit.html` to use new CSS paths
-   - Update script imports to use correct module paths
-   - Add required meta tags and version display
-   - Implement proper ARIA attributes
-
-3. Implement Error Handling
+2. Error Handling
    - Add form validation error states
    - Add chat error handling
    - Implement loading states
    - Add network error recovery
 
-4. Testing & Validation
+3. Testing & Validation
    - Run HTML validation
    - Test CSS scoping
    - Verify JavaScript modules
@@ -221,8 +217,8 @@ eslint clients/elpl/assets/js/*.js
 - [x] Moved shared assets to client-wide directory
 - [x] Updated assistant ID to use file search enabled version
 - [x] Modularized JavaScript into separate components
-- [ ] Need to implement client-wide CSS
-- [ ] Need to update HTML imports
+- [x] Using existing CSS files (no new files needed)
+- [x] Updated HTML to use correct CSS paths
 
 ## Contact
 For questions or issues:
