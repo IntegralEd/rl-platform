@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="../assets/css/elpl.custom.css">
     
     <!-- Required client scripts -->
-    <script src="/shared/assets/js/client-component-loader.js"></script>
-    <script src="/shared/assets/js/client-auth.js"></script>
-    <script src="/shared/assets/js/client-router.js"></script>
+    <script src="/shared/assets/js/component-loader.js"></script>
+    <script src="/shared/assets/js/auth.js"></script>
+    <script src="/shared/assets/js/url-resolver.js"></script>
+    <script src="/shared/assets/js/chat.js"></script>
     
     <!-- Merit specific logic -->
     <script src="../assets/js/client-merit-logic.js"></script>
@@ -489,49 +490,5 @@
             Powered by Recursive Learning
         </footer>
     </div>
-
-    <script>
-        function handleNextClick() {
-            // Clear previous errors
-            document.getElementById('grade-level-error').textContent = '';
-            document.getElementById('curriculum-error').textContent = '';
-            
-            const gradeLevel = document.getElementById('grade-level').value;
-            const curriculum = document.getElementById('curriculum').value;
-            let hasError = false;
-            
-            if (!gradeLevel) {
-                document.getElementById('grade-level-error').textContent = 'Please select a grade level';
-                hasError = true;
-            }
-            
-            if (!curriculum) {
-                document.getElementById('curriculum-error').textContent = 'Please enter your curriculum';
-                hasError = true;
-            }
-            
-            if (hasError) {
-                return;
-            }
-            
-            try {
-                // Show loading state
-                const loadingOverlay = document.createElement('div');
-                loadingOverlay.className = 'loading-overlay';
-                loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
-                document.querySelector('.client-layout').appendChild(loadingOverlay);
-                
-                // Store the form data
-                localStorage.setItem('merit_grade_level', gradeLevel);
-                localStorage.setItem('merit_curriculum', curriculum);
-                
-                // Proceed to chat interface
-                window.location.href = 'merit-chat.html';
-            } catch (error) {
-                console.error('Error saving form data:', error);
-                alert('An error occurred while saving your responses. Please try again.');
-            }
-        }
-    </script>
 </body>
 </html> 
