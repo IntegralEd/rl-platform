@@ -12,20 +12,20 @@ This document serves as the master index for all rulesets in the Recursive Learn
 ## Ruleset Categories
 
 ### Layout & Structure
-- [Admin Layout](admin-layout-structure-behavior.mdc)
+- [Admin Layout](mdc:admin-layout-structure-behavior.mdc)
   - Admin page structure
   - Component organization
   - Navigation patterns
   - UI/UX standards
   
-- [Client Layout](client-layout-structure-behavior.mdc)
+- [Client Layout](mdc:client-layout-structure-behavior.mdc)
   - Client page structure
   - Content organization
   - Navigation flow
   - User experience
 
 ### Data & API
-- [Redis Access](redis-api-access-patterns.mdc)
+- [Redis Access](mdc:redis-api-access-patterns.mdc)
   - Key naming conventions
   - Data structures
   - Caching strategies
