@@ -82,6 +82,58 @@ This document outlines the MVP requirements for implementing the Merit chat inte
    - [ ] Playbar for content pages
    - [ ] Responsive behavior
 
+### Critical UI Fixes (Priority Order)
+
+#### 1. Layout Structure Issues
+- [ ] Add sidebar with tabs
+  - [ ] Implement "Welcome" and "Chat" tabs
+  - [ ] Style tabs according to design system
+  - [ ] Add tab switching functionality
+  - [ ] Ensure proper responsive behavior
+
+#### 2. Footer Implementation
+- [ ] Add consistent footer div
+  - [ ] Implement chatbar for chat tab
+  - [ ] Implement playbar for welcome tab
+  - [ ] Add proper positioning and styling
+  - [ ] Ensure footer stays at bottom
+  - [ ] Add dynamic switching based on active tab
+
+#### 3. Button Visibility and Styling
+- [ ] Fix "Next" button visibility
+  - [ ] Add proper background color (#211651)
+  - [ ] Ensure icon is visible and properly sized
+  - [ ] Add hover states
+- [ ] Fix chat "Send" button visibility
+  - [ ] Add proper background color (#211651)
+  - [ ] Implement send icon from assets
+  - [ ] Add hover and active states
+
+#### 4. Header and Branding
+- [ ] Add logo to header
+  - [ ] Implement proper logo sizing
+  - [ ] Add correct positioning
+  - [ ] Ensure responsive behavior
+- [ ] Fix version display
+  - [ ] Update version format to match spec
+  - [ ] Add proper padding and positioning
+  - [ ] Implement auto-updating time display
+
+#### 5. Color Scheme Corrections
+- [ ] Audit and fix color hues
+  - [ ] Update primary color to #211651
+  - [ ] Ensure consistent button colors
+  - [ ] Fix header background color
+  - [ ] Update text colors for contrast
+  - [ ] Verify hover state colors
+
+### Implementation Priority Order
+1. Layout Structure (Sidebar + Tabs)
+2. Footer Implementation
+3. Button Visibility
+4. Header and Logo
+5. Color Scheme
+
 ## Phase 2: Assistant Integration
 
 ### Hardcoded Configuration
