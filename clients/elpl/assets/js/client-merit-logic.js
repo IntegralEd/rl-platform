@@ -8,8 +8,10 @@ class MeritIntakeForm {
         this.gradeLevelError = document.getElementById('grade-level-error');
         this.curriculumError = document.getElementById('curriculum-error');
         this.nextButton = document.querySelector('.next-button');
+        this.contentArea = document.querySelector('.content');
         
         this.initializeEventListeners();
+        this.checkPreviousResponses();
     }
 
     initializeEventListeners() {
@@ -19,6 +21,17 @@ class MeritIntakeForm {
         
         // Handle form submission
         this.nextButton.addEventListener('click', () => this.handleNextClick());
+    }
+
+    checkPreviousResponses() {
+        // Check if user has already completed the intake form
+        const gradeLevel = localStorage.getItem('merit_grade_level');
+        const curriculum = localStorage.getItem('merit_curriculum');
+        
+        if (gradeLevel && curriculum) {
+            // User has completed the form before, show chat interface
+            this.showChatInterface();
+        }
     }
 
     clearError(fieldId) {
@@ -62,6 +75,94 @@ class MeritIntakeForm {
         loadingOverlay.className = 'loading-overlay';
         loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
         document.querySelector('.client-layout').appendChild(loadingOverlay);
+        return loadingOverlay;
+    }
+
+    createChatInterface() {
+        return `
+            <div class="chat-container" data-client-component="merit-chat">
+                <div class="chat-messages">
+                    <!-- Messages will be dynamically added here -->
+                </div>
+                <div class="chat-input-container">
+                    <textarea 
+                        class="chat-input" 
+                        placeholder="Type your message here..."
+                        rows="3"
+                    ></textarea>
+                    <button class="send-button">Send</button>
+                </div>
+            </div>
+        `;
+    }
+
+    showChatInterface() {
+        // Replace form content with chat interface
+        this.contentArea.innerHTML = this.createChatInterface();
+        
+        // Initialize chat functionality
+        this.initializeChat();
+    }
+
+    initializeChat() {
+        const chatContainer = document.querySelector('[data-client-component="merit-chat"]');
+        const messagesContainer = chatContainer.querySelector('.chat-messages');
+        const input = chatContainer.querySelector('.chat-input');
+        const sendButton = chatContainer.querySelector('.send-button');
+
+        // Add welcome message
+        const gradeLevel = localStorage.getItem('merit_grade_level');
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'message assistant';
+        welcomeMessage.textContent = `Welcome! I see you teach ${gradeLevel}. How can I help you today?`;
+        messagesContainer.appendChild(welcomeMessage);
+
+        // Handle send button click
+        sendButton.addEventListener('click', () => {
+            if (input.value.trim()) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.textContent = input.value;
+                messagesContainer.appendChild(userMessage);
+
+                // Clear input
+                input.value = '';
+
+                // Auto scroll to bottom
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // TODO: Handle sending message to backend
+                // For now, just show a loading state
+                this.showTypingIndicator();
+            }
+        });
+
+        // Handle enter key
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendButton.click();
+            }
+        });
+    }
+
+    showTypingIndicator() {
+        const messagesContainer = document.querySelector('.chat-messages');
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'message assistant typing';
+        typingIndicator.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+        messagesContainer.appendChild(typingIndicator);
+
+        // Simulate response (remove this when backend is integrated)
+        setTimeout(() => {
+            typingIndicator.remove();
+            const response = document.createElement('div');
+            response.className = 'message assistant';
+            response.textContent = 'I understand. Let me help you with that...';
+            messagesContainer.appendChild(response);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 2000);
     }
 
     async handleNextClick() {
@@ -75,7 +176,7 @@ class MeritIntakeForm {
         }
         
         try {
-            this.showLoadingState();
+            const loadingOverlay = this.showLoadingState();
             
             // Store form data
             const formData = {
@@ -86,8 +187,14 @@ class MeritIntakeForm {
             localStorage.setItem('merit_grade_level', formData.gradeLevel);
             localStorage.setItem('merit_curriculum', formData.curriculum);
             
-            // Proceed to chat interface
-            window.location.href = 'merit-chat.html';
+            // Simulate some loading time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Remove loading overlay
+            loadingOverlay.remove();
+            
+            // Show chat interface
+            this.showChatInterface();
             
         } catch (error) {
             console.error('Error saving form data:', error);
