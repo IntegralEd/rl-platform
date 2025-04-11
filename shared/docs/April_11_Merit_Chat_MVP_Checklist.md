@@ -85,9 +85,9 @@ This document outlines the MVP requirements for implementing the Merit chat inte
 ### Critical UI Fixes (Priority Order)
 
 #### 1. Layout Structure Issues
-- [ ] Add sidebar with tabs
-  - [ ] Implement "Welcome" and "Chat" tabs
-  - [ ] Style tabs according to design system
+- [T] Add sidebar with tabs
+  - [T] Implement "Welcome" and "Chat" tabs
+  - [T] Style tabs according to design system
   - [ ] Add tab switching functionality
   - [ ] Ensure proper responsive behavior
 
@@ -311,3 +311,25 @@ For questions or issues:
    - Location: `/shared/assets/js/`
    - Naming: `{feature}.js`
    - Example: `component-loader.js` 
+
+## Directory Structure Rules Clarification
+
+### Page-Specific Files
+- Page-specific JavaScript files MUST stay with their HTML page:
+  ```
+  /clients/elpl/merit/
+    ├── merit.html
+    └── assets/
+        └── js/
+            └── client-merit-logic.js  # Controls merit.html specifically
+  ```
+
+### Shared Client Assets
+- Shared assets used across multiple pages go in client assets:
+  ```
+  /clients/elpl/assets/  # Shared across all ELPL pages
+    ├── js/             # Shared JavaScript (auth, routing, etc)
+    ├── css/            # Shared styles
+    ├── images/         # Shared images, icons, SVGs
+    └── variables.css   # Client-wide variables
+  ``` 
