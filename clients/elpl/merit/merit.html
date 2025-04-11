@@ -17,24 +17,27 @@
 
     <style>
         :root {
-            /* Core Layout Dimensions */
-            --embed-width: 1900px;
-            --embed-height: 90vh;
+            /* Layout */
+            --sidebar-width: 250px;
+            --content-padding: 20px;
             --header-height: 50px;
             --footer-height: 60px;
-            --border-color: #eee;
-            --page-margin: 20px;
-
-            /* Branding Colors */
+            
+            /* Colors */
             --primary-color: #003366; /* ELPL Blue */
-            --secondary-color: #4A90E2; /* ELPL Light Blue */
-            --background-color: #f9f9f9;
+            --secondary-color: #4A90E2;
+            --bg-color: #fff;
             --text-color: #2b2b2b;
+            --border-color: #eee;
+            
+            /* Dimensions */
+            --max-width: 1200px;
+            --max-height: 900px;
         }
 
         body {
             margin: 0;
-            padding: var(--page-margin);
+            padding: var(--content-padding);
             font-family: Arial, sans-serif;
             min-height: 100vh;
             display: flex;
@@ -45,14 +48,16 @@
 
         .app-container {
             width: 100%;
-            max-width: var(--embed-width);
-            height: var(--embed-height);
+            max-width: var(--max-width);
+            height: var(--max-height);
             display: flex;
             flex-direction: column;
             background: white;
             box-shadow: 0 2px 12px rgba(0,0,0,0.1);
             margin: 0 auto;
             position: relative;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         /* Header */
@@ -72,69 +77,95 @@
             font-weight: 500;
         }
 
-        /* Main Content */
-        #chatbot-container {
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
             flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: #f8f9fa;
+            border-right: 1px solid var(--border-color);
+            padding: var(--content-padding);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar button {
+            padding: 12px;
+            border: none;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar button:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .sidebar button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--content-padding);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        #chatbot-container.loaded {
+        .section.active {
+            display: block;
             opacity: 1;
         }
 
-        #chatbot-iframe {
+        /* Welcome Form */
+        .welcome-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group input {
             width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Loading State */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1920px) {
-            body {
-                padding: 0;
-            }
-            
-            .app-container {
-                height: 100vh;
-                margin: 0;
-            }
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
         }
 
         /* Chat Interface */
         .chat-container {
+            height: 100%;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
         }
 
         .chat-messages {
@@ -143,7 +174,7 @@
             padding: 15px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            background: var(--background-color);
+            background: var(--bg-color);
             margin-bottom: 20px;
         }
 
@@ -198,6 +229,47 @@
             background: var(--secondary-color);
         }
 
+        /* Footer */
+        .app-footer {
+            height: var(--footer-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 0 24px;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Cache Status */
         .cache-status {
             position: fixed;
             bottom: 10px;
@@ -209,26 +281,102 @@
             font-size: 12px;
             display: none;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .app-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                flex-direction: row;
+                padding: 10px;
+            }
+
+            .sidebar button {
+                flex: 1;
+            }
+
+            .welcome-form {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="loading-overlay">
-        <div class="loading-spinner"></div>
-    </div>
-
     <div class="app-container">
         <header class="app-header">
             <h1 class="header-title">ELPL Merit System</h1>
         </header>
 
-        <div id="chatbot-container" class="chat-container">
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-container">
-                <textarea class="chat-input" id="chat-input" 
-                    placeholder="Type your message..." 
-                    rows="3"></textarea>
-                <button class="send-button" onclick="sendMessage()">Send</button>
-            </div>
+        <div class="main-content">
+            <nav class="sidebar" role="navigation">
+                <button onclick="showSection('welcome')" class="active" aria-pressed="true">Welcome</button>
+                <button onclick="showSection('chat')" aria-pressed="false">Chat</button>
+            </nav>
+
+            <main class="content" role="main">
+                <section id="welcome" class="section active" aria-labelledby="welcome-title">
+                    <div class="welcome-form">
+                        <h2 id="welcome-title">Welcome</h2>
+                        <form id="intake-form">
+                            <div class="form-group">
+                                <label for="grade-level">What grade level do you teach?</label>
+                                <select id="grade-level" name="User_Intake_Item_02" required>
+                                    <option value="">Select a grade level</option>
+                                    <option value="Kindergarten">Kindergarten</option>
+                                    <option value="Grade 1">Grade 1</option>
+                                    <option value="Grade 2">Grade 2</option>
+                                    <option value="Grade 3">Grade 3</option>
+                                    <option value="Grade 4">Grade 4</option>
+                                    <option value="Grade 5">Grade 5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="curriculum">What curriculum do you use?</label>
+                                <input type="text" id="curriculum" name="User_Intake_Item_01" 
+                                    placeholder="English Language Arts (ELA)" required />
+                            </div>
+                            <input type="hidden" name="User_Intake_Token" value="Bmore" />
+                        </form>
+                    </div>
+                </section>
+
+                <section id="chat" class="section" aria-labelledby="chat-title">
+                    <div class="chat-container">
+                        <h2 id="chat-title" class="visually-hidden">Chat Interface</h2>
+                        <div class="chat-messages" id="chat-messages"></div>
+                        <div class="chat-input-container">
+                            <textarea class="chat-input" id="chat-input" 
+                                placeholder="Type your message..." 
+                                rows="3"
+                                aria-label="Chat message"></textarea>
+                            <button class="send-button" onclick="sendMessage()" aria-label="Send message">Send</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <footer class="app-footer">
+            Powered by Recursive Learning
+        </footer>
+
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner" role="status" aria-label="Loading"></div>
         </div>
 
         <div class="cache-status" id="cache-status"></div>
@@ -351,6 +499,41 @@
             status.textContent = `Cache: ${ratio}% hit rate (${cacheHits}/${cacheHits + cacheMisses})`;
             status.style.display = 'block';
         }
+
+        // Section Navigation
+        function showSection(id) {
+            // Update button states
+            document.querySelectorAll('.sidebar button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            document.querySelector(`button[onclick="showSection('${id}')"]`).classList.add('active');
+            document.querySelector(`button[onclick="showSection('${id}')"]`).setAttribute('aria-pressed', 'true');
+
+            // Update section visibility
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // Form Validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('intake-form');
+            const grade = document.getElementById('grade-level');
+            const curriculum = document.getElementById('curriculum');
+
+            function validateForm() {
+                const isValid = grade.value && curriculum.value.trim();
+                if (isValid) {
+                    document.querySelector('button[onclick="showSection(\'chat\')"]').removeAttribute('disabled');
+                } else {
+                    document.querySelector('button[onclick="showSection(\'chat\')"]').setAttribute('disabled', 'true');
+                }
+            }
+
+            grade.addEventListener('change', validateForm);
+            curriculum.addEventListener('input', validateForm);
+            validateForm();
+        });
 
         // Initialize system
         function initMeritSystem() {
