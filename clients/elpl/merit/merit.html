@@ -206,30 +206,79 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            gap: var(--client-spacing-medium);
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: var(--client-spacing-small);
+            padding: var(--client-spacing-medium);
             border: 1px solid var(--client-border);
             border-radius: var(--client-card-border-radius);
             background: var(--client-bg);
-            margin-bottom: var(--client-spacing-medium);
+            display: flex;
+            flex-direction: column;
+            gap: var(--client-spacing-small);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: var(--client-spacing-small);
+            padding: var(--client-spacing-small);
+            background: white;
+            border: 1px solid var(--client-border);
+            border-radius: var(--client-card-border-radius);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: var(--client-spacing-small);
+            border: 1px solid var(--client-border);
+            border-radius: var(--client-button-radius);
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            resize: none;
+            min-height: 60px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
+        }
+
+        .send-button {
+            align-self: flex-end;
+            padding: var(--client-button-padding);
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
+            border: none;
+            border-radius: var(--client-button-radius);
+            cursor: pointer;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            transition: background 0.2s;
+            min-width: 80px;
+            height: 40px;
+        }
+
+        .send-button:hover {
+            background: var(--secondary-color);
         }
 
         .message {
-            margin-bottom: var(--client-spacing-small);
             padding: var(--client-spacing-small);
             border-radius: var(--client-button-radius);
             max-width: 80%;
             font-family: var(--client-font-body);
+            line-height: 1.5;
         }
 
         .message.user {
             background: var(--tertiary-color);
             color: var(--cta-text-color);
             margin-left: auto;
+            align-self: flex-end;
         }
 
         .message.assistant {
@@ -237,6 +286,35 @@
             border: 1px solid var(--client-border);
             margin-right: auto;
             color: var(--client-text);
+            align-self: flex-start;
+        }
+
+        .message.typing {
+            padding: var(--client-spacing-small) var(--client-spacing-medium);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            height: 20px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--client-border);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+            opacity: 0.4;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
         /* Footer */
@@ -401,7 +479,7 @@
                         <div class="error-message" id="curriculum-error"></div>
                     </div>
                     <div class="form-actions">
-                        <button type="button" class="next-button" onclick="handleNextClick()">Next</button>
+                        <button type="button" class="next-button">Next</button>
                     </div>
                 </form>
             </div>
