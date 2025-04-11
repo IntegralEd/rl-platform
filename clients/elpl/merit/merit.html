@@ -21,6 +21,16 @@
         data-last-login="">
     </span>
 
+    <script>
+        // Set initial time immediately
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.querySelector('.version-display').textContent = `v1.0.0 (${hours}:${minutes})`;
+        });
+    </script>
+
     <style>
         :root {
             /* Layout - using standard client variables */
@@ -174,9 +184,10 @@
             justify-content: flex-end;
         }
 
+        /* Button Styling */
         .next-button {
             padding: var(--client-button-padding);
-            background: var(--secondary-color, #211651);
+            background: #FF0000;
             color: white;
             border: none;
             border-radius: var(--client-button-radius);
@@ -188,26 +199,57 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 10px 20px;
             gap: 8px;
         }
 
         .next-button::after {
             content: '';
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background-image: url('/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            flex-shrink: 0;
         }
 
         .next-button:hover {
-            background: var(--secondary-color-dark, #1a1141);
+            background: #CC0000;
         }
 
-        .next-button:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--primary-color);
+        .send-button {
+            align-self: flex-end;
+            padding: 10px 20px;
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: var(--client-button-radius);
+            cursor: pointer;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            transition: background 0.2s;
+            min-width: 100px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .send-button::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-image: url('/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .send-button:hover {
+            background: #CC0000;
         }
 
         /* Chat Interface */
@@ -254,39 +296,6 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
-        }
-
-        .send-button {
-            align-self: flex-end;
-            padding: var(--client-button-padding);
-            background: var(--secondary-color, #211651);
-            color: white;
-            border: none;
-            border-radius: var(--client-button-radius);
-            cursor: pointer;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            transition: background 0.2s;
-            min-width: 80px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .send-button::after {
-            content: '';
-            width: 24px;
-            height: 24px;
-            background-image: url('/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .send-button:hover {
-            background: var(--secondary-color-dark, #1a1141);
         }
 
         .message {
@@ -473,7 +482,7 @@
     <div class="client-layout">
         <header class="client-header" role="banner">
             <h1 class="header-title">Merit</h1>
-            <span class="version-display">v1.0.0 (live)</span>
+            <span class="version-display">v1.0.0 (--:--)</span>
         </header>
 
         <main class="client-content" role="main">
@@ -520,7 +529,7 @@
                             type="submit" 
                             class="next-button" 
                             aria-label="Submit form and proceed to chat"
-                        >Next</button>
+                        >NEXT</button>
                     </div>
                 </form>
             </div>

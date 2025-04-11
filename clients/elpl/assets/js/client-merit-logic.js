@@ -11,7 +11,8 @@ class MeritIntakeForm {
         
         // Initialize
         this.setupEventListeners();
-        this.updateVersionTime();
+        this.updateVersionTime(); // Initial update
+        setInterval(() => this.updateVersionTime(), 60000); // Update every minute
         this.resetForm();
     }
 
@@ -19,10 +20,9 @@ class MeritIntakeForm {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
-        this.versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
-
-        // Update every minute
-        setTimeout(() => this.updateVersionTime(), 60000);
+        if (this.versionDisplay) {
+            this.versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
+        }
     }
 
     resetForm() {
@@ -125,7 +125,7 @@ class MeritIntakeForm {
                         class="send-button" 
                         aria-label="Send message"
                         role="button"
-                    ></button>
+                    >SEND</button>
                 </div>
             </div>
         `;
