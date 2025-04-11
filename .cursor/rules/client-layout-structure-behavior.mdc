@@ -1,0 +1,51 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Client-facing layout and embedding rules for Recursive Platform
+globs: ["/clients/**/*.html"]
+alwaysApply: true
+---
+
+# CLIENT LAYOUT RULESET (IFRAME-READY PAGES)
+
+## Core File Rules
+- [ ] Each activity must include: `goalsetter.html`, `goalsetter_live.html`, `goalsetter_temp.html`
+- [ ] Only one canonical file may omit suffix (e.g. `goalsetter.html`)
+- [ ] Variant naming must follow: `_live`, `_temp`, `_embed`, `_chat`, `_review`
+- [ ] File path must match pattern: `/clients/{org}/{activity}/{variant}.html`
+- [ ] `{org}` and `{activity}` segments must use kebab-case (no underscores)
+
+## DOM & Accessibility
+- [ ] Use `<rl-iframe>` or native `<iframe>` inside `.iframe-container`
+- [ ] Must include: `title`, `loading="lazy"`, and `aria-live` for loading states
+- [ ] Provide `.iframe-loading` and `.iframe-error` overlays
+
+## Layout Compliance
+- [ ] Max page container: `1200px x 900px`
+- [ ] Use CSS variables for layout sizing:
+  - `--sidebar-width`, `--content-padding`, `--bg-color`, etc.
+- [ ] Must support dark mode media query
+
+## Component & Asset Behavior
+- [ ] JS modules must import from `/shared/page_ingredients/`
+- [ ] Assets loaded from `/shared/assets/` or `/clients/{org}/assets/`
+- [ ] No CDN dependencies without explicit approval
+
+## Embed Builder Requirements
+- [ ] Iframe builders must validate URLs (`https://` required)
+- [ ] Must expose copyable embed snippet via `#iframe-code`
+- [ ] Optional: support email/share via `mailto:` with encoded snippet
+
+## API & Redis Access
+- [ ] All Redis-backed requests must include:
+  - `user_id`, `org_id`, `assistant_id`, `thread_id`
+  - `user_type: "frontend_user"`
+- [ ] All dynamic embeds must respect Redis caching headers
+- [ ] Fallbacks must be Airtable or local cache (never `localStorage`)
+
+## Test & Validation Attributes
+- [ ] Each interactive element (tabs, modals, buttons) must have `data-test-id`
+- [ ] Top-level container must expose a unique `data-test-id`

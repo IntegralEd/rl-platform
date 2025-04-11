@@ -1,0 +1,34 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Recursive Platform - Canonical Ruleset Index
+globs: ["**/*.html"]
+alwaysApply: true
+---
+
+# RULESET INDEX
+
+## Client Pages
+- [ ] Enforce `client-layout.mdc` for all /clients/**/*.html pages
+
+## Admin Pages
+- [ ] Enforce `admin-layout.mdc` for all /admin/pages/**/*.html pages
+
+## MDC Registration
+- [ ] Each .mdc must include:
+    - description block
+    - globs definition
+    - alwaysApply flag
+
+## Enforcement Logic
+- [ ] Rule globs must not overlap unless explicitly merged
+- [ ] Rule conflicts must be resolved by naming scope
+- [ ] Redundant checks should be centralized in this file only if shared
+
+## Active Files (by responsibility)
+- [ ] `client-layout.mdc` – layout and embed rules for public views
+- [ ] `admin-layout.mdc` – layout and ingredient rules for admin UI
+- [ ] `redis-api-access-patterns.mdc` – Redis access patterns, identity headers
