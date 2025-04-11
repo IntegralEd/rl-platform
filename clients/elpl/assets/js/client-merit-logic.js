@@ -7,8 +7,78 @@ class MeritIntakeForm {
         this.gradeLevelInput = document.getElementById('grade-level');
         this.curriculumInput = document.getElementById('curriculum');
         this.contentArea = document.querySelector('.content');
+        this.versionDisplay = document.querySelector('.version-display');
         
         // Initialize
+        this.setupEventListeners();
+        this.updateVersionTime();
+        this.resetForm();
+    }
+
+    updateVersionTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        this.versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
+
+        // Update every minute
+        setTimeout(() => this.updateVersionTime(), 60000);
+    }
+
+    resetForm() {
+        // Clear any previous values
+        this.gradeLevelInput.value = '';
+        this.curriculumInput.value = '';
+        
+        // Ensure the form is visible
+        this.contentArea.innerHTML = `
+            <form class="welcome-form" role="form" aria-label="User intake form">
+                <div class="form-group">
+                    <label for="grade-level">What grade level do you teach?</label>
+                    <select 
+                        id="grade-level" 
+                        name="grade-level" 
+                        required
+                        aria-required="true"
+                        aria-label="Select your grade level"
+                    >
+                        <option value="">Select a grade level</option>
+                        <option value="Kindergarten">Kindergarten</option>
+                        <option value="Grade 1">Grade 1</option>
+                        <option value="Grade 2">Grade 2</option>
+                        <option value="Grade 3">Grade 3</option>
+                        <option value="Grade 4">Grade 4</option>
+                        <option value="Grade 5">Grade 5</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="curriculum">What curriculum do you use?</label>
+                    <input 
+                        type="text" 
+                        id="curriculum" 
+                        name="curriculum" 
+                        required
+                        aria-required="true"
+                        aria-label="Enter your curriculum"
+                        placeholder="Enter your curriculum"
+                    >
+                </div>
+                
+                <div class="form-actions">
+                    <button 
+                        type="submit" 
+                        class="next-button" 
+                        aria-label="Submit form and proceed to chat"
+                    >Next</button>
+                </div>
+            </form>
+        `;
+        
+        // Re-initialize form elements and listeners
+        this.form = document.querySelector('.welcome-form');
+        this.gradeLevelInput = document.getElementById('grade-level');
+        this.curriculumInput = document.getElementById('curriculum');
         this.setupEventListeners();
     }
 
