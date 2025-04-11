@@ -9,19 +9,40 @@ alwaysApply: true
 ## Overview
 These rules define the standard patterns for accessing Redis in the Recursive Learning platform. They ensure consistent, performant, and secure data access across all components.
 
-## Always Apply
-- [ ] All Redis access must follow these patterns
-- [ ] Deviations require explicit documentation and approval
-- [ ] Changes to these rules must be version controlled
+## Redis Configuration
+- [ ] Endpoint: `redis://redis.recursivelearning.app:6379`
+- [ ] Authentication Users:
+  - `recursive-frontend`: Read-only access to context:*
+  - `recursive-backend`: Read/write access to context:*, threads:*, schema:*, findings:*
+- [ ] Access Control: Managed via Redis ACLs
+- [ ] Password Management:
+  - Passwords not stored in SSM
+  - ARN: `arn:aws:ssm:us-east-2:559050208320:parameter/integraled/redis/user-password`
+  - Contact system admin for password decryption
+
+## Context Structure
+- [ ] Context Fields:
+  - User_Intake_Context_01 through Context_05
+  - Tags (weighted, typed)
+  - System Variables
+  - Prior Thread Messages
+- [ ] Context Assembly:
+  - User → Tags + Intake Fields → Context Store → Assistant Payload
+  - Roles, Variables, Threads feed into Context Store
 
 ## Access Patterns
 - [ ] Use consistent key naming convention:
-  - `{client}:{project}:{type}:{id}`
-  - Example: `st:goalsetter:user:123`
+  ```
+  {client}:{project}:{type}:{id}
+  context:{org}:{user}:{field}
+  threads:{org}:{user}:{thread_id}
+  schema:{type}:{field_id}
+  findings:{org}:{type}:{id}
+  ```
 - [ ] Implement proper key expiration
-  - Session data: 24 hours
-  - Cache data: 1 hour
-  - Temp data: 15 minutes
+  - Session data: 24 hours (86400s)
+  - Cache data: 1 hour (3600s)
+  - Temp data: 15 minutes (900s)
 - [ ] Use appropriate data structures:
   - Strings for simple values
   - Hashes for object data
@@ -29,12 +50,70 @@ These rules define the standard patterns for accessing Redis in the Recursive Le
   - Sorted sets for ranked data
   - Lists for queues
 
-## Caching Rules
-- [ ] Cache expensive computations
-- [ ] Cache frequently accessed data
-- [ ] Implement cache invalidation strategy
-- [ ] Use cache versioning for updates
+## Schema Enforcement
+- [ ] All fields must be schema-registered before Redis caching
+- [ ] Validate field identity via Field_AT_ID and Field_ID
+- [ ] Enforce TTL compliance (default: 3600s)
+- [ ] Map frontend labels to backend schema keys
+- [ ] Ensure safe ingestion into OpenAI context
+- [ ] Schema source: Schema Registry Airtable
+
+## Implementation
+```javascript
+// Frontend Redis Configuration
+const REDIS_CONFIG = {
+    endpoint: 'redis://redis.recursivelearning.app:6379',
+    user: 'recursive-frontend',
+    // password handled via secure env
+    defaultTTL: 3600,
+    contextPrefix: 'context',
+    retryAttempts: 3
+};
+
+// Example context key pattern
+const contextKey = `context:${orgId}:${userId}:${fieldId}`;
+
+// Example caching with schema validation
+async function cacheWithSchema(key, value, fieldId) {
+    if (!await validateSchemaField(fieldId)) {
+        throw new Error('Invalid schema field');
+    }
+    await redis.set(key, value, 'EX', REDIS_CONFIG.defaultTTL);
+}
+
+// Example batch operations with schema validation
+const pipeline = redis.pipeline();
+for (const [key, value] of entries) {
+    if (await validateSchemaField(key)) {
+        pipeline.hset(contextKey, key, value);
+    }
+}
+await pipeline.exec();
+```
+
+## Security Requirements
+- [ ] Use appropriate Redis user based on access needs
+- [ ] No sensitive data in keys
+- [ ] Encrypt sensitive values
+- [ ] Implement rate limiting
+- [ ] Monitor access patterns
+- [ ] Validate schema before writes
+- [ ] Enforce org-based tenant isolation
+
+## Validation & Monitoring
+- [ ] Pre-commit hooks for schema validation
+- [ ] CI/CD pipeline checks
+- [ ] Code review requirements
+- [ ] CloudWatch logging
+- [ ] Findings routing for dashboard reporting
+- [ ] Cache invalidation on schema mismatch
+
+## Error Handling
+- [ ] Implement retry logic for connection issues
 - [ ] Handle cache misses gracefully
+- [ ] Log schema validation failures
+- [ ] Monitor TTL compliance
+- [ ] Track cache hit/miss ratios
 
 ## Performance
 - [ ] Use pipelining for multiple operations
@@ -42,6 +121,15 @@ These rules define the standard patterns for accessing Redis in the Recursive Le
 - [ ] Monitor memory usage
 - [ ] Implement proper error handling
 - [ ] Use appropriate serialization
+- [ ] Cache frequently accessed data
+- [ ] Implement cache versioning
+
+## Caching Rules
+- [ ] Cache expensive computations
+- [ ] Cache frequently accessed data
+- [ ] Implement cache invalidation strategy
+- [ ] Use cache versioning for updates
+- [ ] Handle cache misses gracefully
 
 ## Security
 - [ ] No sensitive data in keys
