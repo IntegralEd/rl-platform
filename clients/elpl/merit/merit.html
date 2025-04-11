@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELPL Merit System</title>
     
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="../assets/css/elpl.custom.css">
+    
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
         data-user-email=""
@@ -19,15 +22,12 @@
         :root {
             /* Layout */
             --sidebar-width: 250px;
-            --content-padding: 20px;
+            --content-padding: var(--client-spacing-medium, 20px);
             --header-height: 50px;
             --footer-height: 60px;
             
-            /* Colors */
-            --primary-color: #003366; /* ELPL Blue */
-            --secondary-color: #4A90E2;
-            --bg-color: #fff;
-            --text-color: #2b2b2b;
+            /* Colors - inheriting from elpl.custom.css */
+            --bg-color: var(--background-color);
             --border-color: #eee;
             
             /* Dimensions */
@@ -38,11 +38,9 @@
         body {
             margin: 0;
             padding: var(--content-padding);
-            font-family: Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            background: #f4f4f4;
             box-sizing: border-box;
         }
 
@@ -53,10 +51,10 @@
             display: flex;
             flex-direction: column;
             background: white;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             margin: 0 auto;
             position: relative;
-            border-radius: 8px;
+            border-radius: var(--client-card-border-radius, 8px);
             overflow: hidden;
         }
 
@@ -72,9 +70,9 @@
         }
 
         .header-title {
-            color: white;
-            font-size: 20px;
-            font-weight: 500;
+            color: var(--cta-text-color, white);
+            font-family: var(--client-font-h1);
+            font-size: var(--client-font-size-h2);
         }
 
         /* Main Content Layout */
@@ -87,33 +85,32 @@
         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background: #f8f9fa;
+            background: var(--background-color);
             border-right: 1px solid var(--border-color);
             padding: var(--content-padding);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: var(--client-spacing-small);
         }
 
         .sidebar button {
-            padding: 12px;
+            padding: var(--client-button-padding);
             border: none;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
+            border-radius: var(--client-button-radius);
             cursor: pointer;
-            font-size: 14px;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
             transition: all 0.2s;
         }
 
         .sidebar button:hover {
             background: var(--secondary-color);
-            color: white;
         }
 
         .sidebar button.active {
             background: var(--primary-color);
-            color: white;
         }
 
         /* Content Area */
@@ -123,42 +120,32 @@
             padding: var(--content-padding);
         }
 
-        /* Sections */
-        .section {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .section.active {
-            display: block;
-            opacity: 1;
-        }
-
         /* Welcome Form */
         .welcome-form {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: var(--client-spacing-medium);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: var(--client-spacing-small);
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
+            font-family: var(--client-font-h2);
             font-weight: 500;
         }
 
         .form-group select,
         .form-group input {
             width: 100%;
-            padding: 10px;
+            padding: var(--client-spacing-small);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: var(--client-button-radius);
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
         }
 
         /* Chat Interface */
@@ -171,23 +158,24 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: var(--client-spacing-small);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--client-card-border-radius);
             background: var(--bg-color);
-            margin-bottom: 20px;
+            margin-bottom: var(--client-spacing-medium);
         }
 
         .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 8px;
+            margin-bottom: var(--client-spacing-small);
+            padding: var(--client-spacing-small);
+            border-radius: var(--client-button-radius);
             max-width: 80%;
+            font-family: var(--client-font-body);
         }
 
         .message.user {
-            background: var(--secondary-color);
-            color: white;
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
             margin-left: auto;
         }
 
@@ -195,33 +183,36 @@
             background: white;
             border: 1px solid var(--border-color);
             margin-right: auto;
+            color: var(--text-color);
         }
 
         .chat-input-container {
             display: flex;
-            gap: 10px;
-            padding: 15px;
+            gap: var(--client-spacing-small);
+            padding: var(--client-spacing-small);
             background: white;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--client-card-border-radius);
         }
 
         .chat-input {
             flex: 1;
-            padding: 10px;
+            padding: var(--client-spacing-small);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: var(--client-button-radius);
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
             resize: none;
         }
 
         .send-button {
-            padding: 10px 20px;
-            background: var(--primary-color);
-            color: white;
+            padding: var(--client-button-padding);
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
             border: none;
-            border-radius: 4px;
+            border-radius: var(--client-button-radius);
             cursor: pointer;
+            font-family: var(--client-font-body);
             transition: background 0.2s;
         }
 
@@ -233,11 +224,12 @@
         .app-footer {
             height: var(--footer-height);
             background: var(--primary-color);
-            color: white;
+            color: var(--cta-text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
             padding: 0 24px;
         }
 
