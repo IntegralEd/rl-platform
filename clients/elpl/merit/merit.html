@@ -176,8 +176,8 @@
 
         .next-button {
             padding: var(--client-button-padding);
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
+            background: var(--secondary-color, #211651);
+            color: white;
             border: none;
             border-radius: var(--client-button-radius);
             cursor: pointer;
@@ -185,10 +185,24 @@
             font-size: var(--client-font-size-body);
             transition: background 0.2s;
             min-width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .next-button::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background-image: url('/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .next-button:hover {
-            background: var(--secondary-color);
+            background: var(--secondary-color-dark, #1a1141);
         }
 
         .next-button:focus {
@@ -245,8 +259,8 @@
         .send-button {
             align-self: flex-end;
             padding: var(--client-button-padding);
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
+            background: var(--secondary-color, #211651);
+            color: white;
             border: none;
             border-radius: var(--client-button-radius);
             cursor: pointer;
@@ -255,10 +269,24 @@
             transition: background 0.2s;
             min-width: 80px;
             height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .send-button::after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background-image: url('/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .send-button:hover {
-            background: var(--secondary-color);
+            background: var(--secondary-color-dark, #1a1141);
         }
 
         .message {
@@ -270,8 +298,8 @@
         }
 
         .message.user {
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
+            background: var(--secondary-color, #211651);
+            color: white;
             margin-left: auto;
             align-self: flex-end;
         }
@@ -443,21 +471,27 @@
 </head>
 <body>
     <div class="client-layout">
-        <header class="client-header">
+        <header class="client-header" role="banner">
             <h1 class="header-title">Merit</h1>
-            <div class="version-display">v1.0.0 (live)</div>
+            <span class="version-display">v1.0.0 (live)</span>
         </header>
 
-        <main class="client-content">
+        <main class="client-content" role="main">
             <aside class="sidebar">
                 <!-- Sidebar content will be dynamically loaded -->
             </aside>
 
             <div class="content">
-                <form class="welcome-form" data-client-component="merit-intake-form">
+                <form class="welcome-form" role="form" aria-label="User intake form">
                     <div class="form-group">
                         <label for="grade-level">What grade level do you teach?</label>
-                        <select id="grade-level" name="User_Intake_Item_02" required>
+                        <select 
+                            id="grade-level" 
+                            name="grade-level" 
+                            required
+                            aria-required="true"
+                            aria-label="Select your grade level"
+                        >
                             <option value="">Select a grade level</option>
                             <option value="Kindergarten">Kindergarten</option>
                             <option value="Grade 1">Grade 1</option>
@@ -466,22 +500,34 @@
                             <option value="Grade 4">Grade 4</option>
                             <option value="Grade 5">Grade 5</option>
                         </select>
-                        <div class="error-message" id="grade-level-error"></div>
                     </div>
+                    
                     <div class="form-group">
                         <label for="curriculum">What curriculum do you use?</label>
-                        <input type="text" id="curriculum" name="User_Intake_Item_03" required>
-                        <div class="error-message" id="curriculum-error"></div>
+                        <input 
+                            type="text" 
+                            id="curriculum" 
+                            name="curriculum" 
+                            required
+                            aria-required="true"
+                            aria-label="Enter your curriculum"
+                            placeholder="Enter your curriculum"
+                        >
                     </div>
+                    
                     <div class="form-actions">
-                        <button type="button" class="next-button">Next</button>
+                        <button 
+                            type="submit" 
+                            class="next-button" 
+                            aria-label="Submit form and proceed to chat"
+                        >Next</button>
                     </div>
                 </form>
             </div>
         </main>
 
-        <footer class="client-footer">
-            Powered by Recursive Learning
+        <footer class="client-footer" role="contentinfo">
+            <span>Powered by Recursive Learning</span>
         </footer>
     </div>
 </body>
