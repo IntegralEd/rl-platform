@@ -1,39 +1,203 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
- ---
-description: 
-globs: 
-alwaysApply: true
----
----
-description: Recursive Platform - Canonical Ruleset Index
-globs: ["**/*.html"]
+description: Master index of all platform rulesets
+globs: ["**/*"]
 alwaysApply: true
 ---
 
-# RULESET INDEX
+# Recursive Learning Platform Rulesets
 
-## Client Pages
-- [ ] Enforce `client-layout.mdc` for all /clients/**/*.html pages
+## Overview
+This document serves as the master index for all rulesets in the Recursive Learning platform. It defines the relationships between rulesets and their application contexts.
 
-## Admin Pages
-- [ ] Enforce `admin-layout.mdc` for all /admin/pages/**/*.html pages
+## Ruleset Categories
 
-## MDC Registration
-- [ ] Each .mdc must include:
-    - description block
-    - globs definition
-    - alwaysApply flag
+### Layout & Structure
+- [Admin Layout](admin-layout-structure-behavior.mdc)
+  - Admin page structure
+  - Component organization
+  - Navigation patterns
+  - UI/UX standards
+  
+- [Client Layout](client-layout-structure-behavior.mdc)
+  - Client page structure
+  - Content organization
+  - Navigation flow
+  - User experience
 
-## Enforcement Logic
-- [ ] Rule globs must not overlap unless explicitly merged
-- [ ] Rule conflicts must be resolved by naming scope
-- [ ] Redundant checks should be centralized in this file only if shared
+### Data & API
+- [Redis Access](redis-api-access-patterns.mdc)
+  - Key naming conventions
+  - Data structures
+  - Caching strategies
+  - Performance optimization
 
-## Active Files (by responsibility)
-- [ ] `client-layout.mdc` – layout and embed rules for public views
-- [ ] `admin-layout.mdc` – layout and ingredient rules for admin UI
-- [ ] `redis-api-access-patterns.mdc` – Redis access patterns, identity headers
+## Application Context
+
+### Admin Interface
+- Primary: Admin Layout Rules
+- Secondary: Redis Access Rules
+- Use Cases:
+  - Admin dashboard construction
+  - Content management interfaces
+  - System configuration panels
+  - Monitoring displays
+
+### Client Interface
+- Primary: Client Layout Rules
+- Secondary: Redis Access Rules
+- Use Cases:
+  - Learning content display
+  - Interactive exercises
+  - Progress tracking
+  - User settings
+
+### API Layer
+- Primary: Redis Access Rules
+- Secondary: Both Layout Rules
+- Use Cases:
+  - Data caching
+  - Session management
+  - Real-time updates
+  - Performance optimization
+
+## Rule Precedence
+
+1. Security Rules (Always highest priority)
+2. Data Access Rules
+3. Layout Rules
+4. Performance Rules
+5. Documentation Rules
+
+## Validation Methods
+
+### Automated Checks
+- Pre-commit hooks
+- CI/CD pipeline tests
+- Linting rules
+- Unit tests
+
+### Manual Review
+- Code review checklist
+- Design review process
+- Performance audits
+- Security assessments
+
+## Change Management
+
+### Process
+1. Propose change
+2. Review impact
+3. Update documentation
+4. Implement changes
+5. Validate compliance
+6. Deploy updates
+
+### Requirements
+- Version control all changes
+- Document rationale
+- Update affected systems
+- Notify stakeholders
+
+## Compliance Tracking
+
+### Metrics
+- Rule compliance percentage
+- Violation frequency
+- Fix turnaround time
+- Technical debt impact
+
+### Reporting
+- Weekly compliance reports
+- Monthly trend analysis
+- Quarterly reviews
+- Annual assessments
+
+## Tools & Integration
+
+### Development
+- ESLint rules
+- Prettier config
+- TypeScript types
+- JSDoc templates
+
+### Testing
+- Jest configurations
+- Cypress test suites
+- Performance benchmarks
+- Security scans
+
+### Documentation
+- JSDoc generation
+- README templates
+- API documentation
+- Change logs
+
+## Best Practices
+
+### Code Organization
+- Follow folder structure
+- Use consistent naming
+- Implement patterns
+- Document decisions
+
+### Performance
+- Optimize loading
+- Cache effectively
+- Minimize requests
+- Monitor metrics
+
+### Security
+- Validate input
+- Sanitize output
+- Manage permissions
+- Log activities
+
+### Accessibility
+- Use semantic HTML
+- Add ARIA labels
+- Test with readers
+- Support keyboard
+
+## Version Control
+
+### Branch Strategy
+- Feature branches
+- Release branches
+- Hotfix process
+- Version tagging
+
+### Commit Standards
+- Clear messages
+- Linked issues
+- Change scope
+- Breaking changes
+
+## Deployment
+
+### Environments
+- Development
+- Staging
+- Production
+- Testing
+
+### Process
+1. Build verification
+2. Rule validation
+3. Security checks
+4. Performance tests
+5. Deployment approval
+6. Release notes
+
+## Support
+
+### Documentation
+- Implementation guides
+- Troubleshooting steps
+- Best practices
+- Examples
+
+### Resources
+- Code templates
+- Style guides
+- Tool configs
+- Test suites 
