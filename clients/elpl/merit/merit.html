@@ -14,6 +14,9 @@
     <script src="/shared/assets/js/client-auth.js"></script>
     <script src="/shared/assets/js/client-router.js"></script>
     
+    <!-- Merit specific logic -->
+    <script src="../assets/js/client-merit-logic.js"></script>
+    
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
         data-user-email=""
@@ -282,6 +285,53 @@
             color: var(--error-color, #dc3545);
             font-size: var(--client-font-size-small);
             margin-top: 4px;
+        }
+
+        /* Error Dialog */
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .error-dialog {
+            background: white;
+            padding: var(--client-spacing-medium);
+            border-radius: var(--client-card-border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .error-dialog p {
+            margin: 0 0 var(--client-spacing-medium);
+            color: var(--client-text);
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+        }
+
+        .error-dialog button {
+            padding: var(--client-button-padding);
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
+            border: none;
+            border-radius: var(--client-button-radius);
+            cursor: pointer;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            min-width: 80px;
+        }
+
+        .error-dialog button:hover {
+            background: var(--secondary-color);
         }
 
         /* Responsive Design */
