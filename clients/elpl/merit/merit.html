@@ -4,10 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELPL Merit System</title>
+    <title>Merit</title>
     
     <!-- Custom styles -->
     <link rel="stylesheet" href="../assets/css/elpl.custom.css">
+    
+    <!-- Required client scripts -->
+    <script src="/shared/assets/js/client-component-loader.js"></script>
+    <script src="/shared/assets/js/client-auth.js"></script>
+    <script src="/shared/assets/js/client-router.js"></script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -20,19 +25,17 @@
 
     <style>
         :root {
-            /* Layout */
+            /* Layout - using standard client variables */
+            --header-height: 60px;
+            --footer-height: 40px;
             --sidebar-width: 250px;
+            --content-width: 1200px;
             --content-padding: var(--client-spacing-medium, 20px);
-            --header-height: 50px;
-            --footer-height: 60px;
             
-            /* Colors - inheriting from elpl.custom.css */
-            --bg-color: var(--background-color);
-            --border-color: #eee;
-            
-            /* Dimensions */
-            --max-width: 1200px;
-            --max-height: 900px;
+            /* Colors - using client variables */
+            --client-bg: #ffffff;
+            --client-text: #2c3e50;
+            --client-border: #e1e4e8;
         }
 
         body {
@@ -42,12 +45,14 @@
             display: flex;
             justify-content: center;
             box-sizing: border-box;
+            background: var(--client-bg);
+            color: var(--client-text);
         }
 
-        .app-container {
+        .client-layout {
             width: 100%;
-            max-width: var(--max-width);
-            height: var(--max-height);
+            max-width: var(--content-width);
+            min-height: var(--max-height);
             display: flex;
             flex-direction: column;
             background: white;
@@ -59,7 +64,7 @@
         }
 
         /* Header */
-        .app-header {
+        .client-header {
             height: var(--header-height);
             background: var(--primary-color);
             display: flex;
@@ -75,18 +80,24 @@
             font-size: var(--client-font-size-h2);
         }
 
-        /* Main Content Layout */
-        .main-content {
-            display: flex;
+        .version-display {
+            color: var(--cta-text-color);
+            font-size: var(--client-font-size-small);
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .client-content {
             flex: 1;
             overflow: hidden;
+            display: flex;
         }
 
         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--background-color);
-            border-right: 1px solid var(--border-color);
+            background: var(--client-bg);
+            border-right: 1px solid var(--client-border);
             padding: var(--content-padding);
             display: flex;
             flex-direction: column;
@@ -122,13 +133,14 @@
 
         /* Welcome Form */
         .welcome-form {
-            max-width: 600px;
-            margin: 0 auto;
+            background: white;
             padding: var(--client-spacing-medium);
+            border-radius: var(--client-card-border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .form-group {
-            margin-bottom: var(--client-spacing-small);
+            margin-bottom: var(--client-spacing-medium);
         }
 
         .form-group label {
@@ -136,16 +148,54 @@
             margin-bottom: 8px;
             font-family: var(--client-font-h2);
             font-weight: 500;
+            color: var(--client-text);
         }
 
         .form-group select,
         .form-group input {
             width: 100%;
             padding: var(--client-spacing-small);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--client-border);
             border-radius: var(--client-button-radius);
             font-family: var(--client-font-body);
             font-size: var(--client-font-size-body);
+            color: var(--client-text);
+            background: white;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
+        }
+
+        .form-actions {
+            margin-top: var(--client-spacing-medium);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-button {
+            padding: var(--client-button-padding);
+            background: var(--tertiary-color);
+            color: var(--cta-text-color);
+            border: none;
+            border-radius: var(--client-button-radius);
+            cursor: pointer;
+            font-family: var(--client-font-body);
+            font-size: var(--client-font-size-body);
+            transition: background 0.2s;
+            min-width: 120px;
+        }
+
+        .next-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .next-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-color);
         }
 
         /* Chat Interface */
@@ -159,9 +209,9 @@
             flex: 1;
             overflow-y: auto;
             padding: var(--client-spacing-small);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--client-border);
             border-radius: var(--client-card-border-radius);
-            background: var(--bg-color);
+            background: var(--client-bg);
             margin-bottom: var(--client-spacing-medium);
         }
 
@@ -181,47 +231,13 @@
 
         .message.assistant {
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--client-border);
             margin-right: auto;
-            color: var(--text-color);
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: var(--client-spacing-small);
-            padding: var(--client-spacing-small);
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: var(--client-card-border-radius);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: var(--client-spacing-small);
-            border: 1px solid var(--border-color);
-            border-radius: var(--client-button-radius);
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            resize: none;
-        }
-
-        .send-button {
-            padding: var(--client-button-padding);
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
-            border: none;
-            border-radius: var(--client-button-radius);
-            cursor: pointer;
-            font-family: var(--client-font-body);
-            transition: background 0.2s;
-        }
-
-        .send-button:hover {
-            background: var(--secondary-color);
+            color: var(--client-text);
         }
 
         /* Footer */
-        .app-footer {
+        .client-footer {
             height: var(--footer-height);
             background: var(--primary-color);
             color: var(--cta-text-color);
@@ -261,17 +277,11 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Cache Status */
-        .cache-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            display: none;
+        /* Error States */
+        .error-message {
+            color: var(--error-color, #dc3545);
+            font-size: var(--client-font-size-small);
+            margin-top: 4px;
         }
 
         /* Responsive Design */
@@ -280,22 +290,22 @@
                 padding: 0;
             }
 
-            .app-container {
+            .client-layout {
                 height: 100vh;
                 max-height: none;
                 border-radius: 0;
             }
 
-            .main-content {
+            .client-content {
                 flex-direction: column;
             }
 
             .sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--client-border);
                 flex-direction: row;
-                padding: 10px;
+                padding: var(--client-spacing-small);
             }
 
             .sidebar button {
@@ -303,275 +313,97 @@
             }
 
             .welcome-form {
-                padding: 10px;
+                padding: var(--client-spacing-small);
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1 class="header-title">ELPL Merit System</h1>
+    <div class="client-layout">
+        <header class="client-header">
+            <h1 class="header-title">Merit</h1>
+            <div class="version-display">v1.0.0 (live)</div>
         </header>
 
-        <div class="main-content">
-            <nav class="sidebar" role="navigation">
-                <button onclick="showSection('welcome')" class="active" aria-pressed="true">Welcome</button>
-                <button onclick="showSection('chat')" aria-pressed="false">Chat</button>
-            </nav>
+        <main class="client-content">
+            <aside class="sidebar">
+                <!-- Sidebar content will be dynamically loaded -->
+            </aside>
 
-            <main class="content" role="main">
-                <section id="welcome" class="section active" aria-labelledby="welcome-title">
-                    <div class="welcome-form">
-                        <h2 id="welcome-title">Welcome</h2>
-                        <form id="intake-form">
-                            <div class="form-group">
-                                <label for="grade-level">What grade level do you teach?</label>
-                                <select id="grade-level" name="User_Intake_Item_02" required>
-                                    <option value="">Select a grade level</option>
-                                    <option value="Kindergarten">Kindergarten</option>
-                                    <option value="Grade 1">Grade 1</option>
-                                    <option value="Grade 2">Grade 2</option>
-                                    <option value="Grade 3">Grade 3</option>
-                                    <option value="Grade 4">Grade 4</option>
-                                    <option value="Grade 5">Grade 5</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="curriculum">What curriculum do you use?</label>
-                                <input type="text" id="curriculum" name="User_Intake_Item_01" 
-                                    placeholder="English Language Arts (ELA)" required />
-                            </div>
-                            <input type="hidden" name="User_Intake_Token" value="Bmore" />
-                        </form>
+            <div class="content">
+                <form class="welcome-form" data-client-component="merit-intake-form">
+                    <div class="form-group">
+                        <label for="grade-level">What grade level do you teach?</label>
+                        <select id="grade-level" name="User_Intake_Item_02" required>
+                            <option value="">Select a grade level</option>
+                            <option value="Kindergarten">Kindergarten</option>
+                            <option value="Grade 1">Grade 1</option>
+                            <option value="Grade 2">Grade 2</option>
+                            <option value="Grade 3">Grade 3</option>
+                            <option value="Grade 4">Grade 4</option>
+                            <option value="Grade 5">Grade 5</option>
+                        </select>
+                        <div class="error-message" id="grade-level-error"></div>
                     </div>
-                </section>
-
-                <section id="chat" class="section" aria-labelledby="chat-title">
-                    <div class="chat-container">
-                        <h2 id="chat-title" class="visually-hidden">Chat Interface</h2>
-                        <div class="chat-messages" id="chat-messages"></div>
-                        <div class="chat-input-container">
-                            <textarea class="chat-input" id="chat-input" 
-                                placeholder="Type your message..." 
-                                rows="3"
-                                aria-label="Chat message"></textarea>
-                            <button class="send-button" onclick="sendMessage()" aria-label="Send message">Send</button>
-                        </div>
+                    <div class="form-group">
+                        <label for="curriculum">What curriculum do you use?</label>
+                        <input type="text" id="curriculum" name="User_Intake_Item_03" required>
+                        <div class="error-message" id="curriculum-error"></div>
                     </div>
-                </section>
-            </main>
-        </div>
+                    <div class="form-actions">
+                        <button type="button" class="next-button" onclick="handleNextClick()">Next</button>
+                    </div>
+                </form>
+            </div>
+        </main>
 
-        <footer class="app-footer">
+        <footer class="client-footer">
             Powered by Recursive Learning
         </footer>
-
-        <div id="loading-overlay" class="loading-overlay" style="display: none;">
-            <div class="loading-spinner" role="status" aria-label="Loading"></div>
-        </div>
-
-        <div class="cache-status" id="cache-status"></div>
     </div>
 
     <script>
-        // Redis configuration
-        const REDIS_CONFIG = {
-            endpoint: '/integraled/redis/endpoint',
-            ttl: 3600, // 1 hour cache TTL
-            retryAttempts: 3,
-            cachePrefix: 'merit_chat'
-        };
-
-        // OpenAI configuration
-        const OPENAI_CONFIG = {
-            assistantId: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
-            model: 'gpt-4-turbo-preview',
-            threadTTL: 86400 // 24 hours
-        };
-
-        let messageThread = null;
-        let cacheHits = 0;
-        let cacheMisses = 0;
-
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            input.value = '';
-            addMessageToUI('user', message);
-
+        function handleNextClick() {
+            // Clear previous errors
+            document.getElementById('grade-level-error').textContent = '';
+            document.getElementById('curriculum-error').textContent = '';
+            
+            const gradeLevel = document.getElementById('grade-level').value;
+            const curriculum = document.getElementById('curriculum').value;
+            let hasError = false;
+            
+            if (!gradeLevel) {
+                document.getElementById('grade-level-error').textContent = 'Please select a grade level';
+                hasError = true;
+            }
+            
+            if (!curriculum) {
+                document.getElementById('curriculum-error').textContent = 'Please enter your curriculum';
+                hasError = true;
+            }
+            
+            if (hasError) {
+                return;
+            }
+            
             try {
-                const cacheKey = `${REDIS_CONFIG.cachePrefix}:${messageThread || 'new'}:${Date.now()}`;
-                const cachedResponse = await checkCache(cacheKey);
-
-                if (cachedResponse) {
-                    cacheHits++;
-                    updateCacheStatus();
-                    addMessageToUI('assistant', cachedResponse);
-                    return;
-                }
-
-                cacheMisses++;
-                updateCacheStatus();
-
-                const response = await fetch('https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Cache-Strategy': 'redis-preferred',
-                        'X-Thread-ID': messageThread || ''
-                    },
-                    body: JSON.stringify({
-                        message,
-                        threadId: messageThread,
-                        assistantId: OPENAI_CONFIG.assistantId,
-                        model: OPENAI_CONFIG.model
-                    })
-                });
-
-                const data = await response.json();
+                // Show loading state
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = '<div class="loading-spinner"></div>';
+                document.querySelector('.client-layout').appendChild(loadingOverlay);
                 
-                if (data.threadId && !messageThread) {
-                    messageThread = data.threadId;
-                    localStorage.setItem('merit_thread_id', messageThread);
-                }
-
-                await setCache(cacheKey, data.response);
-                addMessageToUI('assistant', data.response);
-
+                // Store the form data
+                localStorage.setItem('merit_grade_level', gradeLevel);
+                localStorage.setItem('merit_curriculum', curriculum);
+                
+                // Proceed to chat interface
+                window.location.href = 'merit-chat.html';
             } catch (error) {
-                console.error('Error:', error);
-                addMessageToUI('assistant', 'Sorry, there was an error processing your message. Please try again.');
+                console.error('Error saving form data:', error);
+                alert('An error occurred while saving your responses. Please try again.');
             }
         }
-
-        async function checkCache(key) {
-            try {
-                const response = await fetch(`${REDIS_CONFIG.endpoint}/get/${key}`);
-                if (response.ok) {
-                    const data = await response.text();
-                    return data;
-                }
-            } catch (error) {
-                console.warn('Cache miss:', error);
-            }
-            return null;
-        }
-
-        async function setCache(key, value) {
-            try {
-                await fetch(`${REDIS_CONFIG.endpoint}/set/${key}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                        'X-Cache-TTL': REDIS_CONFIG.ttl.toString()
-                    },
-                    body: value
-                });
-            } catch (error) {
-                console.warn('Cache set failed:', error);
-            }
-        }
-
-        function addMessageToUI(type, content) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = content;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function updateCacheStatus() {
-            const status = document.getElementById('cache-status');
-            const ratio = cacheHits + cacheMisses > 0 ? 
-                Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) : 0;
-            status.textContent = `Cache: ${ratio}% hit rate (${cacheHits}/${cacheHits + cacheMisses})`;
-            status.style.display = 'block';
-        }
-
-        // Section Navigation
-        function showSection(id) {
-            // Update button states
-            document.querySelectorAll('.sidebar button').forEach(btn => {
-                btn.classList.remove('active');
-                btn.setAttribute('aria-pressed', 'false');
-            });
-            document.querySelector(`button[onclick="showSection('${id}')"]`).classList.add('active');
-            document.querySelector(`button[onclick="showSection('${id}')"]`).setAttribute('aria-pressed', 'true');
-
-            // Update section visibility
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        // Form Validation
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('intake-form');
-            const grade = document.getElementById('grade-level');
-            const curriculum = document.getElementById('curriculum');
-
-            function validateForm() {
-                const isValid = grade.value && curriculum.value.trim();
-                if (isValid) {
-                    document.querySelector('button[onclick="showSection(\'chat\')"]').removeAttribute('disabled');
-                } else {
-                    document.querySelector('button[onclick="showSection(\'chat\')"]').setAttribute('disabled', 'true');
-                }
-            }
-
-            grade.addEventListener('change', validateForm);
-            curriculum.addEventListener('input', validateForm);
-            validateForm();
-        });
-
-        // Initialize system
-        function initMeritSystem() {
-            const headerSpan = document.getElementById('header-span');
-            const chatbotContainer = document.getElementById('chatbot-container');
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const chatInput = document.getElementById('chat-input');
-            
-            // Restore thread if exists
-            messageThread = localStorage.getItem('merit_thread_id');
-            
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            let checkCount = 0;
-            const maxChecks = 20;
-            
-            function checkHeaderData() {
-                const userEmail = headerSpan.getAttribute('data-user-email');
-                if (userEmail) {
-                    localStorage.setItem('merit_user_email', userEmail);
-                    localStorage.setItem('merit_user_name', headerSpan.getAttribute('data-user-name'));
-                    localStorage.setItem('merit_user_id', headerSpan.getAttribute('data-user-id'));
-                    
-                    loadingOverlay.style.display = 'none';
-                    chatbotContainer.classList.add('loaded');
-                    
-                    addMessageToUI('assistant', 'Welcome to the ELPL Merit System. How can I help you today?');
-                } else if (checkCount < maxChecks) {
-                    checkCount++;
-                    setTimeout(checkHeaderData, 500);
-                } else {
-                    loadingOverlay.style.display = 'none';
-                    chatbotContainer.classList.add('loaded');
-                    addMessageToUI('assistant', 'Welcome! Please note that some features may be limited without user authentication.');
-                }
-            }
-            
-            checkHeaderData();
-        }
-        
-        document.addEventListener('DOMContentLoaded', initMeritSystem);
     </script>
 </body>
 </html> 
