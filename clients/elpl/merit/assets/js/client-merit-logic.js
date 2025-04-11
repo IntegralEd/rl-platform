@@ -4,20 +4,55 @@
 
 class MeritIntakeForm {
     constructor() {
-        // Initialize form elements
+        // Get form elements
         this.form = document.querySelector('.welcome-form');
         this.gradeLevelInput = document.getElementById('grade-level');
         this.curriculumInput = document.getElementById('curriculum');
         this.nextButton = document.querySelector('.next-button');
-        this.chatContainer = document.querySelector('.chat-container');
+        this.contentArea = document.querySelector('.content');
+        
+        // Tab elements
+        this.tabs = document.querySelectorAll('.tab-button');
+        this.welcomeTab = document.getElementById('welcome-tab');
+        this.chatTab = document.getElementById('chat-tab');
         
         // Set up event listeners
         this.setupEventListeners();
+        this.setupTabs();
     }
 
     setupEventListeners() {
-        this.nextButton.addEventListener('click', () => this.handleNextClick());
+        this.nextButton?.addEventListener('click', () => this.handleNextClick());
         this.form.addEventListener('input', () => this.validateForm());
+    }
+
+    setupTabs() {
+        this.tabs.forEach(tab => {
+            tab.addEventListener('click', () => this.switchTab(tab));
+        });
+    }
+
+    switchTab(selectedTab) {
+        // Update tab states
+        this.tabs.forEach(tab => {
+            tab.classList.remove('active');
+            tab.setAttribute('aria-selected', 'false');
+        });
+        selectedTab.classList.add('active');
+        selectedTab.setAttribute('aria-selected', 'true');
+
+        // Show corresponding content
+        const tabName = selectedTab.dataset.tab;
+        if (tabName === 'welcome') {
+            this.welcomeTab.style.display = 'block';
+            this.chatTab.style.display = 'none';
+        } else if (tabName === 'chat') {
+            this.welcomeTab.style.display = 'none';
+            this.chatTab.style.display = 'block';
+        }
+
+        // Log for debugging
+        console.log(`Switched to ${tabName} tab`);
     }
 
     validateForm() {

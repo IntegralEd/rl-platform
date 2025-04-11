@@ -105,32 +105,43 @@
         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--client-bg);
+            background: var(--background-color);
             border-right: 1px solid var(--client-border);
-            padding: var(--content-padding);
+            padding: var(--client-spacing-medium);
             display: flex;
             flex-direction: column;
             gap: var(--client-spacing-small);
         }
 
-        .sidebar button {
+        .tab-button {
             padding: var(--client-button-padding);
             border: none;
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
+            background: var(--background-color);
+            color: var(--text-color);
             border-radius: var(--client-button-radius);
             cursor: pointer;
             font-family: var(--client-font-body);
             font-size: var(--client-font-size-body);
             transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: var(--client-spacing-small);
         }
 
-        .sidebar button:hover {
+        .tab-button:hover {
             background: var(--secondary-color);
+            color: var(--cta-text-color);
         }
 
-        .sidebar button.active {
-            background: var(--primary-color);
+        .tab-button.active {
+            background: var(--secondary-color);
+            color: var(--cta-text-color);
+        }
+
+        .tab-button svg {
+            width: 24px;
+            height: 24px;
         }
 
         /* Content Area */
@@ -487,12 +498,26 @@
         </header>
 
         <main class="client-content" role="main">
-            <aside class="sidebar">
-                <!-- Sidebar content will be dynamically loaded -->
-            </aside>
+            <!-- Sidebar with tabs -->
+            <nav class="sidebar" role="navigation" aria-label="Main navigation">
+                <button class="tab-button active" data-tab="welcome" aria-selected="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/>
+                    </svg>
+                    Welcome
+                </button>
+                <button class="tab-button" data-tab="chat" aria-selected="false">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    Chat
+                </button>
+            </nav>
 
+            <!-- Content area -->
             <div class="content">
-                <form class="welcome-form" role="form" aria-label="User intake form">
+                <!-- Welcome form content -->
+                <div class="welcome-form" id="welcome-tab" role="tabpanel" aria-labelledby="welcome-tab">
                     <div class="form-group">
                         <label for="grade-level">What grade level do you teach?</label>
                         <select 
@@ -532,7 +557,7 @@
                             aria-label="Submit form and proceed to chat"
                         >NEXT</button>
                     </div>
-                </form>
+                </div>
             </div>
         </main>
 
