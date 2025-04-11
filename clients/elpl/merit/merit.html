@@ -4,237 +4,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ELPL Merit System - Chat interface for merit-based learning">
+    <!-- TODO: Add favicon -->
+    <meta name="theme-color" content="#003366">
     <title>ELPL Merit System</title>
     
-    <!-- Preheader data span -->
-    <span id="header-span" style="display:none" 
-        data-user-email=""
-        data-user-name=""
-        data-user-id=""
-        data-access-level=""
-        data-last-login="">
-    </span>
+    <!-- Required client layout scripts -->
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    
+    <!-- TODO: Add client-specific analytics -->
+    
+    <link rel="stylesheet" href="/clients/elpl/assets/css/merit.css">
+    <!-- TODO: Add shared component styles -->
+    <link rel="stylesheet" href="/shared/assets/css/components.css">
 
     <style>
         :root {
-            /* Core Layout Dimensions */
-            --embed-width: 1900px;
-            --embed-height: 90vh;
-            --header-height: 50px;
-            --footer-height: 60px;
-            --border-color: #eee;
-            --page-margin: 20px;
+            /* Required client layout variables */
+            --header-height: 60px;
+            --footer-height: 40px;
+            --client-bg: #ffffff;
+            --client-text: #2c3e50;
+            --client-border: #e1e4e8;
+            --content-width: 1200px;
 
-            /* Branding Colors */
-            --primary-color: #003366; /* ELPL Blue */
-            --secondary-color: #4A90E2; /* ELPL Light Blue */
+            /* ELPL specific variables */
+            --primary-color: #003366;
+            --secondary-color: #4A90E2;
             --background-color: #f9f9f9;
             --text-color: #2b2b2b;
+            --border-color: #eee;
+            --page-margin: 20px;
         }
 
-        body {
-            margin: 0;
-            padding: var(--page-margin);
-            font-family: Arial, sans-serif;
+        /* Standard client layout structure */
+        .client-layout {
+            display: grid;
+            grid-template-rows: var(--header-height) 1fr var(--footer-height);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            background: #f4f4f4;
-            box-sizing: border-box;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: var(--embed-width);
-            height: var(--embed-height);
-            display: flex;
-            flex-direction: column;
-            background: white;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            max-width: var(--content-width);
             margin: 0 auto;
-            position: relative;
+            background: var(--client-bg);
         }
 
-        /* Header */
-        .app-header {
-            height: var(--header-height);
+        .client-header {
             background: var(--primary-color);
+            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            box-sizing: border-box;
+            border-bottom: 1px solid var(--client-border);
         }
 
-        .header-title {
-            color: white;
-            font-size: 20px;
-            font-weight: 500;
-        }
-
-        /* Main Content */
-        #chatbot-container {
-            flex: 1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        #chatbot-container.loaded {
-            opacity: 1;
-        }
-
-        #chatbot-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Loading State */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1920px) {
-            body {
-                padding: 0;
-            }
-            
-            .app-container {
-                height: 100vh;
-                margin: 0;
-            }
-        }
-
-        /* Chat Interface */
-        .chat-container {
+        .client-content {
+            padding: var(--page-margin);
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
+        }
+
+        .client-footer {
+            background: var(--client-bg);
+            border-top: 1px solid var(--client-border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Chat interface styles */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--client-border);
             border-radius: 8px;
             background: var(--background-color);
-            margin-bottom: 20px;
         }
 
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 8px;
-            max-width: 80%;
+        /* Accessibility and state styles */
+        [aria-busy="true"] {
+            cursor: wait;
         }
 
-        .message.user {
-            background: var(--secondary-color);
-            color: white;
-            margin-left: auto;
-        }
-
-        .message.assistant {
-            background: white;
-            border: 1px solid var(--border-color);
-            margin-right: auto;
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            padding: 15px;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 14px;
-            resize: none;
-        }
-
-        .send-button {
-            padding: 10px 20px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .send-button:hover {
-            background: var(--secondary-color);
-        }
-
-        .cache-status {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
+        [aria-hidden="true"] {
             display: none;
+        }
+
+        /* TODO: Add dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* TODO: Define dark mode variables */
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loading-overlay">
+    <!-- Loading state -->
+    <div id="loading-overlay" role="alert" aria-busy="true" aria-label="Loading application">
         <div class="loading-spinner"></div>
     </div>
 
-    <div class="app-container">
-        <header class="app-header">
-            <h1 class="header-title">ELPL Merit System</h1>
+    <!-- Main layout structure -->
+    <div class="client-layout">
+        <header class="client-header" role="banner">
+            <h1>ELPL Merit System</h1>
+            <!-- TODO: Add navigation menu -->
+            <nav role="navigation" aria-label="Main navigation">
+                <!-- TODO: Implement navigation -->
+            </nav>
         </header>
 
-        <div id="chatbot-container" class="chat-container">
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-container">
-                <textarea class="chat-input" id="chat-input" 
-                    placeholder="Type your message..." 
-                    rows="3"></textarea>
-                <button class="send-button" onclick="sendMessage()">Send</button>
+        <main class="client-content" role="main">
+            <div class="chat-container" id="chatbot-container">
+                <div class="chat-messages" 
+                     id="chat-messages" 
+                     role="log" 
+                     aria-live="polite" 
+                     aria-label="Chat messages">
+                </div>
+                <div class="chat-input-container">
+                    <label for="chat-input" class="sr-only">Type your message</label>
+                    <textarea class="chat-input" 
+                              id="chat-input" 
+                              placeholder="Type your message..." 
+                              rows="3"
+                              aria-label="Chat input"></textarea>
+                    <button class="send-button" 
+                            onclick="sendMessage()"
+                            aria-label="Send message">
+                        Send
+                    </button>
+                </div>
             </div>
-        </div>
+        </main>
 
-        <div class="cache-status" id="cache-status"></div>
+        <footer class="client-footer" role="contentinfo">
+            <div class="version">v1.0.0 (live)</div>
+            <div class="cache-status" 
+                 id="cache-status" 
+                 role="status" 
+                 aria-live="polite">
+            </div>
+        </footer>
     </div>
 
-    <script>
+    <!-- TODO: Add error boundary component -->
+    <div id="error-boundary" 
+         role="alert" 
+         aria-live="assertive" 
+         hidden>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // TODO: Move to separate JS file
+        import { ClientRouter } from '/shared/assets/js/client-router.js';
+        import { initializeChat } from '/clients/elpl/assets/js/chat.js';
+
         // Redis configuration
         const REDIS_CONFIG = {
             endpoint: '/integraled/redis/endpoint',
@@ -243,160 +178,10 @@
             cachePrefix: 'merit_chat'
         };
 
-        // OpenAI configuration
-        const OPENAI_CONFIG = {
-            assistantId: 'asst_IA5PsJxdShVPTAv2xeXTr4Ma',
-            model: 'gpt-4-turbo-preview',
-            threadTTL: 86400 // 24 hours
-        };
-
-        let messageThread = null;
-        let cacheHits = 0;
-        let cacheMisses = 0;
-
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            input.value = '';
-            addMessageToUI('user', message);
-
-            try {
-                const cacheKey = `${REDIS_CONFIG.cachePrefix}:${messageThread || 'new'}:${Date.now()}`;
-                const cachedResponse = await checkCache(cacheKey);
-
-                if (cachedResponse) {
-                    cacheHits++;
-                    updateCacheStatus();
-                    addMessageToUI('assistant', cachedResponse);
-                    return;
-                }
-
-                cacheMisses++;
-                updateCacheStatus();
-
-                const response = await fetch('https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Cache-Strategy': 'redis-preferred',
-                        'X-Thread-ID': messageThread || ''
-                    },
-                    body: JSON.stringify({
-                        message,
-                        threadId: messageThread,
-                        assistantId: OPENAI_CONFIG.assistantId,
-                        model: OPENAI_CONFIG.model
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.threadId && !messageThread) {
-                    messageThread = data.threadId;
-                    localStorage.setItem('merit_thread_id', messageThread);
-                }
-
-                await setCache(cacheKey, data.response);
-                addMessageToUI('assistant', data.response);
-
-            } catch (error) {
-                console.error('Error:', error);
-                addMessageToUI('assistant', 'Sorry, there was an error processing your message. Please try again.');
-            }
-        }
-
-        async function checkCache(key) {
-            try {
-                const response = await fetch(`${REDIS_CONFIG.endpoint}/get/${key}`);
-                if (response.ok) {
-                    const data = await response.text();
-                    return data;
-                }
-            } catch (error) {
-                console.warn('Cache miss:', error);
-            }
-            return null;
-        }
-
-        async function setCache(key, value) {
-            try {
-                await fetch(`${REDIS_CONFIG.endpoint}/set/${key}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain',
-                        'X-Cache-TTL': REDIS_CONFIG.ttl.toString()
-                    },
-                    body: value
-                });
-            } catch (error) {
-                console.warn('Cache set failed:', error);
-            }
-        }
-
-        function addMessageToUI(type, content) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = content;
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function updateCacheStatus() {
-            const status = document.getElementById('cache-status');
-            const ratio = cacheHits + cacheMisses > 0 ? 
-                Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) : 0;
-            status.textContent = `Cache: ${ratio}% hit rate (${cacheHits}/${cacheHits + cacheMisses})`;
-            status.style.display = 'block';
-        }
-
-        // Initialize system
-        function initMeritSystem() {
-            const headerSpan = document.getElementById('header-span');
-            const chatbotContainer = document.getElementById('chatbot-container');
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const chatInput = document.getElementById('chat-input');
-            
-            // Restore thread if exists
-            messageThread = localStorage.getItem('merit_thread_id');
-            
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-
-            let checkCount = 0;
-            const maxChecks = 20;
-            
-            function checkHeaderData() {
-                const userEmail = headerSpan.getAttribute('data-user-email');
-                if (userEmail) {
-                    localStorage.setItem('merit_user_email', userEmail);
-                    localStorage.setItem('merit_user_name', headerSpan.getAttribute('data-user-name'));
-                    localStorage.setItem('merit_user_id', headerSpan.getAttribute('data-user-id'));
-                    
-                    loadingOverlay.style.display = 'none';
-                    chatbotContainer.classList.add('loaded');
-                    
-                    addMessageToUI('assistant', 'Welcome to the ELPL Merit System. How can I help you today?');
-                } else if (checkCount < maxChecks) {
-                    checkCount++;
-                    setTimeout(checkHeaderData, 500);
-                } else {
-                    loadingOverlay.style.display = 'none';
-                    chatbotContainer.classList.add('loaded');
-                    addMessageToUI('assistant', 'Welcome! Please note that some features may be limited without user authentication.');
-                }
-            }
-            
-            checkHeaderData();
-        }
-        
-        document.addEventListener('DOMContentLoaded', initMeritSystem);
+        // Initialize components
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeChat(REDIS_CONFIG);
+        });
     </script>
 </body>
 </html> 
