@@ -40,23 +40,42 @@ This document outlines the MVP requirements for implementing the Merit chat inte
 +------------------------+ 
 |       Header 60px     |  ← Fixed height, contains logo and version
 +------------------------+
-|                       |
-|    Main Content       |  ← Flex-grow: 1
-|    min-height: 70vh   |
-|                       |
+|          |            |
+| Sidebar  |   Main     |  ← Flex container with collapsible sidebar
+|  20%     |  Content   |  ← Sidebar: 20% (collapsible)
+|          |   80%      |  ← Content: 80% (expands when sidebar hidden)
+|          |            |
 +------------------------+
 |    Footer 80px        |  ← Fixed height, contains chat/play bar
 +------------------------+
 ```
 
+### Sidebar Specifications
+- Width: 20% of viewport (collapsible)
+- States:
+  - Expanded: 20% width with smooth transition
+  - Collapsed: 0% width, content expands to 100%
+  - Mobile: Slides in from left as overlay
+- Toggle:
+  - Desktop: Persistent toggle button
+  - Mobile: Hamburger menu in header
+- Content:
+  - Navigation buttons
+  - Context information
+  - Collapsible sections
+- Accessibility:
+  - Keyboard navigable
+  - Screen reader announcements for state changes
+  - Focus management on toggle
+
 ### Content Area Proportions
 - Header: 60px fixed height
 - Main Content: 
-  - Width: 70% of viewport (max-width: 1200px)
+  - Width: 80% with sidebar, 100% without (max-width: 1200px)
   - Min-height: 70vh
   - Padding: 2rem (desktop), 1rem (mobile)
+- Sidebar: 20% width (0% when collapsed)
 - Footer: 80px fixed height
-- Sidebar: 250px fixed width (collapses on mobile)
 
 ### Component Dimensions
 - Chat messages: max-width 70% of container
@@ -75,17 +94,16 @@ This document outlines the MVP requirements for implementing the Merit chat inte
 
 ### Responsive Breakpoints
 - Desktop: > 1024px
-  - Two-column layout
-  - Fixed sidebar
+  - Sidebar: 20% width, collapsible
+  - Content: 80% width, expands to 100%
   - Full spacing
 - Tablet: 768px - 1024px
-  - Optional sidebar collapse
+  - Sidebar: Overlay mode
+  - Content: 100% width
   - Reduced padding
-  - Maintained touch targets
 - Mobile: < 768px
-  - Single column
-  - Collapsed sidebar
-  - Full-width inputs
+  - Sidebar: Full-width overlay
+  - Single column layout
   - Maintained touch targets
 
 ### State Management
@@ -93,10 +111,17 @@ This document outlines the MVP requirements for implementing the Merit chat inte
   - Form visible
   - Playbar active
   - Chat hidden
+  - Sidebar expanded
 - Chat State:
   - Chat window visible
   - Chatbar active
   - Form minimized
+  - Sidebar collapsible
+- Sidebar State:
+  - Expanded: 20% width
+  - Collapsed: 0% width
+  - Transition: 300ms ease-in-out
+  - Persistence: Saves state to localStorage
 
 ### Current Implementation Status [T]
 - [T] Basic structure implemented
@@ -1420,3 +1445,136 @@ clients/elpl/goalsetter/
   - [T] User management
   - [T] Analytics accuracy
   - [T] Log completeness 
+
+## Phase 4: Platform Form Enhancement
+
+### Curious Form Migration
+- [ ] Import styled form from frontend repo
+  - [ ] Match platform typography
+  - [ ] Implement platform color scheme
+  - [ ] Add responsive breakpoints
+  - [ ] Ensure accessibility compliance
+
+### Form Components
+- [ ] Input field styling
+  - [ ] Text inputs with floating labels
+  - [ ] Dropdown with custom styling
+  - [ ] Checkbox and radio components
+  - [ ] Error state visualization
+
+### Animation & Interaction
+- [ ] Add micro-interactions
+  - [ ] Field focus states
+  - [ ] Button hover effects
+  - [ ] Form submission feedback
+  - [ ] Loading states
+
+### Validation & Feedback
+- [ ] Client-side validation
+  - [ ] Real-time field validation
+  - [ ] Custom error messages
+  - [ ] Form completion check
+  - [ ] Success state handling
+
+## Next T Review Items to Check
+1. Chat Interface Progress
+   - [ ] Message display implementation
+   - [ ] Chat container styling
+   - [ ] Loading state indicators
+   - [ ] Error handling
+
+2. Form Integration
+   - [ ] Grade level selection working
+   - [ ] Curriculum input validation
+   - [ ] Form submission flow
+   - [ ] Transition animations
+
+3. Navigation
+   - [ ] Tab switching functionality
+   - [ ] State preservation
+   - [ ] URL handling
+   - [ ] History management
+
+4. Error Boundaries
+   - [ ] Component error catching
+   - [ ] Fallback UI implementation
+   - [ ] Error reporting
+   - [ ] Recovery options
+
+## Phase 5: Analytics & Monitoring
+
+### Usage Tracking
+- [ ] Implement form analytics
+  - [ ] Track completion rates
+  - [ ] Monitor drop-off points
+  - [ ] Capture user paths
+  - [ ] Measure response times
+
+### Performance Metrics
+- [ ] Monitor load times
+  - [ ] Asset loading
+  - [ ] API response times
+  - [ ] Client-side rendering
+  - [ ] Cache effectiveness
+
+### Error Tracking
+- [ ] Set up error logging
+  - [ ] Client-side errors
+  - [ ] API failures
+  - [ ] Validation issues
+  - [ ] Performance problems
+
+## Phase 6: A/B Testing Infrastructure
+
+### Test Framework
+- [ ] Set up testing infrastructure
+  - [ ] Version control
+  - [ ] Feature flags
+  - [ ] User segmentation
+  - [ ] Analytics integration
+
+### Test Cases
+- [ ] Define initial tests
+  - [ ] Form layout variants
+  - [ ] CTA messaging
+  - [ ] Button placement
+  - [ ] Color schemes
+
+## Next Steps (Priority Order)
+1. Chat Interface Implementation
+   - [ ] Initialize chat container
+   - [ ] Add message display
+   - [ ] Implement typing indicators
+   - [ ] Add loading states
+
+2. Form Submission Flow
+   - [ ] Add form validation
+   - [ ] Implement submission handling
+   - [ ] Add success/error states
+   - [ ] Handle transition to chat
+
+3. State Management
+   - [ ] Implement tab state persistence
+   - [ ] Add form data caching
+   - [ ] Handle chat history
+   - [ ] Manage loading states
+
+4. Testing & Validation
+   - [ ] Test form submission
+   - [ ] Validate chat functionality
+   - [ ] Check responsive design
+   - [ ] Verify accessibility
+
+## Notes
+- [x] Reorganized directory structure following client layout rules
+- [x] Moved shared assets to client-wide directory
+- [x] Updated assistant ID to use file search enabled version
+- [x] Modularized JavaScript into separate components
+- [x] Using existing CSS files (no new files needed)
+- [x] Updated HTML to use correct CSS paths
+
+## Contact
+For questions or issues:
+- Frontend Team Lead
+- Platform Architecture Team
+- QA Team Lead 
