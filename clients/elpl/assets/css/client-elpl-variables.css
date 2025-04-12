@@ -1,0 +1,52 @@
+/* ELPL Client Variables */
+:root {
+    /* Brand Colors */
+    --elpl-primary: #C6123F;    /* ELPL Crimson */
+    --elpl-secondary: #211651;  /* ELPL Purple */
+    --elpl-tertiary: #F5F5F5;   /* Light Gray */
+    
+    /* Layout */
+    --header-height: 60px;
+    --footer-height: 40px;
+    --content-width: 1200px;
+    --sidebar-width: 250px;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Typography */
+    --font-primary: 'Roboto', sans-serif;
+    --font-secondary: 'Open Sans', sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+    
+    /* Colors */
+    --client-bg: #ffffff;
+    --client-text: #2c3e50;
+    --client-border: #e1e4e8;
+    --client-link: var(--elpl-primary);
+    --client-link-hover: var(--elpl-secondary);
+    
+    /* Components */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 300ms ease;
+    --transition-slow: 500ms ease;
+    
+    /* Z-index layers */
+    --z-header: 100;
+    --z-modal: 200;
+    --z-tooltip: 300;
+    --z-toast: 400;
+} 
