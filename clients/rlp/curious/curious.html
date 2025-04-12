@@ -3,132 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curious About Our Platform?</title>
+    <title>Curious About Recursive Learning ?</title>
+    <link rel="stylesheet" href="/clients/integral-ed/assets/css/custom.css">
+    <link rel="icon" href="/clients/integral-ed/assets/images/logo.png" type="image/png">
     <style>
         :root {
-            --primary-blue: #0B3D91;
-            --accent-orange: #FF6B2B;
+            --primary-color: #007BFF;
+            --accent-color: #0056b3;
+            --dark-text-color: #111;
         }
 
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #f9f9f9, #e0e0e0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 2rem;
-            background: #f5f5f5;
-            color: #333;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        #container {
+            display: flex;
+            width: 90vw;
+            height: 80vh;
             background: white;
-            padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
-        h1 {
-            color: var(--primary-blue);
-            margin-bottom: 2rem;
+        #sidebar {
+            width: 20%;
+            background: white;
+            color: var(--dark-text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 2px solid var(--primary-color);
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
+        #sidebar button {
+            background: none;
+            border: none;
+            color: var(--dark-text-color);
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        label {
+        #sidebar button.active {
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            color: var(--primary-color);
+        }
+
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+            padding: 10px;
+        }
+
+        .section.active {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
         }
 
         input, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 10px;
+            border: 1px solid var(--primary-color);
             border-radius: 4px;
-            font-size: 1rem;
+            box-sizing: border-box;
         }
 
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .btn {
-            background: var(--primary-blue);
+        button {
+            background: var(--primary-color);
             color: white;
+            padding: 10px 20px;
             border: none;
-            padding: 0.75rem 1.5rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: opacity 0.2s;
+            margin-top: 10px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
+        button:hover {
+            background: var(--accent-color);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Curious About Our Platform?</h1>
-        <form id="intakeForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="Curious_Form_Email" required>
+    <div id="container">
+        <div id="sidebar">
+            <button onclick="showSection(0)" id="nav-welcome">Welcome</button>
+            <button onclick="showSection(1)" id="nav-info">Email</button>
+            <button onclick="showSection(2)" id="nav-context">Context</button>
+            <button onclick="showSection(3)" id="nav-submit" disabled>Submit</button>
+        </div>
+        <div id="content">
+            <div class="section active">
+                <h1>Welcome!</h1>
+                <p>You weren't supposed to find us until 2026. We're hiding out in a friends and family beta. If you have a great use for this platform, fill out the info below. If you are aligned to our values and your needs match our early-release features, you may be invited to join our 2025 learning community.</p>
+                <button onclick="showSection(1)">Next</button>
             </div>
-            <div class="form-group">
-                <label for="role">Your Role</label>
-                <input type="text" id="role" name="Curious_Form_01_Role" required>
+            <div class="section">
+                <h1>Email</h1>
+                <h2>We'll use this email to get in touch and to share preview access if you are approved for a beta account.</h2>
+                <input type="email" id="signup-email" placeholder="Your Email" required oninput="validateForm()" />
+                <button onclick="showSection(2)">Next</button>
             </div>
-            <div class="form-group">
-                <label for="purpose">What would you like to achieve with our platform?</label>
-                <textarea id="purpose" name="Curious_Form_02_Purpose" required></textarea>
+            <div class="section">
+                <h1>Context</h1>
+                <h2>How did you learn about us?</h2>
+                <div class="form-group">
+                    <p><em>Helper: Context-aware systems can handle traditional form field inputs, which can be nice when you want multiple-choice.</em></p>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="source" value="friend"> Friend of Integral Ed</label>
+                        <input type="text" class="details-input" placeholder="Add detail" style="display: none;">
+                        <label><input type="checkbox" name="source" value="client"> Client of Integral Ed</label>
+                        <input type="text" class="details-input" placeholder="Add detail" style="display: none;">
+                        <label><input type="checkbox" name="source" value="alt_lms"> Seeking alternatives to traditional LMS</label>
+                        <input type="text" class="details-input" placeholder="Add detail" style="display: none;">
+                        <label><input type="checkbox" name="source" value="other"> Other</label>
+                        <input type="text" id="intake-other-source" placeholder="Describe here" class="details-input" style="display: none;">
+                    </div>
+                </div>
+                <button onclick="showSection(3)">Next</button>
             </div>
-            <div class="form-group">
-                <label for="howHeard">How did you hear about us?</label>
-                <textarea id="howHeard" name="Curious_Form_03_HowHeard" required></textarea>
+            <div class="section">
+                <h1>Submit</h1>
+                <button id="submit-button" disabled onclick="signup()">Sign Up</button>
             </div>
-            <button type="submit" class="btn">Submit</button>
-        </form>
+        </div>
     </div>
-
-    <script>
-        document.getElementById('intakeForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                Curious_Form_Email: document.getElementById('email').value,
-                Curious_Form_01_Role: document.getElementById('role').value,
-                Curious_Form_02_Purpose: document.getElementById('purpose').value,
-                Curious_Form_03_HowHeard: document.getElementById('howHeard').value,
-                Intake_Token: new Date().toISOString()
-            };
-
-            console.log('Form submission:', formData);
-
-            try {
-                const response = await fetch('https://hook.us1.make.com/gp1ykvaa7e7q5e3xnvjym2g9dkg9vl4y', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    alert('Thank you for your interest! We\'ll be in touch soon.');
-                    this.reset();
-                } else {
-                    throw new Error('Network response was not ok');
-                }
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                alert('Sorry, there was an error submitting your form. Please try again later.');
-            }
-        });
-    </script>
 </body>
-</html> 
+</html>
