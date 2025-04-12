@@ -157,6 +157,59 @@ shared/assets/                    # Platform-Shared assets
 └── ...
 ```
 
+## Script Loading Order [Updated April 12]
+
+### Active Scripts
+1. **Security Layer**
+   ```html
+   <script type="module" src="/clients/elpl/assets/elpl-security.js"></script>
+   ```
+   - Client-level CORS and embed protection
+   - Must load first for security enforcement
+
+2. **Core Flow Controller**
+   ```html
+   <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+   ```
+   - Main instructional flow management
+   - Handles navigation, state, and form validation
+   - Implements keyboard accessibility
+
+3. **Version Display**
+   ```html
+   <script>
+   document.addEventListener('DOMContentLoaded', () => {
+       // Initializes version display
+       // Sets build number and timestamp
+       // Persists to localStorage
+   });
+   </script>
+   ```
+   - Inline script for version management
+   - Updates on each page load
+
+### Deprecated Scripts (Console Error Tracking)
+```html
+<script type="module" src="assets/js/D_client-merit-logic.js"></script>
+<script type="module" src="assets/js/D_client-merit-chat.js"></script>
+<script type="module" src="assets/js/D_client-merit-form.js"></script>
+```
+- Prefixed with 'D_' to indicate deprecation
+- Kept temporarily for error tracking
+- Will be removed after full migration to instructional flow
+
+### Loading Behavior
+- All external scripts use `type="module"`
+- Scripts load asynchronously
+- Execution order maintained through ES6 modules
+- No render-blocking scripts in critical path
+
+### Dependencies
+1. Security script must load first
+2. Flow controller initializes on DOMContentLoaded
+3. Version display runs after DOM is ready
+4. Deprecated scripts load but don't execute core logic
+
 ## Instructional Logic & Flow Control
 
 ### Overview
