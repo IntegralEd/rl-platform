@@ -86,17 +86,18 @@ This template defines a rigid, consistent layout structure that enables:
 *   Clicking enabled `#next-button` shows chat `.section` and `#chatbar`.
 
 ## Current Implementation Status [T]
-- [X] Basic layout structure matches canonical structure.
-- [X] Header with logo and version.
-- [X] Form exists and is visible in welcome section.
-- [X] Footer with conditional playbar/chatbar states.
-- [X] Basic tab navigation via sidebar links.
-- [X] Sidebar toggle functionality implemented.
-- [X] Section transitions working properly.
-- [X] Footer states properly synced.
-- [ ] Full responsive testing needed.
-- [ ] Complete accessibility features audit needed.
-- [ ] Gating logic beyond form validity (chat/quiz interaction) TBD.
+- [X] Basic layout structure matches canonical structure
+- [X] Header with logo and version
+- [X] Form exists and is visible in welcome section
+- [X] Footer with conditional playbar/chatbar states
+- [X] Basic tab navigation via sidebar links
+- [X] Sidebar toggle functionality implemented
+- [X] Section transitions working properly
+- [X] Footer states properly synced
+- [X] Form elements properly initialized
+- [ ] Full responsive testing needed
+- [ ] Complete accessibility features audit needed
+- [ ] Gating logic beyond form validity (chat/quiz interaction) TBD
 
 ## File Structure
 ```
@@ -167,7 +168,11 @@ shared/assets/                    # Platform-Shared assets
    - Grid Layout: `footer-content`
      - Left Spacer: `footer-spacer` (flexible)
      - Center Area: `footer-center` (700px max)
+       - Playbar: Contains next button (welcome state)
+       - Chatbar: Contains chat input (chat state)
      - Action Area: `footer-action-area` (150px fixed)
+       - Next/Send button with proper states
+       - Icon loading with lazy attribute
    - Background: transparent
    - Border: 1px solid var(--elpl-border)
    - Height: Fixed 80px
@@ -179,6 +184,7 @@ shared/assets/                    # Platform-Shared assets
 - Border Radius: `--elpl-border-radius: 12px`
 - Input Height: `40px` (min) to `100px` (max)
 - Chat Input Font Size: `18px`
+- Next/Send Button: `60px` x `60px`
 
 ### Responsive Breakpoints
 ```css
@@ -286,18 +292,21 @@ shared/assets/                    # Platform-Shared assets
 ## State Management [Updated April 11]
 1. Welcome State
    - Active: Welcome section
-   - Footer: Playbar visible
+   - Footer: Playbar visible with next button
    - Sidebar: Welcome link active
    - Form: Enabled and visible
+   - Next Button: Disabled until form valid
 2. Chat State
    - Active: Chat section
    - Footer: Chatbar visible with transparent background
    - Sidebar: Chat link active
    - Input: Focused and ready
-3. Sidebar State
-   - `expanded` / `collapsed` classes on `.sidebar`
-   - `sidebar-collapsed` class on `.client-content`
-   - Managed by `SidebarManager`, persisted in `localStorage`
+   - Send Button: Enabled for input
+3. Form State
+   - Validation: Real-time field checking
+   - Next Button: Enabled when valid
+   - Error Display: Inline validation messages
+   - State Persistence: Form data cached
 4. Section Transitions
    - Smooth opacity transitions
    - Synchronized footer state changes

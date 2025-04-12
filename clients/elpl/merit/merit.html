@@ -868,8 +868,9 @@
                 <!-- Left spacer -->
                 <div class="footer-spacer"></div>
                 
-                <!-- Center area - Chat input -->
+                <!-- Center area -->
                 <div class="footer-center">
+                    <!-- Playbar - visible by default in welcome section -->
                     <div id="playbar" class="playbar" data-test-id="playbar">
                         <button id="next-button" 
                                 class="action-button next-button" 
@@ -882,6 +883,7 @@
                                  loading="lazy">
                         </button>
                     </div>
+                    <!-- Chatbar - hidden initially -->
                     <div id="chatbar" class="chat-input-container" hidden data-test-id="chatbar">
                         <textarea 
                             class="chat-input" 
@@ -898,11 +900,12 @@
                     </div>
                 </div>
                 
-                <!-- Right action area - Send button -->
+                <!-- Right action area -->
                 <div class="footer-action-area">
                     <button id="send-button" 
                             class="action-button send-button" 
                             aria-label="Send message"
+                            hidden
                             data-test-id="send-button">
                         <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
                              alt="Send" 
