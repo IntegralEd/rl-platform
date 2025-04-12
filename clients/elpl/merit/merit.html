@@ -135,7 +135,10 @@
         }
 
         .sidebar-nav { /* Added wrapper */
-            flex: 1;
+            flex: 1; /* Allow nav to grow */
+            display: flex; /* Use flex */
+            flex-direction: column; /* Stack items vertically */
+            justify-content: center; /* Center items vertically */
         }
 
         .sidebar-nav a, .nav-link { /* Merged styles */
@@ -147,6 +150,7 @@
             margin-bottom: 5px; /* Adjusted margin */
             transition: all 0.2s ease; /* Use 'all' */
             cursor: pointer;
+            font-size: 24px; /* Inactive font size */
         }
 
         .sidebar-nav a:hover, .nav-link:hover {
@@ -156,6 +160,10 @@
         .sidebar-nav a.active, .nav-link.active {
             background: var(--elpl-primary);
             color: white;
+            border-bottom: 3px solid var(--elpl-primary); /* Added underline */
+            padding-bottom: calc(15px - 3px); /* Adjust padding to keep text centered */
+            font-size: 36px; /* Active font size */
+            font-weight: bold; /* Make active bolder */
         }
 
         .sidebar-toggle { /* Styles added */
@@ -202,6 +210,11 @@
             padding: 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow-y: auto; /* Allow content scrolling */
+        }
+        
+        .section { /* Add padding to sections */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
 
         .client-footer {
@@ -473,6 +486,13 @@
             clip: rect(0,0,0,0);
             white-space: nowrap;
             border: 0;
+        }
+
+        .header-logo {
+            height: calc(var(--elpl-header-height) - 10px); /* 5px padding top and bottom */
+            max-height: calc(var(--elpl-header-height) - 10px); /* Explicit max height */
+            padding: 5px;
+            object-fit: contain;
         }
 
     </style>
