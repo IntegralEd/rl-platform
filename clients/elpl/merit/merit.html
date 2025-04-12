@@ -38,17 +38,27 @@
             const versionDisplay = document.querySelector('.version-display');
             if (versionDisplay) {
                 const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const buildNumber = 14;
-                const version = `v1.0.${buildNumber}`;
-                const datetime = `(${hours}:${minutes})`;
-                versionDisplay.textContent = `${version} ${datetime}`;
-                localStorage.setItem('meritBuildNumber', buildNumber);
+                // Convert to Central Time
+                const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+                const hours = String(centralTime.getHours()).padStart(2, '0');
+                const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+                
+                // Version 1.0.14 represents:
+                // 1 = Major version (platform)
+                // 0 = Minor version (feature set)
+                // 14 = Build number (current sprint)
+                const version = 'v1.0.14';
+                const datetime = `CT ${hours}:${minutes}`;
+                versionDisplay.textContent = `${version} (${datetime})`;
+                
+                // Store for debugging
+                localStorage.setItem('meritVersion', version);
                 localStorage.setItem('meritLastBuild', now.toISOString());
+                localStorage.setItem('meritBuildTime', datetime);
             }
         });
 
+        // MVP validation logging
         console.log('[Merit Flow] All validations passed for MVP testing');
         console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.15');
         console.log('[Merit Flow] Form validation hardcoded to pass for testing');
