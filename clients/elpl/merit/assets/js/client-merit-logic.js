@@ -1,5 +1,40 @@
 // Merit page logic and form handling
 
+class BuildManager {
+    static BUILD_KEY = 'meritBuildNumber';
+    static LAST_BUILD_KEY = 'meritLastBuild';
+    static MIN_BUILD = 12;
+
+    static getCurrentBuild() {
+        return parseInt(localStorage.getItem(this.BUILD_KEY)) || this.MIN_BUILD;
+    }
+
+    static getLastBuildTime() {
+        return localStorage.getItem(this.LAST_BUILD_KEY) || new Date().toISOString();
+    }
+
+    static incrementBuild() {
+        const currentBuild = this.getCurrentBuild();
+        const newBuild = currentBuild + 1;
+        localStorage.setItem(this.BUILD_KEY, newBuild);
+        localStorage.setItem(this.LAST_BUILD_KEY, new Date().toISOString());
+        return newBuild;
+    }
+
+    static updateVersionDisplay() {
+        const versionDisplay = document.querySelector('.version-display');
+        if (versionDisplay) {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const buildNumber = this.getCurrentBuild();
+            const version = `v1.0.${buildNumber}`;
+            const datetime = `(${hours}:${minutes})`;
+            versionDisplay.textContent = `${version} ${datetime}`;
+        }
+    }
+}
+
 class MeritIntakeForm {
     constructor() {
         this.initializeElements();
@@ -128,7 +163,8 @@ class ErrorBoundary {
     }
 }
 
-// Initialize the form when the DOM is loaded
+// Update the DOMContentLoaded handler
 document.addEventListener('DOMContentLoaded', () => {
+    BuildManager.updateVersionDisplay();
     new MeritIntakeForm();
 }); 
