@@ -806,6 +806,63 @@
             display: flex;
         }
 
+        .loading-animation {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--elpl-border);
+            border-radius: 50%;
+            border-top-color: var(--elpl-secondary);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 2rem;
+            color: var(--elpl-secondary);
+            font-style: italic;
+        }
+
+        .message {
+            max-width: var(--chat-message-max-width);
+            margin: 1rem;
+            padding: 1rem;
+            border-radius: var(--chat-message-radius);
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .message.assistant {
+            background: var(--elpl-bg);
+            margin-right: 20%;
+        }
+
+        .message.user {
+            background: var(--elpl-secondary);
+            color: white;
+            margin-left: 20%;
+        }
+
+        .error-message {
+            text-align: center;
+            color: var(--elpl-primary);
+            padding: 2rem;
+        }
+
+        .error-message button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--elpl-border-radius);
+            background: var(--elpl-secondary);
+            color: white;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -933,53 +990,36 @@
 
         <footer class="client-footer" role="contentinfo" data-test-id="footer">
             <div class="footer-content">
-                <!-- Left spacer -->
                 <div class="footer-spacer"></div>
-                
-                <!-- Center area - max width 700px -->
                 <div class="footer-center">
-                    <!-- Playbar - visible by default -->
                     <div id="playbar" class="playbar" data-test-id="playbar">
-                        <div class="action-state-container">
-                            <div class="action-overlay" id="actionOverlay"></div>
-                            <button id="next-button" 
-                                    class="action-button" 
-                                    aria-label="Continue to chat"
-                                    data-active="true"
-                                    disabled
-                                    data-test-id="next-button">
-                                <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
-                                     alt="Next" 
-                                     class="button-icon"
-                                     loading="lazy">
-                            </button>
-                        </div>
-                    </div>
-                    <!-- Chatbar - hidden initially -->
-                    <div id="chatbar" class="chat-input-container" hidden data-test-id="chatbar">
-                        <textarea 
-                            class="chat-input" 
-                            id="chat-input"
-                            aria-label="Type your message"
-                            placeholder="Type your message..."
-                            rows="1"
-                            maxlength="1000"
-                            data-gramm="false"
-                            data-gramm_editor="false"
-                            data-enable-grammarly="false"
-                            data-test-id="chat-input"
-                        ></textarea>
-                    </div>
-                </div>
-                
-                <!-- Right action area - fixed 150px -->
-                <div class="footer-action-area">
-                    <div class="action-state-container">
-                        <div class="action-overlay" id="actionOverlay"></div>
-                        <button id="send-button" 
+                        <button id="next-button" 
                                 class="action-button" 
+                                aria-label="Continue to chat"
+                                data-active="true"
+                                disabled
+                                data-test-id="next-button">
+                            <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
+                                 alt="Next" 
+                                 class="button-icon"
+                                 loading="lazy">
+                        </button>
+                    </div>
+                    <div id="chatbar" class="chatbar" hidden data-test-id="chatbar">
+                        <div class="chat-input-container">
+                            <textarea id="chat-input"
+                                    class="chat-input"
+                                    aria-label="Type your message"
+                                    placeholder="Type your message..."
+                                    rows="1"
+                                    maxlength="1000"
+                                    disabled
+                                    data-test-id="chat-input"></textarea>
+                        </div>
+                        <button id="send-button" 
+                                class="action-button"
                                 aria-label="Send message"
-                                data-active="false"
+                                disabled
                                 data-test-id="send-button">
                             <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
                                  alt="Send" 
