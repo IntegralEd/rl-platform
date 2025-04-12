@@ -1,5 +1,5 @@
 ---
-description: Rules for client layout structure and behavior
+description: Rules for client layout structure and behavior, including Redis caching patterns
 globs: ["clients/**/*.html", "clients/**/*.js", "clients/**/*.css"]
 alwaysApply: true
 ---
@@ -14,27 +14,21 @@ These rules define the standard structure and behavior for client pages across t
 - [ ] Deviations require explicit documentation and approval
 - [ ] Changes to these rules must be version controlled
 
-- Location: `/shared/assets/js/`
-   - Naming: `{feature}.js`
-   - Example: `component-loader.js` 
-
-## Directory Structure Rules Clarification
-
-### Page-Specific Files
-- Page-specific JavaScript files MUST stay with their HTML page:
+## Directory Structure
+- [ ] Page-specific files must stay with their HTML page:
   ```
-  /clients/elpl/merit/
-    ├── merit.html
+  /clients/{client}/{project}/
+    ├── project.html
     └── assets/
         └── js/
-            └── client-merit-logic.js  # Controls merit.html specifically
+            └── client-project-logic.js  # Controls this specific page
   ```
-
 - [ ] Shared client assets must be in `/clients/{client}/assets/` for reuse:
   - JS files in `/assets/js/` (auth, routing, shared utilities)
   - CSS files in `/assets/css/` (shared styles)
   - Images in `/assets/images/` (shared icons, logos, SVGs)
   - Variables in `/assets/variables.css` (client-wide variables)
+- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
 
 ## File Naming
 - [ ] Client JavaScript files must be prefixed with `client-`
