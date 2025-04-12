@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curious About Recursive Learning?</title>
+    
+    <!-- RLP Client-Wide Styles (Update paths/create files as needed) -->
+    <link rel="stylesheet" href="/clients/rlp/assets/css/rlp-variables.css"> <!-- Placeholder -->
+    <link rel="stylesheet" href="/clients/rlp/assets/css/rlp-custom.css"> 
+    
+    <!-- Curious Form Specific Styles -->
+    <link rel="stylesheet" href="/clients/rlp/curious/assets/css/rl-curious.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/shared/assets/images/recursive-learning-favicon.ico" type="image/x-icon"> 
+
+    <!-- Inline Styles for basic layout (until rlp-custom.css is defined) -->
+    <style>
+        /* Basic Layout Styles - Move to rlp-custom.css later */
+        body { font-family: sans-serif; margin: 0; background-color: #f4f5f7; color: #333; }
+        .client-layout { display: flex; flex-direction: column; min-height: 100vh; }
+        .client-header { background-color: #2c3e50; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; height: 60px; box-sizing: border-box;}
+        .header-content { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .header-title { font-weight: bold; font-size: 1.2em; }
+        .version-display { font-size: 0.9em; }
+        .client-content { display: flex; flex: 1; padding: 1rem; max-width: 1200px; margin: 1rem auto; width: 100%; box-sizing: border-box; gap: 1rem; }
+        .sidebar { width: 200px; background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: width 0.3s ease; }
+        .sidebar.collapsed { width: 0; padding: 0; border: none; overflow: hidden; } /* Basic collapse */
+        .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav .nav-link { display: block; padding: 10px 15px; color: #333; text-decoration: none; border-radius: 4px; margin-bottom: 5px; transition: background-color 0.2s; }
+        .sidebar-nav .nav-link:hover { background-color: #eee; }
+        .sidebar-nav .nav-link.active { background-color: var(--rlp-color-primary, #007bff); color: white; font-weight: bold; }
+        .content-area { flex: 1; background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .client-footer { background-color: #2c3e50; color: #aaa; padding: 15px 20px; text-align: center; font-size: 0.9em; height: 50px; box-sizing: border-box; margin-top: auto;}
+        .footer-content { max-width: 1200px; margin: 0 auto; }
+         /* Ensure RLP form styles integrate */
+        .content-area .rlp-form { margin: 0; max-width: none; } /* Override margin */
+        button, .rlp-form__button { /* Basic button style */
+             background-color: var(--rlp-color-primary, #007bff);
+             color: white;
+             padding: 10px 15px;
+             border: none;
+             border-radius: 4px;
+             cursor: pointer;
+             font-size: 1em;
+             transition: background-color 0.2s;
+             margin-top: 10px; /* Add some spacing */
+         }
+         button:hover, .rlp-form__button:hover {
+             background-color: var(--rlp-color-primary-dark, #0056b3);
+         }
+         button:disabled, .rlp-form__button:disabled {
+             background-color: #ccc;
+             cursor: not-allowed;
+         }
+    </style>
+
+</head>
+<body>
+    <div class="client-layout"> 
+        <header class="client-header" role="banner">
+            <div class="header-content">
+                <span class="header-title">Recursive Learning Platform</span>
+                <!-- Add RLP logo image here -->
+                <div class="version-display">vBeta</div>
+            </div>
+        </header>
+
+        <main class="client-content" role="main">
+            <nav class="sidebar" role="navigation" aria-label="Form Steps">
+                 <ul class="sidebar-nav">
+                     <li><a href="#welcome" class="nav-link active" data-step="0">Welcome</a></li>
+                     <li><a href="#contact" class="nav-link" data-step="1">Contact Info</a></li>
+                     <li><a href="#context" class="nav-link" data-step="2">Context</a></li>
+                     <li><a href="#submit" class="nav-link" data-step="3" id="nav-submit" disabled>Submit</a></li> <!-- Disabled initially -->
+                 </ul>
+            </nav>
+
+            <div class="content-area" role="region" aria-label="Curious Form Content">
+                <div class="rlp-form" id="curious-form-container">
+                    <!-- Form sections will be shown/hidden by JS -->
+                    <form id="curious-form">
+                        <!-- Step 0: Welcome -->
+                        <div class="rlp-form__section" data-step="0">
+                            <div class="rlp-form__header">
+                                <h1 class="rlp-form__title">Curious About Recursive Learning?</h1>
+                                <p class="rlp-form__subtitle">Join the Friends & Family Beta</p>
+                            </div>
+                            <legend class="rlp-form__legend">Welcome!</legend>
+                            <p class="rlp-form__helper">Thanks for your interest! We're currently in a friends and family beta. If you have a great use case for this platform and our values align, please fill out the info below to be considered for our 2025 learning community.</p>
+                            <button type="button" class="rlp-form__button rlp-form__button--next" onclick="navigateToStep(1)">Start</button>
+                        </div>
+
+                        <!-- Step 1: Contact Info -->
+                        <div class="rlp-form__section" data-step="1" hidden>
+                             <legend class="rlp-form__legend">Contact Info</legend>
+                             <label for="signup-email" class="rlp-form__label">Email</label>
+                             <p class="rlp-form__helper">We'll use this email to get in touch and share preview access if you are approved.</p>
+                             <input type="email" id="signup-email" class="rlp-form__input" placeholder="your.email@example.com" required />
+                             <button type="button" class="rlp-form__button rlp-form__button--next" onclick="navigateToStep(2)">Next</button>
+                        </div>
+
+                        <!-- Step 2: Context -->
+                        <div class="rlp-form__section" data-step="2" hidden>
+                            <legend class="rlp-form__legend">Context</legend>
+                            <label class="rlp-form__label">How did you learn about us?</label>
+                            <p class="rlp-form__helper">Select all that apply.</p>
+                            <div class="rlp-form__checkbox-group">
+                                <label class="rlp-form__label--checkbox"><input type="checkbox" name="source" value="friend"> Friend/Colleague Referral</label>
+                                <input type="text" class="rlp-form__input rlp-form__input--details" placeholder="Referred by (optional)" style="display: none; margin-top: -5px; margin-bottom: 10px;">
+                                <label class="rlp-form__label--checkbox"><input type="checkbox" name="source" value="client"> Client of Integral Ed</label>
+                                <input type="text" class="rlp-form__input rlp-form__input--details" placeholder="Which project? (optional)" style="display: none; margin-top: -5px; margin-bottom: 10px;">
+                                <label class="rlp-form__label--checkbox"><input type="checkbox" name="source" value="alt_lms"> Seeking alternatives to traditional LMS</label>
+                                <input type="text" class="rlp-form__input rlp-form__input--details" placeholder="What are you looking for? (optional)" style="display: none; margin-top: -5px; margin-bottom: 10px;">
+                                <label class="rlp-form__label--checkbox"><input type="checkbox" name="source" value="other"> Other</label>
+                                <input type="text" id="intake-other-source" class="rlp-form__input rlp-form__input--details" placeholder="Please describe" style="display: none; margin-top: -5px; margin-bottom: 10px;">
+                            </div>
+                             <button type="button" class="rlp-form__button rlp-form__button--next" onclick="navigateToStep(3)">Next</button>
+                        </div>
+
+                        <!-- Step 3: Submit -->
+                        <div class="rlp-form__section" data-step="3" hidden>
+                             <legend class="rlp-form__legend">Submit</legend>
+                             <p class="rlp-form__helper">Ready to submit your interest? We'll review your information and be in touch if you're selected for the beta.</p>
+                             <button type="submit" id="submit-button" class="rlp-form__button rlp-form__button--submit" disabled>Submit Application</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="client-footer" role="contentinfo">
+            <div class="footer-content">
+                <span>&copy; 2024 Recursive Learning Platform</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Add link to new JS file -->
+    <script type="module" src="/clients/rlp/curious/assets/js/client-curious-logic.js"></script>
+
+</body>
+</html>
