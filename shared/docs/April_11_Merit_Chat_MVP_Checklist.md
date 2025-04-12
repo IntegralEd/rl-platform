@@ -368,8 +368,10 @@ eslint clients/elpl/assets/js/*.js
 - [ ] Confirm sidebar initialization logic is working correctly after path fixes.
 - [ ] Test navigation between Welcome/Chat tabs and ensure footer state updates.
 - [ ] Review `client-layout-structure-behavior.mdc` to ensure full compliance for JS/CSS/Image locations.
-- [ ] Remove authentication checks and redirects for MVP testing. (Done by commenting out auth.js)
+- [X] Remove authentication checks and redirects for MVP testing. (Done by commenting out auth.js)
 - [ ] Investigate and remove source of any remaining redirects (if auth.js comment-out isn't sufficient).
+- [ ] **Fix 404 error for Next button image:** Find correct filename in `/clients/elpl/assets/images/` and update `merit.html`.
+- [ ] **Resolve JS conflicts:** Remove duplicate initialization/event handling logic from inline script in `merit.html` to rely solely on `client-merit-logic.js` classes.
 
 ## Current Status (April 11, 2025)
 - [x] Basic form structure
