@@ -1,0 +1,57 @@
+/* Recursive Learning Platform Base Styles */
+:root {
+  --rlp-color-primary: #204060;
+  --rlp-color-secondary: #9BAEC8;
+  --rlp-color-highlight: #FFE066;
+  --rlp-font-sans: 'Inter', sans-serif;
+  --rlp-radius: 0.75rem;
+  --rlp-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --rlp-line-twist: repeating-linear-gradient(
+    135deg,
+    #FFE066,
+    #FFE066 4px,
+    #204060 4px,
+    #204060 8px
+  );
+}
+
+body {
+  font-family: var(--rlp-font-sans);
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 2rem;
+}
+
+.rlp-card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: var(--rlp-radius);
+  box-shadow: var(--rlp-shadow);
+  position: relative;
+}
+
+.rlp-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+  width: 4px;
+  height: 90%;
+  background-image: var(--rlp-line-twist);
+  border-radius: 2px;
+}
+
+.rlp-form__submit {
+  background-color: var(--rlp-color-primary);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--rlp-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rlp-form__submit:hover {
+  background-color: var(--rlp-color-secondary);
+} 
