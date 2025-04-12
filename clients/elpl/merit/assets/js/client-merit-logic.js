@@ -155,22 +155,36 @@ class MeritIntakeForm {
 
         console.log('Form submitted with data:', formData);
         
-        // Switch to chat section
+        // Switch to chat section immediately
         this.switchToChat();
     }
 
     async switchToChat() {
+        // Update navigation state
         const chatLink = document.querySelector('[data-section="chat"]');
-        if (chatLink) {
-            this.handleNavigation(chatLink, 1);
-            
+        const welcomeSection = document.querySelector('[data-section="welcome"]');
+        const chatSection = document.querySelector('[data-section="chat"]');
+        
+        if (chatLink && welcomeSection && chatSection) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                link.removeAttribute('aria-current');
+            });
+            chatLink.classList.add('active');
+            chatLink.setAttribute('aria-current', 'page');
+
+            // Hide welcome, show chat
+            welcomeSection.classList.remove('active');
+            welcomeSection.hidden = true;
+            chatSection.classList.add('active');
+            chatSection.hidden = false;
+
             // Initialize chat if not already done
             if (!this.chat) {
-                // Dynamic import of MeritChat
                 try {
                     const ChatModule = await import('./client-merit-chat.js');
                     this.chat = new ChatModule.default();
-                    console.log('Chat initialized successfully');
                 } catch (error) {
                     console.error('Failed to initialize chat:', error);
                     ErrorBoundary.handleError(error, 'Chat Initialization');
@@ -180,7 +194,13 @@ class MeritIntakeForm {
     }
 
     handleNavigation(link, index) {
-        // Update navigation links
+        // Only allow navigation to chat if form is completed
+        if (index === 1 && !this.form.checkValidity()) {
+            this.form.reportValidity();
+            return;
+        }
+
+        // Update navigation state
         document.querySelectorAll('.nav-link').forEach(navLink => {
             navLink.classList.remove('active');
             navLink.removeAttribute('aria-current');
@@ -190,13 +210,23 @@ class MeritIntakeForm {
         link.setAttribute('aria-current', 'page');
 
         // Show correct section
-        const targetSection = this.sections[index];
-        if (targetSection) {
-            if (index === 1 && !this.chat) {
-                // If navigating to chat section and chat not initialized
-                this.switchToChat();
+        const welcomeSection = document.querySelector('[data-section="welcome"]');
+        const chatSection = document.querySelector('[data-section="chat"]');
+        
+        if (welcomeSection && chatSection) {
+            if (index === 0) {
+                welcomeSection.classList.add('active');
+                welcomeSection.hidden = false;
+                chatSection.classList.remove('active');
+                chatSection.hidden = true;
+                
+                // Update footer state
+                if (this.playbar && this.chatbar) {
+                    this.playbar.hidden = false;
+                    this.chatbar.hidden = true;
+                }
             } else {
-                this.showSection(targetSection, index);
+                this.switchToChat();
             }
         }
     }
