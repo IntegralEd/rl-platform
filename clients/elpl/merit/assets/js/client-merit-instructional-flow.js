@@ -128,12 +128,43 @@ export class MeritInstructionalFlow {
     }
 
     /**
-     * Handle section navigation
+     * Updates the action button states based on current section and form validity
      * @private
-     * @param {string} sectionId
+     */
+    #updateActionState() {
+        const nextButton = document.getElementById('next-button');
+        const sendButton = document.getElementById('send-button');
+        const actionOverlay = document.getElementById('actionOverlay');
+
+        // Update button active states
+        nextButton.dataset.active = this.#state.currentSection === 'welcome' ? 'true' : 'false';
+        sendButton.dataset.active = this.#state.currentSection === 'chat' ? 'true' : 'false';
+
+        // Update button enabled states
+        if (this.#state.currentSection === 'welcome') {
+            nextButton.disabled = !this.#state.formValid;
+            actionOverlay.classList.toggle('disabled', !this.#state.formValid);
+        } else if (this.#state.currentSection === 'chat') {
+            const chatInput = document.getElementById('chat-input');
+            sendButton.disabled = !chatInput?.value?.trim();
+            actionOverlay.classList.toggle('disabled', !chatInput?.value?.trim());
+        }
+
+        console.log('[Merit Flow] Action state updated:', {
+            section: this.#state.currentSection,
+            formValid: this.#state.formValid,
+            nextEnabled: !nextButton.disabled,
+            sendEnabled: !sendButton.disabled
+        });
+    }
+
+    /**
+     * Handles section navigation
+     * @private
+     * @param {string} sectionId - The ID of the section to navigate to
      */
     #handleNavigation(sectionId) {
-        console.log(`[Merit Flow] Navigating to section: ${sectionId}`);
+        console.log('[Merit Flow] Navigating to section:', sectionId);
         
         // Validate section exists
         if (!this.#config.sections.includes(sectionId)) {
@@ -162,7 +193,7 @@ export class MeritInstructionalFlow {
         });
 
         // Update footer state
-        this.#updateFooterState(sectionId);
+        this.#updateActionState();
 
         // Update state and persist
         this.#state.currentSection = sectionId;
@@ -189,17 +220,6 @@ export class MeritInstructionalFlow {
             return this.#state.formValid;
         }
         return true;
-    }
-
-    /**
-     * Update footer state based on active section
-     * @private
-     * @param {string} sectionId
-     */
-    #updateFooterState(sectionId) {
-        const isWelcome = sectionId === 'welcome';
-        this.#elements.playbar.hidden = !isWelcome;
-        this.#elements.chatbar.hidden = isWelcome;
     }
 
     /**
