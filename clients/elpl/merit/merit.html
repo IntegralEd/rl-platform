@@ -22,9 +22,9 @@
     <link rel="stylesheet" href="./assets/css/client-merit-chat.css">
     
     <!-- Merit specific scripts -->
-    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="./assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="./assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="./assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
     
     <!-- Error handling for scripts -->
     <script>
@@ -223,22 +223,69 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             color: var(--elpl-text);
             font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px; /* 2x size */
+            height: 16px; /* 2x size */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c6123f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--elpl-border);
-            border-radius: 4px;
-            font-size: 1rem;
+            padding: 1rem;
+            padding-right: 3rem; /* Space for larger caret */
+            border: 2px solid var(--elpl-border);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            appearance: none;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:hover {
+            border-color: var(--elpl-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--elpl-primary);
+            box-shadow: 0 0 0 3px rgba(198, 18, 63, 0.1);
+        }
+
+        .form-control option {
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .form-control option[disabled] {
+            color: #999;
+            font-style: italic;
+            background: #f5f5f5;
         }
 
         .btn-next {
@@ -679,6 +726,21 @@
                 transform: translateX(0);
             }
         }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 0 1rem;
+        }
+
+        .header-logo {
+            height: calc(var(--elpl-header-height) - 10px); /* 5px padding top and bottom */
+            padding: 5px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -742,12 +804,12 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            // Initialize sidebar
-            const mainContent = document.getElementById('mainContent');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
+            // Initialize sidebar with new element IDs
+            const mainContent = document.querySelector('.main-content');
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
             
-            if (!mainContent || !sidebar || !sidebarToggle) {
+            if (!mainContent || !sidebar || !menuToggle) {
                 throw new Error('Required elements not found');
             }
 
@@ -760,11 +822,11 @@
                 sidebar.classList.remove('expanded');
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('sidebar-collapsed');
-                sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
+                menuToggle.setAttribute('aria-expanded', 'false');
             }
 
             // Add sidebar toggle handler
-            sidebarToggle.addEventListener('click', function() {
+            menuToggle.addEventListener('click', function() {
                 const isNowCollapsed = !sidebar.classList.contains('collapsed');
                 
                 // Update classes
@@ -775,9 +837,8 @@
                 // Store state
                 localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 
-                // Update icon
-                this.querySelector('.toggle-icon').style.transform = 
-                    isNowCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+                // Update ARIA state
+                this.setAttribute('aria-expanded', !isNowCollapsed);
                 
                 console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
             });
