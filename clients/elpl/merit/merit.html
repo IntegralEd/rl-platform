@@ -7,17 +7,17 @@
     <title>Merit - Recursive Learning</title>
     
     <!-- Required client scripts -->
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-auth.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-router.js"></script>
     
     <!-- Base variables and custom styles -->
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
-    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
+    <link rel="stylesheet" href="../assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="../assets/css/client-elpl.css">
+    <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
     <!-- Merit specific logic -->
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <script type="module" src="assets/js/client-merit-logic.js"></script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -588,42 +588,55 @@
         }
 
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: var(--elpl-header-height);
-            bottom: var(--elpl-footer-height);
-            width: 250px;
-            background: var(--elpl-background-color);
-            border-right: 1px solid var(--elpl-border);
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 100;
+            width: 20%;
+            background: white;
+            border-radius: var(--elpl-border-radius);
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: width 0.3s ease;
         }
 
         .sidebar.expanded {
-            transform: translateX(0);
+            width: 20%;
         }
 
-        .sidebar-toggle {
-            position: fixed;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--elpl-primary);
-            color: white;
-            border: none;
-            padding: 8px;
-            cursor: pointer;
-            border-radius: 0 4px 4px 0;
-            z-index: 101;
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
-        .sidebar-toggle:hover {
-            background: var(--elpl-secondary);
+        .sidebar-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-nav {
-            padding: 20px;
+            flex: 1;
+        }
+
+        .sidebar-toggle {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: var(--elpl-primary);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed .toggle-icon {
+            transform: rotate(180deg);
         }
 
         .sidebar-nav a {
@@ -680,20 +693,6 @@
             outline: none;
             border-color: var(--elpl-primary);
             box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
-        }
-
-        .sidebar {
-            width: 20%;
-            background: white;
-            border-right: 1px solid var(--elpl-border);
-            padding: 20px;
-            transition: width 0.3s ease;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
 
         .nav-link {
@@ -754,24 +753,26 @@
     <div class="client-layout" data-client-component="merit-page">
         <header class="client-header" role="banner">
             <div class="header-content">
-                <img src="/clients/elpl/assets/images/lockup_white_logo.png" alt="EL Education Logo" class="logo" style="padding: 5px;">
+                <img src="../assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="logo" style="padding: 5px;">
                 <div class="version-display" aria-label="Version and time">v1.0.0</div>
             </div>
         </header>
 
         <main class="client-content" role="main">
-            <nav class="sidebar" role="navigation" aria-label="Main navigation">
-                <div class="sidebar-nav">
-                    <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
-                        <span class="nav-text">Welcome</span>
-                    </a>
-                    <a href="#chat" class="nav-link" data-section="chat">
-                        <span class="nav-text">Chat</span>
-                    </a>
+            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation">
+                <div class="sidebar-content">
+                    <div class="sidebar-nav">
+                        <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
+                            <span class="nav-text">Welcome</span>
+                        </a>
+                        <a href="#chat" class="nav-link" data-section="chat">
+                            <span class="nav-text">Chat</span>
+                        </a>
+                    </div>
+                    <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
+                        <span class="toggle-icon">◀</span>
+                    </button>
                 </div>
-                <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
-                    <span class="toggle-icon">◀</span>
-                </button>
             </nav>
 
             <div class="content-area" role="region" aria-label="Main content">
@@ -814,7 +815,7 @@
             <div class="footer-content">
                 <div class="playbar" id="playbar">
                     <button class="next-button" id="next-button" disabled aria-label="Continue to chat">
-                        <img src="/clients/elpl/assets/images/noun-next-5654311-C6123F.png" alt="" class="button-icon">
+                        <img src="../assets/images/client-elpl-next-button.png" alt="" class="button-icon">
                     </button>
                 </div>
                 <div class="chatbar" id="chatbar" hidden>
@@ -825,7 +826,7 @@
                                  placeholder="Type your message..."
                                  rows="1"></textarea>
                         <button class="send-button" id="send-button" aria-label="Send message">
-                            <img src="/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png" alt="" class="button-icon">
+                            <img src="../assets/images/client-elpl-send-button.png" alt="" class="button-icon">
                         </button>
                     </div>
                 </div>
@@ -834,14 +835,14 @@
     </div>
 
     <!-- Required client scripts with correct paths -->
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-auth.js"></script>
+    <script type="module" src="../../../shared/assets/js/client-router.js"></script>
     
     <!-- Merit specific scripts -->
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <script type="module" src="assets/js/client-merit-form.js"></script>
+    <script type="module" src="assets/js/client-merit-chat.js"></script>
+    <script type="module" src="assets/js/client-merit-logic.js"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
