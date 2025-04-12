@@ -41,6 +41,7 @@ class MeritIntakeForm {
         this.setupEventListeners();
         this.updateNextButtonState();
         this.initializeActiveSection();
+        this.chat = null; // Will hold MeritChat instance
     }
 
     initializeElements() {
@@ -86,7 +87,7 @@ class MeritIntakeForm {
         section.style.display = 'block';
         section.classList.add('active');
 
-        // Update footer visibility
+        // Update footer visibility and initialize chat if needed
         if (this.playbar && this.chatbar) {
             if (index === 0) {
                 this.playbar.style.display = 'flex';
@@ -94,6 +95,10 @@ class MeritIntakeForm {
             } else {
                 this.playbar.style.display = 'none';
                 this.chatbar.style.display = 'flex';
+                // Initialize chat when switching to chat section
+                if (!this.chat) {
+                    this.switchToChat();
+                }
             }
         }
     }
@@ -154,10 +159,23 @@ class MeritIntakeForm {
         this.switchToChat();
     }
 
-    switchToChat() {
+    async switchToChat() {
         const chatLink = document.querySelector('[data-section="chat"]');
         if (chatLink) {
             this.handleNavigation(chatLink, 1);
+            
+            // Initialize chat if not already done
+            if (!this.chat) {
+                // Dynamic import of MeritChat
+                try {
+                    const ChatModule = await import('./client-merit-chat.js');
+                    this.chat = new ChatModule.default();
+                    console.log('Chat initialized successfully');
+                } catch (error) {
+                    console.error('Failed to initialize chat:', error);
+                    ErrorBoundary.handleError(error, 'Chat Initialization');
+                }
+            }
         }
     }
 
@@ -174,7 +192,12 @@ class MeritIntakeForm {
         // Show correct section
         const targetSection = this.sections[index];
         if (targetSection) {
-            this.showSection(targetSection, index);
+            if (index === 1 && !this.chat) {
+                // If navigating to chat section and chat not initialized
+                this.switchToChat();
+            } else {
+                this.showSection(targetSection, index);
+            }
         }
     }
 }
