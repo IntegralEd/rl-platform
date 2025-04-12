@@ -52,10 +52,12 @@ export class MeritInstructionalFlow {
      * @constructor
      */
     constructor() {
+        console.log('[Merit Flow] Initializing instructional flow controller');
         this.#initializeElements();
         this.#setupEventListeners();
         this.#loadPersistedState();
         this.#initializeActiveSection();
+        this.#logState('Initialization complete');
     }
 
     /**
@@ -121,15 +123,17 @@ export class MeritInstructionalFlow {
      * @param {string} sectionId
      */
     #handleNavigation(sectionId) {
+        console.log(`[Merit Flow] Navigating to section: ${sectionId}`);
+        
         // Validate section exists
         if (!this.#config.sections.includes(sectionId)) {
-            console.error(`Invalid section: ${sectionId}`);
+            console.error(`[Merit Flow] Invalid section: ${sectionId}`);
             return;
         }
 
         // Check if navigation is allowed
         if (!this.#canNavigateToSection(sectionId)) {
-            console.warn(`Navigation to ${sectionId} blocked - requirements not met`);
+            console.warn(`[Merit Flow] Navigation to ${sectionId} blocked - requirements not met`);
             return;
         }
 
@@ -160,6 +164,8 @@ export class MeritInstructionalFlow {
             '',
             `#${sectionId}`
         );
+
+        this.#logState('Navigation complete');
     }
 
     /**
@@ -207,6 +213,7 @@ export class MeritInstructionalFlow {
         }
 
         this.#persistState();
+        this.#logState('Form validation');
     }
 
     /**
@@ -288,6 +295,21 @@ export class MeritInstructionalFlow {
         };
         this.#persistState();
         this.#handleNavigation(this.#config.defaultSection);
+    }
+
+    /**
+     * Log current state for debugging
+     * @private
+     * @param {string} action - The action that triggered the state change
+     */
+    #logState(action) {
+        console.group(`[Merit Flow] ${action}`);
+        console.log('Current Section:', this.#state.currentSection);
+        console.log('Form Valid:', this.#state.formValid);
+        console.log('Grade Level:', this.#state.gradeLevel);
+        console.log('Curriculum:', this.#state.curriculum);
+        console.log('Path:', window.location.pathname + window.location.hash);
+        console.groupEnd();
     }
 }
 

@@ -1,28 +1,31 @@
 <!DOCTYPE html>
-<!-- Deploy: 2024-04-03 -->
+<!-- Deploy: 2024-04-12 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Merit - Student progress tracking and feedback system by Recursive Learning">
+    <meta name="description" content="Merit - Teacher and Leader Support Chat for EL Education Language Arts Curriculum">
     <meta name="theme-color" content="#c6123f">
-    <title>Merit - Recursive Learning</title>
+    <title>Merit - Teacher Support | EL Education</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
     
-    <!-- Required client scripts -->
-    <!-- <script type="module" src="/shared/assets/js/client-component-loader.js"></script> --> <!-- File does not exist -->
-    <!-- <script type="module" src="/shared/assets/js/client-auth.js"></script> --> <!-- Commented out for MVP testing -->
-    <!-- <script type="module" src="/shared/assets/js/client-router.js"></script> --> <!-- File does not exist -->
+    <!-- Required security - client level CORS and embed protection -->
+    <script type="module" src="/clients/elpl/assets/elpl-security.js"></script>
     
     <!-- Base variables and custom styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
-    <link rel="stylesheet" href="assets/css/client-merit-chat.css"> <!-- Correct relative path -->
+    <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
-    <!-- Merit specific logic -->
-    <script type="module" src="assets/js/client-merit-logic.js"></script> <!-- Correct relative path -->
+    <!-- Merit specific logic - instructional flow controller -->
+    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+    
+    <!-- Deprecated scripts - for console error tracking -->
+    <script type="module" src="assets/js/D_client-merit-logic.js"></script>
+    <script type="module" src="assets/js/D_client-merit-chat.js"></script>
+    <script type="module" src="assets/js/D_client-merit-form.js"></script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -42,24 +45,14 @@
                 const now = new Date();
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-                const buildNumber = 12; // Start at 12, increment with each build
+                const buildNumber = 12;
                 const version = `v1.0.${buildNumber}`;
                 const datetime = `(${hours}:${minutes})`;
                 versionDisplay.textContent = `${version} ${datetime}`;
-                
-                // Store build number in localStorage for persistence
                 localStorage.setItem('meritBuildNumber', buildNumber);
                 localStorage.setItem('meritLastBuild', now.toISOString());
             }
         });
-
-        // Function to increment build number (call this when deploying)
-        function incrementBuildNumber() {
-            const currentBuild = parseInt(localStorage.getItem('meritBuildNumber')) || 12;
-            const newBuild = currentBuild + 1;
-            localStorage.setItem('meritBuildNumber', newBuild);
-            return newBuild;
-        }
     </script>
 
     <style>
@@ -766,7 +759,8 @@
         </header>
 
         <main class="client-content" role="main" data-test-id="main-content">
-            <nav class="sidebar" 
+            <!-- Sidebar with fixed width -->
+            <nav class="sidebar expanded" 
                  role="navigation" 
                  aria-label="Main navigation"
                  data-test-id="sidebar">
@@ -789,6 +783,15 @@
                 </div>
             </nav>
 
+            <!-- Sidebar toggle button -->
+            <button id="sidebarToggle" 
+                    class="sidebar-toggle" 
+                    aria-expanded="true" 
+                    aria-label="Toggle Sidebar">
+                <span class="toggle-icon">◀</span>
+            </button>
+
+            <!-- Main content area -->
             <div class="content-area" 
                  role="region" 
                  aria-label="Main content"
@@ -799,14 +802,14 @@
                      aria-labelledby="welcome-tab"
                      data-test-id="welcome-section">
                     <div class="welcome-content">
-                        <h1>Welcome Teachers!</h1>
-                        <h2>I'm Merit, I'm here to help you navigate your EL Education curriculum.</h2>
+                        <h1>Welcome to Merit</h1>
+                        <h2>Your EL Education Curriculum Support Assistant</h2>
                         
                         <form class="welcome-form" 
                               id="welcome-form"
                               data-test-id="welcome-form">
                             <div class="form-group">
-                                <label for="grade-level">What grade level do you teach?</label>
+                                <label for="grade-level">What grade level do you teach or support?</label>
                                 <div class="select-wrapper">
                                     <select id="grade-level" 
                                             class="form-control" 
@@ -848,15 +851,6 @@
                              role="log" 
                              aria-live="polite"
                              data-test-id="chat-window">
-                            <!-- Messages will be added here -->
-                        </div>
-                        <!-- Loading and Error States -->
-                        <div class="loading-state" data-test-id="chat-loading">
-                            <div class="loading-spinner"></div>
-                            <p>Loading chat...</p>
-                        </div>
-                        <div class="error-state" data-test-id="chat-error">
-                            <p>Error loading chat. Please try again.</p>
                         </div>
                     </div>
                 </div>
@@ -868,9 +862,9 @@
                 <!-- Left spacer -->
                 <div class="footer-spacer"></div>
                 
-                <!-- Center area -->
+                <!-- Center area - max width 700px -->
                 <div class="footer-center">
-                    <!-- Playbar - visible by default in welcome section -->
+                    <!-- Playbar - visible by default -->
                     <div id="playbar" class="playbar" data-test-id="playbar">
                         <button id="next-button" 
                                 class="action-button next-button" 
@@ -900,7 +894,7 @@
                     </div>
                 </div>
                 
-                <!-- Right action area -->
+                <!-- Right action area - fixed 150px -->
                 <div class="footer-action-area">
                     <button id="send-button" 
                             class="action-button send-button" 
@@ -916,10 +910,5 @@
             </div>
         </footer>
     </div>
-
-    <script type="module" src="assets/js/client-merit-form.js"></script>
-    <script type="module" src="assets/js/client-merit-chat.js"></script>
-    <script type="module" src="assets/js/client-merit-logic.js"></script>
-
 </body>
 </html> 
