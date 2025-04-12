@@ -132,29 +132,34 @@ export class MeritInstructionalFlow {
      * @private
      */
     #updateActionState() {
-        const nextButton = document.getElementById('next-button');
-        const sendButton = document.getElementById('send-button');
-        const actionOverlay = document.getElementById('actionOverlay');
-
-        // Update button active states
-        nextButton.dataset.active = this.#state.currentSection === 'welcome' ? 'true' : 'false';
-        sendButton.dataset.active = this.#state.currentSection === 'chat' ? 'true' : 'false';
-
-        // Update button enabled states
-        if (this.#state.currentSection === 'welcome') {
+        const { nextButton, sendButton, playbar, chatbar, actionOverlay, chatInput } = this.#elements;
+        const isWelcome = this.#state.currentSection === 'welcome';
+        
+        // Update visibility
+        playbar.hidden = !isWelcome;
+        chatbar.hidden = isWelcome;
+        
+        // Update button states
+        if (nextButton) {
             nextButton.disabled = !this.#state.formValid;
-            actionOverlay.classList.toggle('disabled', !this.#state.formValid);
-        } else if (this.#state.currentSection === 'chat') {
-            const chatInput = document.getElementById('chat-input');
+            nextButton.dataset.active = isWelcome.toString();
+        }
+        
+        if (sendButton) {
             sendButton.disabled = !chatInput?.value?.trim();
-            actionOverlay.classList.toggle('disabled', !chatInput?.value?.trim());
+            sendButton.dataset.active = (!isWelcome).toString();
+        }
+        
+        // Update overlay
+        if (actionOverlay) {
+            actionOverlay.classList.toggle('disabled', isWelcome ? !this.#state.formValid : !chatInput?.value?.trim());
         }
 
         console.log('[Merit Flow] Action state updated:', {
             section: this.#state.currentSection,
             formValid: this.#state.formValid,
-            nextEnabled: !nextButton.disabled,
-            sendEnabled: !sendButton.disabled
+            nextEnabled: nextButton ? !nextButton.disabled : false,
+            sendEnabled: sendButton ? !sendButton.disabled : false
         });
     }
 
@@ -236,11 +241,8 @@ export class MeritInstructionalFlow {
         this.#state.gradeLevel = gradeLevel;
         this.#state.curriculum = curriculum;
 
-        // Update next button state
-        const nextButton = document.getElementById('next-button');
-        if (nextButton) {
-            nextButton.disabled = !isValid;
-        }
+        // Update UI state
+        this.#updateActionState();
 
         this.#persistState();
         this.#logState('Form validation');
