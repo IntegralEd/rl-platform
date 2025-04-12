@@ -200,7 +200,7 @@ class MeritIntakeForm {
 
     async initializeChat() {
         try {
-            const ChatModule = await import('./client-merit-chat.js');
+            const ChatModule = await import('./D_client-merit-chat.js');
             this.chat = new ChatModule.default();
             console.log('Chat initialized successfully');
         } catch (error) {
