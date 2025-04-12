@@ -43,6 +43,16 @@
 
   /* Voice & Tone */
   --client-voice-tone: 'Reflective, academic, and adventurous.';
+
+  /* Override platform colors for ELPL */
+  --elpl-primary: var(--primary-color);
+  --elpl-secondary: var(--secondary-color);
+  --elpl-tertiary: var(--tertiary-color);
+  
+  /* Client-specific spacing */
+  --elpl-card-padding: var(--space-lg);
+  --elpl-icon-size: 48px;
+  --elpl-border-radius: 12px;
 }
 
 /* Global Styles */
@@ -307,5 +317,64 @@ button:hover {
     background: white;
     color: black;
     border: 2px solid black;
+  }
+}
+
+/* Client-specific components */
+.elpl-card {
+  background: white;
+  padding: var(--elpl-card-padding);
+  border-radius: var(--elpl-border-radius);
+  box-shadow: var(--shadow-md);
+}
+
+.elpl-callout {
+  display: flex;
+  align-items: center;
+  background: var(--elpl-secondary);
+  color: var(--cta-text-color);
+  padding: var(--space-md);
+  border-radius: var(--elpl-border-radius);
+}
+
+.elpl-callout img {
+  width: var(--elpl-icon-size);
+  height: var(--elpl-icon-size);
+  margin-right: var(--space-md);
+}
+
+/* Client-specific button styles */
+.elpl-button {
+  background: var(--elpl-tertiary);
+  color: var(--cta-text-color);
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--elpl-border-radius);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: background var(--transition-base);
+}
+
+.elpl-button:hover {
+  background: var(--elpl-secondary);
+}
+
+/* Client-specific typography */
+.elpl-heading {
+  font-family: var(--font-primary);
+  color: var(--elpl-primary);
+  margin-bottom: var(--space-md);
+}
+
+/* Client-specific accessibility */
+@media (prefers-contrast: high) {
+  .elpl-card,
+  .elpl-callout {
+    border: 2px solid var(--text-color);
+  }
+  
+  .elpl-button {
+    background: var(--text-color);
+    color: var(--background-color);
   }
 }
