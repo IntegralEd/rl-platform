@@ -441,99 +441,99 @@ class AssistantManager {
    - [ ] Check navigation flow
    - [ ] Validate mobile layout
 
-### v1.0.14 Predictions [T]
+### v1.0.14 (11:38) Predictions [T]
 
-1. Remove Toggle Elements
-```css
-/* Remove from merit.html */
-.sidebar-toggle,
-.toggle-icon {
-    display: none !important;
-}
-
-/* Clean up related styles */
-.sidebar {
-    position: relative; /* Change from fixed */
-    left: auto;
-    width: 250px;
-    min-width: 250px;
-}
-
-.content-area {
-    margin-left: 0; /* Remove offset */
-}
-```
-
-2. Header Logo Container Fix
-```css
-.header-logo-container {
-    height: calc(var(--elpl-header-height) - 20px); /* Reduce from -10px to -20px */
-    padding: 10px 0; /* Add vertical padding */
-    display: flex;
-    align-items: center;
-}
-
-.header-logo {
-    max-height: 100%;
-    width: auto;
-    object-fit: contain;
-}
-```
-
-3. Typography Alignment
-```css
-/* Add to client-elpl-variables.css */
-:root {
-    --elpl-heading-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --elpl-body-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Update heading styles */
-h1 {
-    font-family: var(--elpl-heading-font);
-    font-size: 2.5rem;
-    line-height: 1.2;
-    color: var(--elpl-secondary);
-    margin-bottom: 1rem;
-}
-
-h2 {
-    font-family: var(--elpl-heading-font);
-    font-size: 1.5rem;
-    line-height: 1.4;
-    color: var(--elpl-text);
-    font-weight: 400;
-}
-```
-
-### Expected Changes [T]
-1. Layout Structure
-   - [T] Toggle box and oval completely removed
-   - [T] Sidebar stays fixed width without toggle
-   - [T] Content area uses full available space
-   - [T] No more phantom UI elements
-
-2. Header Refinements
-   - [T] Logo container height reduced by 20px
-   - [T] 10px padding above and below logo
-   - [T] Better vertical centering in crimson bar
-   - [T] Cleaner header proportions
-
-3. Typography Improvements
-   - [T] Consistent system font stack
-   - [T] Better heading size hierarchy
-   - [T] Improved color contrast
-   - [T] More professional text appearance
-
-### Console Verification [T]
+1. Console Output Verification
 ```javascript
-// Expected Console Output after v1.0.14
-[Merit Flow] Layout structure updated:
-- Sidebar: static positioning
-- Content area: full width
-- Navigation: direct section control
-- No toggle state management needed
+[MeritInstructionalFlow] Initializing v1.0.14...
+[MeritInstructionalFlow] Elements found: form, grade, curriculum
+[MeritInstructionalFlow] Form validation: false (grade: null, curriculum: "ela")
+[MeritInstructionalFlow] Next button disabled
+
+// On Next Button Click
+[MeritInstructionalFlow] Form submitted: {grade: "Grade 3", curriculum: "ela"}
+[MeritInstructionalFlow] Transitioning to chat...
+[MeritInstructionalFlow] Redis connection established
+[MeritInstructionalFlow] Loading welcome message...
 ```
+
+2. Immediate State Changes [T]
+   - [ ] Next click → Instant UI updates:
+     - Footer switches to chat mode
+     - Sidebar chat tab activates
+     - Welcome section fades out
+     - Chat section fades in with loading indicator
+   - [ ] No waiting for Redis before UI changes
+   - [ ] Loading indicator shows in chat window
+   - [ ] Chat container ready for content
+
+3. Redis Integration [T]
+   - [ ] Welcome message preloaded
+   - [ ] Message appears after transition
+   - [ ] Grade-specific context loaded
+   - [ ] Thread ID generated and cached
+
+4. Navigation Flow [T]
+   - [ ] Click next → Immediate section change
+   - [ ] Loading indicator appears in chat window
+   - [ ] Welcome message loads from Redis
+   - [ ] Input enabled after welcome message
+
+5. Chat Container [T]
+   - [ ] Present but empty on page load
+   - [ ] Shows loading state on transition
+   - [ ] Displays welcome message when ready
+   - [ ] Maintains smooth layout during load
+
+6. Error States [T]
+   - [ ] Redis connection failure handled
+   - [ ] Loading timeout managed
+   - [ ] Graceful fallback messages
+   - [ ] Recovery options provided
+
+### Testing Sequence [T]
+1. Initial Load
+   - [ ] Check console initialization
+   - [ ] Verify disabled next button
+   - [ ] Confirm ELA pre-selected
+   - [ ] Note grade placeholder
+
+2. Form Submission
+   - [ ] Select grade level
+   - [ ] Click next button
+   - [ ] Verify INSTANT UI changes
+   - [ ] Check loading indicator
+
+3. Chat Initialization
+   - [ ] Watch welcome message load
+   - [ ] Verify Redis connection
+   - [ ] Check thread creation
+   - [ ] Test input activation
+
+4. Error Recovery
+   - [ ] Test Redis timeout
+   - [ ] Verify error messages
+   - [ ] Check retry options
+   - [ ] Validate state recovery
+
+### Expected Outcomes [T]
+1. Instant Transitions
+   - [ ] No UI lag on next click
+   - [ ] Smooth section changes
+   - [ ] Loading states visible
+   - [ ] Clean animations
+
+2. Redis Performance
+   - [ ] < 500ms to show loading
+   - [ ] < 2s to welcome message
+   - [ ] Proper error handling
+   - [ ] State preservation
+
+3. User Experience
+   - [ ] No jarring changes
+   - [ ] Clear loading feedback
+   - [ ] Smooth animations
+   - [ ] Responsive interface
 
 ### Compliance with @client-layout-structure-behavior.mdc
 - [✓] Grid layout structure maintained

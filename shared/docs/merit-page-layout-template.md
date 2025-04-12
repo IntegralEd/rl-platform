@@ -540,6 +540,52 @@ export class MeritInstructionalFlow {
 - Button click handlers not properly attached
 - State persistence incomplete
 
+### v1.0.14 [T] Predictions
+1. Console Output:
+   ```
+   [MeritInstructionalFlow] Initializing v1.0.14...
+   [MeritInstructionalFlow] Elements found: form, grade, curriculum
+   [MeritInstructionalFlow] Form validation: false (grade: null, curriculum: "ela")
+   [MeritInstructionalFlow] Next button disabled
+   ```
+
+2. Initial State:
+   - Next button should be disabled
+   - Form shows ELA pre-selected
+   - Grade level shows placeholder
+   - Console shows initialization sequence
+
+3. After Grade Selection:
+   - Console updates with validation state
+   - Next button enables only if grade selected
+   - Form state persists in localStorage
+   - Validation status logged to console
+
+4. Navigation Test:
+   - Welcome → Chat blocked until form valid
+   - URL hash updates with section
+   - State preserved on refresh
+   - Console logs section changes
+
+5. Button States:
+   - Next button disabled by default
+   - Next button enables with valid form
+   - Send button appears in chat view
+   - Proper ARIA state updates
+
+6. Error Handling:
+   - Invalid form attempts logged
+   - Navigation blocks logged
+   - Element initialization verified
+   - State persistence confirmed
+
+Testing Sequence:
+1. Load page → Check console for initialization
+2. Select grade → Verify button enables
+3. Click next → Confirm chat transition
+4. Refresh page → Verify state persists
+5. Check console → Validate logging
+
 ### v1.0.13 [April 12 @1145pm]
 - ✓ Fixed form validation to explicitly check both gradeLevel and curriculum
 - ✓ Implemented proper button state management in #updateActionState
@@ -567,3 +613,125 @@ Testing Sequence:
 5. Verify chat input and send button visible
 6. Test keyboard navigation
 7. Reload page - verify state persists
+
+### v1.0.14 Canonical Implementation [T]
+
+1. Immediate State Transition Pattern
+```javascript
+class MeritInstructionalFlow {
+  constructor() {
+    this.state = {
+      section: 'welcome',
+      formValid: false,
+      gradeLevel: null,
+      curriculum: 'ela',
+      isLoading: false
+    };
+    this.initializeElements();
+    this.setupEventListeners();
+  }
+
+  async handleNextClick() {
+    // 1. Immediate UI Updates
+    this.updateUIState('chat');
+    this.showLoadingState();
+    
+    // 2. Start Redis Connection
+    try {
+      const welcomeMessage = await this.loadWelcomeMessage();
+      this.displayWelcomeMessage(welcomeMessage);
+    } catch (error) {
+      this.handleRedisError(error);
+    }
+  }
+
+  updateUIState(section) {
+    // Instant UI changes
+    this.state.section = section;
+    this.updateNavigation();
+    this.updateFooterState();
+    this.transitionSections();
+  }
+
+  showLoadingState() {
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.innerHTML = `
+      <div class="loading-indicator" role="status">
+        Loading your personalized chat experience...
+      </div>
+    `;
+  }
+}
+```
+
+2. Redis Integration Pattern
+```javascript
+class RedisManager {
+  async loadWelcomeMessage(gradeLevel) {
+    const key = `welcome:${gradeLevel}:ela`;
+    try {
+      const message = await redis.get(key);
+      return message || this.getDefaultWelcome(gradeLevel);
+    } catch (error) {
+      console.error('[Redis] Connection error:', error);
+      return this.getDefaultWelcome(gradeLevel);
+    }
+  }
+
+  getDefaultWelcome(gradeLevel) {
+    return {
+      type: 'assistant',
+      content: `Welcome to Grade ${gradeLevel} ELA support! How can I help you today?`
+    };
+  }
+}
+```
+
+3. State Management Rules
+- UI updates must be immediate on next click
+- Redis operations must not block UI changes
+- Loading states must be visible during transitions
+- Error states must have fallbacks
+
+4. CSS Transition Pattern
+```css
+.section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.section.active {
+  display: block;
+  opacity: 1;
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  color: var(--elpl-secondary);
+  font-style: italic;
+}
+```
+
+5. Error Handling Pattern
+```javascript
+async handleRedisError(error) {
+  console.error('[Redis] Error:', error);
+  const chatWindow = document.getElementById('chat-window');
+  chatWindow.innerHTML = `
+    <div class="error-message" role="alert">
+      <p>Unable to load chat experience. Please try:</p>
+      <button onclick="this.retryConnection()">Retry Connection</button>
+    </div>
+  `;
+}
+```
+
+6. Performance Requirements
+- UI transitions: < 100ms
+- Loading indicator: < 500ms
+- Welcome message: < 2s
+- Error recovery: < 1s
