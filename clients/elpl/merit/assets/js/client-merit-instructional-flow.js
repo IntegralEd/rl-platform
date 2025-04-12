@@ -136,23 +136,18 @@ export class MeritInstructionalFlow {
         const isWelcome = this.#state.currentSection === 'welcome';
         
         // Update visibility
-        playbar.hidden = !isWelcome;
-        chatbar.hidden = isWelcome;
+        if (playbar) playbar.hidden = !isWelcome;
+        if (chatbar) chatbar.hidden = isWelcome;
         
-        // Update button states
-        if (nextButton) {
-            nextButton.disabled = !this.#state.formValid;
-            nextButton.dataset.active = isWelcome.toString();
-        }
+        // Critical: Update button states based on form validity
+        const shouldEnable = isWelcome && this.#state.formValid;
+        nextButton.disabled = !shouldEnable;
+        nextButton.dataset.active = String(shouldEnable);
         
         if (sendButton) {
-            sendButton.disabled = !chatInput?.value?.trim();
-            sendButton.dataset.active = (!isWelcome).toString();
-        }
-        
-        // Update overlay
-        if (actionOverlay) {
-            actionOverlay.classList.toggle('disabled', isWelcome ? !this.#state.formValid : !chatInput?.value?.trim());
+            const canSend = !isWelcome && chatInput?.value?.trim();
+            sendButton.disabled = !canSend;
+            sendButton.dataset.active = String(!isWelcome);
         }
 
         console.log('[Merit Flow] Action state updated:', {
@@ -161,6 +156,13 @@ export class MeritInstructionalFlow {
             nextEnabled: nextButton ? !nextButton.disabled : false,
             sendEnabled: sendButton ? !sendButton.disabled : false
         });
+
+        // Added click handler for next button
+        if (!nextButton._hasClickHandler && shouldEnable) {
+            nextButton.addEventListener('click', () => {
+                this.#handleNavigation('chat');
+            });
+        }
     }
 
     /**
@@ -174,13 +176,13 @@ export class MeritInstructionalFlow {
         // Validate section exists
         if (!this.#config.sections.includes(sectionId)) {
             console.error(`[Merit Flow] Invalid section: ${sectionId}`);
-            return;
+            return false;
         }
 
-        // Check if navigation is allowed
-        if (!this.#canNavigateToSection(sectionId)) {
-            console.warn(`[Merit Flow] Navigation to ${sectionId} blocked - requirements not met`);
-            return;
+        // Critical: Check navigation requirements
+        if (sectionId === 'chat' && !this.#state.formValid) {
+            console.warn('[Merit Flow] Cannot navigate to chat - form invalid');
+            return false;
         }
 
         // Update section visibility
@@ -197,33 +199,17 @@ export class MeritInstructionalFlow {
             link.setAttribute('aria-current', isActive ? 'page' : 'false');
         });
 
-        // Update footer state
-        this.#updateActionState();
-
-        // Update state and persist
+        // Critical: Update state before UI
         this.#state.currentSection = sectionId;
         this.#persistState();
+        
+        // Update UI last
+        this.#updateActionState();
 
         // Update URL without reload
-        history.pushState(
-            { section: sectionId },
-            '',
-            `#${sectionId}`
-        );
-
+        history.pushState({ section: sectionId }, '', `#${sectionId}`);
+        
         this.#logState('Navigation complete');
-    }
-
-    /**
-     * Check if navigation to section is allowed
-     * @private
-     * @param {string} sectionId
-     * @returns {boolean}
-     */
-    #canNavigateToSection(sectionId) {
-        if (sectionId === 'chat') {
-            return this.#state.formValid;
-        }
         return true;
     }
 
@@ -233,19 +219,25 @@ export class MeritInstructionalFlow {
      */
     #validateForm() {
         const form = this.#elements.form;
-        const isValid = form.checkValidity();
         const gradeLevel = form.querySelector('#grade-level').value;
         const curriculum = form.querySelector('#curriculum').value;
-
+        
+        // Now explicitly checks both fields
+        const isValid = gradeLevel && curriculum;
+        
+        // Update state
         this.#state.formValid = isValid;
         this.#state.gradeLevel = gradeLevel;
         this.#state.curriculum = curriculum;
-
-        // Update UI state
+        
+        // Force UI update
         this.#updateActionState();
-
         this.#persistState();
+        
+        // Log validation
         this.#logState('Form validation');
+        
+        return isValid;
     }
 
     /**

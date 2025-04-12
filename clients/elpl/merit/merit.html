@@ -59,13 +59,21 @@
             --elpl-content-width: 1200px;
             --elpl-max-height: 900px;
             
-            /* Colors */
-            --elpl-primary: #c6123f;
-            --elpl-secondary: #211651;
-            --elpl-tertiary: #ffa409;
-            --elpl-bg: #ffffff;
-            --elpl-text: #2c3e50;
-            --elpl-border: #e1e4e8;
+            /* Colors - inherit from client-elpl-variables.css */
+            --elpl-primary: var(--primary-color);
+            --elpl-secondary: var(--secondary-color);
+            --elpl-tertiary: var(--tertiary-color);
+            --elpl-bg: var(--background-color);
+            --elpl-text: var(--text-color);
+            --elpl-border: var(--chat-input-border);
+            
+            /* Typography - inherit from client-elpl.css */
+            --elpl-font-h1: var(--client-font-h1);
+            --elpl-font-h2: var(--client-font-h2);
+            --elpl-font-body: var(--client-font-body);
+            --elpl-font-size-h1: var(--client-font-size-h1);
+            --elpl-font-size-h2: var(--client-font-size-h2);
+            --elpl-font-size-body: var(--client-font-size-body);
             
             /* Component Sizing */
             --elpl-card-padding: 1.5rem;
@@ -87,8 +95,8 @@
             color: var(--elpl-text);
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.5;
+            font-family: var(--elpl-font-body);
+            line-height: var(--line-height-base);
             min-height: 100vh;
         }
 
@@ -123,9 +131,8 @@
         }
 
         .header-logo-container {
-            height: calc(var(--elpl-header-height) - 10px);
-            display: flex;
-            align-items: center;
+            height: calc(var(--elpl-header-height) - 20px);
+            padding: 10px 0;
         }
 
         .header-version-container {
@@ -165,8 +172,8 @@
         .content-area {
             flex: 1;
             padding: 2rem;
-            margin-left: 250px; /* Match sidebar width */
-            width: calc(100% - 250px);
+            margin-left: 0;
+            width: calc(100% - var(--elpl-sidebar-width));
             background: var(--elpl-bg);
             border-radius: var(--elpl-border-radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -383,89 +390,116 @@
             display: none !important;
         }
         
+        /* Form Group Accessibility Enhancements */
         .form-group {
-            margin-bottom: 2rem;
-            margin-top: 2rem;
+            margin-bottom: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.75rem;
-            color: var(--elpl-text);
-            font-weight: 600;
-            font-size: 1.3em;
+            margin-bottom: var(--spacing-md);
+            color: var(--elpl-secondary);
+            font-family: var(--elpl-font-h2);
+            font-size: calc(var(--elpl-font-size-h2) * 0.85);
+            font-weight: 500;
+            line-height: 1.4;
         }
-        
+
+        /* Enhanced Select Wrapper Accessibility */
         .select-wrapper {
             position: relative;
             width: 100%;
+            margin-bottom: var(--spacing-lg);
         }
 
         .select-wrapper::after {
-            content: "▼";
-            color: var(--elpl-primary);
-            font-size: 24px;
+            content: "";
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23211651' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            width: 16px;
+            height: 16px;
             position: absolute;
-            right: 10px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
             pointer-events: none;
-            padding-right: 10px;
+            transition: transform 0.2s ease;
         }
 
+        .select-wrapper:hover::after {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Enhanced Form Control Accessibility */
         .form-control {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--elpl-border);
+            padding: 14px 16px;
+            border: 2px solid var(--elpl-border);
             border-radius: var(--elpl-border-radius);
-            font-size: 16px;
+            font-family: var(--elpl-font-body);
+            font-size: var(--elpl-font-size-body);
+            color: var(--elpl-secondary);
             appearance: none;
             background: white;
             cursor: pointer;
-            padding-right: 40px;
+            padding-right: 48px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:hover {
+            border-color: var(--elpl-secondary);
+            box-shadow: 0 2px 4px rgba(33, 22, 81, 0.1);
         }
         
         .form-control:focus {
             outline: none;
             border-color: var(--elpl-primary);
-            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
+            box-shadow: 0 0 0 3px rgba(198, 18, 63, 0.15);
         }
 
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            gap: 1rem;
-            color: var(--elpl-secondary);
-            font-size: 1.2rem;
+        .form-control option {
+            font-family: var(--elpl-font-body);
+            font-size: var(--elpl-font-size-body);
+            color: var(--elpl-text);
+            padding: 12px;
+            background: white;
         }
 
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(33, 22, 81, 0.2);
-            border-top: 4px solid var(--elpl-secondary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        /* Enhanced focus and selection states */
+        .form-control:focus option:checked,
+        .form-control option:checked {
+            background: var(--elpl-secondary);
+            color: white;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Disabled state with better contrast */
+        .form-control:disabled {
+            background-color: var(--elpl-bg);
+            border-color: var(--elpl-border);
+            color: var(--elpl-text);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Error state handling */
+        .form-control[aria-invalid="true"] {
+            border-color: var(--elpl-primary);
+            padding-right: 48px;
         }
 
         .error-message {
             color: var(--elpl-primary);
             font-size: 0.9rem;
             margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* High contrast focus indicator */
+        .form-control:focus-visible {
+            outline: 2px solid var(--elpl-secondary);
+            outline-offset: 2px;
+            border-color: var(--elpl-secondary);
         }
 
         @media (max-width: 768px) {
@@ -527,50 +561,12 @@
         }
 
         .sidebar {
-            width: 250px;
-            min-width: 250px;
-            background: var(--elpl-bg);
-            border-right: 1px solid var(--elpl-border);
+            width: var(--elpl-sidebar-width);
+            min-width: var(--elpl-sidebar-width);
+            position: relative;
+            left: auto;
             padding: 2rem 1rem;
             height: calc(100vh - var(--elpl-header-height) - var(--elpl-footer-height));
-            position: fixed;
-            left: 0;
-            top: var(--elpl-header-height);
-            overflow-y: auto;
-            display: flex !important; /* Force display */
-            flex-direction: column;
-        }
-
-        /* Remove the problematic display: none rules */
-        .sidebar.expanded {
-            width: 250px;
-            visibility: visible;
-        }
-
-        .sidebar.collapsed {
-            width: 0;
-            visibility: hidden;
-        }
-
-        .sidebar-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            left: 250px;
-            top: calc(var(--elpl-header-height) + 1rem);
-            width: 24px;
-            height: 24px;
-            background: var(--elpl-bg);
-            border: 1px solid var(--elpl-border);
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 90;
-            transition: left 0.3s ease;
-        }
-
-        .client-content.sidebar-collapsed {
-            margin-left: 0;
         }
 
         .section {
@@ -599,17 +595,20 @@
         .section h1 {
             margin: 0;
             padding-top: 1rem;
-            color: var(--elpl-text);
-            font-size: 2.2em;
+            font-family: var(--elpl-font-h1);
+            font-size: var(--elpl-font-size-h1);
+            color: var(--elpl-secondary);
             line-height: 1.2;
+            margin-bottom: var(--spacing-md);
         }
 
         .section h2 {
-            margin-top: 1rem;
-            margin-bottom: 2rem;
-            color: var(--elpl-secondary);
-            font-size: 1.4em;
-            font-weight: normal;
+            margin-top: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            font-family: var(--elpl-font-h2);
+            font-size: var(--elpl-font-size-h2);
+            color: var(--elpl-text);
+            font-weight: 400;
             line-height: 1.4;
         }
 
@@ -853,14 +852,6 @@
                 </div>
             </nav>
 
-            <!-- Sidebar toggle button -->
-            <button id="sidebarToggle" 
-                    class="sidebar-toggle" 
-                    aria-expanded="true" 
-                    aria-label="Toggle Sidebar">
-                <span class="toggle-icon">◀</span>
-            </button>
-
             <!-- Main content area -->
             <div class="content-area" 
                  role="region" 
@@ -877,15 +868,19 @@
                         
                         <form class="welcome-form" 
                               id="welcome-form"
-                              data-test-id="welcome-form">
+                              data-test-id="welcome-form"
+                              aria-label="Welcome Form">
                             <div class="form-group">
-                                <label for="grade-level">What grade level do you teach or support?</label>
+                                <label for="grade-level" id="grade-level-label">What grade level do you teach or support?</label>
                                 <div class="select-wrapper">
                                     <select id="grade-level" 
                                             class="form-control" 
                                             required
-                                            data-test-id="grade-select">
-                                        <option value="">Select a grade level</option>
+                                            data-test-id="grade-select"
+                                            aria-labelledby="grade-level-label"
+                                            aria-describedby="grade-level-description"
+                                            aria-required="true">
+                                        <option value="" disabled selected>Select a grade level</option>
                                         <option value="Kindergarten">Kindergarten</option>
                                         <option value="Grade 1">Grade 1</option>
                                         <option value="Grade 2">Grade 2</option>
@@ -893,17 +888,26 @@
                                         <option value="Grade 4">Grade 4</option>
                                         <option value="Grade 5">Grade 5</option>
                                     </select>
+                                    <span id="grade-level-description" class="sr-only">
+                                        Choose your grade level from Kindergarten through Grade 5
+                                    </span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="curriculum">Which curriculum are you here with questions about?</label>
+                                <label for="curriculum" id="curriculum-label">Which curriculum are you here with questions about?</label>
                                 <div class="select-wrapper">
                                     <select id="curriculum" 
                                             class="form-control" 
                                             required
-                                            data-test-id="curriculum-select">
+                                            data-test-id="curriculum-select"
+                                            aria-labelledby="curriculum-label"
+                                            aria-describedby="curriculum-description"
+                                            aria-required="true">
                                         <option value="ela" selected>English Language Arts (ELA)</option>
                                     </select>
+                                    <span id="curriculum-description" class="sr-only">
+                                        Currently only ELA curriculum is available
+                                    </span>
                                 </div>
                             </div>
                         </form>

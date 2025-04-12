@@ -530,3 +530,40 @@ export class MeritInstructionalFlow {
 - State transition: < 300ms (current CSS)
 - Input response: < 50ms
 - Scroll performance: 60fps 
+
+## Build Notes
+
+### v1.0.14 [April 12 @1138pm]
+- Form validation not properly checking both fields
+- Next button state not syncing with form validity
+- Navigation to chat allowed without valid form
+- Button click handlers not properly attached
+- State persistence incomplete
+
+### v1.0.13 [April 12 @1145pm]
+- ✓ Fixed form validation to explicitly check both gradeLevel and curriculum
+- ✓ Implemented proper button state management in #updateActionState
+- ✓ Added navigation gating to prevent chat access without valid form
+- ✓ Fixed click handler attachment for next button
+- ✓ Improved state persistence and logging
+- ✓ Added explicit error handling for element initialization
+- ✓ Synchronized footer state changes with section transitions
+- ✓ Added keyboard navigation improvements
+
+Expected Outcomes v1.0.13:
+1. Next button only enables when both form fields are valid
+2. Navigation to chat section blocked until form is valid
+3. Button states properly reflect current section and form validity
+4. Smooth transitions between welcome and chat sections
+5. Proper state persistence between page reloads
+6. Improved error logging and state tracking
+7. Better keyboard navigation support
+
+Testing Sequence:
+1. Load page - verify next button disabled
+2. Select grade - verify next still disabled
+3. Confirm ELA selected - verify next enables
+4. Click next - verify chat section shows
+5. Verify chat input and send button visible
+6. Test keyboard navigation
+7. Reload page - verify state persists
