@@ -1,6 +1,4 @@
-/**
- * Merit page logic handling form submission and chat interface
- */
+// Merit page logic and form handling
 
 class MeritIntakeForm {
     constructor() {
@@ -8,111 +6,185 @@ class MeritIntakeForm {
         this.form = document.querySelector('.welcome-form');
         this.gradeLevelInput = document.getElementById('grade-level');
         this.curriculumInput = document.getElementById('curriculum');
-        this.nextButton = document.querySelector('.next-button');
         this.contentArea = document.querySelector('.content');
+        this.versionDisplay = document.querySelector('.version-display');
         
-        // Tab elements
-        this.tabs = document.querySelectorAll('.tab-button');
-        this.welcomeTab = document.getElementById('welcome-tab');
-        this.chatTab = document.getElementById('chat-tab');
-        
-        // Set up event listeners
+        // Initialize
         this.setupEventListeners();
-        this.setupTabs();
+        this.updateVersionTime(); // Initial update
+        setInterval(() => this.updateVersionTime(), 60000); // Update every minute
+        this.resetForm();
+    }
+
+    updateVersionTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        // Track environment internally
+        this.currentEnv = window.location.hostname.includes('review') ? 'review' : 'live';
+        if (this.versionDisplay) {
+            this.versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
+        }
+    }
+
+    resetForm() {
+        // Clear any previous values
+        this.gradeLevelInput.value = '';
+        this.curriculumInput.value = '';
+        
+        // Ensure the form is visible
+        this.contentArea.innerHTML = `
+            <form class="welcome-form" role="form" aria-label="User intake form">
+                <div class="form-group">
+                    <label for="grade-level">What grade level do you teach?</label>
+                    <select 
+                        id="grade-level" 
+                        name="grade-level" 
+                        required
+                        aria-required="true"
+                        aria-label="Select your grade level"
+                    >
+                        <option value="">Select a grade level</option>
+                        <option value="Kindergarten">Kindergarten</option>
+                        <option value="Grade 1">Grade 1</option>
+                        <option value="Grade 2">Grade 2</option>
+                        <option value="Grade 3">Grade 3</option>
+                        <option value="Grade 4">Grade 4</option>
+                        <option value="Grade 5">Grade 5</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="curriculum">What curriculum do you use?</label>
+                    <input 
+                        type="text" 
+                        id="curriculum" 
+                        name="curriculum" 
+                        required
+                        aria-required="true"
+                        aria-label="Enter your curriculum"
+                        placeholder="Enter your curriculum"
+                    >
+                </div>
+                
+                <div class="form-actions">
+                    <button 
+                        type="submit" 
+                        class="next-button" 
+                        aria-label="Submit form and proceed to chat"
+                    >Next</button>
+                </div>
+            </form>
+        `;
+        
+        // Re-initialize form elements and listeners
+        this.form = document.querySelector('.welcome-form');
+        this.gradeLevelInput = document.getElementById('grade-level');
+        this.curriculumInput = document.getElementById('curriculum');
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
-        this.nextButton?.addEventListener('click', () => this.handleNextClick());
-        this.form.addEventListener('input', () => this.validateForm());
-    }
-
-    setupTabs() {
-        this.tabs.forEach(tab => {
-            tab.addEventListener('click', () => this.switchTab(tab));
+        // Handle form submission
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleFormSubmit();
         });
     }
 
-    switchTab(selectedTab) {
-        // Update tab states
-        this.tabs.forEach(tab => {
-            tab.classList.remove('active');
-            tab.setAttribute('aria-selected', 'false');
-        });
-        selectedTab.classList.add('active');
-        selectedTab.setAttribute('aria-selected', 'true');
-
-        // Show corresponding content
-        const tabName = selectedTab.dataset.tab;
-        if (tabName === 'welcome') {
-            this.welcomeTab.style.display = 'block';
-            this.chatTab.style.display = 'none';
-        } else if (tabName === 'chat') {
-            this.welcomeTab.style.display = 'none';
-            this.chatTab.style.display = 'block';
+    handleFormSubmit() {
+        const gradeLevel = this.gradeLevelInput.value;
+        const curriculum = this.curriculumInput.value;
+        
+        // Validate both fields are filled
+        if (!gradeLevel || !curriculum) {
+            alert('Please tell us a little about yourself before we get started');
+            return;
         }
-
-        // Log for debugging
-        console.log(`Switched to ${tabName} tab`);
+        
+        // Show chat interface
+        this.showChatInterface(gradeLevel, curriculum);
     }
 
-    validateForm() {
-        const isValid = this.gradeLevelInput.value && this.curriculumInput.value;
-        this.nextButton.classList.toggle('enabled', isValid);
-        return isValid;
-    }
+    showChatInterface(gradeLevel, curriculum) {
+        // Replace form with chat interface
+        this.contentArea.innerHTML = `
+            <div class="chat-container" role="region" aria-label="Chat interface">
+                <div class="chat-messages" role="log" aria-label="Chat messages">
+                    <div class="message assistant" role="status" aria-label="Assistant message">
+                        Welcome! I see you teach ${gradeLevel}. How can I help you today?
+                    </div>
+                </div>
+                <div class="chat-input-container" role="form" aria-label="Chat input form">
+                    <textarea 
+                        class="chat-input" 
+                        placeholder="Type your message here..."
+                        rows="3"
+                        aria-label="Type your message"
+                        role="textbox"
+                    ></textarea>
+                    <button 
+                        class="send-button" 
+                        aria-label="Send message"
+                        role="button"
+                    >SEND</button>
+                </div>
+            </div>
+        `;
 
-    handleNextClick() {
-        if (!this.validateForm()) return;
-        
-        // Hide form, show chat
-        this.form.style.display = 'none';
-        this.chatContainer.classList.add('active');
-        
-        // Initialize chat interface
-        this.initializeChat();
-    }
-
-    initializeChat() {
-        const context = {
-            gradeLevel: this.gradeLevelInput.value,
-            curriculum: this.curriculumInput.value
-        };
-        
-        // Add welcome message
-        this.addMessage('assistant', `Welcome! I see you're teaching ${context.gradeLevel} using ${context.curriculum}. How can I help you today?`);
-        
-        // Set up chat handlers
+        // Setup chat handlers
         this.setupChatHandlers();
     }
 
     setupChatHandlers() {
         const input = document.querySelector('.chat-input');
         const sendButton = document.querySelector('.send-button');
-        const messagesContainer = document.querySelector('.chat-window');
+        const messagesContainer = document.querySelector('.chat-messages');
 
+        // Send message function
         const sendMessage = () => {
             const message = input.value.trim();
-            if (!message) return;
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.setAttribute('role', 'status');
+                userMessage.setAttribute('aria-label', 'Your message');
+                userMessage.textContent = message;
+                messagesContainer.appendChild(userMessage);
 
-            // Add user message
-            this.addMessage('user', message);
-            input.value = '';
+                // Clear input
+                input.value = '';
 
-            // Show typing indicator
-            const typingIndicator = document.createElement('div');
-            typingIndicator.className = 'message assistant typing';
-            typingIndicator.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-            messagesContainer.appendChild(typingIndicator);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message assistant typing';
+                typingIndicator.setAttribute('role', 'status');
+                typingIndicator.setAttribute('aria-label', 'Assistant is typing');
+                typingIndicator.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+                messagesContainer.appendChild(typingIndicator);
 
-            // Clear typing indicator and add response after delay
-            setTimeout(() => {
-                typingIndicator.remove();
-                this.addMessage('assistant', 'I understand. Let me help you with that...');
-            }, 2000);
+                // Auto scroll
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Simulate response (remove this when backend is integrated)
+                setTimeout(() => {
+                    typingIndicator.remove();
+                    const response = document.createElement('div');
+                    response.className = 'message assistant';
+                    response.setAttribute('role', 'status');
+                    response.setAttribute('aria-label', 'Assistant response');
+                    response.textContent = 'I understand. Let me help you with that...';
+                    messagesContainer.appendChild(response);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 2000);
+            }
         };
 
+        // Click handler
         sendButton.addEventListener('click', sendMessage);
+
+        // Enter key handler
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -120,18 +192,17 @@ class MeritIntakeForm {
             }
         });
     }
-
-    addMessage(type, content) {
-        const messagesContainer = document.querySelector('.chat-window');
-        const message = document.createElement('div');
-        message.className = `message ${type}`;
-        message.textContent = content;
-        messagesContainer.appendChild(message);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
 }
 
-// Initialize when DOM is loaded
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
     new MeritIntakeForm();
-}); 
+});
+
+class ErrorBoundary {
+    static handleError(error, component) {
+        console.error(`Error in ${component}:`, error);
+        // Show user-friendly error message
+        document.querySelector('.error-overlay').style.display = 'flex';
+    }
+} 
