@@ -30,7 +30,8 @@
         data-user-name=""
         data-user-id=""
         data-access-level=""
-        data-last-login="">
+        data-last-login=""
+        data-test-id="header-data">
     </span>
 
     <script>
@@ -63,19 +64,26 @@
 
     <style>
         :root {
-            /* Use ELPL-specific variables */
+            /* Layout Variables */
             --elpl-header-height: 60px;
             --elpl-footer-height: 80px;
+            --elpl-sidebar-width: 250px;
+            --elpl-content-width: 1200px;
+            --elpl-max-height: 900px;
+            
+            /* Colors */
             --elpl-primary: #c6123f;
             --elpl-secondary: #211651;
             --elpl-tertiary: #ffa409;
             --elpl-bg: #ffffff;
             --elpl-text: #2c3e50;
             --elpl-border: #e1e4e8;
-            --elpl-content-width: 1200px;
+            
+            /* Component Sizing */
             --elpl-card-padding: 1.5rem;
             --elpl-icon-size: 48px;
             --elpl-border-radius: 12px;
+            
             /* Chat Variables */
             --chat-message-radius: 16px;
             --chat-container-padding: 24px;
@@ -83,6 +91,11 @@
             --chat-input-focus: var(--elpl-primary);
             --chat-message-max-width: 80%;
             --chat-window-height: calc(100vh - var(--elpl-header-height) - var(--elpl-footer-height) - 40px);
+            
+            /* Dark Mode Colors */
+            --dark-bg: #333;
+            --dark-text: #eee;
+            --dark-border: #555;
         }
 
         .client-layout {
@@ -586,45 +599,128 @@
             }
         }
 
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --elpl-bg: var(--dark-bg);
+                --elpl-text: var(--dark-text);
+                --elpl-border: var(--dark-border);
+            }
+            
+            .client-header {
+                background-color: var(--elpl-primary);
+            }
+            
+            .sidebar {
+                background-color: var(--dark-bg);
+                border-color: var(--dark-border);
+            }
+            
+            .nav-link {
+                background-color: var(--dark-border);
+                color: var(--dark-text);
+            }
+            
+            .form-control {
+                background-color: var(--dark-bg);
+                color: var(--dark-text);
+                border-color: var(--dark-border);
+            }
+        }
+
+        /* Loading States */
+        .iframe-container {
+            position: relative;
+            border: 1px solid var(--elpl-border);
+            margin: var(--elpl-card-padding);
+        }
+
+        .loading-state,
+        .error-state {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        .loading-state.active,
+        .error-state.active {
+            display: flex;
+        }
+
     </style>
 </head>
 <body>
-    <div class="client-layout" data-client-component="merit-page">
-        <header class="client-header" role="banner">
+    <div class="client-layout" data-client-component="merit-page" data-test-id="page-container">
+        <header class="client-header" role="banner" data-test-id="header-bar">
             <div class="header-content">
-                <div class="header-logo-container"> 
-                     <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="header-logo">
+                <div class="header-logo-container" data-test-id="logo-container"> 
+                     <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" 
+                          alt="EL Education Logo" 
+                          class="header-logo"
+                          loading="lazy"
+                          aria-live="polite">
                 </div>
                 <div class="header-version-container"> 
-                    <div class="version-display" aria-label="Version and time"></div>
+                    <div class="version-display" 
+                         aria-label="Version and time"
+                         data-test-id="version-display"></div>
                 </div>
             </div>
         </header>
 
-        <main class="client-content" role="main">
-            <nav class="sidebar" role="navigation" aria-label="Main navigation">
+        <main class="client-content" role="main" data-test-id="main-content">
+            <nav class="sidebar" 
+                 role="navigation" 
+                 aria-label="Main navigation"
+                 data-test-id="sidebar">
                 <div class="sidebar-content">
                     <div class="sidebar-nav">
-                        <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
+                        <a href="#welcome" 
+                           class="nav-link active" 
+                           data-section="welcome" 
+                           aria-current="page"
+                           data-test-id="nav-welcome">
                             <span class="nav-text">Welcome</span>
                         </a>
-                        <a href="#chat" class="nav-link" data-section="chat">
+                        <a href="#chat" 
+                           class="nav-link" 
+                           data-section="chat"
+                           data-test-id="nav-chat">
                             <span class="nav-text">Chat</span>
                         </a>
                     </div>
                 </div>
             </nav>
 
-            <div class="content-area" role="region" aria-label="Main content">
-                <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+            <div class="content-area" 
+                 role="region" 
+                 aria-label="Main content"
+                 data-test-id="content-area">
+                <div class="section active" 
+                     data-section="welcome" 
+                     role="tabpanel" 
+                     aria-labelledby="welcome-tab"
+                     data-test-id="welcome-section">
                     <h1>Welcome Teachers!</h1>
                     <h2>I'm Merit, I'm here to help you navigate your EL Education curriculum.</h2>
                     
-                    <form class="welcome-form" id="welcome-form">
+                    <form class="welcome-form" 
+                          id="welcome-form"
+                          data-test-id="welcome-form">
                         <div class="form-group">
                             <label for="grade-level">What grade level do you teach?</label>
                             <div class="select-wrapper">
-                                <select id="grade-level" class="form-control" required>
+                                <select id="grade-level" 
+                                        class="form-control" 
+                                        required
+                                        data-test-id="grade-select">
                                     <option value="">Select a grade level</option>
                                     <option value="Kindergarten">Kindergarten</option>
                                     <option value="Grade 1">Grade 1</option>
@@ -638,31 +734,63 @@
                         <div class="form-group">
                             <label for="curriculum">Which curriculum are you here with questions about?</label>
                             <div class="select-wrapper">
-                                <select id="curriculum" class="form-control" required>
+                                <select id="curriculum" 
+                                        class="form-control" 
+                                        required
+                                        data-test-id="curriculum-select">
                                     <option value="ela" selected>English Language Arts (ELA)</option>
                                 </select>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
-                    <div class="chat-container">
-                        <div id="chat-window" class="chat-window" role="log" aria-live="polite">
+                <div class="section" 
+                     data-section="chat" 
+                     role="tabpanel" 
+                     aria-labelledby="chat-tab" 
+                     hidden
+                     data-test-id="chat-section">
+                    <div class="chat-container" data-test-id="chat-container">
+                        <div id="chat-window" 
+                             class="chat-window" 
+                             role="log" 
+                             aria-live="polite"
+                             data-test-id="chat-window">
                             <!-- Messages will be added here -->
+                        </div>
+                        <!-- Loading and Error States -->
+                        <div class="loading-state" data-test-id="chat-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading chat...</p>
+                        </div>
+                        <div class="error-state" data-test-id="chat-error">
+                            <p>Error loading chat. Please try again.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer class="client-footer" role="contentinfo">
+        <footer class="client-footer" 
+                role="contentinfo"
+                data-test-id="footer">
             <div class="footer-content">
                 <div class="playbar" id="playbar">
-                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat">
-                        <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" alt="Next" class="button-icon">
+                    <button class="next-button" 
+                            id="next-button" 
+                            disabled 
+                            aria-label="Continue to chat"
+                            data-test-id="next-button">
+                        <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
+                             alt="Next" 
+                             class="button-icon"
+                             loading="lazy">
                     </button>
                 </div>
-                <div class="chatbar" id="chatbar" hidden>
+                <div class="chatbar" 
+                     id="chatbar" 
+                     hidden
+                     data-test-id="chatbar">
                     <div class="chat-input-container">
                         <textarea 
                             class="chat-input" 
@@ -674,9 +802,16 @@
                             data-gramm="false"
                             data-gramm_editor="false"
                             data-enable-grammarly="false"
+                            data-test-id="chat-input"
                         ></textarea>
-                        <button class="send-button" id="send-button" aria-label="Send message">
-                            <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" alt="Send" class="button-icon">
+                        <button class="send-button" 
+                                id="send-button" 
+                                aria-label="Send message"
+                                data-test-id="send-button">
+                            <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
+                                 alt="Send" 
+                                 class="button-icon"
+                                 loading="lazy">
                             <span class="sr-only">Send message</span>
                         </button>
                     </div>
