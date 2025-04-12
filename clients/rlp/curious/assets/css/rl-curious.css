@@ -1,0 +1,125 @@
+/* Curious Intake Form Specific Styles */
+.rlp-form {
+  max-width: 700px;
+  margin: auto;
+}
+
+.rlp-form__header {
+  margin-bottom: 1.5rem;
+}
+
+.rlp-form__title {
+  color: var(--rlp-color-primary);
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.rlp-form__subtitle {
+  color: var(--rlp-color-secondary);
+  font-size: 1rem;
+}
+
+.rlp-form__section {
+  margin-bottom: 2rem;
+  padding-left: 1rem;
+  border-left: 4px solid transparent;
+}
+
+.rlp-form__legend {
+  font-weight: bold;
+  color: var(--rlp-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.rlp-form__callout {
+  background-color: var(--rlp-color-highlight);
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  border-left: 4px solid var(--rlp-color-primary);
+  font-size: 0.9rem;
+  color: var(--rlp-color-primary);
+  border-radius: var(--rlp-radius);
+}
+
+.rlp-form__helper {
+  font-size: 0.85rem;
+  color: var(--rlp-color-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.rlp-form__label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--rlp-color-primary);
+  font-weight: 500;
+}
+
+.rlp-form__input,
+.rlp-form__textarea {
+  width: 100%;
+  padding: 0.75rem 0.5rem;
+  border: none;
+  border-bottom: 2px solid var(--rlp-color-secondary);
+  background-color: transparent;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.rlp-form__input:focus,
+.rlp-form__textarea:focus {
+  border-bottom: 2px solid var(--rlp-color-primary);
+  background-color: #fcfcfc;
+}
+
+.rlp-form__qc-indicator {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.icon--qc {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--rlp-color-highlight);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rlp-form__section {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.rlp-form__section:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.rlp-form__section:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .rlp-form {
+    max-width: 100%;
+    padding: 1rem;
+  }
+  
+  .rlp-form__title {
+    font-size: 1.5rem;
+  }
+  
+  .rlp-form__section {
+    padding-left: 0.5rem;
+  }
+} 
