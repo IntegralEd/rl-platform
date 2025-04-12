@@ -9,29 +9,20 @@
     <title>Merit - Recursive Learning</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/logo.ico">
+    <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
     
-    <!-- Required client scripts (Shared & Client-Specific) -->
-    <!-- <script type="module" src="/clients/elpl/assets/js/client-auth.js" defer onerror="handleScriptError(event)"></script> --> <!-- Commented out for MVP testing -->
-    <script type="module" src="/shared/assets/js/client-router.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="/shared/assets/js/client-component-loader.js" defer onerror="handleScriptError(event)"></script>
+    <!-- Required client scripts -->
+    <!-- <script type="module" src="/shared/assets/js/client-component-loader.js"></script> --> <!-- File does not exist -->
+    <!-- <script type="module" src="/shared/assets/js/client-auth.js"></script> --> <!-- Commented out for MVP testing -->
+    <!-- <script type="module" src="/shared/assets/js/client-router.js"></script> --> <!-- File does not exist -->
     
-    <!-- Base variables and custom styles (Client-Specific) -->
+    <!-- Base variables and custom styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
-    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
+    <link rel="stylesheet" href="assets/css/client-merit-chat.css"> <!-- Correct relative path -->
     
-    <!-- Merit specific scripts -->
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
-    
-    <!-- Error handling for scripts -->
-    <script>
-        function handleScriptError(event) {
-            console.error('Script loading error:', event);
-        }
-    </script>
+    <!-- Merit specific logic -->
+    <script type="module" src="assets/js/client-merit-logic.js"></script> <!-- Correct relative path -->
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -39,21 +30,18 @@
         data-user-name=""
         data-user-id=""
         data-access-level=""
-        data-last-login=""
-        data-version="1.0.1">
+        data-last-login="">
     </span>
 
     <script>
-        // Initialize version display with auto-increment
+        // Initialize version display
         document.addEventListener('DOMContentLoaded', () => {
             const versionDisplay = document.querySelector('.version-display');
-            const headerSpan = document.getElementById('header-span');
-            if (versionDisplay && headerSpan) {
+            if (versionDisplay) {
                 const now = new Date();
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-                const version = headerSpan.dataset.version || '1.0.1';
-                versionDisplay.textContent = `v${version} (${hours}:${minutes})`;
+                versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`; // Consider updating version source later
             }
         });
     </script>
@@ -95,36 +83,117 @@
 
         .client-content {
             flex: 1;
-            display: flex;
+            display: flex; /* Changed from grid in original paste */
             padding: 1rem;
             gap: 1rem;
             max-width: var(--elpl-content-width);
             margin: 0 auto;
             width: 100%;
+            position: relative; /* Added for sidebar toggle positioning */
         }
 
-        .client-nav {
-            width: 200px;
+        .sidebar { /* Renamed from client-nav in original */
+            width: 20%; /* Adjusted from 200px */
+            min-width: 200px; /* Added */
             background: white;
             border-radius: 8px;
             padding: 1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease; /* Added transition */
+            overflow: hidden; /* Added */
+            display: flex; /* Added */
+            flex-direction: column; /* Added */
+        }
+        
+        .sidebar.expanded {
+            width: 20%; /* Ensure expanded state is correct */
+             opacity: 1; /* Added */
+             visibility: visible; /* Added */
         }
 
-        .client-nav a {
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            min-width: 0; /* Added */
+            border: none; /* Added */
+            box-shadow: none; /* Added */
+             opacity: 0; /* Added */
+             visibility: hidden; /* Added */
+        }
+        
+        .sidebar-content { /* Added wrapper */
+             width: 100%;
+             height: 100%;
+             display: flex;
+             flex-direction: column;
+             opacity: 1; /* Added */
+            transition: opacity 0.3s ease; /* Added */
+        }
+        
+         .sidebar.collapsed .sidebar-content { /* Added */
+             opacity: 0;
+        }
+
+        .sidebar-nav { /* Added wrapper */
+            flex: 1;
+        }
+
+        .sidebar-nav a, .nav-link { /* Merged styles */
             display: block;
-            padding: 0.75rem 1rem;
+            padding: 15px 20px; /* Adjusted padding */
             color: var(--elpl-text);
             text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-            transition: background-color 0.2s;
+            border-radius: var(--elpl-border-radius); /* Use variable */
+            margin-bottom: 5px; /* Adjusted margin */
+            transition: all 0.2s ease; /* Use 'all' */
+            cursor: pointer;
         }
 
-        .client-nav a.active {
+        .sidebar-nav a:hover, .nav-link:hover {
+             background: rgba(198, 18, 63, 0.1); /* Adjusted hover */
+        }
+        
+        .sidebar-nav a.active, .nav-link.active {
             background: var(--elpl-primary);
             color: white;
         }
+
+        .sidebar-toggle { /* Styles added */
+            position: absolute; /* Changed from relative */
+            left: calc(20% - 20px); /* Position based on sidebar */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px; /* Larger touch target */
+            height: 40px; /* Larger touch target */
+            border-radius: 50%;
+            background: var(--elpl-primary);
+            border: none;
+            color: white; /* Added color */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100; /* Ensure it's above content */
+            transition: left 0.3s ease;
+        }
+
+        .toggle-icon { /* Added */
+            transition: transform 0.3s ease;
+        }
+
+        /* Style adjustments for when sidebar is collapsed */
+         .client-content.sidebar-collapsed { /* Target parent */
+             /* No grid changes needed as using flex */
+         }
+
+        .client-content.sidebar-collapsed .sidebar-toggle { /* Adjust toggle position */
+            left: 0px; /* Move to edge */
+        }
+        
+         .client-content.sidebar-collapsed .toggle-icon { /* Rotate icon */
+             transform: rotate(180deg); /* Point inwards */
+         }
+
 
         .content-area {
             flex: 1;
@@ -132,35 +201,49 @@
             border-radius: 8px;
             padding: 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Allow content scrolling */
         }
 
         .client-footer {
             height: var(--elpl-footer-height);
             background: var(--elpl-primary);
-            margin-top: auto;
+            /* margin-top: auto; */ /* Removed as it's fixed */
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 100;
+            display: flex; /* Added */
+            align-items: center; /* Added */
+            justify-content: center; /* Added */
+             padding: 0 20px; /* Added padding like playbar/chatbar */
+             box-shadow: 0 -2px 6px rgba(0,0,0,0.1); /* Added shadow */
         }
 
-        .footer-content {
-            max-width: var(--elpl-content-width);
-            margin: 0 auto;
-            height: 100%;
-            padding: 0 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .footer-content { /* Container inside footer */
+             /* max-width: var(--elpl-content-width); */ /* Removed, let playbar/chatbar handle width */
+             /* margin: 0 auto; */ /* Removed */
+             height: 100%;
+             /* padding: 0 1rem; */ /* Removed */
+             display: flex;
+             align-items: center;
+             /* justify-content: center; */ /* Removed */
+             width: 100%; /* Added */
+             max-width: 800px; /* Added max-width similar to chat */
         }
-
-        .chat-footer, .welcome-footer {
+        
+         /* Keep playbar/chatbar styles from original */
+         .playbar, .chatbar {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end; /* Align button right */
+            /* padding: 0 20px; */ /* Removed, padding on footer */
+        }
+
+        .chatbar {
+             justify-content: center; /* Center chat input */
         }
 
         .chat-input-container {
@@ -168,11 +251,11 @@
             align-items: center;
             gap: 1rem;
             width: 100%;
-            max-width: 800px;
+            /* max-width: 800px; */ /* Let footer-content handle max-width */
             background: white;
             border-radius: 8px;
             padding: 0.5rem;
-            margin: 0.5rem;
+            /* margin: 0.5rem; */ /* Removed margin */
         }
 
         .chat-input {
@@ -182,146 +265,118 @@
             font-size: 1rem;
             resize: none;
             background: transparent;
+            min-height: 36px; /* Added min-height */
         }
 
         .chat-input:focus {
             outline: none;
         }
 
-        .send-button {
-            background: var(--elpl-secondary);
-            border: none;
-            border-radius: 4px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        .send-button, .next-button { /* Merged styles */
+             width: 60px; /* Larger */
+             height: 60px; /* Larger */
+             border-radius: 50%; /* Circular */
+             background: var(--elpl-secondary); /* Use secondary for contrast */
+             border: none;
+             color: white;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             cursor: pointer;
+             padding: 5px; /* Reset padding */
+             transition: background 0.2s ease;
+             flex-shrink: 0; /* Prevent shrinking */
+        }
+        
+         .send-button:hover, .next-button:hover:not(:disabled) { /* Added hover */
+            background: #3a2c7e; /* Darken secondary */
+        }
+        
+         .next-button:disabled { /* Style disabled */
+            background: var(--elpl-border);
+            cursor: not-allowed;
+             opacity: 0.7; /* Added opacity */
         }
 
-        .send-button:hover {
-            background: var(--elpl-primary);
-        }
-
-        .send-button img {
-            width: 20px;
-            height: 20px;
+        .button-icon { /* Style icons */
+             width: 30px; /* Larger icon */
+             height: 30px; /* Larger icon */
         }
 
         [hidden] {
             display: none !important;
         }
-
+        
+         /* Form styles from original */
         .form-group {
-            margin-bottom: 2rem;
-            position: relative;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
             color: var(--elpl-text);
             font-weight: 500;
-            font-size: 1.1rem;
         }
-
-        .select-wrapper {
+        
+         .select-wrapper {
             position: relative;
             width: 100%;
         }
 
         .select-wrapper::after {
-            content: '';
+            content: "▼";
+            color: var(--elpl-primary);
+            font-size: 24px;
             position: absolute;
-            right: 1rem;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
-            width: 16px; /* 2x size */
-            height: 16px; /* 2x size */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23c6123f'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-            background-size: contain;
-            background-repeat: no-repeat;
             pointer-events: none;
+            padding-right: 10px;
         }
 
         .form-control {
             width: 100%;
-            padding: 1rem;
-            padding-right: 3rem; /* Space for larger caret */
-            border: 2px solid var(--elpl-border);
-            border-radius: 8px;
-            font-size: 1.1rem;
+            padding: 12px; /* Adjusted padding */
+            border: 1px solid var(--elpl-border); /* Adjusted border */
+            border-radius: var(--elpl-border-radius); /* Use variable */
+            font-size: 16px; /* Adjusted font size */
             appearance: none;
             background: white;
             cursor: pointer;
-            transition: border-color 0.2s, box-shadow 0.2s;
+             padding-right: 40px; /* Ensure space for caret */
         }
-
-        .form-control:hover {
-            border-color: var(--elpl-primary);
-        }
-
-        .form-control:focus {
+        
+         .form-control:focus { /* Added focus style */
             outline: none;
             border-color: var(--elpl-primary);
-            box-shadow: 0 0 0 3px rgba(198, 18, 63, 0.1);
+            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
         }
 
-        .form-control option {
-            padding: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .form-control option[disabled] {
-            color: #999;
-            font-style: italic;
-            background: #f5f5f5;
-        }
-
-        .btn-next {
-            background: var(--elpl-primary);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background-color 0.2s;
-        }
-
-        .btn-next:hover {
-            background: var(--elpl-secondary);
-        }
-
-        .btn-next img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Loading State */
+        /* Loading State (simplified) */
         .loading-overlay {
-            position: absolute;
+            position: fixed; /* Changed to fixed */
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255,255,255,0.8); /* Slightly less opaque */
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+             flex-direction: column; /* Added */
+             gap: 1rem; /* Added */
+             color: var(--elpl-secondary); /* Added */
+             font-size: 1.2rem; /* Added */
         }
 
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--elpl-primary);
+            border: 4px solid rgba(33, 22, 81, 0.2); /* Lighter border */
+            border-top: 4px solid var(--elpl-secondary); /* Use secondary */
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -331,262 +386,84 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Error States */
+        /* Error States (simplified) */
         .error-message {
-            color: var(--error-color, #dc3545);
-            font-size: var(--elpl-font-size-small);
+            color: var(--elpl-primary); /* Use primary for error */
+            font-size: 0.9rem; /* Smaller */
             margin-top: 4px;
-        }
-
-        /* Error Dialog */
-        .error-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .error-dialog {
-            background: white;
-            padding: var(--elpl-spacing-medium);
-            border-radius: var(--elpl-card-border-radius);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .error-dialog p {
-            margin: 0 0 var(--elpl-spacing-medium);
-            color: var(--elpl-text);
-            font-family: var(--elpl-font-body);
-            font-size: var(--elpl-font-size-body);
-        }
-
-        .error-dialog button {
-            padding: var(--elpl-button-padding);
-            background: var(--elpl-tertiary);
-            color: var(--elpl-cta-text-color);
-            border: none;
-            border-radius: var(--elpl-button-radius);
-            cursor: pointer;
-            font-family: var(--elpl-font-body);
-            font-size: var(--elpl-font-size-body);
-            min-width: 80px;
-        }
-
-        .error-dialog button:hover {
-            background: var(--elpl-secondary);
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            body {
-                padding: 0;
+            .client-header { /* Adjust header padding */
+                 padding: 0 1rem;
             }
-
-            .client-layout {
-                height: 100vh;
-                max-height: none;
-                border-radius: 0;
-            }
-
+           
             .client-content {
-                flex-direction: column;
+                /* flex-direction: column; */ /* Keep sidebar for now */
+                 padding: 0.5rem; /* Reduce padding */
+                 gap: 0.5rem; /* Reduce gap */
             }
 
-            .client-nav {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--elpl-border);
-                flex-direction: row;
-                padding: var(--elpl-spacing-small);
+            .sidebar { /* Make sidebar overlay */
+                 position: fixed;
+                 left: 0;
+                 top: var(--elpl-header-height);
+                 bottom: var(--elpl-footer-height);
+                 height: auto; /* Let it fill space */
+                 z-index: 200; /* Above content */
+                 transform: translateX(-100%);
+                 border-radius: 0 8px 8px 0; /* Round outer corner */
+                 width: 250px; /* Fixed width overlay */
+                 min-width: 250px; /* Fixed width overlay */
             }
-
-            .client-nav a {
-                flex: 1;
+             .sidebar.expanded { /* Slide in */
+                 transform: translateX(0);
             }
-
-            .welcome-form {
-                padding: var(--elpl-spacing-small);
-            }
-
-            .footer-content {
-                padding: 0 0.5rem;
-            }
-
-            .chat-input-container {
-                margin: 0.25rem;
-            }
-        }
-
-        /* Footer styles */
-        .page-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--elpl-footer-height, 80px);
-            background: var(--elpl-primary);
-            z-index: 100;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 1rem;
-            width: 100%;
-            max-width: var(--elpl-content-width, 800px);
-            padding: 0 1rem;
-        }
-
-        .chat-input {
-            flex: 1;
-            min-height: 48px;
-            padding: 0.75rem;
-            border: 1px solid var(--elpl-border);
-            border-radius: 8px;
-            resize: none;
-            font-size: 1rem;
-            background: var(--elpl-background-color);
-            color: var(--elpl-text);
-        }
-
-        .send-button, .next-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            min-width: 48px;
-            height: 48px;
-            border: none;
-            border-radius: 8px;
-            background: var(--elpl-secondary);
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .send-button:hover, .next-button:hover {
-            background: var(--elpl-secondary-hover);
-        }
-
-        .send-button img, .next-button img {
-            width: 24px;
-            height: 24px;
-        }
-
-        @media (max-width: 768px) {
-            .page-footer {
-                padding: 0.5rem;
+             .sidebar.collapsed { /* Slide out */
+                 transform: translateX(-100%);
+                 /* Keep padding/opacity 0 from base collapsed */
             }
             
-            .chat-input-container {
-                padding: 0 0.5rem;
+             .content-area {
+                 padding: 1rem; /* Reduce padding */
             }
-        }
+            
+            .sidebar-toggle { /* Reposition toggle */
+                 position: fixed; /* Fixed position */
+                 top: calc(var(--elpl-header-height) + 10px); /* Below header */
+                 left: 10px; /* Near edge */
+                 background: var(--elpl-secondary); /* Different color? */
+                 z-index: 210; /* Above sidebar */
+                 transition: transform 0.3s ease; /* Add transition */
+            }
+            
+             .client-content.sidebar-collapsed .sidebar-toggle { /* Adjust toggle position when closed */
+                 left: 10px; /* Keep near edge */
+                 transform: rotate(0deg); /* Icon rotation managed separately */
+            }
+             /* No need for .client-content.sidebar-collapsed grid changes */
 
-        /* New interaction container styles */
-        .interaction-container {
-            width: 100%;
-            height: 80px;
-            display: flex;
-            flex-shrink: 0;
-            background: var(--elpl-primary);
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
+             .client-footer {
+                 padding: 0 1rem; /* Consistent padding */
+                 height: 70px; /* Slightly smaller footer */
+                 --elpl-footer-height: 70px; /* Update variable */
+             }
+             .chat-input-container {
+                 padding: 0.25rem; /* Tighter padding */
+                 gap: 0.5rem; /* Reduce gap */
+             }
+              .send-button, .next-button { /* Smaller buttons */
+                 width: 50px;
+                 height: 50px;
+             }
+             .button-icon { /* Smaller icons */
+                 width: 24px;
+                 height: 24px;
+             }
         }
-
-        .interaction-bar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: stretch;
-        }
-
-        .interaction-left, .interaction-right {
-            width: 80px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .interaction-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-input-group {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .interaction-input {
-            width: 100%;
-            padding: 0.5rem;
-            font-size: 1rem;
-            border-radius: 6px;
-            border: none;
-            background: white;
-            min-height: 36px;
-            box-sizing: border-box;
-        }
-
-        .interaction-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
-        }
-
-        .interaction-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .interaction-button:not(:disabled):hover {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .interaction-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .interaction-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .interaction-button:not(:disabled):hover .interaction-icon {
-            background: rgba(255,255,255,0.15);
-        }
-
+        
+        /* Added sr-only for accessibility */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -598,245 +475,209 @@
             border: 0;
         }
 
-        .sidebar-toggle {
-            position: absolute;
-            left: calc(20% - 20px);
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--elpl-primary);
-            border: none;
-            cursor: pointer;
-            z-index: 100;
-            transition: left 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar-toggle .toggle-icon {
-            width: 24px;
-            height: 24px;
-            transition: transform 0.3s ease;
-        }
-
-        .main-content {
-            position: relative;
-            display: grid;
-            grid-template-columns: 20% 1fr;
-            transition: grid-template-columns 0.3s ease;
-        }
-
-        .main-content.sidebar-collapsed {
-            grid-template-columns: 0% 1fr;
-        }
-
-        .main-content.sidebar-collapsed .sidebar-toggle {
-            left: 0;
-        }
-
-        .main-content.sidebar-collapsed .toggle-icon {
-            transform: rotate(0deg);
-        }
-
-        #sidebar {
-            transition: width 0.3s ease, opacity 0.3s ease;
-            overflow: hidden;
-        }
-
-        .sidebar-collapsed #sidebar {
-            width: 0;
-            opacity: 0;
-        }
-
-        .sidebar {
-            width: 20%;
-            min-width: 200px;
-            background: white;
-            border-radius: var(--elpl-border-radius);
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .sidebar.collapsed {
-            width: 0;
-            min-width: 0;
-            padding: 0;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .sidebar-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar.collapsed .sidebar-content {
-            opacity: 0;
-        }
-
-        /* Main content layout */
-        .client-content {
-            display: grid;
-            grid-template-columns: minmax(200px, 20%) 1fr;
-            gap: 1rem;
-            padding: 1rem;
-            max-width: var(--elpl-content-width);
-            margin: 0 auto;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .client-content.sidebar-collapsed {
-            grid-template-columns: 0 1fr;
-        }
-
-        @media (max-width: 768px) {
-            .client-content {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: fixed;
-                left: 0;
-                top: var(--elpl-header-height);
-                bottom: var(--elpl-footer-height);
-                z-index: 100;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.expanded {
-                transform: translateX(0);
-            }
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            height: 100%;
-            padding: 0 1rem;
-        }
-
-        .header-logo {
-            height: calc(var(--elpl-header-height) - 10px); /* 5px padding top and bottom */
-            padding: 5px;
-            object-fit: contain;
-        }
     </style>
 </head>
 <body>
-    <!-- Skip to main content link -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <div class="page-container" role="application">
-        <header class="page-header" role="banner">
+    <div class="client-layout" data-client-component="merit-page"> <!-- Keep component hook -->
+        <header class="client-header" role="banner">
             <div class="header-content">
-                <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
-                    <span class="menu-icon"></span>
-                </button>
-                <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="ELPL Logo" class="header-logo">
-                <div class="version-display" aria-label="Application version"></div>
+                <!-- Add menu toggle for mobile? -->
+                <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="logo" style="padding: 5px;">
+                <div class="version-display" aria-label="Version and time">v1.0.0</div>
             </div>
         </header>
 
-        <nav class="sidebar" role="navigation" aria-label="Main navigation">
-            <div class="nav-content">
-                <!-- Navigation items will be dynamically populated -->
-            </div>
-        </nav>
+        <main class="client-content" role="main"> <!-- ID removed, class used -->
+            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation"> <!-- ID removed, class used -->
+                <div class="sidebar-content">
+                    <div class="sidebar-nav">
+                        <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
+                            <span class="nav-text">Welcome</span>
+                        </a>
+                        <a href="#chat" class="nav-link" data-section="chat">
+                            <span class="nav-text">Chat</span>
+                        </a>
+                    </div>
+                 </div>
+            </nav>
+             <!-- Moved toggle outside nav but inside main-content for positioning -->
+             <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
+                 <span class="toggle-icon">◀</span> <!-- Icon indicates collapse -->
+             </button>
 
-        <main id="main-content" class="main-content" role="main">
-            <div class="content-header">
-                <h1 class="page-title">Merit Dashboard</h1>
-            </div>
-            
-            <div class="content-body" aria-live="polite">
-                <!-- Dynamic content will be loaded here -->
+            <div class="content-area" role="region" aria-label="Main content">
+                <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+                    <form class="welcome-form" id="welcome-form">
+                        <div class="form-group">
+                            <label for="grade-level">What grade level do you teach?</label>
+                            <div class="select-wrapper">
+                                <select id="grade-level" class="form-control" required>
+                                    <option value="">Select a grade level</option>
+                                    <option value="elementary">Elementary (K-5)</option>
+                                    <option value="middle">Middle School (6-8)</option>
+                                    <option value="high">High School (9-12)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="curriculum">What curriculum do you use?</label>
+                            <div class="select-wrapper">
+                                <select id="curriculum" class="form-control" required>
+                                    <option value="">Select your curriculum</option>
+                                    <option value="ela" selected>English Language Arts (ELA)</option>
+                                    <option value="crew">Crew</option>
+                                    <option value="math">Mathematics</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
+                    <!-- Chat interface content -->
+                    <div class="chat-container">
+                        <div class="messages" id="chat-messages"></div>
+                    </div>
+                </div>
             </div>
         </main>
 
-        <footer class="page-footer" role="contentinfo">
-            <div class="chat-input-container" role="complementary" aria-label="Chat interface">
-                <input type="text" 
-                       class="chat-input" 
-                       placeholder="Type your message..." 
-                       aria-label="Chat message input"
-                       autocomplete="off">
-                <button class="send-button" 
-                        aria-label="Send message"
-                        disabled>
-                    <img src="/clients/elpl/assets/images/client-elpl-send-button-crimson.png" 
-                         alt="Send" 
-                         class="send-icon">
-                </button>
+        <footer class="client-footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="playbar" id="playbar"> <!-- Keep ID for JS -->
+                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat"> <!-- Keep ID for JS -->
+                        <img src="/clients/elpl/assets/images/client-elpl-next-button-crimson.png" alt="" class="button-icon">
+                    </button>
+                </div>
+                <div class="chatbar" id="chatbar" hidden> <!-- Keep ID for JS -->
+                    <div class="chat-input-container">
+                        <textarea class="chat-input" 
+                                 id="chat-input" <!-- Keep ID for JS -->
+                                 aria-label="Type your message"
+                                 placeholder="Type your message..."
+                                 rows="1"
+                                 onkeypress="handleKeyPress(event)"></textarea> <!-- Added keypress handler -->
+                        <button class="send-button" id="send-button" aria-label="Send message"> <!-- Keep ID for JS -->
+                            <img src="/clients/elpl/assets/images/client-elpl-send-button-crimson.png" alt="" class="button-icon">
+                        </button>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
 
-    <!-- Loading overlay -->
-    <div class="loading-overlay" role="alert" aria-busy="true" hidden>
-        <div class="loading-spinner"></div>
-        <p>Loading...</p>
-    </div>
-
-    <!-- Error message container -->
-    <div class="error-container" role="alert" aria-live="assertive" hidden></div>
+    <!-- Merit specific scripts (order matters) -->
+    <script type="module" src="assets/js/client-merit-form.js"></script>
+    <script type="module" src="assets/js/client-merit-chat.js"></script>
+    <script type="module" src="assets/js/client-merit-logic.js"></script> <!-- Logic likely depends on form/chat -->
 
     <script>
+    // Inline script from original file - keep this logic
     document.addEventListener('DOMContentLoaded', function() {
-        try {
-            // Initialize sidebar with new element IDs
-            const mainContent = document.querySelector('.main-content');
-            const sidebar = document.querySelector('.sidebar');
-            const menuToggle = document.querySelector('.menu-toggle');
+        // Show playbar by default, hide chatbar
+        const playbar = document.getElementById('playbar'); // Use IDs
+        const chatbar = document.getElementById('chatbar'); // Use IDs
+        if (playbar) playbar.style.display = 'flex';
+        if (chatbar) chatbar.style.display = 'none';
+        
+        // Enable next button when form is valid
+        const form = document.querySelector('.welcome-form'); // Use class
+        const nextButton = document.getElementById('next-button'); // Use ID
+        
+        if (form && nextButton) {
+            // Initial check in case of pre-filled values
+             nextButton.disabled = !form.checkValidity();
+             
+            form.addEventListener('change', function() {
+                nextButton.disabled = !form.checkValidity();
+            });
             
-            if (!mainContent || !sidebar || !menuToggle) {
-                throw new Error('Required elements not found');
-            }
+             // Add click handler for the next button
+             nextButton.addEventListener('click', handleNextClick);
+        }
 
-            // Get initial state
+        // Initialize sidebar state
+        const mainContent = document.querySelector('.client-content'); // Use class
+        const sidebar = document.querySelector('.sidebar'); // Use class
+        const sidebarToggle = document.getElementById('sidebarToggle'); // Use ID
+        
+        if (mainContent && sidebar && sidebarToggle) { // Check all elements exist
             const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             console.log(`Initial sidebar state: ${isCollapsed ? 'collapsed' : 'expanded'}`);
-
-            // Apply initial state
+            
+            // Apply initial state correctly
             if (isCollapsed) {
-                sidebar.classList.remove('expanded');
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('sidebar-collapsed');
-                menuToggle.setAttribute('aria-expanded', 'false');
+                 sidebar.classList.remove('expanded');
+                 sidebar.classList.add('collapsed');
+                 mainContent.classList.add('sidebar-collapsed'); // Add class to parent
+                 sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(180deg)'; // Point inwards when collapsed
+                 sidebarToggle.setAttribute('aria-expanded', 'false'); // Update ARIA
+            } else {
+                 sidebar.classList.add('expanded');
+                 sidebar.classList.remove('collapsed');
+                 mainContent.classList.remove('sidebar-collapsed'); // Remove class from parent
+                 sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(0deg)'; // Point outwards when expanded
+                 sidebarToggle.setAttribute('aria-expanded', 'true'); // Update ARIA
             }
 
             // Add sidebar toggle handler
-            menuToggle.addEventListener('click', function() {
-                const isNowCollapsed = !sidebar.classList.contains('collapsed');
+            sidebarToggle.addEventListener('click', function() {
+                 const isNowCollapsed = sidebar.classList.toggle('collapsed'); // Toggle directly on sidebar
+                 sidebar.classList.toggle('expanded', !isNowCollapsed);
+                 mainContent.classList.toggle('sidebar-collapsed', isNowCollapsed); // Toggle on parent
+                 localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 
-                // Update classes
-                sidebar.classList.toggle('collapsed', isNowCollapsed);
-                sidebar.classList.toggle('expanded', !isNowCollapsed);
-                mainContent.classList.toggle('sidebar-collapsed', isNowCollapsed);
+                 console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
                 
-                // Store state
-                localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                 // Update icon rotation
+                 this.querySelector('.toggle-icon').style.transform = 
+                    isNowCollapsed ? 'rotate(180deg)' : 'rotate(0deg)'; // Point in/out
+                 this.setAttribute('aria-expanded', !isNowCollapsed); // Update ARIA
                 
-                // Update ARIA state
-                this.setAttribute('aria-expanded', !isNowCollapsed);
-                
-                console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
+                // Announce to screen readers
+                const announcement = isNowCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
+                const announcer = document.createElement('div');
+                announcer.setAttribute('role', 'status');
+                announcer.setAttribute('aria-live', 'polite');
+                announcer.className = 'sr-only';
+                announcer.textContent = announcement;
+                document.body.appendChild(announcer);
+                setTimeout(() => announcer.remove(), 1000);
             });
-        } catch (error) {
-            console.error('Error initializing sidebar:', error);
+        } else {
+             console.error("Sidebar elements not found for initialization.");
         }
+        
+         // Initialize Navigation Links
+         const navLinks = document.querySelectorAll('.nav-link');
+         navLinks.forEach((link, index) => {
+             link.addEventListener('click', (e) => {
+                 e.preventDefault();
+                 showSection(index); // Use index to show section
+                 
+                 // Update active state on links
+                 navLinks.forEach(el => el.classList.remove('active'));
+                 link.classList.add('active');
+                 
+                 // Update ARIA current
+                 navLinks.forEach(el => el.removeAttribute('aria-current'));
+                 link.setAttribute('aria-current', 'page');
+             });
+         });
+         
+         // Initialize Send Button
+         const sendButton = document.getElementById('send-button');
+         if (sendButton) {
+             sendButton.addEventListener('click', sendMessage);
+         }
+         
+          // Set initial section based on hash or default to 0
+         const initialSectionIndex = window.location.hash === '#chat' ? 1 : 0;
+         showSection(initialSectionIndex);
+         navLinks.forEach((link, index) => {
+             link.classList.toggle('active', index === initialSectionIndex);
+             if(index === initialSectionIndex) link.setAttribute('aria-current', 'page');
+         });
+
     });
 
     function handleKeyPress(event) {
@@ -847,15 +688,15 @@
     }
 
     function handleNextClick() {
+         console.log("Next button clicked");
         const form = document.querySelector('.welcome-form');
         if (form.checkValidity()) {
-            // Hide playbar, show chatbar
-            document.querySelector('.playbar').style.display = 'none';
-            document.querySelector('.chatbar').style.display = 'flex';
-            
-            // Switch to chat tab
-            document.querySelector('a[href="#welcome"]').classList.remove('active');
-            document.querySelector('a[href="#chat"]').classList.add('active');
+            showSection(1); // Show chat section (index 1)
+            document.querySelectorAll('.nav-link').forEach((link, index) => {
+                 link.classList.toggle('active', index === 1);
+                 if(index === 1) link.setAttribute('aria-current', 'page');
+                 else link.removeAttribute('aria-current');
+             });
         } else {
             form.reportValidity();
         }
@@ -866,8 +707,9 @@
         const message = input.value.trim();
         
         if (message) {
-            // TODO: Implement actual message sending
-            console.log('Sending message:', message);
+            // TODO: Implement actual message sending via client-merit-chat.js
+            console.log('Attempting to send message:', message);
+            // Example: window.meritChat.sendMessage(message);
             input.value = '';
         }
     }
@@ -875,30 +717,38 @@
     // Update existing showSection function with more logging
     function showSection(index) {
         console.group('Tab Navigation');
-        console.log(`Activating tab: ${index}`);
+        console.log(`Activating section index: ${index}`);
+        
+        const sections = document.querySelectorAll('.section');
+        const playbar = document.getElementById('playbar');
+        const chatbar = document.getElementById('chatbar');
+
+         if (!sections.length || !playbar || !chatbar) {
+             console.error("Required elements for section switching not found.");
+             console.groupEnd();
+             return;
+         }
         
         const prevActive = document.querySelector('.section.active');
-        console.log(`Previous active tab: ${prevActive ? prevActive.dataset.index : 'none'}`);
+        console.log(`Previous active section: ${prevActive ? prevActive.dataset.section : 'none'}`);
         
         // Toggle sections
-        const sections = document.querySelectorAll('.section');
         sections.forEach((section, i) => {
+            const isActive = i === index;
             const wasActive = section.classList.contains('active');
-            section.classList.toggle('active', i === index);
-            if (wasActive !== (i === index)) {
-                console.log(`Section ${i}: ${wasActive ? 'deactivated' : 'activated'}`);
+            section.hidden = !isActive; // Use hidden attribute
+            section.classList.toggle('active', isActive);
+            if (wasActive !== isActive) {
+                console.log(`Section ${section.dataset.section}: ${wasActive ? 'deactivated' : 'activated'}`);
             }
         });
 
         // Toggle footer state
-        const playbar = document.querySelector('.playbar');
-        const chatbar = document.querySelector('.chatbar');
-        
-        if (index === 0) {
+        if (index === 0) { // Welcome section
             console.log('Footer State: Welcome - Showing playbar, hiding chatbar');
             playbar.style.display = 'flex';
             chatbar.style.display = 'none';
-        } else {
+        } else { // Chat section
             console.log('Footer State: Chat - Showing chatbar, hiding playbar');
             playbar.style.display = 'none';
             chatbar.style.display = 'flex';
@@ -906,27 +756,7 @@
         console.groupEnd();
     }
 
-    // Update existing checkAffirmations function with more logging
-    function checkAffirmations() {
-        console.group('Form Validation');
-        const checkboxes = document.querySelectorAll('#teacher-context input[type="checkbox"]');
-        const nextButton = document.getElementById('next-button');
-        let selectedGrades = [];
-
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                selectedGrades.push(checkbox.value);
-            }
-        });
-
-        const anyChecked = selectedGrades.length > 0;
-        console.log(`Selected grades: ${selectedGrades.join(', ') || 'none'}`);
-        console.log(`Next button ${anyChecked ? 'enabled' : 'disabled'}`);
-        
-        nextButton.disabled = !anyChecked;
-        nextButton.classList.toggle('enabled', anyChecked);
-        console.groupEnd();
-    }
+    // Check affirmations logic seems removed in this version, keep it out.
     </script>
 </body>
 </html> 
