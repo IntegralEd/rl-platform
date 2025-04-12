@@ -378,3 +378,141 @@ button:hover {
     color: var(--background-color);
   }
 }
+
+/* ELPL Client Styles */
+@import 'client-elpl-variables.css';
+
+/* Base Layout */
+.client-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--client-bg);
+    color: var(--client-text);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+}
+
+/* Header */
+.client-header {
+    height: var(--header-height);
+    background: var(--elpl-primary);
+    color: white;
+    padding: 0 var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-header);
+    box-shadow: var(--shadow-sm);
+}
+
+.client-logo {
+    height: calc(var(--header-height) - 20px);
+    width: auto;
+}
+
+/* Content Area */
+.client-content {
+    flex: 1;
+    margin-top: var(--header-height);
+    padding: var(--spacing-lg);
+    max-width: var(--content-width);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+/* Footer */
+.client-footer {
+    height: var(--footer-height);
+    background: var(--elpl-secondary);
+    color: white;
+    padding: 0 var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Components */
+.client-button {
+    background: var(--elpl-primary);
+    color: white;
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.client-button:hover {
+    background: var(--elpl-secondary);
+}
+
+.client-card {
+    background: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.client-input {
+    width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--client-border);
+    border-radius: var(--border-radius-sm);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-fast);
+}
+
+.client-input:focus {
+    border-color: var(--elpl-primary);
+    outline: none;
+}
+
+/* Navigation */
+.client-nav {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.client-nav-link {
+    color: white;
+    text-decoration: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.client-nav-link:hover,
+.client-nav-link.active {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Utilities */
+.client-text-center { text-align: center; }
+.client-mt-lg { margin-top: var(--spacing-lg); }
+.client-mb-lg { margin-bottom: var(--spacing-lg); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .client-content {
+        padding: var(--spacing-md);
+    }
+    
+    .client-header {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .client-card {
+        padding: var(--spacing-md);
+    }
+}

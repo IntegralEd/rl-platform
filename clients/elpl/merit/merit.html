@@ -7,8 +7,9 @@
     <title>Merit - Recursive Learning</title>
     
     <!-- Base variables and custom styles -->
-    <link rel="stylesheet" href="/clients/elpl/assets/variables.css">
-    <link rel="stylesheet" href="/clients/elpl/assets/css/elpl.custom.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
     
     <!-- Merit specific logic -->
     <script src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
@@ -40,8 +41,21 @@
             --client-text: #2c3e50;
             --client-border: #e1e4e8;
             --content-width: 1200px;
-            --primary-color: #211651;
-            --accent-color: #C6123F;
+            --primary-color: #C6123F;  /* ELPL Crimson */
+            --accent-color: #211651;   /* ELPL Purple */
+            --client-font-size-small: 0.875rem;
+            --client-font-size-body: 1rem;
+            --client-font-body: 'Arial', sans-serif;
+            --client-spacing-medium: 1.5rem;
+            --client-card-border-radius: 8px;
+            --client-button-padding: 0.75rem 1.5rem;
+            --client-button-radius: 4px;
+            --tertiary-color: #f0f0f0;
+            --cta-text-color: #ffffff;
+            --secondary-color: #e0e0e0;
+            --background-color: #f9f9f9;
+            --text-color: #333;
+            --border-color: #e1e4e8;
         }
 
         .client-layout {
@@ -578,6 +592,7 @@
     <div class="client-layout">
         <header class="client-header">
             <h1>Merit</h1>
+            <img src="/clients/elpl/assets/images/lockup_white_logo.png" alt="ELPL Merit" class="logo">
             <span class="version">v1.0.0 (13:22)</span>
         </header>
 
@@ -681,7 +696,7 @@
         </div>
     </div>
 
-    <script type="module" src="/shared/assets/js/component-loader.js"></script>
+    <script type="module" src="/clients/elpl/assets/js/client-component-loader.js"></script>
     <script type="module" src="/shared/assets/js/auth.js"></script>
     <script type="module" src="/shared/assets/js/url-resolver.js"></script>
     <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
