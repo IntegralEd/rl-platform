@@ -892,3 +892,135 @@ For questions or issues:
 - [ ] Test form submission flow
 - [ ] Verify sidebar behavior
 - [ ] Check accessibility score
+
+Priority: CRITICAL
+Issue: Need to handle thread persistence and message caching
+Fix:
+- Implement thread_id storage in localStorage
+- Add message cache with 1-hour TTL
+- Handle cache invalidation
+- Add offline message queue
+Location: Update client-merit-logic.js
+
+Priority: HIGH
+Issue: Need robust error handling for Redis integration
+Fix:
+- Add error boundaries for API calls
+- Implement retry logic
+- Add user-friendly error messages
+- Handle network failures gracefully
+Location: Both chat.js and logic.js
+
+Priority: HIGH
+Issue: Need proper loading states for Redis operations
+Fix:
+- Add loading indicators for thread creation
+- Show message sending states
+- Implement typing indicators
+- Add progress feedback
+Location: merit.html and CSS
+
+## Phase 7: Security & Headers
+
+### Security Requirements
+- [ ] Add required headers for API calls
+- [ ] Implement CORS requirements
+- [ ] Add origin verification
+- [ ] Implement proper error handling
+
+Location: Update client-merit-chat.js
+
+### New Changes
+- Add MERIT_CONFIG constants
+- Implement createThread() method
+- Update sendToAPI() with proper headers and endpoints
+- Add proper error handling for Redis responses
+- Implement message TTL handling
+
+### Thread Management
+- Store thread_id in localStorage
+- Handle thread expiration (1-hour TTL)
+- Add thread recreation logic
+- Implement message persistence
+
+### Error Handling
+- Add specific error types from Redis doc
+- Implement retry logic
+- Add user-friendly error messages
+- Handle CORS errors properly
+
+## Redis Integration Foundation
+Location: client-merit-logic.js
+Priority: HIGH
+Changes:
+- Add thread persistence layer
+- Implement localStorage for thread_id
+- Add TTL monitoring (3600s)
+- Handle thread recreation on expiration
+- Add message queue for offline/error states
+
+## Redis Integration Foundation
+Location: client-merit-chat.js
+Priority: HIGH
+Changes:
+- Add MERIT_CONFIG with required fields:
+  {
+    baseUrl: 'https://api.recursivelearning.app/dev',
+    org_id: 'recdg5Hlm3VVaBA2u',
+    assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
+    schema_version: '04102025.B01'
+  }
+- Implement two-step chat flow (createThread, sendMessage)
+- Add proper CORS headers and origin verification
+- Implement 3600s TTL handling
+
+## Redis Integration Foundation
+Location: client-merit-logic.js
+Priority: HIGH
+Changes:
+- Add thread persistence layer
+- Implement localStorage for thread_id
+- Add TTL monitoring (3600s)
+- Handle thread recreation on expiration
+- Add message queue for offline/error states
+
+## Redis Integration Foundation
+Location: client-merit-logic.js
+Priority: HIGH
+Changes:
+- Add specific Redis error types
+- Implement retry logic with backoff
+- Add user-friendly error messages
+- Handle CORS and network failures
+- Add CloudWatch logging integration
+
+## Redis Integration Foundation
+Location: merit.html, CSS
+Priority: MEDIUM
+Changes:
+- Add loading indicators for:
+  - Thread creation
+  - Message sending
+  - Redis operations
+- Implement typing indicators
+- Add progress feedback
+
+## Redis Integration Validation
+- [ ] CORS preflight succeeds
+- [ ] Thread creation works
+- [ ] Message exchange works
+- [ ] TTL verification (3600s)
+- [ ] Error handling validation
+
+## Validation Checklist
+- [ ] CSS variable usage
+- [ ] Responsive design
+- [ ] Accessibility standards
+- [ ] Component structure
+- [ ] Error boundaries
+
+## New Performance Metrics
+- [ ] Response time < 100ms
+- [ ] No layout shifts
+- [ ] Cache effectiveness
+- [ ] Asset loading
