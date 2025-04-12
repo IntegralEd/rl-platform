@@ -216,10 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 class ErrorBoundary {
-    static handleError(error, component) {
+    static handleError(error, component = 'Unknown') {
         console.error(`Error in ${component}:`, error);
-        // Show user-friendly error message
-        document.querySelector('.error-overlay').style.display = 'flex';
+        // Implement proper error handling/reporting here
     }
 }
 
@@ -284,76 +283,141 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class SidebarManager {
     constructor() {
-        this.sidebar = document.querySelector('#sidebar');
-        this.toggle = document.querySelector('#sidebar-toggle');
-        this.content = document.querySelector('.client-content');
-        
-        if (!this.sidebar || !this.toggle || !this.content) {
-            ErrorBoundary.handleError(new Error('Sidebar elements not found'), 'SidebarManager');
-            return;
-        }
+        try {
+            // Get sidebar elements with proper error handling
+            this.sidebar = document.querySelector('.sidebar');
+            this.mainContent = document.querySelector('.client-content');
+            this.toggleButton = document.getElementById('sidebarToggle');
+            
+            if (!this.sidebar || !this.mainContent || !this.toggleButton) {
+                throw new Error('Required sidebar elements not found');
+            }
 
-        this.isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        this.setupEventListeners();
-        this.applyInitialState();
+            this.setupEventListeners();
+            this.applyInitialState();
+        } catch (error) {
+            ErrorBoundary.handleError(error, 'SidebarManager');
+        }
     }
 
     setupEventListeners() {
-        this.toggle.addEventListener('click', () => this.toggleSidebar());
+        // Toggle sidebar on button click
+        this.toggleButton.addEventListener('click', () => this.toggleSidebar());
+        
+        // Handle navigation clicks
+        const navLinks = this.sidebar.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleNavigation(link);
+            });
+        });
+
+        // Close sidebar on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.isCollapsed()) {
+                this.toggleSidebar();
+            }
+        });
+
+        // Handle window resize
         window.addEventListener('resize', () => this.handleResize());
     }
 
     applyInitialState() {
-        try {
-            if (this.isCollapsed) {
-                this.content.classList.add('sidebar-collapsed');
-                this.updateToggleIcon(true);
-            }
-            this.announceState();
-        } catch (error) {
-            ErrorBoundary.handleError(error, 'SidebarManager.applyInitialState');
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        if (isCollapsed) {
+            this.mainContent.classList.add('sidebar-collapsed');
+            this.updateToggleIcon(true);
         }
+        console.log('Initial sidebar state:', isCollapsed ? 'collapsed' : 'expanded');
     }
 
     toggleSidebar() {
-        try {
-            this.isCollapsed = this.content.classList.toggle('sidebar-collapsed');
-            localStorage.setItem('sidebarCollapsed', this.isCollapsed);
-            this.updateToggleIcon(this.isCollapsed);
-            this.announceState();
-        } catch (error) {
-            ErrorBoundary.handleError(error, 'SidebarManager.toggleSidebar');
+        const isNowCollapsed = this.mainContent.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+        this.updateToggleIcon(isNowCollapsed);
+        this.announceState(isNowCollapsed);
+    }
+
+    handleNavigation(link) {
+        // Remove active class from all links
+        this.sidebar.querySelectorAll('.nav-link').forEach(navLink => {
+            navLink.classList.remove('active');
+            navLink.removeAttribute('aria-current');
+        });
+
+        // Add active class to clicked link
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+
+        // Show corresponding section
+        const sectionId = link.getAttribute('data-section');
+        this.showSection(sectionId);
+    }
+
+    showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.hidden = true;
+            section.classList.remove('active');
+        });
+
+        // Show selected section
+        const targetSection = document.querySelector(`[data-section="${sectionId}"]`);
+        if (targetSection) {
+            targetSection.hidden = false;
+            targetSection.classList.add('active');
+        }
+
+        // Toggle footer state
+        const playbar = document.getElementById('playbar');
+        const chatbar = document.getElementById('chatbar');
+        
+        if (sectionId === 'welcome') {
+            playbar.hidden = false;
+            chatbar.hidden = true;
+        } else {
+            playbar.hidden = true;
+            chatbar.hidden = false;
         }
     }
 
     updateToggleIcon(collapsed) {
-        const icon = this.toggle.querySelector('.toggle-icon');
+        const icon = this.toggleButton.querySelector('.toggle-icon');
         if (icon) {
-            icon.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+            icon.textContent = collapsed ? '▶' : '◀';
+            this.toggleButton.setAttribute('aria-expanded', !collapsed);
         }
     }
 
-    announceState() {
-        const announcement = this.isCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
-        const announcer = document.createElement('div');
-        announcer.setAttribute('role', 'status');
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.className = 'sr-only';
-        announcer.textContent = announcement;
-        document.body.appendChild(announcer);
-        setTimeout(() => announcer.remove(), 1000);
+    announceState(collapsed) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('role', 'status');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.className = 'sr-only';
+        announcement.textContent = `Sidebar ${collapsed ? 'collapsed' : 'expanded'}`;
+        document.body.appendChild(announcement);
+        setTimeout(() => announcement.remove(), 1000);
+    }
+
+    isCollapsed() {
+        return this.mainContent.classList.contains('sidebar-collapsed');
     }
 
     handleResize() {
-        // Add responsive behavior if needed
-        const isMobile = window.innerWidth < 768;
-        if (isMobile && !this.isCollapsed) {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile && !this.isCollapsed()) {
             this.toggleSidebar();
         }
     }
 }
 
-// Initialize sidebar manager
+// Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
-    new SidebarManager();
+    try {
+        new SidebarManager();
+    } catch (error) {
+        ErrorBoundary.handleError(error, 'Page Initialization');
+    }
 }); 

@@ -6,13 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merit - Recursive Learning</title>
     
+    <!-- Required client scripts -->
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    
     <!-- Base variables and custom styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
     <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
     
     <!-- Merit specific logic -->
-    <script src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -24,50 +29,45 @@
     </span>
 
     <script>
-        // Set initial time immediately
+        // Initialize version display
         document.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.querySelector('.version-display').textContent = `v1.0.0 (${hours}:${minutes})`;
+            const versionDisplay = document.querySelector('.version-display');
+            if (versionDisplay) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
+            }
         });
     </script>
 
     <style>
         :root {
-            --header-height: 60px;
-            --footer-height: 40px;
-            --client-bg: #ffffff;
-            --client-text: #2c3e50;
-            --client-border: #e1e4e8;
-            --content-width: 1200px;
-            --primary-color: #C6123F;  /* ELPL Crimson */
-            --accent-color: #211651;   /* ELPL Purple */
-            --client-font-size-small: 0.875rem;
-            --client-font-size-body: 1rem;
-            --client-font-body: 'Arial', sans-serif;
-            --client-spacing-medium: 1.5rem;
-            --client-card-border-radius: 8px;
-            --client-button-padding: 0.75rem 1.5rem;
-            --client-button-radius: 4px;
-            --tertiary-color: #f0f0f0;
-            --cta-text-color: #ffffff;
-            --secondary-color: #e0e0e0;
-            --background-color: #f9f9f9;
-            --text-color: #333;
-            --border-color: #e1e4e8;
+            /* Use ELPL-specific variables */
+            --elpl-header-height: 60px;
+            --elpl-footer-height: 80px;
+            --elpl-primary: #c6123f;
+            --elpl-secondary: #211651;
+            --elpl-tertiary: #ffa409;
+            --elpl-bg: #ffffff;
+            --elpl-text: #2c3e50;
+            --elpl-border: #e1e4e8;
+            --elpl-content-width: 1200px;
+            --elpl-card-padding: 1.5rem;
+            --elpl-icon-size: 48px;
+            --elpl-border-radius: 12px;
         }
 
         .client-layout {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background: var(--client-bg);
+            background: var(--elpl-bg);
         }
 
         .client-header {
-            height: var(--header-height);
-            background: var(--primary-color);
+            height: var(--elpl-header-height);
+            background: var(--elpl-primary);
             color: white;
             display: flex;
             align-items: center;
@@ -81,7 +81,7 @@
             display: flex;
             padding: 1rem;
             gap: 1rem;
-            max-width: var(--content-width);
+            max-width: var(--elpl-content-width);
             margin: 0 auto;
             width: 100%;
         }
@@ -97,7 +97,7 @@
         .client-nav a {
             display: block;
             padding: 0.75rem 1rem;
-            color: var(--client-text);
+            color: var(--elpl-text);
             text-decoration: none;
             border-radius: 4px;
             margin-bottom: 0.5rem;
@@ -105,7 +105,7 @@
         }
 
         .client-nav a.active {
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             color: white;
         }
 
@@ -118,8 +118,8 @@
         }
 
         .client-footer {
-            height: var(--footer-height);
-            background: var(--primary-color);
+            height: var(--elpl-footer-height);
+            background: var(--elpl-primary);
             margin-top: auto;
             position: fixed;
             bottom: 0;
@@ -129,7 +129,7 @@
         }
 
         .footer-content {
-            max-width: var(--content-width);
+            max-width: var(--elpl-content-width);
             margin: 0 auto;
             height: 100%;
             padding: 0 1rem;
@@ -172,7 +172,7 @@
         }
 
         .send-button {
-            background: var(--accent-color);
+            background: var(--elpl-secondary);
             border: none;
             border-radius: 4px;
             width: 36px;
@@ -185,7 +185,7 @@
         }
 
         .send-button:hover {
-            background: var(--primary-color);
+            background: var(--elpl-primary);
         }
 
         .send-button img {
@@ -204,20 +204,20 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--client-text);
+            color: var(--elpl-text);
             font-weight: 500;
         }
 
         .form-control {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--client-border);
+            border: 1px solid var(--elpl-border);
             border-radius: 4px;
             font-size: 1rem;
         }
 
         .btn-next {
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             color: white;
             padding: 0.75rem 1.5rem;
             border: none;
@@ -231,7 +231,7 @@
         }
 
         .btn-next:hover {
-            background: var(--accent-color);
+            background: var(--elpl-secondary);
         }
 
         .btn-next img {
@@ -257,7 +257,7 @@
             width: 40px;
             height: 40px;
             border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
+            border-top: 4px solid var(--elpl-primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -270,7 +270,7 @@
         /* Error States */
         .error-message {
             color: var(--error-color, #dc3545);
-            font-size: var(--client-font-size-small);
+            font-size: var(--elpl-font-size-small);
             margin-top: 4px;
         }
 
@@ -290,8 +290,8 @@
 
         .error-dialog {
             background: white;
-            padding: var(--client-spacing-medium);
-            border-radius: var(--client-card-border-radius);
+            padding: var(--elpl-spacing-medium);
+            border-radius: var(--elpl-card-border-radius);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             max-width: 400px;
             width: 90%;
@@ -299,26 +299,26 @@
         }
 
         .error-dialog p {
-            margin: 0 0 var(--client-spacing-medium);
-            color: var(--client-text);
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
+            margin: 0 0 var(--elpl-spacing-medium);
+            color: var(--elpl-text);
+            font-family: var(--elpl-font-body);
+            font-size: var(--elpl-font-size-body);
         }
 
         .error-dialog button {
-            padding: var(--client-button-padding);
-            background: var(--tertiary-color);
-            color: var(--cta-text-color);
+            padding: var(--elpl-button-padding);
+            background: var(--elpl-tertiary);
+            color: var(--elpl-cta-text-color);
             border: none;
-            border-radius: var(--client-button-radius);
+            border-radius: var(--elpl-button-radius);
             cursor: pointer;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
+            font-family: var(--elpl-font-body);
+            font-size: var(--elpl-font-size-body);
             min-width: 80px;
         }
 
         .error-dialog button:hover {
-            background: var(--secondary-color);
+            background: var(--elpl-secondary);
         }
 
         /* Responsive Design */
@@ -340,9 +340,9 @@
             .client-nav {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid var(--client-border);
+                border-bottom: 1px solid var(--elpl-border);
                 flex-direction: row;
-                padding: var(--client-spacing-small);
+                padding: var(--elpl-spacing-small);
             }
 
             .client-nav a {
@@ -350,7 +350,7 @@
             }
 
             .welcome-form {
-                padding: var(--client-spacing-small);
+                padding: var(--elpl-spacing-small);
             }
 
             .footer-content {
@@ -368,8 +368,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: var(--footer-height, 80px);
-            background: var(--primary-color);
+            height: var(--elpl-footer-height, 80px);
+            background: var(--elpl-primary);
             z-index: 100;
             padding: 1rem;
             display: flex;
@@ -381,7 +381,7 @@
             display: flex;
             gap: 1rem;
             width: 100%;
-            max-width: var(--content-width, 800px);
+            max-width: var(--elpl-content-width, 800px);
             padding: 0 1rem;
         }
 
@@ -389,12 +389,12 @@
             flex: 1;
             min-height: 48px;
             padding: 0.75rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--elpl-border);
             border-radius: 8px;
             resize: none;
             font-size: 1rem;
-            background: var(--background-color);
-            color: var(--text-color);
+            background: var(--elpl-background-color);
+            color: var(--elpl-text);
         }
 
         .send-button, .next-button {
@@ -406,14 +406,14 @@
             height: 48px;
             border: none;
             border-radius: 8px;
-            background: var(--accent-color);
+            background: var(--elpl-secondary);
             color: white;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .send-button:hover, .next-button:hover {
-            background: var(--accent-color-hover);
+            background: var(--elpl-secondary-hover);
         }
 
         .send-button img, .next-button img {
@@ -437,7 +437,7 @@
             height: 80px;
             display: flex;
             flex-shrink: 0;
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
             position: fixed;
             bottom: 0;
@@ -542,7 +542,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             border: none;
             cursor: pointer;
             z-index: 100;
@@ -590,11 +590,11 @@
         .sidebar {
             position: fixed;
             left: 0;
-            top: var(--header-height);
-            bottom: var(--footer-height);
+            top: var(--elpl-header-height);
+            bottom: var(--elpl-footer-height);
             width: 250px;
-            background: var(--background-color);
-            border-right: 1px solid var(--border-color);
+            background: var(--elpl-background-color);
+            border-right: 1px solid var(--elpl-border);
             transform: translateX(-100%);
             transition: transform 0.3s ease;
             z-index: 100;
@@ -609,7 +609,7 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             color: white;
             border: none;
             padding: 8px;
@@ -619,7 +619,7 @@
         }
 
         .sidebar-toggle:hover {
-            background: var(--accent-color);
+            background: var(--elpl-secondary);
         }
 
         .sidebar-nav {
@@ -629,7 +629,7 @@
         .sidebar-nav a {
             display: block;
             padding: 10px;
-            color: var(--text-color);
+            color: var(--elpl-text);
             text-decoration: none;
             border-radius: 4px;
             margin-bottom: 5px;
@@ -637,7 +637,7 @@
 
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
-            background: var(--primary-color);
+            background: var(--elpl-primary);
             color: white;
         }
 
@@ -646,48 +646,204 @@
                 width: 200px;
             }
         }
+
+        /* Add these styles to fix the select dropdowns and navigation */
+        .select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            color: var(--elpl-primary);
+            font-size: 24px;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            padding-right: 10px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--elpl-border);
+            border-radius: var(--elpl-border-radius);
+            font-size: 16px;
+            appearance: none;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--elpl-primary);
+            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
+        }
+
+        .sidebar {
+            width: 20%;
+            background: white;
+            border-right: 1px solid var(--elpl-border);
+            padding: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: var(--elpl-text);
+            text-decoration: none;
+            border-radius: var(--elpl-border-radius);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(198, 18, 63, 0.1);
+        }
+
+        .nav-link.active {
+            background: var(--elpl-primary);
+            color: white;
+        }
+
+        /* Footer button styles */
+        .next-button, .send-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--elpl-primary);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 5px;
+            transition: background 0.2s ease;
+        }
+
+        .next-button:disabled {
+            background: var(--elpl-border);
+            cursor: not-allowed;
+        }
+
+        .button-icon {
+            font-size: 24px;
+        }
+
+        .playbar, .chatbar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="client-layout">
-        <header class="page-header">
-            <h1>Merit</h1>
+    <div class="client-layout" data-client-component="merit-page">
+        <header class="client-header" role="banner">
+            <div class="header-content">
+                <img src="/clients/elpl/assets/images/logo.svg" alt="EL Education Logo" class="logo" style="padding: 5px;">
+                <div class="version-display" aria-label="Version and time">v1.0.0</div>
+            </div>
         </header>
-        
-        <aside class="sidebar" id="sidebar">
-            <nav>
-                <a href="#welcome" class="active">Welcome</a>
-                <a href="#chat">Chat</a>
-                <a href="#settings">Settings</a>
+
+        <main class="client-content" role="main">
+            <nav class="sidebar" role="navigation" aria-label="Main navigation">
+                <div class="sidebar-nav">
+                    <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
+                        <span class="nav-text">Welcome</span>
+                    </a>
+                    <a href="#chat" class="nav-link" data-section="chat">
+                        <span class="nav-text">Chat</span>
+                    </a>
+                </div>
+                <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
+                    <span class="toggle-icon">◀</span>
+                </button>
             </nav>
-        </aside>
-        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation" aria-expanded="false">
-            <span class="icon">☰</span>
-        </button>
-        
-        <main class="content-area">
-            <div class="content-area" role="main">
-                <!-- Form will be injected here by MeritIntakeForm -->
+
+            <div class="content-area" role="region" aria-label="Main content">
+                <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+                    <form class="welcome-form" id="welcome-form">
+                        <div class="form-group">
+                            <label for="grade-level">What grade level do you teach?</label>
+                            <div class="select-wrapper">
+                                <select id="grade-level" class="form-control" required>
+                                    <option value="">Select a grade level</option>
+                                    <option value="elementary">Elementary (K-5)</option>
+                                    <option value="middle">Middle School (6-8)</option>
+                                    <option value="high">High School (9-12)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="curriculum">What curriculum do you use?</label>
+                            <div class="select-wrapper">
+                                <select id="curriculum" class="form-control" required>
+                                    <option value="">Select your curriculum</option>
+                                    <option value="ela" selected>English Language Arts (ELA)</option>
+                                    <option value="crew">Crew</option>
+                                    <option value="math">Mathematics</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
+                    <!-- Chat interface content -->
+                    <div class="chat-container">
+                        <div class="messages" id="chat-messages"></div>
+                    </div>
+                </div>
             </div>
         </main>
-        
-        <footer class="client-footer">
-            <div class="interaction-bar playbar">
-                <button class="next-button" onclick="handleNextClick()">Next</button>
-            </div>
-            <div class="interaction-bar chatbar">
-                <textarea id="chat-input" onkeypress="handleKeyPress(event)" placeholder="Type your message..."></textarea>
-                <button onclick="sendMessage()">Send</button>
+
+        <footer class="client-footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="playbar" id="playbar">
+                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat">
+                        <span class="button-icon">→</span>
+                        <span class="button-text">Next</span>
+                    </button>
+                </div>
+                <div class="chatbar" id="chatbar" hidden>
+                    <div class="chat-input-container">
+                        <textarea class="chat-input" 
+                                 id="chat-input"
+                                 aria-label="Type your message"
+                                 placeholder="Type your message..."
+                                 rows="1"></textarea>
+                        <button class="send-button" id="send-button" aria-label="Send message">
+                            <span class="button-icon">↗</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
 
-    <script type="module" src="../assets/js/client-component-loader.js"></script>
-    <script type="module" src="../../shared/assets/js/auth.js"></script>
-    <script type="module" src="../../shared/assets/js/url-resolver.js"></script>
-    <script type="module" src="assets/js/client-merit-form.js"></script>
-    <script type="module" src="assets/js/client-merit-chat.js"></script>
-    <script type="module" src="assets/js/client-merit-logic.js"></script>
+    <!-- Required client scripts with correct paths -->
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    
+    <!-- Merit specific scripts -->
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Show playbar by default, hide chatbar
