@@ -205,4 +205,98 @@ class ErrorBoundary {
         // Show user-friendly error message
         document.querySelector('.error-overlay').style.display = 'flex';
     }
-} 
+}
+
+class MeritPage {
+    constructor() {
+        this.chatFooter = document.querySelector('.chat-footer');
+        this.welcomeFooter = document.querySelector('.welcome-footer');
+        this.chatInput = document.querySelector('.chat-input');
+        this.sendButton = document.querySelector('.send-button');
+        this.nextButton = document.querySelector('.next-button');
+        
+        this.setupEventListeners();
+        this.showWelcomeFooter();
+    }
+
+    setupEventListeners() {
+        // Chat input handlers
+        this.chatInput?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.handleSendMessage();
+            }
+        });
+
+        this.sendButton?.addEventListener('click', () => {
+            this.handleSendMessage();
+        });
+
+        // Next button handler
+        this.nextButton?.addEventListener('click', () => {
+            this.handleNextStep();
+        });
+
+        // Auto-resize textarea
+        this.chatInput?.addEventListener('input', () => {
+            this.chatInput.style.height = 'auto';
+            this.chatInput.style.height = this.chatInput.scrollHeight + 'px';
+        });
+    }
+
+    showChatFooter() {
+        if (this.chatFooter && this.welcomeFooter) {
+            this.chatFooter.style.display = 'block';
+            this.welcomeFooter.style.display = 'none';
+            this.chatInput?.focus();
+        }
+    }
+
+    showWelcomeFooter() {
+        if (this.chatFooter && this.welcomeFooter) {
+            this.chatFooter.style.display = 'none';
+            this.welcomeFooter.style.display = 'block';
+        }
+    }
+
+    handleSendMessage() {
+        const message = this.chatInput?.value.trim();
+        if (!message) return;
+
+        // Add message to chat
+        this.addMessageToChat(message, 'user');
+        
+        // Clear input and reset height
+        this.chatInput.value = '';
+        this.chatInput.style.height = 'auto';
+        
+        // TODO: Send message to server
+        // For now, just show a placeholder response
+        setTimeout(() => {
+            this.addMessageToChat('Thank you for your message. I am processing your request...', 'assistant');
+        }, 1000);
+    }
+
+    handleNextStep() {
+        // TODO: Implement next step logic
+        this.showChatFooter();
+    }
+
+    addMessageToChat(message, sender) {
+        const chatContainer = document.querySelector('.chat-container');
+        if (!chatContainer) return;
+
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', `${sender}-message`);
+        messageElement.textContent = message;
+        chatContainer.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new MeritPage();
+}); 

@@ -4,83 +4,148 @@
  */
 
 class MeritChat {
-    constructor(config = {}) {
-        this.config = {
-            assistantId: config.assistantId || 'asst_9GkHpGa5t50Yw74uzonh6FAz',
-            container: config.container || '.chat-container',
-            input: config.input || '.chat-input',
-            sendButton: config.sendButton || '.send-button',
-            messagesContainer: config.messagesContainer || '.chat-window',
-            sendIcon: config.sendIcon || '/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png'
-        };
-
-        this.elements = {
-            container: document.querySelector(this.config.container),
-            input: document.querySelector(this.config.input),
-            sendButton: document.querySelector(this.config.sendButton),
-            messagesContainer: document.querySelector(this.config.messagesContainer)
-        };
-
+    constructor() {
+        this.messageCount = 0;
+        this.threadId = localStorage.getItem('threadId') || null;
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-        this.elements.sendButton.addEventListener('click', () => this.sendMessage());
-        this.elements.input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        });
-    }
+        const chatInput = document.getElementById('chat-input');
+        const sendButton = document.querySelector('.interaction-button.send-button');
 
-    addMessage(type, content) {
-        const message = document.createElement('div');
-        message.className = `message ${type}`;
-        message.setAttribute('role', type === 'assistant' ? 'status' : 'comment');
-        message.setAttribute('aria-label', `${type} message`);
-        message.textContent = content;
-        
-        this.elements.messagesContainer.appendChild(message);
-        this.scrollToBottom();
-    }
+        if (chatInput) {
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    this.sendMessage();
+                }
+                if (event.key === 'Tab') {
+                    event.preventDefault();
+                    sendButton?.focus();
+                }
+            });
+        }
 
-    showTypingIndicator() {
-        const indicator = document.createElement('div');
-        indicator.className = 'message assistant typing';
-        indicator.setAttribute('role', 'status');
-        indicator.setAttribute('aria-label', 'Assistant is typing');
-        indicator.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-        
-        this.elements.messagesContainer.appendChild(indicator);
-        this.scrollToBottom();
-        return indicator;
-    }
-
-    scrollToBottom() {
-        this.elements.messagesContainer.scrollTop = this.elements.messagesContainer.scrollHeight;
+        if (sendButton) {
+            sendButton.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.sendMessage();
+                }
+            });
+            sendButton.addEventListener('click', () => this.sendMessage());
+        }
     }
 
     async sendMessage() {
-        const message = this.elements.input.value.trim();
+        const input = document.getElementById('chat-input');
+        const message = input?.value.trim();
         if (!message) return;
 
-        // Clear input
-        this.elements.input.value = '';
+        this.messageCount++;
+        console.log(`Message ${this.messageCount}: ${this.threadId ? `Using thread ${this.threadId}` : 'No thread exists'}`);
 
-        // Add user message
-        this.addMessage('user', message);
+        // Add user message to UI
+        this.addMessageToUI(message, 'user');
+        input.value = '';
 
-        // Show typing indicator
-        const typingIndicator = this.showTypingIndicator();
+        // Show loading indicator
+        const loadingId = this.addLoadingIndicator();
 
-        // Simulate response for now
-        setTimeout(() => {
-            typingIndicator.remove();
-            this.addMessage('assistant', 'I understand. Let me help you with that...');
-        }, 2000);
+        try {
+            const response = await this.sendToAPI(message);
+            this.removeLoadingIndicator(loadingId);
+            this.addMessageToUI(response.message, 'assistant');
+
+            if (this.messageCount === 5) {
+                this.saveChat();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            this.removeLoadingIndicator(loadingId);
+            this.addMessageToUI('Failed to send message. Please try again.', 'error');
+        }
+    }
+
+    addMessageToUI(text, type) {
+        const chatWindow = document.getElementById('chat-window');
+        if (!chatWindow) return;
+
+        const message = document.createElement('div');
+        message.classList.add('message', type);
+        message.textContent = text;
+        chatWindow.appendChild(message);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    addLoadingIndicator() {
+        const id = `loading-${Date.now()}`;
+        const indicator = document.createElement('div');
+        indicator.id = id;
+        indicator.classList.add('loading-indicator');
+        indicator.textContent = 'Sending';
+        
+        const chatWindow = document.getElementById('chat-window');
+        chatWindow?.appendChild(indicator);
+        
+        return id;
+    }
+
+    removeLoadingIndicator(id) {
+        document.getElementById(id)?.remove();
+    }
+
+    async sendToAPI(message) {
+        const requestBody = this.threadId ? 
+            { message, threadId: this.threadId } : 
+            { message };
+
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+
+        return response.json();
+    }
+
+    saveChat() {
+        const chatSummary = {
+            event_type: "merit_chat",
+            session: {
+                id: this.threadId || 'new',
+                timestamp: new Date().toISOString(),
+                source_url: window.location.href,
+                entry_point: "merit_form"
+            },
+            interaction_log: {
+                message_count: this.messageCount,
+                completion_status: "in_progress"
+            }
+        };
+
+        // Send to analytics endpoint
+        fetch('/api/analytics/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(chatSummary)
+        }).catch(console.error);
     }
 }
+
+// Initialize chat when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new MeritChat();
+});
 
 // Export for use in other files
 export default MeritChat; 
