@@ -358,16 +358,18 @@ eslint clients/elpl/assets/js/*.js
 
 ## Open Questions (April 12)
 - Is the `client-auth.js` intended to be client-specific (`/clients/elpl/assets/js/`) or truly shared (`/shared/assets/js/`)? The rules suggest shared, but the tree has it client-specific.
-answer: applies to /elpl/ I think but check code to be sure 
+  answer: applies to /elpl/ I think but check code to be sure 
 - Confirm the correct send button icon is `client-elpl-send-button-crimson.png`.
-answer: should be white as it appears on crimson color field saem for logo in crimson header 
+  answer: should be white as it appears on crimson color field saem for logo in crimson header 
 - Are there any other path discrepancies we should address?
 
 ## Suggested Critical Tasks (April 12)
-- [ ] Verify all resource paths are correct and resolve without 404 errors after domain-relative path updates.
+- [X] Verify all resource paths are correct and resolve without 404 errors after domain-relative path updates. (Done via file restore/path correction)
 - [ ] Confirm sidebar initialization logic is working correctly after path fixes.
 - [ ] Test navigation between Welcome/Chat tabs and ensure footer state updates.
 - [ ] Review `client-layout-structure-behavior.mdc` to ensure full compliance for JS/CSS/Image locations.
+- [ ] Remove authentication checks and redirects for MVP testing. (Done by commenting out auth.js)
+- [ ] Investigate and remove source of any remaining redirects (if auth.js comment-out isn't sufficient).
 
 ## Current Status (April 11, 2025)
 - [x] Basic form structure
