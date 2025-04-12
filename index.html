@@ -10,6 +10,7 @@
     
     <style>
         :root {
+            /* Required CSS Variables */
             --header-height: 60px;
             --footer-height: 40px;
             --client-bg: #ffffff;
@@ -47,6 +48,7 @@
             max-width: var(--content-width);
             margin: 0 auto;
             text-align: center;
+            position: relative;
         }
 
         .client-footer {
@@ -56,6 +58,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            padding: 0 2rem;
         }
 
         .logo {
@@ -64,9 +68,7 @@
         }
 
         .welcome-avatar {
-            width: 120px;
-            height: 120px;
-            margin: 2rem 0;
+            display: none;
         }
 
         .verb-container {
@@ -77,35 +79,47 @@
             height: 3rem;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
+        .footer-link {
+            height: 20px;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-family: "Courier New", monospace;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+            padding: 0 10px;
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
+        .footer-link:hover {
+            opacity: 1;
         }
 
-        .btn-secondary {
+        .admin-button {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
             background: var(--accent-color);
             color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.3s ease;
         }
 
-        .btn-primary:hover, .btn-secondary:hover {
+        .admin-button:hover {
             opacity: 0.9;
+        }
+
+        .admin-button img {
+            height: 20px;
+            width: 20px;
+            filter: brightness(0) invert(1);
         }
 
         @keyframes fadeInOut {
@@ -119,59 +133,129 @@
     </style>
 </head>
 <body>
-    <div class="client-layout" data-client-component="landing-layout">
-        <header class="client-header">
+    <div class="client-layout" data-client-component="landing-layout" role="application">
+        <header class="client-header" role="banner">
             <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="logo">
-            <span class="version-display">v1.0.0 (<span id="time">00:00</span>)</span>
+            <span class="version-display" aria-live="polite">v1.0.0 (<span id="time">00:00</span>)</span>
         </header>
 
-        <main class="client-content">
-            <img src="/shared/assets/images/avatar.png" alt="Avatar" class="welcome-avatar">
-            <div class="verb-container">
-                <span class="verb">Teaching...</span>
+        <main class="client-content" role="main">
+            <div class="loading-state" aria-hidden="true">
+                <div class="loading-spinner"></div>
             </div>
-            <div class="action-buttons">
-                <a href="/clients/integraled/curious_intake.html" class="btn-primary">
-                    Start Learning
-                </a>
-                <a href="/admin" class="btn-secondary">Admin Portal</a>
+            <div class="error-state" hidden aria-hidden="true">
+                <p>An error occurred. Please try again.</p>
+                <button onclick="window.location.reload()">Reload</button>
             </div>
+            <div class="content-state">
+                <div class="verb-container" aria-live="polite">
+                    <span class="verb">Teaching...</span>
+                </div>
+            </div>
+            <a href="/admin" class="admin-button" role="button">
+                <img src="/shared/assets/images/Performance-3850108-004080.svg" alt="Admin">
+                Admin Portal
+            </a>
         </main>
 
-        <footer class="client-footer">
-            <span>&copy; 2024 Recursive Learning</span>
+        <footer class="client-footer" role="contentinfo">
+            <a href="/clients/integraled/curious_intake.html" class="footer-link" role="button">
+                🧬 Launching in 2026, Recursive Learning is a new platform built on human wisdom.... curious? join our list -->
+            </a>
         </footer>
     </div>
 
     <!-- Required platform scripts -->
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    <script type="module" src="/shared/assets/js/component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/auth.js"></script>
+    <script type="module" src="/shared/assets/js/url-resolver.js"></script>
 
     <script>
-        // Verb animation
-        const verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
-        const verbElement = document.querySelector('.verb');
-        let currentIndex = 0;
+        // Component initialization and error handling
+        class LandingLayout {
+            constructor() {
+                this.verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
+                this.currentIndex = 0;
+                this.verbElement = document.querySelector('.verb');
+                this.timeElement = document.getElementById('time');
+                this.loadingState = document.querySelector('.loading-state');
+                this.errorState = document.querySelector('.error-state');
+                this.contentState = document.querySelector('.content-state');
+                
+                this.init();
+            }
 
-        setInterval(() => {
-            currentIndex = (currentIndex + 1) % verbs.length;
-            verbElement.textContent = verbs[currentIndex];
-        }, 4000);
+            init() {
+                try {
+                    this.startVerbAnimation();
+                    this.startTimeUpdate();
+                    this.setupErrorHandling();
+                    this.showContent();
+                } catch (error) {
+                    console.error('Landing layout initialization failed:', error);
+                    this.showError();
+                }
+            }
 
-        // Time update
-        function updateTime() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { 
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('time').textContent = time;
+            startVerbAnimation() {
+                setInterval(() => {
+                    this.currentIndex = (this.currentIndex + 1) % this.verbs.length;
+                    this.verbElement.textContent = this.verbs[this.currentIndex];
+                }, 4000);
+            }
+
+            startTimeUpdate() {
+                const updateTime = () => {
+                    const now = new Date();
+                    const time = now.toLocaleTimeString('en-US', { 
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    this.timeElement.textContent = time;
+                };
+                
+                updateTime();
+                setInterval(updateTime, 60000);
+            }
+
+            setupErrorHandling() {
+                window.addEventListener('error', () => this.showError());
+                window.addEventListener('unhandledrejection', () => this.showError());
+            }
+
+            showLoading() {
+                this.loadingState.setAttribute('aria-hidden', 'false');
+                this.errorState.setAttribute('aria-hidden', 'true');
+                this.contentState.setAttribute('aria-hidden', 'true');
+                this.loadingState.hidden = false;
+                this.errorState.hidden = true;
+                this.contentState.hidden = true;
+            }
+
+            showError() {
+                this.loadingState.setAttribute('aria-hidden', 'true');
+                this.errorState.setAttribute('aria-hidden', 'false');
+                this.contentState.setAttribute('aria-hidden', 'true');
+                this.loadingState.hidden = true;
+                this.errorState.hidden = false;
+                this.contentState.hidden = true;
+            }
+
+            showContent() {
+                this.loadingState.setAttribute('aria-hidden', 'true');
+                this.errorState.setAttribute('aria-hidden', 'true');
+                this.contentState.setAttribute('aria-hidden', 'false');
+                this.loadingState.hidden = true;
+                this.errorState.hidden = true;
+                this.contentState.hidden = false;
+            }
         }
-        
-        updateTime();
-        setInterval(updateTime, 60000);
+
+        // Initialize landing layout component
+        document.addEventListener('DOMContentLoaded', () => {
+            new LandingLayout();
+        });
     </script>
 </body>
 </html> 
