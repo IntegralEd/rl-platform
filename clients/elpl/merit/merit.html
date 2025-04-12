@@ -9,35 +9,27 @@
     <title>Merit - Recursive Learning</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../../assets/images/logo.ico">
+    <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/logo.ico">
     
-    <!-- Required client scripts -->
-    <script type="module" src="../../assets/js/client-auth.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="../../assets/js/client-router.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="../../assets/js/client-component-loader.js" defer onerror="handleScriptError(event)"></script>
+    <!-- Required client scripts (Shared & Client-Specific) -->
+    <script type="module" src="/clients/elpl/assets/js/client-auth.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/shared/assets/js/client-router.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/shared/assets/js/client-component-loader.js" defer onerror="handleScriptError(event)"></script>
     
-    <!-- Base variables and custom styles -->
-    <link rel="stylesheet" href="../../assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="../../assets/css/client-elpl.css">
-    <link rel="stylesheet" href="./assets/css/client-merit-chat.css">
+    <!-- Base variables and custom styles (Client-Specific) -->
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
     
     <!-- Merit specific scripts -->
-    <script type="module" src="./assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="./assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
-    <script type="module" src="./assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
     
     <!-- Error handling for scripts -->
     <script>
         function handleScriptError(event) {
             console.error('Script loading error:', event);
-            const errorDialog = document.createElement('div');
-            errorDialog.setAttribute('role', 'alert');
-            errorDialog.classList.add('error-dialog');
-            errorDialog.innerHTML = `
-                <p>Failed to load required resources. Please refresh the page or contact support.</p>
-                <button onclick="location.reload()">Refresh</button>
-            `;
-            document.body.appendChild(errorDialog);
         }
     </script>
     
@@ -753,7 +745,7 @@
                 <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
                     <span class="menu-icon"></span>
                 </button>
-                <img src="../../assets/images/lockup_crimson_logo.png" alt="ELPL Logo" class="header-logo">
+                <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="ELPL Logo" class="header-logo">
                 <div class="version-display" aria-label="Application version"></div>
             </div>
         </header>
@@ -784,7 +776,7 @@
                 <button class="send-button" 
                         aria-label="Send message"
                         disabled>
-                    <img src="../../assets/images/noun-send-7149925-C6123F.png" 
+                    <img src="/clients/elpl/assets/images/client-elpl-send-button-crimson.png" 
                          alt="Send" 
                          class="send-icon">
                 </button>
