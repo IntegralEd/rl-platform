@@ -7,15 +7,94 @@ This template defines a rigid, consistent layout structure that enables:
 3. Predictable component dimensions for stable navigation
 4. Standardized interaction patterns across all states
 
+## Canonical Structure & Nomenclature (Based on @client-layout-structure-behavior.mdc & Current Implementation)
+
+```html
+<div class="client-layout" data-client-component="merit-page">
+  <!-- Overall flex column container -->
+  <header class="client-header" role="banner">
+    <!-- Top fixed bar -->
+    <div class="header-content">
+      <!-- ... logo, version ... -->
+    </div>
+  </header>
+
+  <main class="client-content" role="main">
+    <!-- Main flex row container -->
+    
+    <nav class="sidebar expanded" role="navigation" aria-label="Main navigation">
+      <!-- Navigation panel -->
+      <div class="sidebar-content">
+        <div class="sidebar-nav">
+          <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">...</a>
+          <a href="#chat" class="nav-link" data-section="chat">...</a>
+        </div>
+      </div>
+    </nav>
+
+    <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
+      <!-- Visually collapses/expands sidebar -->
+      <span class="toggle-icon">◀</span>
+    </button>
+
+    <div class="content-area" role="region" aria-label="Main content">
+      <!-- Main area where sections are displayed -->
+      <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+        <!-- Contains .welcome-form -->
+      </div>
+      <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
+        <!-- Contains .chat-container -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="client-footer" role="contentinfo">
+    <!-- Bottom fixed bar -->
+    <div class="footer-content">
+      <!-- Centering/max-width wrapper -->
+      <div class="playbar" id="playbar">
+        <!-- Shown when welcome section active -->
+        <button class="next-button" id="next-button" disabled aria-label="Continue to chat">...</button>
+      </div>
+      <div class="chatbar" id="chatbar" hidden>
+        <!-- Shown when chat section active -->
+        <div class="chat-input-container">
+          <textarea class="chat-input" id="chat-input">...</textarea>
+          <button class="send-button" id="send-button">...</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+```
+
+**Key Elements:**
+*   **Sidebar Panel:** `nav.sidebar`
+*   **Sidebar Toggle Button:** `button#sidebarToggle`
+*   **Main Content Area:** `div.content-area`
+*   **Switchable Views:** `div.section` (identified by `data-section="<name>"`)
+*   **Bottom Fixed Bar:** `footer.client-footer`
+*   **Conditional Footer Bars:** `div#playbar`, `div#chatbar`
+*   **Gating Button:** `button#next-button`
+*   **Chat Send Button:** `button#send-button`
+*   **Navigation Links:** `a.nav-link`
+
+## Behavior Summary
+*   Clicking `.nav-link` updates active state, shows corresponding `.section`, toggles `#playbar`/`#chatbar`.
+*   Clicking `#sidebarToggle` visually collapses/expands `.sidebar`.
+*   Form changes enable/disable `#next-button`.
+*   Clicking enabled `#next-button` shows chat `.section` and `#chatbar`.
+
 ## Current Implementation Status [T]
-- [T] Basic layout structure implemented
-- [T] Header with logo and version
-- [T] Form exists and is visible
-- [T] Footer with playbar/chatbar states
-- [T] Basic tab navigation
-- [ ] Sidebar toggle functionality
-- [ ] Full responsive design
-- [ ] Complete accessibility features
+- [X] Basic layout structure matches canonical structure.
+- [X] Header with logo and version.
+- [X] Form exists and is visible in welcome section.
+- [X] Footer with conditional playbar/chatbar states.
+- [X] Basic tab navigation via sidebar links.
+- [X] Sidebar toggle functionality implemented.
+- [ ] Full responsive design testing needed.
+- [ ] Complete accessibility features audit needed.
+- [ ] Gating logic beyond form validity (chat/quiz interaction) TBD.
 
 ## File Structure
 ```
@@ -23,56 +102,27 @@ clients/elpl/merit/
 ├── merit.html                     # Main entry point
 ├── assets/
 │   ├── js/
-│   │   ├── client-merit-logic.js  # Core page logic
-│   │   ├── client-merit-form.js   # Form handling
-│   │   └── client-merit-chat.js   # Chat functionality
+│   │   ├── client-merit-logic.js  # Core page logic (Sidebar, Nav, Form state)
+│   │   ├── client-merit-form.js   # Handles form interactions (potentially could be merged into logic?)
+│   │   └── client-merit-chat.js   # Chat functionality (UI, message handling)
 │   ├── css/
-│   │   └── merit-theme.css        # Page-specific styles
-│   └── images/                    # Page-specific images
-└── components/                    # Future partial HTML files
-    ├── header.html               # Header partial
-    ├── sidebar.html              # Sidebar partial
-    ├── footer.html              # Footer partial
-    └── content.html             # Content area partial
+│   │   └── client-merit-chat.css  # Page-specific styles (mostly chat?)
+│   └── images/                    # Page-specific images (if any)
+└── components/                    # Future: Not used currently
 
-clients/elpl/assets/              # Shared client assets
+clients/elpl/assets/              # Shared ELPL client assets
 ├── css/
-│   ├── variables.css            # CSS variables
-│   └── custom.css               # Client-wide styles
+│   ├── client-elpl-variables.css # CSS variables
+│   └── client-elpl.css           # Client-wide styles
 ├── js/
-│   ├── client-auth.js          # Authentication
-│   └── client-router.js        # Routing logic
-└── images/                     # Shared images
-```
+│   ├── client-auth.js            # Authentication (Currently ELPL specific)
+│   └── client-router.js          # Routing logic (Currently non-existent)
+└── images/                       # Shared images (logos, icons)
 
-## Current HTML Structure
-```html
-<div id="container">
-    <div id="header-bar">
-        <!-- Logo and version -->
-    </div>
-    <div class="main-content">
-        <div id="sidebar">
-            <!-- Navigation tabs -->
-        </div>
-        <div id="content">
-            <div class="section active">
-                <!-- Welcome form -->
-            </div>
-            <div class="section">
-                <!-- Chat interface -->
-            </div>
-        </div>
-    </div>
-    <div class="interaction-container">
-        <div class="interaction-bar playbar">
-            <!-- Next button -->
-        </div>
-        <div class="interaction-bar chatbar">
-            <!-- Chat input -->
-        </div>
-    </div>
-</div>
+shared/assets/                    # Platform-Shared assets
+├── js/
+│   └── client-component-loader.js # Component Loader (Currently non-existent)
+└── ...
 ```
 
 ## Core Layout Dimensions
@@ -85,7 +135,7 @@ clients/elpl/assets/              # Shared client assets
 │         │                       │
 │         │                       │
 │ Sidebar │     Content Area      │
-│ (20%)   │      (80%)           │
+│ (20%)   │      (Flex 1)         │
 │         │                       │
 │         │                       │
 ├─────────┴───────────────────────┤
@@ -94,14 +144,15 @@ clients/elpl/assets/              # Shared client assets
 ```
 
 ### Fixed Dimensions
-- Header Height: `60px`
+- Header Height: `var(--elpl-header-height, 60px)`
 - Sidebar Width: `20%` (collapsible to 0%)
-- Footer Height: `80px`
-- Content Max-Width: `1200px`
-- Content Padding: `2rem`
-- Component Spacing: `1rem`
+- Footer Height: `var(--elpl-footer-height, 80px)`
+- Content Max-Width: `var(--elpl-content-width, 1200px)`
+- Content Padding: `1rem` (in `.client-content`)
+- Content Area Padding: `2rem` (in `.content-area`)
+- Component Spacing: `1rem` (general gap)
 
-## 5. Styling and Accessibility Priorities
+## Styling and Accessibility Priorities
 
 ### Review with Creative Director
 - [ ] Review current implementation
@@ -112,149 +163,104 @@ clients/elpl/assets/              # Shared client assets
 
 ### CSS Organization
 1. Variables and Theming
-   - [ ] Move all variables to variables.css
-   - [ ] Create theme variations
-   - [ ] Document color system
+   - [X] Client variables in `/clients/elpl/assets/css/client-elpl-variables.css`
+   - [ ] Document color system fully
    - [ ] Define animation constants
 
 2. Layout Structure
-   - [ ] Implement CSS Grid for main layout
-   - [ ] Add flexbox for component layouts
-   - [ ] Define responsive breakpoints
-   - [ ] Create utility classes
+   - [X] Flexbox for main layout (`.client-content`)
+   - [X] Responsive breakpoints defined (need testing)
+   - [ ] Create more utility classes?
 
 3. Component Styling
-   - [ ] Style form elements
-   - [ ] Design chat bubbles
-   - [ ] Create loading states
-   - [ ] Add transitions
+   - [X] Basic form element styling
+   - [ ] Chat bubble styling (in `client-merit-chat.css`?)
+   - [ ] Loading states (need implementation)
+   - [X] Basic transitions for sidebar
 
 4. Accessibility Enhancements
-   - [ ] Add focus styles
-   - [ ] Implement ARIA attributes
-   - [ ] Add screen reader text
+   - [ ] Focus styles review needed
+   - [X] Basic ARIA attributes added (roles, labels)
+   - [ ] Screen reader text for dynamic changes (partially added for sidebar)
    - [ ] Test color contrast
 
 5. Responsive Design
-   - [ ] Mobile-first approach
-   - [ ] Tablet adaptations
-   - [ ] Desktop optimizations
-   - [ ] Print styles
-
-### Current Console Logging
-```javascript
-// Tab state logging
-function showSection(index) {
-    console.log(`Activating tab: ${index}`);
-    console.log(`Previous active tab: ${document.querySelector('.section.active').dataset.index}`);
-    
-    // Toggle sections
-    const sections = document.querySelectorAll('.section');
-    sections.forEach((section, i) => {
-        section.classList.toggle('active', i === index);
-    });
-
-    // Toggle footer state
-    const playbar = document.querySelector('.playbar');
-    const chatbar = document.querySelector('.chatbar');
-    
-    if (index === 0) {
-        console.log('Showing playbar, hiding chatbar');
-        playbar.style.display = 'flex';
-        chatbar.style.display = 'none';
-    } else {
-        console.log('Showing chatbar, hiding playbar');
-        playbar.style.display = 'none';
-        chatbar.style.display = 'flex';
-    }
-}
-
-// Next button gating
-function checkAffirmations() {
-    const checkboxes = document.querySelectorAll('#teacher-context input[type="checkbox"]');
-    const nextButton = document.getElementById('next-button');
-    let anyChecked = false;
-
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) anyChecked = true;
-    });
-
-    console.log(`Next button ${anyChecked ? 'enabled' : 'disabled'}`);
-    nextButton.disabled = !anyChecked;
-    nextButton.classList.toggle('enabled', anyChecked);
-}
-```
+   - [ ] Mobile-first approach review
+   - [X] Basic Tablet/Mobile adaptations in place (needs testing)
+   - [ ] Print styles (low priority)
 
 ## Testing Checklist [T]
-- [T] Form visible on welcome tab
-- [T] Next button disabled by default
-- [T] Next button enables with checkbox selection
-- [T] Playbar visible on welcome tab
-- [T] Chatbar visible on chat tab
-- [T] Tab navigation working
-- [T] Basic layout structure in place
-- [ ] Sidebar toggle functionality
-- [ ] Full responsive testing
-- [ ] Accessibility audit
+- [X] Form visible on welcome tab
+- [X] Next button disabled by default
+- [X] Next button enables with form validity
+- [X] Playbar visible on welcome tab
+- [X] Chatbar visible on chat tab
+- [X] Tab navigation working
+- [X] Basic layout structure in place
+- [X] Sidebar toggle functionality working
+- [ ] Full responsive testing (mobile, tablet)
+- [ ] Accessibility audit (keyboard nav, screen reader)
 
 ## Component References
-Each component is referenced with `>` to indicate future partial inclusion:
+(Future concept - not currently implemented)
 
 ### > header.html
 - Fixed height: 60px
 - Logo + Version display
 - Consistent across all states
-- Shadow depth: 4px
 
-### > sidebar.html [Priority 2]
-- Fixed width: 200px
+### > sidebar.html
+- Width: 20%
 - Tab navigation
-- Controls footer state
-- Collapses to top bar on mobile
+- Controls footer state via JS
+- Collapses via JS
 
-### > footer.html [Priority 1]
+### > footer.html
 - Fixed height: 80px
-- Two states:
-  1. Playbar (default)
-  2. Chatbar (when active)
-- Smooth state transitions
+- Two states: Playbar / Chatbar
+- State transitions via JS
 
 ### > content-area.html
-- Centered, max-width 1200px
+- Centered, max-width 1200px (via `.client-content`)
 - Flexible height
-- Maintains scroll position
-- Padding: 2rem
+- Contains `.section` elements
 
 ## State Management
 1. Welcome State
-   - Active: Welcome tab
-   - Footer: Playbar
-   - Content: Form
-
+   - Active: Welcome section
+   - Footer: Playbar visible
+   - Sidebar: Link active
 2. Chat State
-   - Active: Chat tab
-   - Footer: Chatbar
-   - Content: Chat history
+   - Active: Chat section
+   - Footer: Chatbar visible
+   - Sidebar: Link active
+3. Sidebar State
+   - `expanded` / `collapsed` classes on `.sidebar`
+   - `sidebar-collapsed` class on `.client-content`
+   - Managed by `SidebarManager`, persisted in `localStorage`
 
 ## Interaction Patterns
 1. Tab Navigation
-   - Click/tap tabs
-   - Keyboard navigation
-   - State preservation
-
+   - Click/tap `.nav-link`
+   - Keyboard navigation (basic via tab, needs refinement)
+   - State preservation (active link, current section)
 2. Footer Interaction
-   - Next button (Playbar)
-   - Chat input (Chatbar)
-   - Submit actions
+   - Next button click (Playbar)
+   - Chat input + Send button (Chatbar)
+   - Submit actions (via JS)
+3. Sidebar Toggle
+   - Click `#sidebarToggle`
+   - Escape key (closes if expanded)
+   - State preservation (`localStorage`)
 
 ## Accessibility Requirements
-- ARIA roles for regions
-- Keyboard navigation
-- Focus management
-- Screen reader support
+- ARIA roles for regions (banner, navigation, main, contentinfo)
+- Keyboard navigation (needs thorough testing)
+- Focus management (needs testing, esp. after section change)
+- Screen reader support (basic announcements added)
 
 ## Performance Targets
 - Tab switch: < 100ms
-- State transition: < 200ms
+- State transition: < 300ms (current CSS)
 - Input response: < 50ms
 - Scroll performance: 60fps 
