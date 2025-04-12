@@ -360,6 +360,44 @@
             display: none !important;
         }
 
+        .section {
+            padding-top: 10px;
+        }
+
+        .section h1 {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 10px 15px;
+            color: var(--elpl-text);
+            text-decoration: none;
+            border-radius: var(--elpl-border-radius);
+            transition: background-color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(198, 18, 63, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: var(--elpl-primary);
+            color: white;
+        }
+
+        .nav-text {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
     </style>
 </head>
 <body>
