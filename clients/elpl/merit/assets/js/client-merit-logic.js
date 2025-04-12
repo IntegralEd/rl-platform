@@ -2,37 +2,26 @@
 
 class MeritIntakeForm {
     constructor() {
-        // Initialize with null checks
+        this.initializeElements();
+        this.setupEventListeners();
+        this.updateNextButtonState();
+    }
+
+    initializeElements() {
+        // Initialize all required elements
+        this.form = document.querySelector('.welcome-form');
+        this.gradeLevelInput = document.getElementById('grade-level');
+        this.curriculumInput = document.getElementById('curriculum');
+        this.nextButton = document.getElementById('next-button');
+        this.sections = document.querySelectorAll('.section');
+        this.playbar = document.getElementById('playbar');
+        this.chatbar = document.getElementById('chatbar');
         this.contentArea = document.querySelector('.content-area');
-        if (!this.contentArea) {
-            ErrorBoundary.handleError(new Error('Content area not found'), 'MeritIntakeForm');
+
+        // Validate required elements
+        if (!this.form || !this.gradeLevelInput || !this.curriculumInput || !this.nextButton) {
+            console.error("MeritIntakeForm: Required form elements not found");
             return;
-        }
-
-        this.form = null;
-        this.gradeLevelInput = null;
-        this.curriculumInput = null;
-        this.nextButton = null;
-
-        // Initial form setup
-        try {
-            this.form = document.querySelector('.welcome-form');
-            this.gradeLevelInput = document.getElementById('grade-level');
-            this.curriculumInput = document.getElementById('curriculum');
-            this.nextButton = document.getElementById('next-button');
-            this.sections = document.querySelectorAll('.section');
-            this.playbar = document.getElementById('playbar');
-            this.chatbar = document.getElementById('chatbar');
-
-            if (!this.form || !this.gradeLevelInput || !this.curriculumInput || !this.nextButton) {
-                console.error("MeritIntakeForm: Required form elements not found");
-                return;
-            }
-
-            this.setupEventListeners();
-            this.updateNextButtonState();
-        } catch (error) {
-            ErrorBoundary.handleError(error, 'MeritIntakeForm Constructor');
         }
     }
 
@@ -40,6 +29,7 @@ class MeritIntakeForm {
         if (!this.form || !this.nextButton) return;
         
         // Listen for form changes
+        this.form.addEventListener('input', () => this.updateNextButtonState());
         this.form.addEventListener('change', () => this.updateNextButtonState());
         
         // Handle next button click
@@ -47,6 +37,8 @@ class MeritIntakeForm {
             e.preventDefault();
             if (this.form.checkValidity()) {
                 this.handleFormSubmit();
+            } else {
+                this.form.reportValidity();
             }
         });
 
@@ -86,6 +78,10 @@ class MeritIntakeForm {
         console.log('Form submitted with data:', formData);
         
         // Switch to chat section
+        this.switchToChat();
+    }
+
+    switchToChat() {
         const chatLink = document.querySelector('[data-section="chat"]');
         if (chatLink) {
             this.handleNavigation(chatLink, 1);
