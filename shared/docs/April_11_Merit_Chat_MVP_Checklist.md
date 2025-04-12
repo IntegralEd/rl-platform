@@ -269,7 +269,11 @@ const MERIT_ASSISTANT = {
   id: "asst_QoAA395ibbyMImFJERbG2hKT",  // Production assistant ID
   model: "gpt-4-turbo",
   name: "Merit Education Assistant",
-  instructions: "You are an educational assistant helping teachers..."
+  instructions: "You are an educational assistant helping teachers...",
+  vectorDb: {
+    getNamespace: (gradeLevel) => `ela-grade-${gradeLevel}`,
+    contentType: "teacher-guide"
+  }
 };
 ```
 
@@ -831,60 +835,84 @@ For questions or issues:
 - Platform Architecture Team
 - QA Team Lead 
 
-## Recent Updates [April 11 @1130pmvx]
+## Recent Updates [April 12 @0120amvx]
+- Created instructional page template with Redis integration focus
+- Prioritized immediate chat access post-form validation
+- Defined multi-tenant directory structure
+- Added grade-level vector DB namespacing plan
 
-### ✅ Latest Fixes Completed
-1. [FIXED] Form Elements
-   - Added missing next button to footer
-   - Fixed playbar container implementation
-   - Corrected form initialization error
-   - Added proper ARIA labels and test IDs
+## Current Implementation Status
+- Layout Structure: 85% (Mobile testing needed)
+- Navigation: 90% (Form gating fixes in progress)
+- Chat Integration: 75% (Redis integration pending)
+- Form Validation: 80% (Grade-level validation needed)
+- Mobile Responsive: 60% (Testing required)
 
-2. [FIXED] Footer Layout
-   - Made footer background transparent
-   - Implemented proper grid layout (spacer/center/action)
-   - Fixed button positioning and spacing
-   - Added proper test IDs for QA
+## Fixed Items
+1. Section transitions and footer layout
+2. JavaScript structure and organization
+3. Form initialization sequence
+4. Tab navigation base implementation
+5. Basic chat functionality
 
-3. [FIXED] JavaScript Structure
-   - Fixed MeritIntakeForm initialization
-   - Corrected element queries
-   - Improved error handling
-   - Fixed state management for form/chat transition
+## Remaining Items [PRIORITY ORDER]
+1. **IMMEDIATE**
+   - [ ] Grade-level form validation
+   - [ ] Redis chat thread caching
+   - [ ] Vector DB namespacing
+   - [ ] Mobile responsive testing
 
-### Current Implementation Status [Updated]
+2. **NEXT 24 HOURS**
+   - [ ] Complete Redis integration
+   - [ ] Set up tenant structure
+   - [ ] Implement shared assets
+   - [ ] Test isolation
 
-#### Layout Structure [98% Complete]
-- [x] Base grid layout with 20% sidebar
-- [x] Proper header with logo
-- [x] Content area with form/chat sections
-- [x] Footer with transparent background
-- [x] Form elements properly initialized
-- [ ] Final mobile responsive testing needed
+3. **BACKLOG**
+   - [ ] Enhanced error handling
+   - [ ] Performance optimization
+   - [ ] Documentation updates
+   - [ ] Security review
 
-#### Form Functionality [95% Complete]
-- [x] Grade level selection working
-- [x] Curriculum input validation
-- [x] Next button state management
-- [x] Form submission handling
-- [x] Section transition logic
-- [ ] Final accessibility testing needed
+## Critical Navigation Fixes
+1. Form Initialization
+   - Ensure proper state on load
+   - Validate grade selection
+   - Enable immediate chat access
 
-### Immediate Next Steps
-1. Mobile Testing:
-   - Verify responsive breakpoints
-   - Test form element sizing
-   - Check footer positioning
-   - Validate button interactions
+2. Tab Navigation
+   - Fix section transitions
+   - Implement proper gating
+   - Add loading indicators
 
-2. Final Validation:
-   - Cross-browser testing
-   - Accessibility audit
-   - Performance check
-   - User flow verification
+3. State Management
+   - Implement Redis caching
+   - Handle persistence
+   - Manage transitions
+
+## Testing Sequence
+1. Form validation
+2. Chat access
+3. Redis integration
+4. Mobile responsive
+5. Performance
+6. Security
+
+## Next Implementation Steps
+1. Complete grade-level validation
+2. Set up Redis connection
+3. Configure vector DB
+4. Test chat access
+5. Mobile testing
+6. Documentation update
+
+## Notes
+- Focus on immediate chat access
+- Prioritize Redis integration
+- Maintain multi-tenant structure
+- Document all changes
 
 ## Contact
-For questions or issues:
 - Frontend Team Lead
-- Platform Architecture Team
-- QA Team Lead
+- Redis Integration Team
+- Platform Security

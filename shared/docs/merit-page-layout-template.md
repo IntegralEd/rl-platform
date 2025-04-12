@@ -90,14 +90,43 @@ This template defines a rigid, consistent layout structure that enables:
 - [X] Header with logo and version
 - [X] Form exists and is visible in welcome section
 - [X] Footer with conditional playbar/chatbar states
-- [X] Basic tab navigation via sidebar links
-- [X] Sidebar toggle functionality implemented
-- [X] Section transitions working properly
-- [X] Footer states properly synced
-- [X] Form elements properly initialized
+- [ ] Form initialization working properly
+- [ ] Tab navigation system functional
+- [ ] Section transitions working properly
+- [ ] Footer states properly synced
+- [ ] Form elements properly initialized
 - [ ] Full responsive testing needed
 - [ ] Complete accessibility features audit needed
-- [ ] Gating logic beyond form validity (chat/quiz interaction) TBD
+- [ ] Gating logic beyond form validity TBD
+
+## Critical Navigation Issues [April 12]
+1. Form Initialization
+   - MeritIntakeForm not finding required elements
+   - Event listeners not attaching properly
+   - Form validation state not managed
+
+2. Section Transitions
+   - Welcome → Chat transition broken
+   - Section visibility not toggling correctly
+   - Footer state changes not synchronized
+
+3. State Management
+   - Form validation not controlling navigation
+   - Tab state not persisting properly
+   - Section visibility needs coordination
+
+### Required Fixes
+```javascript
+// Form initialization sequence needs review
+class MeritIntakeForm {
+    constructor() {
+        this.initializeElements();    // Currently failing
+        this.setupEventListeners();   // Not reached
+        this.updateNextButtonState(); // Not reached
+        this.initializeActiveSection(); // Not reached
+    }
+}
+```
 
 ## File Structure
 ```
@@ -127,6 +156,116 @@ shared/assets/                    # Platform-Shared assets
 │   └── client-component-loader.js # Component Loader (Currently non-existent)
 └── ...
 ```
+
+## Instructional Logic & Flow Control
+
+### Overview
+The Merit page implements a cascading instructional flow system that manages navigation, state, and feature access across different deployment contexts. This system is implemented through `client-merit-instructional-flow.js`.
+
+### Flow Configuration Layers
+1. **Global Layer** (Platform Default)
+   - Default feature flags
+   - Base accessibility settings
+   - Core UI components (footer bars, headers)
+   - Public access patterns
+
+2. **Client Layer** (ELPL Settings)
+   - Authentication requirements
+   - Licensed domain restrictions
+   - Client-specific feature toggles
+   - Tenant-level persistence rules
+
+3. **Page Layer** (Merit Implementation)
+   - Curriculum-specific flow definition
+   - Tab sequence and gating rules
+   - UI component configuration
+   - State management rules
+
+### Implementation Structure
+```javascript
+// clients/elpl/merit/assets/js/client-merit-instructional-flow.js
+export class MeritInstructionalFlow {
+    constructor(config) {
+        this.flowConfig = {
+            id: "merit-ela-flow",
+            version: "1.0.0",
+            tabs: [
+                {
+                    id: "welcome",
+                    type: "intake",
+                    gating: {
+                        requires: ["gradeLevel"],
+                        validation: "form"
+                    }
+                },
+                {
+                    id: "chat",
+                    type: "interactive",
+                    gating: {
+                        requires: ["welcome.complete"],
+                        validation: "none"
+                    }
+                }
+            ],
+            persistence: {
+                storage: "localStorage",
+                key: "merit-flow-state"
+            }
+        };
+    }
+}
+```
+
+### State Management
+1. **Flow State**
+   - Current active tab
+   - Completion status
+   - Form validation state
+   - Navigation history
+
+2. **User Context**
+   - Selected grade level
+   - Curriculum preferences
+   - Session data
+   - Chat thread ID
+
+3. **Feature Flags**
+   - Accessibility enhancements
+   - UI variations
+   - Experimental features
+   - Analytics tracking
+
+### Integration Points
+1. **Layout System**
+   - Manages tab visibility
+   - Controls footer states
+   - Handles responsive adjustments
+   - Maintains accessibility
+
+2. **Form System**
+   - Validates user input
+   - Gates navigation
+   - Persists selections
+   - Manages errors
+
+3. **Chat System**
+   - Initializes threads
+   - Manages messages
+   - Handles loading states
+   - Controls input
+
+### Scaling Considerations
+1. **Multi-Tab Flows**
+   - Support for 2-20+ tabs
+   - Flexible navigation patterns
+   - State preservation
+   - Progress tracking
+
+2. **Feature Management**
+   - Centralized control
+   - Tenant-specific overrides
+   - Gradual rollout
+   - A/B testing support
 
 ## Core Layout Dimensions
 
