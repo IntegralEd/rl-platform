@@ -111,6 +111,16 @@ export class MeritInstructionalFlow {
             this.#validateForm();
         });
 
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.#handleEscapeKey();
+            }
+            if (e.key === 'Tab') {
+                this.#handleTabNavigation(e);
+            }
+        });
+
         // Handle browser navigation
         window.addEventListener('popstate', () => {
             this.#handleBrowserNavigation();
@@ -310,6 +320,41 @@ export class MeritInstructionalFlow {
         console.log('Curriculum:', this.#state.curriculum);
         console.log('Path:', window.location.pathname + window.location.hash);
         console.groupEnd();
+    }
+
+    /**
+     * Handle Escape key press
+     * @private
+     */
+    #handleEscapeKey() {
+        if (this.#state.currentSection === 'chat') {
+            this.#handleNavigation('welcome');
+        }
+    }
+
+    /**
+     * Handle Tab navigation
+     * @private
+     * @param {KeyboardEvent} e
+     */
+    #handleTabNavigation(e) {
+        const activeSection = document.querySelector('.section.active');
+        if (!activeSection) return;
+
+        const focusableElements = activeSection.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
     }
 }
 
