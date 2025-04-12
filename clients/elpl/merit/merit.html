@@ -4,20 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Merit - Student progress tracking and feedback system by Recursive Learning">
+    <meta name="theme-color" content="#c6123f">
     <title>Merit - Recursive Learning</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../assets/images/logo.ico">
+    
     <!-- Required client scripts -->
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    <script type="module" src="../../assets/js/client-auth.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="../../assets/js/client-router.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="../../assets/js/client-component-loader.js" defer onerror="handleScriptError(event)"></script>
     
     <!-- Base variables and custom styles -->
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
-    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
+    <link rel="stylesheet" href="../../assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="../../assets/css/client-elpl.css">
+    <link rel="stylesheet" href="./assets/css/client-merit-chat.css">
     
-    <!-- Merit specific logic -->
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <!-- Merit specific scripts -->
+    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-logic.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-form.js" defer onerror="handleScriptError(event)"></script>
+    <script type="module" src="/Users/Shared/Repositories/rl-platform/clients/elpl/merit/assets/js/client-merit-chat.js" defer onerror="handleScriptError(event)"></script>
+    
+    <!-- Error handling for scripts -->
+    <script>
+        function handleScriptError(event) {
+            console.error('Script loading error:', event);
+            const errorDialog = document.createElement('div');
+            errorDialog.setAttribute('role', 'alert');
+            errorDialog.classList.add('error-dialog');
+            errorDialog.innerHTML = `
+                <p>Failed to load required resources. Please refresh the page or contact support.</p>
+                <button onclick="location.reload()">Refresh</button>
+            `;
+            document.body.appendChild(errorDialog);
+        }
+    </script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -660,100 +682,62 @@
     </style>
 </head>
 <body>
-    <div class="client-layout" data-client-component="merit-page">
-        <header class="client-header" role="banner">
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="page-container" role="application">
+        <header class="page-header" role="banner">
             <div class="header-content">
-                <img src="../assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="logo" style="padding: 5px;">
-                <div class="version-display" aria-label="Version and time">v1.0.0</div>
+                <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="menu-icon"></span>
+                </button>
+                <img src="../../assets/images/lockup_crimson_logo.png" alt="ELPL Logo" class="header-logo">
+                <div class="version-display" aria-label="Application version"></div>
             </div>
         </header>
 
-        <main class="client-content" role="main" id="mainContent">
-            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation" id="sidebar">
-                <div class="sidebar-content">
-                    <div class="sidebar-nav">
-                        <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
-                            <span class="nav-text">Welcome</span>
-                        </a>
-                        <a href="#chat" class="nav-link" data-section="chat">
-                            <span class="nav-text">Chat</span>
-                        </a>
-                    </div>
-                </div>
-            </nav>
+        <nav class="sidebar" role="navigation" aria-label="Main navigation">
+            <div class="nav-content">
+                <!-- Navigation items will be dynamically populated -->
+            </div>
+        </nav>
 
-            <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
-                <span class="toggle-icon">◀</span>
-            </button>
-
-            <div class="content-area" role="region" aria-label="Main content">
-                <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
-                    <form class="welcome-form" id="welcome-form">
-                        <div class="form-group">
-                            <label for="grade-level">What grade level do you teach?</label>
-                            <div class="select-wrapper">
-                                <select id="grade-level" class="form-control" required>
-                                    <option value="">Select a grade level</option>
-                                    <option value="elementary">Elementary (K-5)</option>
-                                    <option value="middle">Middle School (6-8)</option>
-                                    <option value="high">High School (9-12)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="curriculum">What curriculum do you use?</label>
-                            <div class="select-wrapper">
-                                <select id="curriculum" class="form-control" required>
-                                    <option value="">Select your curriculum</option>
-                                    <option value="ela" selected>English Language Arts (ELA)</option>
-                                    <option value="crew">Crew</option>
-                                    <option value="math">Mathematics</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
-                    <!-- Chat interface content -->
-                    <div class="chat-container">
-                        <div class="messages" id="chat-messages"></div>
-                    </div>
-                </div>
+        <main id="main-content" class="main-content" role="main">
+            <div class="content-header">
+                <h1 class="page-title">Merit Dashboard</h1>
+            </div>
+            
+            <div class="content-body" aria-live="polite">
+                <!-- Dynamic content will be loaded here -->
             </div>
         </main>
 
-        <footer class="client-footer" role="contentinfo">
-            <div class="footer-content">
-                <div class="playbar" id="playbar">
-                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat">
-                        <img src="../assets/images/client-elpl-next-button.png" alt="" class="button-icon">
-                    </button>
-                </div>
-                <div class="chatbar" id="chatbar" hidden>
-                    <div class="chat-input-container">
-                        <textarea class="chat-input" 
-                                 id="chat-input"
-                                 aria-label="Type your message"
-                                 placeholder="Type your message..."
-                                 rows="1"></textarea>
-                        <button class="send-button" id="send-button" aria-label="Send message">
-                            <img src="../assets/images/client-elpl-send-button.png" alt="" class="button-icon">
-                        </button>
-                    </div>
-                </div>
+        <footer class="page-footer" role="contentinfo">
+            <div class="chat-input-container" role="complementary" aria-label="Chat interface">
+                <input type="text" 
+                       class="chat-input" 
+                       placeholder="Type your message..." 
+                       aria-label="Chat message input"
+                       autocomplete="off">
+                <button class="send-button" 
+                        aria-label="Send message"
+                        disabled>
+                    <img src="../../assets/images/noun-send-7149925-C6123F.png" 
+                         alt="Send" 
+                         class="send-icon">
+                </button>
             </div>
         </footer>
     </div>
 
-    <!-- Required client scripts with correct paths -->
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
-    
-    <!-- Merit specific scripts -->
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" role="alert" aria-busy="true" hidden>
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Error message container -->
+    <div class="error-container" role="alert" aria-live="assertive" hidden></div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
