@@ -92,7 +92,9 @@ This template defines a rigid, consistent layout structure that enables:
 - [X] Footer with conditional playbar/chatbar states.
 - [X] Basic tab navigation via sidebar links.
 - [X] Sidebar toggle functionality implemented.
-- [ ] Full responsive design testing needed.
+- [X] Section transitions working properly.
+- [X] Footer states properly synced.
+- [ ] Full responsive testing needed.
 - [ ] Complete accessibility features audit needed.
 - [ ] Gating logic beyond form validity (chat/quiz interaction) TBD.
 
@@ -127,7 +129,7 @@ shared/assets/                    # Platform-Shared assets
 
 ## Core Layout Dimensions
 
-### Layout Position Names
+### Layout Position Names [Updated April 11]
 ```
 ┌─────────────────────────────────┐
 │ client-header                   │ <- --elpl-header-height (60px)
@@ -166,13 +168,17 @@ shared/assets/                    # Platform-Shared assets
      - Left Spacer: `footer-spacer` (flexible)
      - Center Area: `footer-center` (700px max)
      - Action Area: `footer-action-area` (150px fixed)
+   - Background: transparent
+   - Border: 1px solid var(--elpl-border)
+   - Height: Fixed 80px
 
-### Component Spacing
+### Component Spacing [Updated]
 - Content Padding: `2rem` (32px)
 - Component Gap: `1rem` (16px)
 - Button Dimensions: `48px` x `48px`
 - Border Radius: `--elpl-border-radius: 12px`
 - Input Height: `40px` (min) to `100px` (max)
+- Chat Input Font Size: `18px`
 
 ### Responsive Breakpoints
 ```css
@@ -277,19 +283,26 @@ shared/assets/                    # Platform-Shared assets
 - Flexible height
 - Contains `.section` elements
 
-## State Management
+## State Management [Updated April 11]
 1. Welcome State
    - Active: Welcome section
    - Footer: Playbar visible
-   - Sidebar: Link active
+   - Sidebar: Welcome link active
+   - Form: Enabled and visible
 2. Chat State
    - Active: Chat section
-   - Footer: Chatbar visible
-   - Sidebar: Link active
+   - Footer: Chatbar visible with transparent background
+   - Sidebar: Chat link active
+   - Input: Focused and ready
 3. Sidebar State
    - `expanded` / `collapsed` classes on `.sidebar`
    - `sidebar-collapsed` class on `.client-content`
    - Managed by `SidebarManager`, persisted in `localStorage`
+4. Section Transitions
+   - Smooth opacity transitions
+   - Synchronized footer state changes
+   - Proper tab navigation updates
+   - Maintained focus management
 
 ## Interaction Patterns
 1. Tab Navigation
