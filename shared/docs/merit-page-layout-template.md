@@ -127,30 +127,82 @@ shared/assets/                    # Platform-Shared assets
 
 ## Core Layout Dimensions
 
-### Viewport Structure
+### Layout Position Names
 ```
 ┌─────────────────────────────────┐
-│ Header (60px)                   │
+│ client-header                   │ <- --elpl-header-height (60px)
 ├─────────┬───────────────────────┤
 │         │                       │
 │         │                       │
-│ Sidebar │     Content Area      │
-│ (20%)   │      (Flex 1)         │
+│ sidebar │     content-area      │ <- --elpl-content-height (dynamic)
+│ (20%)   │      (Flex 1)        │    content-max-width (1200px)
 │         │                       │
 │         │                       │
 ├─────────┴───────────────────────┤
-│ Footer (80px)                   │
+│ client-footer                   │ <- --elpl-footer-height (80px)
 └─────────────────────────────────┘
 ```
 
 ### Fixed Dimensions
-- Header Height: `var(--elpl-header-height, 60px)`
-- Sidebar Width: `20%` (collapsible to 0%)
-- Footer Height: `var(--elpl-footer-height, 80px)`
-- Content Max-Width: `var(--elpl-content-width, 1200px)`
-- Content Padding: `1rem` (in `.client-content`)
-- Content Area Padding: `2rem` (in `.content-area`)
-- Component Spacing: `1rem` (general gap)
+- Header Height: `--elpl-header-height: 60px`
+- Footer Height: `--elpl-footer-height: 80px`
+- Sidebar Width: `--elpl-sidebar-width: 250px` (20% of viewport)
+- Content Max Width: `--elpl-content-width: 1200px`
+- Content Area Height: `calc(100vh - var(--elpl-header-height) - var(--elpl-footer-height))`
+
+### Grid Areas
+1. Header Area (`client-header`)
+   - Logo Container: `header-logo-container` (left)
+   - Version Container: `header-version-container` (right)
+   - Height: Fixed 60px
+
+2. Main Content (`client-content`)
+   - Sidebar: `sidebar` (fixed width, scrollable)
+   - Content Area: `content-area` (flexible width)
+   - Height: Dynamic (viewport - header - footer)
+
+3. Footer Area (`client-footer`)
+   - Grid Layout: `footer-content`
+     - Left Spacer: `footer-spacer` (flexible)
+     - Center Area: `footer-center` (700px max)
+     - Action Area: `footer-action-area` (150px fixed)
+
+### Component Spacing
+- Content Padding: `2rem` (32px)
+- Component Gap: `1rem` (16px)
+- Button Dimensions: `48px` x `48px`
+- Border Radius: `--elpl-border-radius: 12px`
+- Input Height: `40px` (min) to `100px` (max)
+
+### Responsive Breakpoints
+```css
+@media (max-width: 768px) {
+  /* Mobile Layout Adjustments */
+  .client-content {
+    flex-direction: column;
+    margin-left: 0;
+  }
+  .sidebar {
+    position: static;
+    width: 100%;
+  }
+  .content-area {
+    margin-left: 0;
+    width: 100%;
+  }
+  .footer-content {
+    grid-template-columns: 1fr auto 60px;
+    padding: 0 1rem;
+  }
+}
+```
+
+### Z-Index Hierarchy
+1. Loading Overlay: `1000`
+2. Footer: `100`
+3. Sidebar: `50`
+4. Content Area: `1`
+5. Base Layout: `0`
 
 ## Styling and Accessibility Priorities
 

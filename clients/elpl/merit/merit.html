@@ -205,9 +205,41 @@
             margin: 0 auto;
             padding: 0;
             align-items: center;
+            background: transparent;
         }
 
-        /* Action Area (Next/Send button) */
+        /* Chat Input Container */
+        .chat-input-container {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+        }
+
+        .chat-input {
+            width: 100%;
+            min-height: 48px;
+            max-height: 100px;
+            padding: 12px 16px;
+            border: 1px solid var(--elpl-border);
+            border-radius: var(--elpl-border-radius);
+            font-size: 18px;
+            line-height: 1.5;
+            resize: none;
+            overflow-y: auto;
+            background: var(--elpl-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--elpl-primary);
+            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
+        }
+
+        /* Action Area (Send button) */
         .footer-action-area {
             width: 150px;
             height: 100%;
@@ -215,6 +247,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: transparent;
         }
 
         .action-button {
@@ -229,16 +262,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .action-button:hover {
             background: var(--elpl-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
         }
 
         .action-button:disabled {
             background: var(--elpl-border);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .action-button img {
@@ -247,32 +285,15 @@
             object-fit: contain;
         }
 
-        /* Chat Input Area */
-        .chat-input-container {
-            width: 100%;
-            max-width: 700px;
-            position: relative;
-            padding: 10px 15px;
+        /* Footer Spacer */
+        .footer-spacer {
+            background: transparent;
         }
 
-        .chat-input {
-            width: 100%;
-            min-height: 40px;
-            max-height: 100px;
-            padding: 10px 15px;
-            border: 1px solid var(--elpl-border);
-            border-radius: var(--elpl-border-radius);
-            font-size: 16px;
-            line-height: 1.4;
-            resize: none;
-            overflow-y: auto;
-            background: var(--elpl-bg);
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--elpl-primary);
-            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
+        .footer-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .playbar, .chatbar {
@@ -287,28 +308,8 @@
             justify-content: center;
         }
 
-        .chat-input-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            width: 100%;
-            background: white;
-            border-radius: 8px;
-            padding: 0.5rem;
-        }
-
-        .chat-input {
-            flex: 1;
-            border: none;
-            padding: 0.5rem;
-            font-size: 1rem;
-            resize: none;
-            background: transparent;
-            min-height: 36px;
-        }
-
-        .chat-input:focus {
-            outline: none;
+        .playbar {
+            justify-content: flex-end;
         }
 
         .send-button, .next-button {
@@ -862,14 +863,12 @@
             </div>
         </main>
 
-        <footer class="client-footer" 
-                role="contentinfo"
-                data-test-id="footer">
+        <footer class="client-footer" role="contentinfo" data-test-id="footer">
             <div class="footer-content">
                 <!-- Left spacer -->
                 <div class="footer-spacer"></div>
                 
-                <!-- Center area - Chat input or empty -->
+                <!-- Center area - Chat input -->
                 <div class="footer-center">
                     <div id="chatbar" class="chat-input-container" hidden data-test-id="chatbar">
                         <textarea 
@@ -887,22 +886,10 @@
                     </div>
                 </div>
                 
-                <!-- Right action area - Next/Send button -->
+                <!-- Right action area - Send button -->
                 <div class="footer-action-area">
-                    <button id="next-button" 
-                            class="action-button next-button" 
-                            disabled 
-                            aria-label="Continue to chat"
-                            data-test-id="next-button">
-                        <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
-                             alt="Next" 
-                             class="button-icon"
-                             loading="lazy">
-                    </button>
-                    
                     <button id="send-button" 
                             class="action-button send-button" 
-                            hidden
                             aria-label="Send message"
                             data-test-id="send-button">
                         <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 

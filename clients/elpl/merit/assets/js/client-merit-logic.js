@@ -141,87 +141,76 @@ class MeritIntakeForm {
         console.log('Form submitted with data:', formData);
         
         // Switch to chat section immediately
-        this.switchToChat(true);
-    }
-
-    async switchToChat(isDirectTransition = false) {
-        // Update navigation state
-        const chatLink = document.querySelector('[data-section="chat"]');
-        const welcomeSection = document.querySelector('[data-section="welcome"]');
-        const chatSection = document.querySelector('[data-section="chat"]');
-        
-        if (chatLink && welcomeSection && chatSection) {
-            // Update navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-                link.removeAttribute('aria-current');
-            });
-            chatLink.classList.add('active');
-            chatLink.setAttribute('aria-current', 'page');
-
-            // Hide welcome, show chat
-            welcomeSection.classList.remove('active');
-            welcomeSection.hidden = true;
-            chatSection.classList.add('active');
-            chatSection.hidden = false;
-
-            // Update footer state
-            if (this.playbar && this.chatbar) {
-                this.playbar.hidden = true;
-                this.chatbar.hidden = false;
-            }
-
-            // Initialize chat if not already done
-            if (!this.chat) {
-                try {
-                    const ChatModule = await import('./client-merit-chat.js');
-                    this.chat = new ChatModule.default();
-                    console.log('Chat initialized successfully');
-                } catch (error) {
-                    console.error('Failed to initialize chat:', error);
-                    ErrorBoundary.handleError(error, 'Chat Initialization');
-                }
-            }
-        }
+        this.switchSection('chat');
     }
 
     handleNavigation(link, index) {
+        const targetSection = link.dataset.section;
+        
         // Only allow navigation to chat if form is completed
-        if (index === 1 && !this.form.checkValidity()) {
+        if (targetSection === 'chat' && !this.form.checkValidity()) {
             this.form.reportValidity();
             return;
         }
 
-        // Update navigation state
+        this.switchSection(targetSection);
+    }
+
+    switchSection(targetSection) {
+        // First, hide all sections and remove all active states
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+            section.hidden = true;
+        });
+        
         document.querySelectorAll('.nav-link').forEach(navLink => {
             navLink.classList.remove('active');
             navLink.removeAttribute('aria-current');
         });
 
-        link.classList.add('active');
-        link.setAttribute('aria-current', 'page');
+        // Then activate the target section
+        const targetSectionElement = document.querySelector(`[data-section="${targetSection}"]`);
+        const targetNavLink = document.querySelector(`.nav-link[data-section="${targetSection}"]`);
 
-        // Show correct section
-        const welcomeSection = document.querySelector('[data-section="welcome"]');
-        const chatSection = document.querySelector('[data-section="chat"]');
-        
-        if (welcomeSection && chatSection) {
-            if (index === 0) {
-                welcomeSection.classList.add('active');
-                welcomeSection.hidden = false;
-                chatSection.classList.remove('active');
-                chatSection.hidden = true;
-                
-                // Update footer state
-                if (this.playbar && this.chatbar) {
-                    this.playbar.hidden = false;
-                    this.chatbar.hidden = true;
-                }
-            } else if (index === 1) {
-                // Direct transition to chat without recursion
-                this.switchToChat(true);
+        if (targetSectionElement && targetNavLink) {
+            targetSectionElement.classList.add('active');
+            targetSectionElement.hidden = false;
+            targetNavLink.classList.add('active');
+            targetNavLink.setAttribute('aria-current', 'page');
+        }
+
+        // Update footer state
+        if (this.playbar && this.chatbar) {
+            const isChatSection = targetSection === 'chat';
+            this.playbar.hidden = isChatSection;
+            this.chatbar.hidden = !isChatSection;
+
+            // Ensure send button is visible in chat mode
+            const sendButton = document.getElementById('send-button');
+            if (sendButton) {
+                sendButton.hidden = !isChatSection;
             }
         }
+
+        // Initialize chat if needed
+        if (targetSection === 'chat' && !this.chat) {
+            this.initializeChat();
+        }
+    }
+
+    async initializeChat() {
+        try {
+            const ChatModule = await import('./client-merit-chat.js');
+            this.chat = new ChatModule.default();
+            console.log('Chat initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize chat:', error);
+            ErrorBoundary.handleError(error, 'Chat Initialization');
+        }
+    }
+
+    async switchToChat(isDirectTransition = false) {
+        this.switchSection('chat');
     }
 }
 
