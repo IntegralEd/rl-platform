@@ -106,11 +106,81 @@
         .client-footer {
             height: var(--footer-height);
             background: var(--primary-color);
-            color: white;
+            margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .footer-content {
+            max-width: var(--content-width);
+            margin: 0 auto;
+            height: 100%;
+            padding: 0 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: auto;
+        }
+
+        .chat-footer, .welcome-footer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            padding: 0.5rem;
+            font-size: 1rem;
+            resize: none;
+            background: transparent;
+        }
+
+        .chat-input:focus {
+            outline: none;
+        }
+
+        .send-button {
+            background: var(--accent-color);
+            border: none;
+            border-radius: 4px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background: var(--primary-color);
+        }
+
+        .send-button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        [hidden] {
+            display: none !important;
         }
 
         .form-group {
@@ -268,6 +338,186 @@
             .welcome-form {
                 padding: var(--client-spacing-small);
             }
+
+            .footer-content {
+                padding: 0 0.5rem;
+            }
+
+            .chat-input-container {
+                margin: 0.25rem;
+            }
+        }
+
+        /* Footer styles */
+        .page-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--footer-height, 80px);
+            background: var(--primary-color);
+            z-index: 100;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: var(--content-width, 800px);
+            padding: 0 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            min-height: 48px;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: none;
+            font-size: 1rem;
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .send-button, .next-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover, .next-button:hover {
+            background: var(--accent-color-hover);
+        }
+
+        .send-button img, .next-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .page-footer {
+                padding: 0.5rem;
+            }
+            
+            .chat-input-container {
+                padding: 0 0.5rem;
+            }
+        }
+
+        /* New interaction container styles */
+        .interaction-container {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            flex-shrink: 0;
+            background: var(--primary-color);
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .interaction-bar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .interaction-left, .interaction-right {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .interaction-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input-group {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .interaction-input {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: none;
+            background: white;
+            min-height: 36px;
+            box-sizing: border-box;
+        }
+
+        .interaction-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+        }
+
+        .interaction-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .interaction-button:not(:disabled):hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .interaction-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .interaction-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .interaction-button:not(:disabled):hover .interaction-icon {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
@@ -319,9 +569,53 @@
             </div>
         </main>
 
-        <footer class="client-footer">
-            Powered by Recursive Learning
-        </footer>
+        <div class="interaction-container">
+            <!-- Chatbar -->
+            <div class="interaction-bar chatbar" role="region" aria-label="Chat compose bar" style="display: none;">
+                <div class="interaction-left"></div>
+                <div class="interaction-center">
+                    <div class="chat-input-group">
+                        <label for="chat-input" class="sr-only">Type your message</label>
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            class="interaction-input" 
+                            placeholder="Type your message here…" 
+                            aria-label="Chat input field"
+                            onkeydown="handleKeyPress(event)" 
+                        />
+                    </div>
+                </div>
+                <div class="interaction-right">
+                    <button class="interaction-button send-button" onclick="sendMessage()" aria-label="Send message">
+                        <img 
+                            src="/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png" 
+                            class="interaction-icon" 
+                            alt="Send"
+                            onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Send'));" 
+                        />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Playbar -->
+            <div class="interaction-bar playbar" role="region" aria-label="Form navigation bar" style="display: flex;">
+                <div class="interaction-left"></div>
+                <div class="interaction-center">
+                    <!-- Could place instructions or next-step text here -->
+                </div>
+                <div class="interaction-right">
+                    <button class="interaction-button next-button" onclick="handleNextClick()" aria-label="Go to next step">
+                        <img 
+                            src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" 
+                            class="interaction-icon" 
+                            alt="Next"
+                            onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Next'));" 
+                        />
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="/shared/assets/js/component-loader.js"></script>
@@ -330,5 +624,55 @@
     <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
     <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
     <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show playbar by default, hide chatbar
+        document.querySelector('.playbar').style.display = 'flex';
+        document.querySelector('.chatbar').style.display = 'none';
+        
+        // Enable next button when form is valid
+        const form = document.querySelector('.welcome-form');
+        const nextButton = document.querySelector('.next-button');
+        
+        if (form && nextButton) {
+            form.addEventListener('change', function() {
+                nextButton.disabled = !form.checkValidity();
+            });
+        }
+    });
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function handleNextClick() {
+        const form = document.querySelector('.welcome-form');
+        if (form.checkValidity()) {
+            // Hide playbar, show chatbar
+            document.querySelector('.playbar').style.display = 'none';
+            document.querySelector('.chatbar').style.display = 'flex';
+            
+            // Switch to chat tab
+            document.querySelector('a[href="#welcome"]').classList.remove('active');
+            document.querySelector('a[href="#chat"]').classList.add('active');
+        } else {
+            form.reportValidity();
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+        
+        if (message) {
+            // TODO: Implement actual message sending
+            console.log('Sending message:', message);
+            input.value = '';
+        }
+    }
+    </script>
 </body>
 </html> 

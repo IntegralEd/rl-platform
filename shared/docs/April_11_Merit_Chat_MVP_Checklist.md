@@ -20,129 +20,25 @@ This document outlines the MVP requirements for implementing the Merit chat inte
   - [X] Proper asset paths
   - [X] Platform branding
 
-## Phase 1: UX Implementation
+## Phase 1: HTML Component Priority
+1.0 [X] Base HTML structure
+1.1 [T] Footer (chatbar/playbar) implementation
+1.2 [ ] Sidebar (tab navigation) implementation
+1.3 [ ] Content area structure
+1.4 [ ] Header standardization
 
-### Directory Structure Changes
-```bash
-# Current Structure
-/clients/elpl/
-  ├── assets/                    # Client-wide assets
-  │   ├── js/                   # Shared client JavaScript
-  │   │   ├── client-auth.js    # Client authentication (stays here)
-  │   │   └── client-router.js  # Client routing (stays here)
-  │   ├── css/                  # Client-wide styles (stays here)
-  │   └── images/              # Shared client images
-  └── merit/                    # Merit project directory
-      ├── assets/              # Merit-specific assets
-      │   ├── js/             # Merit JavaScript files
-      │   │   ├── client-merit-logic.js
-      │   │   ├── client-merit-chat.js
-      │   │   └── client-merit-form.js
-      │   ├── css/            # Merit-specific styles
-      │   └── images/         # Merit-specific images
-      └── merit.html
-```
+## Phase 1.5: Component Integration
+- [T] Footer/Chatbar
+  - [T] Playbar state
+  - [T] Chatbar state
+  - [T] State transitions
+  - [T] Mobile responsiveness
 
-### Asset Mapping Checklist
-- [ ] Move Merit-specific JS files to `/clients/elpl/merit/assets/js/`
-  - [ ] client-merit-logic.js
-  - [ ] client-merit-chat.js
-  - [ ] client-merit-form.js
-- [ ] Map all Merit-specific assets:
-  - [ ] Icons and SVGs
-    - [ ] noun-next-5654311-FFFFFF.svg
-    - [ ] noun-send-7149925-FFFFFF.png
-    - [ ] loading-indicator.svg
-    - [ ] error-icon.svg
-    - [ ] success-icon.svg
-  - [ ] UI Elements
-    - [ ] chat-bubble-bg.svg
-    - [ ] form-elements.svg
-    - [ ] button-states.svg
-  - [ ] Animations
-    - [ ] typing-indicator.svg
-    - [ ] transition-effects.svg
-
-### UX State Management
-- [ ] Responsive States
-  - [ ] Chat bar responsive layout
-  - [ ] Send button states (idle, loading, success, error)
-  - [ ] Form validation visual feedback
-  - [ ] Loading state animations
-  - [ ] Error state displays
-  - [ ] Success confirmations
-
-### Required Components
-1. User Intake Form
-   - [ ] Grade level selection (required)
-   - [ ] Curriculum input (required)
-   - [ ] Form validation
-   - [ ] Error handling
-   - [ ] Responsive layout
-
-2. Chat Interface
-   - [ ] Message input
-   - [ ] Send button with states
-   - [ ] Message history
-   - [ ] Loading states
-   - [ ] Responsive design
-
-3. Dynamic Footer
-   - [ ] Chat bar for interactive pages
-   - [ ] Playbar for content pages
-   - [ ] Responsive behavior
-
-### Critical UI Fixes (Priority Order)
-
-#### 1. Layout Structure Issues
-- [T] Add sidebar with tabs
-  - [X] Implement "Welcome" and "Chat" tabs
-  - [X] Style tabs according to design system
-  - [T] Add tab switching functionality
-  - [T] Ensure proper responsive behavior
-
-#### 2. Footer Implementation
-- [T] Add consistent footer div
-  - [T] Implement chatbar for chat tab
-  - [T] Implement playbar for welcome tab
-  - [T] Add proper positioning and styling
-  - [T] Ensure footer stays at bottom
-  - [T] Add dynamic switching based on active tab
-
-#### 3. Button Visibility and Styling
-- [X] Fix "Next" button visibility
-  - [X] Add proper background color (#211651)
-  - [X] Ensure icon is visible and properly sized
-  - [X] Add hover states
-- [T] Fix chat "Send" button visibility
-  - [T] Add proper background color (#211651)
-  - [T] Implement send icon from assets
-  - [T] Add hover and active states
-
-#### 4. Header and Branding
-- [X] Add logo to header
-  - [X] Implement proper logo sizing
-  - [X] Add correct positioning
-  - [X] Ensure responsive behavior
-- [X] Fix version display
-  - [X] Update version format to match spec
-  - [X] Add proper padding and positioning
-  - [X] Implement auto-updating time display
-
-#### 5. Color Scheme Corrections
-- [ ] Audit and fix color hues
-  - [ ] Update primary color to #211651
-  - [ ] Ensure consistent button colors
-  - [ ] Fix header background color
-  - [ ] Update text colors for contrast
-  - [ ] Verify hover state colors
-
-### Implementation Priority Order
-1. Layout Structure (Sidebar + Tabs)
-2. Footer Implementation
-3. Button Visibility
-4. Header and Logo
-5. Color Scheme
+- [ ] Sidebar/Navigation
+  - [ ] Tab structure
+  - [ ] State management
+  - [ ] Footer control
+  - [ ] Responsive behavior
 
 ## Phase 1.5: Rule Validation Infrastructure
 
