@@ -2,18 +2,23 @@
 
 class MeritIntakeForm {
     constructor() {
-        // Get form elements
-        this.form = document.querySelector('.welcome-form');
-        this.gradeLevelInput = document.getElementById('grade-level');
-        this.curriculumInput = document.getElementById('curriculum');
-        this.contentArea = document.querySelector('.content');
-        this.versionDisplay = document.querySelector('.version-display');
-        
-        // Initialize
-        this.setupEventListeners();
-        this.updateVersionTime(); // Initial update
-        setInterval(() => this.updateVersionTime(), 60000); // Update every minute
-        this.resetForm();
+        // Initialize with null checks
+        this.contentArea = document.querySelector('.content-area');
+        if (!this.contentArea) {
+            ErrorBoundary.handleError(new Error('Content area not found'), 'MeritIntakeForm');
+            return;
+        }
+
+        this.form = null;
+        this.gradeLevelInput = null;
+        this.curriculumInput = null;
+
+        // Initial form setup
+        try {
+            this.resetForm();
+        } catch (error) {
+            ErrorBoundary.handleError(error, 'MeritIntakeForm');
+        }
     }
 
     updateVersionTime() {
@@ -28,60 +33,71 @@ class MeritIntakeForm {
     }
 
     resetForm() {
-        // Clear any previous values
-        this.gradeLevelInput.value = '';
-        this.curriculumInput.value = '';
-        
-        // Ensure the form is visible
-        this.contentArea.innerHTML = `
-            <form class="welcome-form" role="form" aria-label="User intake form">
-                <div class="form-group">
-                    <label for="grade-level">What grade level do you teach?</label>
-                    <select 
-                        id="grade-level" 
-                        name="grade-level" 
-                        required
-                        aria-required="true"
-                        aria-label="Select your grade level"
-                    >
-                        <option value="">Select a grade level</option>
-                        <option value="Kindergarten">Kindergarten</option>
-                        <option value="Grade 1">Grade 1</option>
-                        <option value="Grade 2">Grade 2</option>
-                        <option value="Grade 3">Grade 3</option>
-                        <option value="Grade 4">Grade 4</option>
-                        <option value="Grade 5">Grade 5</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="curriculum">What curriculum do you use?</label>
-                    <input 
-                        type="text" 
-                        id="curriculum" 
-                        name="curriculum" 
-                        required
-                        aria-required="true"
-                        aria-label="Enter your curriculum"
-                        placeholder="Enter your curriculum"
-                    >
-                </div>
-                
-                <div class="form-actions">
-                    <button 
-                        type="submit" 
-                        class="next-button" 
-                        aria-label="Submit form and proceed to chat"
-                    >Next</button>
-                </div>
-            </form>
-        `;
-        
-        // Re-initialize form elements and listeners
-        this.form = document.querySelector('.welcome-form');
-        this.gradeLevelInput = document.getElementById('grade-level');
-        this.curriculumInput = document.getElementById('curriculum');
-        this.setupEventListeners();
+        if (!this.contentArea) return;
+
+        try {
+            // Clear any previous values if they exist
+            if (this.gradeLevelInput) this.gradeLevelInput.value = '';
+            if (this.curriculumInput) this.curriculumInput.value = '';
+            
+            // Update content area with form HTML
+            this.contentArea.innerHTML = `
+                <form class="welcome-form" role="form" aria-label="User intake form">
+                    <div class="form-group">
+                        <label for="grade-level">What grade level do you teach?</label>
+                        <select 
+                            id="grade-level" 
+                            name="grade-level" 
+                            required
+                            aria-required="true"
+                            aria-label="Select your grade level"
+                        >
+                            <option value="">Select a grade level</option>
+                            <option value="Kindergarten">Kindergarten</option>
+                            <option value="Grade 1">Grade 1</option>
+                            <option value="Grade 2">Grade 2</option>
+                            <option value="Grade 3">Grade 3</option>
+                            <option value="Grade 4">Grade 4</option>
+                            <option value="Grade 5">Grade 5</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="curriculum">What curriculum do you use?</label>
+                        <input 
+                            type="text" 
+                            id="curriculum" 
+                            name="curriculum" 
+                            required
+                            aria-required="true"
+                            aria-label="Enter your curriculum"
+                            placeholder="Enter your curriculum"
+                        >
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button 
+                            type="submit" 
+                            class="next-button" 
+                            aria-label="Submit form and proceed to chat"
+                        >Next</button>
+                    </div>
+                </form>
+            `;
+            
+            // Re-initialize form elements with null checks
+            this.form = document.querySelector('.welcome-form');
+            this.gradeLevelInput = document.getElementById('grade-level');
+            this.curriculumInput = document.getElementById('curriculum');
+
+            if (!this.form || !this.gradeLevelInput || !this.curriculumInput) {
+                throw new Error('Failed to initialize form elements');
+            }
+
+            this.setupEventListeners();
+        } catch (error) {
+            ErrorBoundary.handleError(error, 'MeritIntakeForm.resetForm');
+        }
     }
 
     setupEventListeners() {
@@ -209,94 +225,135 @@ class ErrorBoundary {
 
 class MeritPage {
     constructor() {
-        this.chatFooter = document.querySelector('.chat-footer');
-        this.welcomeFooter = document.querySelector('.welcome-footer');
-        this.chatInput = document.querySelector('.chat-input');
-        this.sendButton = document.querySelector('.send-button');
-        this.nextButton = document.querySelector('.next-button');
+        this.sidebar = document.getElementById('sidebar');
+        this.sidebarToggle = document.getElementById('sidebarToggle');
+        this.isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         
+        this.initializeSidebar();
         this.setupEventListeners();
-        this.showWelcomeFooter();
     }
-
+    
+    initializeSidebar() {
+        // Set initial state from localStorage
+        if (this.isCollapsed) {
+            this.sidebar.classList.remove('expanded');
+            this.sidebarToggle.setAttribute('aria-expanded', 'false');
+        } else {
+            this.sidebar.classList.add('expanded');
+            this.sidebarToggle.setAttribute('aria-expanded', 'true');
+        }
+    }
+    
     setupEventListeners() {
-        // Chat input handlers
-        this.chatInput?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.handleSendMessage();
+        // Toggle sidebar on button click
+        this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        
+        // Close sidebar on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !this.isCollapsed) {
+                this.toggleSidebar();
             }
         });
-
-        this.sendButton?.addEventListener('click', () => {
-            this.handleSendMessage();
-        });
-
-        // Next button handler
-        this.nextButton?.addEventListener('click', () => {
-            this.handleNextStep();
-        });
-
-        // Auto-resize textarea
-        this.chatInput?.addEventListener('input', () => {
-            this.chatInput.style.height = 'auto';
-            this.chatInput.style.height = this.chatInput.scrollHeight + 'px';
+        
+        // Handle navigation link clicks
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Close sidebar on mobile after navigation
+                if (window.innerWidth <= 768) {
+                    this.toggleSidebar();
+                }
+            });
         });
     }
-
-    showChatFooter() {
-        if (this.chatFooter && this.welcomeFooter) {
-            this.chatFooter.style.display = 'block';
-            this.welcomeFooter.style.display = 'none';
-            this.chatInput?.focus();
-        }
-    }
-
-    showWelcomeFooter() {
-        if (this.chatFooter && this.welcomeFooter) {
-            this.chatFooter.style.display = 'none';
-            this.welcomeFooter.style.display = 'block';
-        }
-    }
-
-    handleSendMessage() {
-        const message = this.chatInput?.value.trim();
-        if (!message) return;
-
-        // Add message to chat
-        this.addMessageToChat(message, 'user');
-        
-        // Clear input and reset height
-        this.chatInput.value = '';
-        this.chatInput.style.height = 'auto';
-        
-        // TODO: Send message to server
-        // For now, just show a placeholder response
-        setTimeout(() => {
-            this.addMessageToChat('Thank you for your message. I am processing your request...', 'assistant');
-        }, 1000);
-    }
-
-    handleNextStep() {
-        // TODO: Implement next step logic
-        this.showChatFooter();
-    }
-
-    addMessageToChat(message, sender) {
-        const chatContainer = document.querySelector('.chat-container');
-        if (!chatContainer) return;
-
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('chat-message', `${sender}-message`);
-        messageElement.textContent = message;
-        chatContainer.appendChild(messageElement);
-        
-        // Scroll to bottom
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    toggleSidebar() {
+        this.isCollapsed = !this.isCollapsed;
+        this.sidebar.classList.toggle('expanded');
+        this.sidebarToggle.setAttribute('aria-expanded', !this.isCollapsed);
+        localStorage.setItem('sidebarCollapsed', this.isCollapsed);
     }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new MeritPage();
+});
+
+class SidebarManager {
+    constructor() {
+        this.sidebar = document.querySelector('#sidebar');
+        this.toggle = document.querySelector('#sidebar-toggle');
+        this.content = document.querySelector('.client-content');
+        
+        if (!this.sidebar || !this.toggle || !this.content) {
+            ErrorBoundary.handleError(new Error('Sidebar elements not found'), 'SidebarManager');
+            return;
+        }
+
+        this.isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        this.setupEventListeners();
+        this.applyInitialState();
+    }
+
+    setupEventListeners() {
+        this.toggle.addEventListener('click', () => this.toggleSidebar());
+        window.addEventListener('resize', () => this.handleResize());
+    }
+
+    applyInitialState() {
+        try {
+            if (this.isCollapsed) {
+                this.content.classList.add('sidebar-collapsed');
+                this.updateToggleIcon(true);
+            }
+            this.announceState();
+        } catch (error) {
+            ErrorBoundary.handleError(error, 'SidebarManager.applyInitialState');
+        }
+    }
+
+    toggleSidebar() {
+        try {
+            this.isCollapsed = this.content.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', this.isCollapsed);
+            this.updateToggleIcon(this.isCollapsed);
+            this.announceState();
+        } catch (error) {
+            ErrorBoundary.handleError(error, 'SidebarManager.toggleSidebar');
+        }
+    }
+
+    updateToggleIcon(collapsed) {
+        const icon = this.toggle.querySelector('.toggle-icon');
+        if (icon) {
+            icon.style.transform = collapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+    }
+
+    announceState() {
+        const announcement = this.isCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
+        const announcer = document.createElement('div');
+        announcer.setAttribute('role', 'status');
+        announcer.setAttribute('aria-live', 'polite');
+        announcer.className = 'sr-only';
+        announcer.textContent = announcement;
+        document.body.appendChild(announcer);
+        setTimeout(() => announcer.remove(), 1000);
+    }
+
+    handleResize() {
+        // Add responsive behavior if needed
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && !this.isCollapsed) {
+            this.toggleSidebar();
+        }
+    }
+}
+
+// Initialize sidebar manager
+document.addEventListener('DOMContentLoaded', () => {
+    new SidebarManager();
 }); 

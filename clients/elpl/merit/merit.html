@@ -586,122 +586,108 @@
             width: 0;
             opacity: 0;
         }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: var(--header-height);
+            bottom: var(--footer-height);
+            width: 250px;
+            background: var(--background-color);
+            border-right: 1px solid var(--border-color);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar.expanded {
+            transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+            z-index: 101;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--accent-color);
+        }
+
+        .sidebar-nav {
+            padding: 20px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="client-layout">
-        <header class="client-header">
+        <header class="page-header">
             <h1>Merit</h1>
-            <img src="/clients/elpl/assets/images/lockup_white_logo.png" alt="ELPL Merit" class="logo">
-            <span class="version">v1.0.0 (13:22)</span>
         </header>
-
-        <main class="client-content">
-            <div class="main-content">
-                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
-                    <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" 
-                         alt="Toggle sidebar" 
-                         class="toggle-icon"
-                         style="transform: rotate(180deg);">
-                </button>
-                <div id="sidebar">
-                    <nav class="client-nav">
-                        <a href="#welcome" class="active">Welcome</a>
-                        <a href="#chat">Chat</a>
-                    </nav>
-                </div>
-
-                <div class="content-area">
-                    <form class="welcome-form">
-                        <div class="form-group">
-                            <label for="grade-level">What grade level do you teach?</label>
-                            <select id="grade-level" class="form-control" required>
-                                <option value="">Select a grade level</option>
-                                <option value="k">Kindergarten</option>
-                                <option value="1">1st Grade</option>
-                                <option value="2">2nd Grade</option>
-                                <option value="3">3rd Grade</option>
-                                <option value="4">4th Grade</option>
-                                <option value="5">5th Grade</option>
-                                <option value="6">6th Grade</option>
-                                <option value="7">7th Grade</option>
-                                <option value="8">8th Grade</option>
-                                <option value="9">9th Grade</option>
-                                <option value="10">10th Grade</option>
-                                <option value="11">11th Grade</option>
-                                <option value="12">12th Grade</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="curriculum">What curriculum do you use?</label>
-                            <input type="text" id="curriculum" class="form-control" placeholder="Enter your curriculum" required>
-                        </div>
-
-                        <button type="submit" class="btn-next">
-                            Next
-                            <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next">
-                        </button>
-                    </form>
-                </div>
+        
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <a href="#welcome" class="active">Welcome</a>
+                <a href="#chat">Chat</a>
+                <a href="#settings">Settings</a>
+            </nav>
+        </aside>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation" aria-expanded="false">
+            <span class="icon">☰</span>
+        </button>
+        
+        <main class="content-area">
+            <div class="content-area" role="main">
+                <!-- Form will be injected here by MeritIntakeForm -->
             </div>
         </main>
-
-        <div class="interaction-container">
-            <!-- Chatbar -->
-            <div class="interaction-bar chatbar" role="region" aria-label="Chat compose bar" style="display: none;">
-                <div class="interaction-left"></div>
-                <div class="interaction-center">
-                    <div class="chat-input-group">
-                        <label for="chat-input" class="sr-only">Type your message</label>
-                        <input 
-                            type="text" 
-                            id="chat-input" 
-                            class="interaction-input" 
-                            placeholder="Type your message here…" 
-                            aria-label="Chat input field"
-                            onkeydown="handleKeyPress(event)" 
-                        />
-                    </div>
-                </div>
-                <div class="interaction-right">
-                    <button class="interaction-button send-button" onclick="sendMessage()" aria-label="Send message">
-                        <img 
-                            src="/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png" 
-                            class="interaction-icon" 
-                            alt="Send"
-                            onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Send'));" 
-                        />
-                    </button>
-                </div>
+        
+        <footer class="client-footer">
+            <div class="interaction-bar playbar">
+                <button class="next-button" onclick="handleNextClick()">Next</button>
             </div>
-
-            <!-- Playbar -->
-            <div class="interaction-bar playbar" role="region" aria-label="Form navigation bar" style="display: flex;">
-                <div class="interaction-left"></div>
-                <div class="interaction-center">
-                    <!-- Could place instructions or next-step text here -->
-                </div>
-                <div class="interaction-right">
-                    <button class="interaction-button next-button" onclick="handleNextClick()" aria-label="Go to next step">
-                        <img 
-                            src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" 
-                            class="interaction-icon" 
-                            alt="Next"
-                            onerror="this.style.display='none'; this.parentElement.appendChild(document.createTextNode('Next'));" 
-                        />
-                    </button>
-                </div>
+            <div class="interaction-bar chatbar">
+                <textarea id="chat-input" onkeypress="handleKeyPress(event)" placeholder="Type your message..."></textarea>
+                <button onclick="sendMessage()">Send</button>
             </div>
-        </div>
+        </footer>
     </div>
 
-    <script type="module" src="/clients/elpl/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/auth.js"></script>
-    <script type="module" src="/shared/assets/js/url-resolver.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
-    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
+    <script type="module" src="../assets/js/client-component-loader.js"></script>
+    <script type="module" src="../../shared/assets/js/auth.js"></script>
+    <script type="module" src="../../shared/assets/js/url-resolver.js"></script>
+    <script type="module" src="assets/js/client-merit-form.js"></script>
+    <script type="module" src="assets/js/client-merit-chat.js"></script>
+    <script type="module" src="assets/js/client-merit-logic.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Show playbar by default, hide chatbar
@@ -720,7 +706,7 @@
 
         // Initialize sidebar state
         const mainContent = document.querySelector('.main-content');
-        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarToggle = document.getElementById('sidebarToggle');
         const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         
         console.log(`Initial sidebar state: ${isCollapsed ? 'collapsed' : 'expanded'}`);
