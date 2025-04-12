@@ -21,17 +21,34 @@ This document outlines the MVP requirements for implementing the Merit chat inte
   - [X] Platform branding
 
 ## Phase 1: HTML Component Priority
-1.0 [X] Base HTML structure
-1.1 [T] Footer (chatbar/playbar) implementation
-1.2 [ ] Sidebar (tab navigation) implementation
-1.3 [ ] Content area structure
-   - [T] Main content area (70% viewport width, centered)
-   - [T] Form container (max-width 800px, responsive padding)
-   - [T] Chat window (flex-grow with scrollable overflow)
-   - [T] Message bubbles (max-width 70% of container)
-   - [ ] Loading states and transitions
-   - [ ] Error message displays
-1.4 [ ] Header standardization
+1.0 [✓] Base HTML structure
+   - Implemented standard grid layout
+   - Added semantic HTML structure
+   - Proper ARIA attributes in place
+   
+1.1 [✓] Footer (chatbar/playbar) implementation
+   - Chat input container with proper styling
+   - Send button with hover states
+   - Smooth transitions between states
+   
+1.2 [T] Sidebar (tab navigation) implementation
+   - Basic structure in place
+   - Navigation links styled
+   - Pending: Toggle functionality
+   
+1.3 [T] Content area structure
+   - [✓] Main content area (70% viewport width, centered)
+   - [✓] Form container (max-width 800px, responsive padding)
+   - [✓] Chat window (flex-grow with scrollable overflow)
+   - [✓] Message bubbles (max-width 70% of container)
+   - [T] Loading states and transitions
+   - [T] Error message displays
+
+1.4 [✓] Header standardization
+   - Fixed height (60px)
+   - Logo placement
+   - Version display
+   - Consistent styling
 
 ## Layout Specifications
 
@@ -123,28 +140,56 @@ This document outlines the MVP requirements for implementing the Merit chat inte
   - Transition: 300ms ease-in-out
   - Persistence: Saves state to localStorage
 
-### Current Implementation Status [T]
-- [T] Basic structure implemented
-- [T] Header/footer fixed positioning
-- [T] Content area responsiveness
-- [T] Chat/play bar transitions
-- [ ] Full responsive testing
-- [ ] Accessibility audit
-- [ ] Performance optimization
+### Current Implementation Status [Updated April 11 @920pmvx]
 
-### Interaction Patterns
-- Tab Navigation:
-  - Enter/Space to activate
-  - Arrow keys for movement
-  - Escape to close overlays
-- Form Flow:
-  - Tab through fields
-  - Enter to submit
-  - Validation feedback
-- Chat Interface:
-  - Enter to send
-  - Shift+Enter for new line
-  - Arrow keys for history
+### Style Implementation Findings
+1. ELPL-Specific Variables [✓]
+   ```css
+   --elpl-primary: #c6123f;    /* EL Education Crimson */
+   --elpl-secondary: #211651;  /* Dark Navy */
+   --elpl-tertiary: #ffa409;   /* CTA Orange */
+   --elpl-card-padding: var(--space-lg);
+   --elpl-icon-size: 48px;
+   --elpl-border-radius: 12px;
+   ```
+
+2. Component Classes [✓]
+   - `.elpl-card`: Standard card component
+   - `.elpl-callout`: Information callouts
+   - `.elpl-button`: Primary action buttons
+   - `.elpl-heading`: Section headings
+
+3. Chat Interface [T]
+   - Message styling complete
+   - Typing indicators implemented
+   - Pending: Loading states
+   - Pending: Error states
+
+4. Accessibility [T]
+   - High contrast mode implemented
+   - Font scaling supported
+   - Pending: Full keyboard navigation
+   - Pending: Screen reader testing
+
+### Next Priority Items
+1. [ ] Complete sidebar toggle functionality
+2. [ ] Implement loading states for chat
+3. [ ] Add error handling UI
+4. [ ] Finish keyboard navigation
+5. [ ] Test responsive breakpoints
+
+### Standards Compliance
+- [✓] Following ELPL naming conventions
+- [✓] Using established color palette
+- [✓] Proper component structure
+- [T] Accessibility requirements
+- [T] Responsive design patterns
+
+### Performance Metrics
+- [✓] CSS Variables properly scoped
+- [✓] Animations optimized
+- [T] Layout shift minimized
+- [T] Asset loading optimized
 
 ## Phase 1.5: Component Integration
 - [T] Footer/Chatbar
@@ -769,812 +814,81 @@ For questions or issues:
 - Platform Architecture Team
 - QA Team Lead 
 
-## Implementation Notes
-
-### Asset Organization Rules
-1. **Project-Specific Assets**
-   - Must be located in project directory: `/clients/{client}/{project}/assets/`
-   - Includes project-specific JS, images, and CSS
-   - Example: Merit chat interface assets
-
-2. **Client-Wide Assets**
-   - Must be in client assets directory: `/clients/{client}/assets/`
-   - Includes shared functionality like auth and routing
-   - Example: Client authentication, global styles
-
-3. **Shared Assets**
-   - Must be in shared directory: `/shared/assets/`
-   - Used across multiple clients
-   - Example: Common components, utilities
-
-### JavaScript Organization
-1. **Project-Specific JS**
-   - Location: `/clients/{client}/{project}/assets/js/`
-   - Naming: `client-{project}-{feature}.js`
-   - Example: `client-merit-logic.js`
-
-2. **Client-Level JS**
-   - Location: `/clients/{client}/assets/js/`
-   - Naming: `client-{feature}.js`
-   - Example: `client-auth.js`
-
-3. **Shared JS**
-   - Location: `/shared/assets/js/`
-   - Naming: `{feature}.js`
-   - Example: `component-loader.js` 
-
-## Directory Structure Rules Clarification
-
-### Page-Specific Files
-- Page-specific JavaScript files MUST stay with their HTML page:
-  ```
-  /clients/elpl/merit/
-    ├── merit.html
-    └── assets/
-        └── js/
-            └── client-merit-logic.js  # Controls merit.html specifically
-  ```
-
-### Shared Client Assets
-- Shared assets used across multiple pages go in client assets:
-  ```
-  /clients/elpl/assets/  # Shared across all ELPL pages
-    ├── js/             # Shared JavaScript (auth, routing, etc)
-    ├── css/            # Shared styles
-    ├── images/         # Shared images, icons, SVGs
-    └── variables.css   # Client-wide variables
-  ``` 
-
-## Phase 2.5: Rule Validation & Page Tree Templating
-
-### Husky Git Hooks Setup
-- [ ] Install and configure Husky
-  ```bash
-  npm install husky --save-dev
-  npx husky install
-  ```
-- [ ] Create hook structure
-  ```bash
-  .husky/
-    ├── pre-commit                    # Main hook runner
-    ├── scripts/
-    │   ├── check-rules.js           # Rule validation
-    │   ├── lint-rules.js            # Rule file linting
-    │   ├── enforce-structure.js      # Directory structure
-    │   └── template-tools/          # Page templating tools
-    │       ├── create-page-tree.js  # Page tree generator
-    │       └── validate-tree.js     # Tree structure checker
-    ```
-
-### Page Tree Templating Script
-```javascript
-// .husky/scripts/template-tools/create-page-tree.js
-
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-
-const PAGE_VARIANTS = ['admin', 'review', 'live', 'temp'];
-const REQUIRED_STRUCTURE = {
-  assets: {
-    js: ['client-{page}-logic.js'],
-    css: ['{page}-theme.css'],
-    images: []
-  }
-};
-
-async function createPageTree(sourcePage, targetName, clientId) {
-  const sourceDir = path.dirname(sourcePage);
-  const pageName = path.basename(sourcePage, '.html');
-  
-  // Create base directories for each variant
-  for (const variant of PAGE_VARIANTS) {
-    const targetPath = path.join(
-      'clients',
-      clientId,
-      targetName,
-      `${targetName}-${variant}`
-    );
-
-    // Create directory structure
-    execSync(`mkdir -p ${targetPath}/assets/{js,css,images}`);
-
-    // Copy and rename files
-    for (const [dir, files] of Object.entries(REQUIRED_STRUCTURE)) {
-      for (const file of files) {
-        const sourceFile = path.join(
-          sourceDir,
-          'assets',
-          dir,
-          file.replace('{page}', pageName)
-        );
-        const targetFile = path.join(
-          targetPath,
-          'assets',
-          dir,
-          file.replace('{page}', `${targetName}-${variant}`)
-        );
-        
-        if (fs.existsSync(sourceFile)) {
-          // Copy and rename file
-          fs.copyFileSync(sourceFile, targetFile);
-          
-          // Update imports and references in the file
-          let content = fs.readFileSync(targetFile, 'utf8');
-          content = content.replace(
-            new RegExp(pageName, 'g'),
-            `${targetName}-${variant}`
-          );
-          fs.writeFileSync(targetFile, content);
-        }
-      }
-    }
-
-    // Copy and modify HTML
-    const targetHtml = path.join(targetPath, `${targetName}-${variant}.html`);
-    let htmlContent = fs.readFileSync(sourcePage, 'utf8');
-    
-    // Update paths and references
-    htmlContent = htmlContent
-      .replace(
-        new RegExp(`/${clientId}/${pageName}/`, 'g'),
-        `/${clientId}/${targetName}/${targetName}-${variant}/`
-      )
-      .replace(
-        new RegExp(pageName, 'g'),
-        `${targetName}-${variant}`
-      );
-    
-    fs.writeFileSync(targetHtml, htmlContent);
-  }
-
-  // Create shared assets at client level if they don't exist
-  const sharedAssetPath = path.join('clients', clientId, 'assets');
-  execSync(`mkdir -p ${sharedAssetPath}/{js,css,images}`);
-
-  console.log(`
-✅ Created page tree for ${targetName}:
-   - Admin:  clients/${clientId}/${targetName}/${targetName}-admin
-   - Review: clients/${clientId}/${targetName}/${targetName}-review
-   - Live:   clients/${clientId}/${targetName}/${targetName}-live
-   - Temp:   clients/${clientId}/${targetName}/${targetName}-temp
-  `);
-}
-
-// Example usage:
-// node create-page-tree.js \
-//   clients/elpl/merit/merit.html \
-//   goalsetter \
-//   elpl
-```
-
-### Rule Validation Implementation
-- [ ] Basic Rule Checking
-  - [ ] Parse MDC frontmatter
-  - [ ] Match files against globs
-  - [ ] Log validation attempts
-  - [ ] Report violations
-
-- [ ] Directory Structure Validation
-  - [ ] Verify page-specific JS location
-  - [ ] Check shared asset placement
-  - [ ] Validate file naming conventions
-  - [ ] Ensure proper imports
-
-- [ ] Style Rule Validation
-  - [ ] Check CSS variable usage
-  - [ ] Verify color values
-  - [ ] Validate layout structure
-  - [ ] Check responsive patterns
-
-### Usage Example
-```bash
-# Create new page tree from merit template
-node .husky/scripts/template-tools/create-page-tree.js \
-  clients/elpl/merit/merit.html \
-  goalsetter \
-  elpl
-
-# This creates:
-clients/elpl/goalsetter/
-  ├── goalsetter-admin/
-  │   ├── goalsetter-admin.html
-  │   └── assets/
-  │       ├── js/
-  │       │   └── client-goalsetter-admin-logic.js
-  │       ├── css/
-  │       │   └── goalsetter-admin-theme.css
-  │       └── images/
-  ├── goalsetter-review/
-  ├── goalsetter-live/
-  └── goalsetter-temp/
-``` 
-
-## Phase 3: Admin & Review Implementation
-
-### Merit Review Page (merit-review.html)
-- [ ] Qipu Comment System Integration
-  - [ ] Add iframe wrapper over merit.html
-  - [ ] Implement footer comment bar
-  - [ ] Add user type switching (IE_All_Users range)
-  - [ ] Integrate screenshot functionality
-  - [ ] Add comment persistence
-  - [ ] Implement IE_Central_Team access controls
-
-### Merit Admin Page (merit-admin.html)
-- [ ] Admin Interface Implementation
-  - [ ] Create admin layout structure
-  - [ ] Add configuration panels
-  - [ ] Implement user management
-  - [ ] Add analytics dashboard
-  - [ ] Create logging interface
-
-### Qipu Comment System
-- [ ] Core Comment Features
-  - [ ] Comment creation and editing
-  - [ ] Screenshot attachment
-  - [ ] User type context
-  - [ ] Thread management
-  - [ ] Notification system
-
-### Admin Features
-- [ ] User Management
-  - [ ] Role assignment
-  - [ ] Access control
-  - [ ] Usage tracking
-  - [ ] Activity logs
-- [ ] Configuration
-  - [ ] System settings
-  - [ ] Feature toggles
-  - [ ] Integration settings
-  - [ ] Backup/restore
-
-### Testing Requirements
-- [T] Review Interface
-  - [T] iframe responsiveness
-  - [T] Comment functionality
-  - [T] Screenshot capture
-  - [T] User type switching
-- [T] Admin Interface
-  - [T] Configuration persistence
-  - [T] User management
-  - [T] Analytics accuracy
-  - [T] Log completeness 
-
-## Phase 4: Platform Form Enhancement
-
-### Curious Form Migration
-- [ ] Import styled form from frontend repo
-  - [ ] Match platform typography
-  - [ ] Implement platform color scheme
-  - [ ] Add responsive breakpoints
-  - [ ] Ensure accessibility compliance
-
-### Form Components
-- [ ] Input field styling
-  - [ ] Text inputs with floating labels
-  - [ ] Dropdown with custom styling
-  - [ ] Checkbox and radio components
-  - [ ] Error state visualization
-
-### Animation & Interaction
-- [ ] Add micro-interactions
-  - [ ] Field focus states
-  - [ ] Button hover effects
-  - [ ] Form submission feedback
-  - [ ] Loading states
-
-### Validation & Feedback
-- [ ] Client-side validation
-  - [ ] Real-time field validation
-  - [ ] Custom error messages
-  - [ ] Form completion check
-  - [ ] Success state handling
-
-## Next T Review Items to Check
-1. Chat Interface Progress
-   - [ ] Message display implementation
-   - [ ] Chat container styling
-   - [ ] Loading state indicators
-   - [ ] Error handling
-
-2. Form Integration
-   - [ ] Grade level selection working
-   - [ ] Curriculum input validation
-   - [ ] Form submission flow
-   - [ ] Transition animations
-
-3. Navigation
-   - [ ] Tab switching functionality
-   - [ ] State preservation
-   - [ ] URL handling
-   - [ ] History management
-
-4. Error Boundaries
-   - [ ] Component error catching
-   - [ ] Fallback UI implementation
-   - [ ] Error reporting
-   - [ ] Recovery options
-
-## Phase 5: Analytics & Monitoring
-
-### Usage Tracking
-- [ ] Implement form analytics
-  - [ ] Track completion rates
-  - [ ] Monitor drop-off points
-  - [ ] Capture user paths
-  - [ ] Measure response times
-
-### Performance Metrics
-- [ ] Monitor load times
-  - [ ] Asset loading
-  - [ ] API response times
-  - [ ] Client-side rendering
-  - [ ] Cache effectiveness
-
-### Error Tracking
-- [ ] Set up error logging
-  - [ ] Client-side errors
-  - [ ] API failures
-  - [ ] Validation issues
-  - [ ] Performance problems
-
-## Phase 6: A/B Testing Infrastructure
-
-### Test Framework
-- [ ] Set up testing infrastructure
-  - [ ] Version control
-  - [ ] Feature flags
-  - [ ] User segmentation
-  - [ ] Analytics integration
-
-### Test Cases
-- [ ] Define initial tests
-  - [ ] Form layout variants
-  - [ ] CTA messaging
-  - [ ] Button placement
-  - [ ] Color schemes
-
-## Next Steps (Priority Order)
-1. Chat Interface Implementation
-   - [ ] Initialize chat container
-   - [ ] Add message display
-   - [ ] Implement typing indicators
-   - [ ] Add loading states
-
-2. Form Submission Flow
-   - [ ] Add form validation
-   - [ ] Implement submission handling
-   - [ ] Add success/error states
-   - [ ] Handle transition to chat
-
-3. State Management
-   - [ ] Implement tab state persistence
-   - [ ] Add form data caching
-   - [ ] Handle chat history
-   - [ ] Manage loading states
-
-4. Testing & Validation
-   - [ ] Test form submission
-   - [ ] Validate chat functionality
-   - [ ] Check responsive design
-   - [ ] Verify accessibility
-
-## Notes
-- [x] Reorganized directory structure following client layout rules
-- [x] Moved shared assets to client-wide directory
-- [x] Updated assistant ID to use file search enabled version
-- [x] Modularized JavaScript into separate components
-- [x] Using existing CSS files (no new files needed)
-- [x] Updated HTML to use correct CSS paths
-
-## Contact
-For questions or issues:
-- Frontend Team Lead
-- Platform Architecture Team
-- QA Team Lead 
-
-## Implementation Notes
-
-### Asset Organization Rules
-1. **Project-Specific Assets**
-   - Must be located in project directory: `/clients/{client}/{project}/assets/`
-   - Includes project-specific JS, images, and CSS
-   - Example: Merit chat interface assets
-
-2. **Client-Wide Assets**
-   - Must be in client assets directory: `/clients/{client}/assets/`
-   - Includes shared functionality like auth and routing
-   - Example: Client authentication, global styles
-
-3. **Shared Assets**
-   - Must be in shared directory: `/shared/assets/`
-   - Used across multiple clients
-   - Example: Common components, utilities
-
-### JavaScript Organization
-1. **Project-Specific JS**
-   - Location: `/clients/{client}/{project}/assets/js/`
-   - Naming: `client-{project}-{feature}.js`
-   - Example: `client-merit-logic.js`
-
-2. **Client-Level JS**
-   - Location: `/clients/{client}/assets/js/`
-   - Naming: `client-{feature}.js`
-   - Example: `client-auth.js`
-
-3. **Shared JS**
-   - Location: `/shared/assets/js/`
-   - Naming: `{feature}.js`
-   - Example: `component-loader.js` 
-
-## Directory Structure Rules Clarification
-
-### Page-Specific Files
-- Page-specific JavaScript files MUST stay with their HTML page:
-  ```
-  /clients/elpl/merit/
-    ├── merit.html
-    └── assets/
-        └── js/
-            └── client-merit-logic.js  # Controls merit.html specifically
-  ```
-
-### Shared Client Assets
-- Shared assets used across multiple pages go in client assets:
-  ```
-  /clients/elpl/assets/  # Shared across all ELPL pages
-    ├── js/             # Shared JavaScript (auth, routing, etc)
-    ├── css/            # Shared styles
-    ├── images/         # Shared images, icons, SVGs
-    └── variables.css   # Client-wide variables
-  ``` 
-
-## Phase 2.5: Rule Validation & Page Tree Templating
-
-### Husky Git Hooks Setup
-- [ ] Install and configure Husky
-  ```bash
-  npm install husky --save-dev
-  npx husky install
-  ```
-- [ ] Create hook structure
-  ```bash
-  .husky/
-    ├── pre-commit                    # Main hook runner
-    ├── scripts/
-    │   ├── check-rules.js           # Rule validation
-    │   ├── lint-rules.js            # Rule file linting
-    │   ├── enforce-structure.js      # Directory structure
-    │   └── template-tools/          # Page templating tools
-    │       ├── create-page-tree.js  # Page tree generator
-    │       └── validate-tree.js     # Tree structure checker
-    ```
-
-### Page Tree Templating Script
-```javascript
-// .husky/scripts/template-tools/create-page-tree.js
-
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-
-const PAGE_VARIANTS = ['admin', 'review', 'live', 'temp'];
-const REQUIRED_STRUCTURE = {
-  assets: {
-    js: ['client-{page}-logic.js'],
-    css: ['{page}-theme.css'],
-    images: []
-  }
-};
-
-async function createPageTree(sourcePage, targetName, clientId) {
-  const sourceDir = path.dirname(sourcePage);
-  const pageName = path.basename(sourcePage, '.html');
-  
-  // Create base directories for each variant
-  for (const variant of PAGE_VARIANTS) {
-    const targetPath = path.join(
-      'clients',
-      clientId,
-      targetName,
-      `${targetName}-${variant}`
-    );
-
-    // Create directory structure
-    execSync(`mkdir -p ${targetPath}/assets/{js,css,images}`);
-
-    // Copy and rename files
-    for (const [dir, files] of Object.entries(REQUIRED_STRUCTURE)) {
-      for (const file of files) {
-        const sourceFile = path.join(
-          sourceDir,
-          'assets',
-          dir,
-          file.replace('{page}', pageName)
-        );
-        const targetFile = path.join(
-          targetPath,
-          'assets',
-          dir,
-          file.replace('{page}', `${targetName}-${variant}`)
-        );
-        
-        if (fs.existsSync(sourceFile)) {
-          // Copy and rename file
-          fs.copyFileSync(sourceFile, targetFile);
-          
-          // Update imports and references in the file
-          let content = fs.readFileSync(targetFile, 'utf8');
-          content = content.replace(
-            new RegExp(pageName, 'g'),
-            `${targetName}-${variant}`
-          );
-          fs.writeFileSync(targetFile, content);
-        }
-      }
-    }
-
-    // Copy and modify HTML
-    const targetHtml = path.join(targetPath, `${targetName}-${variant}.html`);
-    let htmlContent = fs.readFileSync(sourcePage, 'utf8');
-    
-    // Update paths and references
-    htmlContent = htmlContent
-      .replace(
-        new RegExp(`/${clientId}/${pageName}/`, 'g'),
-        `/${clientId}/${targetName}/${targetName}-${variant}/`
-      )
-      .replace(
-        new RegExp(pageName, 'g'),
-        `${targetName}-${variant}`
-      );
-    
-    fs.writeFileSync(targetHtml, htmlContent);
-  }
-
-  // Create shared assets at client level if they don't exist
-  const sharedAssetPath = path.join('clients', clientId, 'assets');
-  execSync(`mkdir -p ${sharedAssetPath}/{js,css,images}`);
-
-  console.log(`
-✅ Created page tree for ${targetName}:
-   - Admin:  clients/${clientId}/${targetName}/${targetName}-admin
-   - Review: clients/${clientId}/${targetName}/${targetName}-review
-   - Live:   clients/${clientId}/${targetName}/${targetName}-live
-   - Temp:   clients/${clientId}/${targetName}/${targetName}-temp
-  `);
-}
-
-// Example usage:
-// node create-page-tree.js \
-//   clients/elpl/merit/merit.html \
-//   goalsetter \
-//   elpl
-```
-
-### Rule Validation Implementation
-- [ ] Basic Rule Checking
-  - [ ] Parse MDC frontmatter
-  - [ ] Match files against globs
-  - [ ] Log validation attempts
-  - [ ] Report violations
-
-- [ ] Directory Structure Validation
-  - [ ] Verify page-specific JS location
-  - [ ] Check shared asset placement
-  - [ ] Validate file naming conventions
-  - [ ] Ensure proper imports
-
-- [ ] Style Rule Validation
-  - [ ] Check CSS variable usage
-  - [ ] Verify color values
-  - [ ] Validate layout structure
-  - [ ] Check responsive patterns
-
-### Usage Example
-```bash
-# Create new page tree from merit template
-node .husky/scripts/template-tools/create-page-tree.js \
-  clients/elpl/merit/merit.html \
-  goalsetter \
-  elpl
-
-# This creates:
-clients/elpl/goalsetter/
-  ├── goalsetter-admin/
-  │   ├── goalsetter-admin.html
-  │   └── assets/
-  │       ├── js/
-  │       │   └── client-goalsetter-admin-logic.js
-  │       ├── css/
-  │       │   └── goalsetter-admin-theme.css
-  │       └── images/
-  ├── goalsetter-review/
-  ├── goalsetter-live/
-  └── goalsetter-temp/
-``` 
-
-## Phase 3: Admin & Review Implementation
-
-### Merit Review Page (merit-review.html)
-- [ ] Qipu Comment System Integration
-  - [ ] Add iframe wrapper over merit.html
-  - [ ] Implement footer comment bar
-  - [ ] Add user type switching (IE_All_Users range)
-  - [ ] Integrate screenshot functionality
-  - [ ] Add comment persistence
-  - [ ] Implement IE_Central_Team access controls
-
-### Merit Admin Page (merit-admin.html)
-- [ ] Admin Interface Implementation
-  - [ ] Create admin layout structure
-  - [ ] Add configuration panels
-  - [ ] Implement user management
-  - [ ] Add analytics dashboard
-  - [ ] Create logging interface
-
-### Qipu Comment System
-- [ ] Core Comment Features
-  - [ ] Comment creation and editing
-  - [ ] Screenshot attachment
-  - [ ] User type context
-  - [ ] Thread management
-  - [ ] Notification system
-
-### Admin Features
-- [ ] User Management
-  - [ ] Role assignment
-  - [ ] Access control
-  - [ ] Usage tracking
-  - [ ] Activity logs
-- [ ] Configuration
-  - [ ] System settings
-  - [ ] Feature toggles
-  - [ ] Integration settings
-  - [ ] Backup/restore
-
-### Testing Requirements
-- [T] Review Interface
-  - [T] iframe responsiveness
-  - [T] Comment functionality
-  - [T] Screenshot capture
-  - [T] User type switching
-- [T] Admin Interface
-  - [T] Configuration persistence
-  - [T] User management
-  - [T] Analytics accuracy
-  - [T] Log completeness 
-
-## Phase 4: Platform Form Enhancement
-
-### Curious Form Migration
-- [ ] Import styled form from frontend repo
-  - [ ] Match platform typography
-  - [ ] Implement platform color scheme
-  - [ ] Add responsive breakpoints
-  - [ ] Ensure accessibility compliance
-
-### Form Components
-- [ ] Input field styling
-  - [ ] Text inputs with floating labels
-  - [ ] Dropdown with custom styling
-  - [ ] Checkbox and radio components
-  - [ ] Error state visualization
-
-### Animation & Interaction
-- [ ] Add micro-interactions
-  - [ ] Field focus states
-  - [ ] Button hover effects
-  - [ ] Form submission feedback
-  - [ ] Loading states
-
-### Validation & Feedback
-- [ ] Client-side validation
-  - [ ] Real-time field validation
-  - [ ] Custom error messages
-  - [ ] Form completion check
-  - [ ] Success state handling
-
-## Next T Review Items to Check
-1. Chat Interface Progress
-   - [ ] Message display implementation
-   - [ ] Chat container styling
-   - [ ] Loading state indicators
-   - [ ] Error handling
-
-2. Form Integration
-   - [ ] Grade level selection working
-   - [ ] Curriculum input validation
-   - [ ] Form submission flow
-   - [ ] Transition animations
-
-3. Navigation
-   - [ ] Tab switching functionality
-   - [ ] State preservation
-   - [ ] URL handling
-   - [ ] History management
-
-4. Error Boundaries
-   - [ ] Component error catching
-   - [ ] Fallback UI implementation
-   - [ ] Error reporting
-   - [ ] Recovery options
-
-## Phase 5: Analytics & Monitoring
-
-### Usage Tracking
-- [ ] Implement form analytics
-  - [ ] Track completion rates
-  - [ ] Monitor drop-off points
-  - [ ] Capture user paths
-  - [ ] Measure response times
-
-### Performance Metrics
-- [ ] Monitor load times
-  - [ ] Asset loading
-  - [ ] API response times
-  - [ ] Client-side rendering
-  - [ ] Cache effectiveness
-
-### Error Tracking
-- [ ] Set up error logging
-  - [ ] Client-side errors
-  - [ ] API failures
-  - [ ] Validation issues
-  - [ ] Performance problems
-
-## Phase 6: A/B Testing Infrastructure
-
-### Test Framework
-- [ ] Set up testing infrastructure
-  - [ ] Version control
-  - [ ] Feature flags
-  - [ ] User segmentation
-  - [ ] Analytics integration
-
-### Test Cases
-- [ ] Define initial tests
-  - [ ] Form layout variants
-  - [ ] CTA messaging
-  - [ ] Button placement
-  - [ ] Color schemes
-
-## Next Steps (Priority Order)
-1. Chat Interface Implementation
-   - [ ] Initialize chat container
-   - [ ] Add message display
-   - [ ] Implement typing indicators
-   - [ ] Add loading states
-
-2. Form Submission Flow
-   - [ ] Add form validation
-   - [ ] Implement submission handling
-   - [ ] Add success/error states
-   - [ ] Handle transition to chat
-
-3. State Management
-   - [ ] Implement tab state persistence
-   - [ ] Add form data caching
-   - [ ] Handle chat history
-   - [ ] Manage loading states
-
-4. Testing & Validation
-   - [ ] Test form submission
-   - [ ] Validate chat functionality
-   - [ ] Check responsive design
-   - [ ] Verify accessibility
-
-## Notes
-- [x] Reorganized directory structure following client layout rules
-- [x] Moved shared assets to client-wide directory
-- [x] Updated assistant ID to use file search enabled version
-- [x] Modularized JavaScript into separate components
-- [x] Using existing CSS files (no new files needed)
-- [x] Updated HTML to use correct CSS paths
-
-## Contact
-For questions or issues:
-- Frontend Team Lead
-- Platform Architecture Team
-- QA Team Lead 
+## Critical Layout Compliance Updates [April 11 - Console Fix]
+
+### Immediate Fixes Required
+1. [YOU] Logo Sizing:
+   - Constrain logo to maintain 5px padding from header div border
+   - Update header height variable to accommodate logo
+
+2. [ME] TypeError Fix in MeritIntakeForm:
+   - Add null checks before accessing form properties
+   - Implement proper form reset handling
+   - Fix at `client-merit-logic.js:36`
+
+3. [ME] Content Area Structure:
+   - Add proper content area wrapper div
+   - Fix content area height calculation
+   - Ensure proper padding inheritance
+   - Fix at `merit.html:32`
+
+4. [ME] Sidebar State Management:
+   - Initialize sidebar state before DOM manipulation
+   - Add state persistence logic
+   - Fix expanded state tracking
+   - Fix at `merit.html:726`
+
+5. [ME] Authentication Token Handling:
+   - Proper token validation before usage
+   - Add token refresh logic
+   - Fix at `auth.js:87`
+
+6. [ME] Form Reset Functionality:
+   - Implement proper form cleanup
+   - Clear state on navigation
+   - Add transition handling
+   - Fix at `client-merit-logic.js:36`
+
+7. [ME] Error Boundary Implementation:
+   - Add try-catch blocks for DOM operations
+   - Implement fallback UI
+   - Add error logging
+   - Fix at `client-merit-logic.js:199`
+
+8. [ME] Layout Event Listeners:
+   - Add proper event cleanup
+   - Fix event delegation
+   - Implement proper resize handling
+   - Fix at `client-merit-logic.js:109`
+
+9. [ME] CSS Variable Compliance:
+   - Use ELPL-specific variables
+   - Fix shadow values
+   - Update spacing constants
+   - Fix at `client-elpl.css`
+
+10. [ME] Accessibility Improvements:
+    - Add proper ARIA labels
+    - Fix focus management
+    - Add keyboard navigation
+    - Fix at multiple locations
+
+11. [ME] Console Error Cleanup:
+    - Fix 404 for merit.html:699
+    - Add error boundaries for null checks
+    - Implement proper state initialization
+    - Clean up console warnings
+
+### Implementation Priority
+1. Fix TypeErrors in form handling
+2. Implement proper error boundaries
+3. Fix sidebar state management
+4. Update CSS variable usage
+5. Add accessibility improvements
+
+### Validation Steps
+- [ ] Run console error check
+- [ ] Validate CSS variable usage
+- [ ] Test form submission flow
+- [ ] Verify sidebar behavior
+- [ ] Check accessibility score
