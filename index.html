@@ -4,40 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Platform</title>
-    <link rel="stylesheet" href="/clients/elpl/assets/variables.css">
-    <link rel="stylesheet" href="/clients/elpl/assets/css/elpl.custom.css">
+    
+    <!-- Required platform styles -->
+    <link rel="stylesheet" href="/shared/assets/css/recursive-platform.css">
+    
     <style>
         :root {
+            --header-height: 60px;
+            --footer-height: 40px;
+            --client-bg: #ffffff;
+            --client-text: #2c3e50;
+            --client-border: #e1e4e8;
+            --content-width: 1200px;
             --primary-color: #211651;
             --accent-color: #C6123F;
-            --text-color: #2C3E50;
-            --bg-gradient-start: #F9F9F9;
-            --bg-gradient-end: #E0E0E0;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: radial-gradient(circle at top, var(--bg-gradient-start), var(--bg-gradient-end));
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .client-layout {
-            flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
+            background: var(--client-bg);
         }
 
         .client-header {
             height: var(--header-height);
+            background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            background: var(--primary-color);
-            color: white;
         }
 
         .client-content {
@@ -62,13 +59,14 @@
         }
 
         .logo {
-            max-width: 150px;
-            border-radius: 50%;
+            max-height: 40px;
             transition: transform 0.3s ease;
         }
 
-        .logo:hover {
-            transform: scale(1.05);
+        .welcome-avatar {
+            width: 120px;
+            height: 120px;
+            margin: 2rem 0;
         }
 
         .verb-container {
@@ -79,29 +77,35 @@
             height: 3rem;
         }
 
-        .cta-button {
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary, .btn-secondary {
             padding: 1rem 2rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
             border-radius: 8px;
             font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
             text-decoration: none;
-            margin: 1rem;
+            transition: background-color 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .cta-button:hover {
-            background: var(--accent-color);
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
         }
 
-        .version {
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .btn-secondary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            opacity: 0.9;
         }
 
         @keyframes fadeInOut {
@@ -115,30 +119,34 @@
     </style>
 </head>
 <body>
-    <div class="client-layout">
+    <div class="client-layout" data-client-component="landing-layout">
         <header class="client-header">
-            <img src="/clients/elpl/assets/images/logo.png" alt="Recursive Learning" class="logo">
-            <span class="version">v1.0.0 (<span id="time">00:00</span>)</span>
+            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" class="logo">
+            <span class="version-display">v1.0.0 (<span id="time">00:00</span>)</span>
         </header>
 
         <main class="client-content">
-            <img src="/clients/elpl/assets/images/avatar.png" alt="Avatar" class="logo">
+            <img src="/shared/assets/images/avatar.png" alt="Avatar" class="welcome-avatar">
             <div class="verb-container">
-                <span class="verb">Listening...</span>
+                <span class="verb">Teaching...</span>
             </div>
-            <div>
-                <a href="/clients/elpl/merit/merit.html" class="cta-button">
+            <div class="action-buttons">
+                <a href="/clients/integraled/curious_intake.html" class="btn-primary">
                     Start Learning
-                    <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next" width="24" height="24">
                 </a>
-                <a href="/admin/index.html" class="cta-button">Admin Portal</a>
+                <a href="/admin" class="btn-secondary">Admin Portal</a>
             </div>
         </main>
 
         <footer class="client-footer">
-            <span>&copy; 2025 Recursive Learning. All rights reserved.</span>
+            <span>&copy; 2024 Recursive Learning</span>
         </footer>
     </div>
+
+    <!-- Required platform scripts -->
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
 
     <script>
         // Verb animation
