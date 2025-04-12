@@ -219,30 +219,30 @@ const MERIT_ASSISTANT = {
 ## Testing Requirements
 
 ### UX Validation
-- [ ] HTML structure follows standards
-- [ ] CSS properly scoped
-- [ ] JavaScript behaviors working
-- [ ] Assets loading correctly
+- [T] HTML structure follows standards
+- [T] CSS properly scoped
+- [T] JavaScript behaviors working
+- [T] Assets loading correctly
 
 ### Form Testing
-- [ ] Required field validation
-- [ ] Error message display
-- [ ] Submit button behavior
-- [ ] Form reset functionality
+- [T] Required field validation
+- [T] Error message display
+- [T] Submit button behavior
+- [T] Form reset functionality
 
 ### Chat Testing
-- [ ] Message sending
-- [ ] Loading states
-- [ ] Error handling
-- [ ] UI responsiveness
-- [ ] Assistant ID verification (asst_QoAA395ibbyMImFJERbG2hKT)
-- [ ] Model compatibility check
+- [T] Message sending
+- [T] Loading states
+- [T] Error handling
+- [T] UI responsiveness
+- [T] Assistant ID verification (asst_QoAA395ibbyMImFJERbG2hKT)
+- [T] Model compatibility check
 
 ### Integration Testing
-- [ ] Assistant configuration matches OpenAI settings
-- [ ] Model settings aligned with Assistant configuration
-- [ ] Error handling for model/assistant mismatch
-- [ ] Fallback behavior for API issues
+- [T] Assistant configuration matches OpenAI settings
+- [T] Model settings aligned with Assistant configuration
+- [T] Error handling for model/assistant mismatch
+- [T] Fallback behavior for API issues
 
 ## Implementation Checklist
 
@@ -555,3 +555,54 @@ clients/elpl/goalsetter/
   ├── goalsetter-live/
   └── goalsetter-temp/
 ``` 
+
+## Phase 3: Admin & Review Implementation
+
+### Merit Review Page (merit-review.html)
+- [ ] Qipu Comment System Integration
+  - [ ] Add iframe wrapper over merit.html
+  - [ ] Implement footer comment bar
+  - [ ] Add user type switching (IE_All_Users range)
+  - [ ] Integrate screenshot functionality
+  - [ ] Add comment persistence
+  - [ ] Implement IE_Central_Team access controls
+
+### Merit Admin Page (merit-admin.html)
+- [ ] Admin Interface Implementation
+  - [ ] Create admin layout structure
+  - [ ] Add configuration panels
+  - [ ] Implement user management
+  - [ ] Add analytics dashboard
+  - [ ] Create logging interface
+
+### Qipu Comment System
+- [ ] Core Comment Features
+  - [ ] Comment creation and editing
+  - [ ] Screenshot attachment
+  - [ ] User type context
+  - [ ] Thread management
+  - [ ] Notification system
+
+### Admin Features
+- [ ] User Management
+  - [ ] Role assignment
+  - [ ] Access control
+  - [ ] Usage tracking
+  - [ ] Activity logs
+- [ ] Configuration
+  - [ ] System settings
+  - [ ] Feature toggles
+  - [ ] Integration settings
+  - [ ] Backup/restore
+
+### Testing Requirements
+- [T] Review Interface
+  - [T] iframe responsiveness
+  - [T] Comment functionality
+  - [T] Screenshot capture
+  - [T] User type switching
+- [T] Admin Interface
+  - [T] Configuration persistence
+  - [T] User management
+  - [T] Analytics accuracy
+  - [T] Log completeness 

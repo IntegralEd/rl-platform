@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merit</title>
+    <title>Merit - Recursive Learning</title>
     
     <!-- Base variables and custom styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/variables.css">
@@ -34,344 +34,125 @@
 
     <style>
         :root {
-            /* Layout - using standard client variables */
             --header-height: 60px;
             --footer-height: 40px;
-            --sidebar-width: 250px;
-            --content-width: 1200px;
-            --content-padding: var(--client-spacing-medium, 20px);
-            
-            /* Colors - using client variables */
             --client-bg: #ffffff;
             --client-text: #2c3e50;
             --client-border: #e1e4e8;
-        }
-
-        body {
-            margin: 0;
-            padding: var(--content-padding);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            box-sizing: border-box;
-            background: var(--client-bg);
-            color: var(--client-text);
+            --content-width: 1200px;
+            --primary-color: #211651;
+            --accent-color: #C6123F;
         }
 
         .client-layout {
-            width: 100%;
-            max-width: var(--content-width);
-            min-height: var(--max-height);
             display: flex;
             flex-direction: column;
-            background: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-            position: relative;
-            border-radius: var(--client-card-border-radius, 8px);
-            overflow: hidden;
+            min-height: 100vh;
+            background: var(--client-bg);
         }
 
-        /* Header */
         .client-header {
             height: var(--header-height);
             background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            box-sizing: border-box;
+            padding: 0 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header-title {
-            color: var(--cta-text-color, white);
-            font-family: var(--client-font-h1);
-            font-size: var(--client-font-size-h2);
-        }
-
-        .version-display {
-            color: var(--cta-text-color);
-            font-size: var(--client-font-size-small);
-            opacity: 0.8;
-        }
-
-        /* Main Content */
         .client-content {
             flex: 1;
-            overflow: hidden;
             display: flex;
+            padding: 1rem;
+            gap: 1rem;
+            max-width: var(--content-width);
+            margin: 0 auto;
+            width: 100%;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--background-color);
-            border-right: 1px solid var(--client-border);
-            padding: var(--client-spacing-medium);
-            display: flex;
-            flex-direction: column;
-            gap: var(--client-spacing-small);
+        .client-nav {
+            width: 200px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .tab-button {
-            padding: var(--client-button-padding);
-            border: none;
-            background: var(--background-color);
-            color: var(--text-color);
-            border-radius: var(--client-button-radius);
-            cursor: pointer;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            transition: all 0.2s;
-            text-align: left;
+        .client-nav a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--client-text);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .client-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .content-area {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .client-footer {
+            height: var(--footer-height);
+            background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
-            gap: var(--client-spacing-small);
-        }
-
-        .tab-button:hover {
-            background: var(--secondary-color);
-            color: var(--cta-text-color);
-        }
-
-        .tab-button.active {
-            background: var(--secondary-color);
-            color: var(--cta-text-color);
-        }
-
-        .tab-button svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        /* Content Area */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--content-padding);
-        }
-
-        /* Welcome Form */
-        .welcome-form {
-            background: white;
-            padding: var(--client-spacing-medium);
-            border-radius: var(--client-card-border-radius);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            justify-content: center;
+            margin-top: auto;
         }
 
         .form-group {
-            margin-bottom: var(--client-spacing-medium);
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-family: var(--client-font-h2);
+            margin-bottom: 0.5rem;
+            color: var(--client-text);
             font-weight: 500;
-            color: var(--client-text);
         }
 
-        .form-group select,
-        .form-group input {
+        .form-control {
             width: 100%;
-            padding: var(--client-spacing-small);
+            padding: 0.75rem;
             border: 1px solid var(--client-border);
-            border-radius: var(--client-button-radius);
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            color: var(--client-text);
-            background: white;
+            border-radius: 4px;
+            font-size: 1rem;
         }
 
-        .form-group select:focus,
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
-        }
-
-        .form-actions {
-            margin-top: var(--client-spacing-medium);
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        /* Button Styling */
-        .next-button {
-            padding: var(--client-button-padding);
-            background: #FF0000;
-            color: white;
-            border: none;
-            border-radius: var(--client-button-radius);
-            cursor: pointer;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            transition: background 0.2s;
-            min-width: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            gap: 8px;
-        }
-
-        .next-button::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background-image: url('/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-        }
-
-        .next-button:hover {
-            background: #CC0000;
-        }
-
-        .send-button {
-            align-self: flex-end;
-            padding: 10px 20px;
-            background: #FF0000;
-            color: white;
-            border: none;
-            border-radius: var(--client-button-radius);
-            cursor: pointer;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            transition: background 0.2s;
-            min-width: 100px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .send-button::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background-image: url('/clients/elpl/assets/images/noun-send-7149925-FFFFFF.png');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-        }
-
-        .send-button:hover {
-            background: #CC0000;
-        }
-
-        /* Chat Interface */
-        .chat-container {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--client-spacing-medium);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: var(--client-spacing-medium);
-            border: 1px solid var(--client-border);
-            border-radius: var(--client-card-border-radius);
-            background: var(--client-bg);
-            display: flex;
-            flex-direction: column;
-            gap: var(--client-spacing-small);
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: var(--client-spacing-small);
-            padding: var(--client-spacing-small);
-            background: white;
-            border: 1px solid var(--client-border);
-            border-radius: var(--client-card-border-radius);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: var(--client-spacing-small);
-            border: 1px solid var(--client-border);
-            border-radius: var(--client-button-radius);
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            resize: none;
-            min-height: 60px;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
-        }
-
-        .message {
-            padding: var(--client-spacing-small);
-            border-radius: var(--client-button-radius);
-            max-width: 80%;
-            font-family: var(--client-font-body);
-            line-height: 1.5;
-        }
-
-        .message.user {
-            background: var(--secondary-color, #211651);
-            color: white;
-            margin-left: auto;
-            align-self: flex-end;
-        }
-
-        .message.assistant {
-            background: white;
-            border: 1px solid var(--client-border);
-            margin-right: auto;
-            color: var(--client-text);
-            align-self: flex-start;
-        }
-
-        .message.typing {
-            padding: var(--client-spacing-small) var(--client-spacing-medium);
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            height: 20px;
-        }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: var(--client-border);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-            opacity: 0.4;
-        }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        /* Footer */
-        .client-footer {
-            height: var(--footer-height);
+        .btn-next {
             background: var(--primary-color);
-            color: var(--cta-text-color);
-            display: flex;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-family: var(--client-font-body);
-            font-size: var(--client-font-size-body);
-            padding: 0 24px;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-next:hover {
+            background: var(--accent-color);
+        }
+
+        .btn-next img {
+            width: 20px;
+            height: 20px;
         }
 
         /* Loading State */
@@ -472,7 +253,7 @@
                 flex-direction: column;
             }
 
-            .sidebar {
+            .client-nav {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--client-border);
@@ -480,7 +261,7 @@
                 padding: var(--client-spacing-small);
             }
 
-            .sidebar button {
+            .client-nav a {
                 flex: 1;
             }
 
@@ -492,78 +273,60 @@
 </head>
 <body>
     <div class="client-layout">
-        <header class="client-header" role="banner">
-            <h1 class="header-title">Merit</h1>
-            <span class="version-display">v1.0.0 (--:--)</span>
+        <header class="client-header">
+            <h1>Merit</h1>
+            <span class="version">v1.0.0 (13:22)</span>
         </header>
 
-        <main class="client-content" role="main">
-            <!-- Sidebar with tabs -->
-            <nav class="sidebar" role="navigation" aria-label="Main navigation">
-                <button class="tab-button active" data-tab="welcome" aria-selected="true">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2z"/>
-                    </svg>
-                    Welcome
-                </button>
-                <button class="tab-button" data-tab="chat" aria-selected="false">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-                    </svg>
-                    Chat
-                </button>
+        <main class="client-content">
+            <nav class="client-nav">
+                <a href="#welcome" class="active">Welcome</a>
+                <a href="#chat">Chat</a>
             </nav>
 
-            <!-- Content area -->
-            <div class="content">
-                <!-- Welcome form content -->
-                <div class="welcome-form" id="welcome-tab" role="tabpanel" aria-labelledby="welcome-tab">
+            <div class="content-area">
+                <form class="welcome-form">
                     <div class="form-group">
                         <label for="grade-level">What grade level do you teach?</label>
-                        <select 
-                            id="grade-level" 
-                            name="grade-level" 
-                            required
-                            aria-required="true"
-                            aria-label="Select your grade level"
-                        >
+                        <select id="grade-level" class="form-control" required>
                             <option value="">Select a grade level</option>
-                            <option value="Kindergarten">Kindergarten</option>
-                            <option value="Grade 1">Grade 1</option>
-                            <option value="Grade 2">Grade 2</option>
-                            <option value="Grade 3">Grade 3</option>
-                            <option value="Grade 4">Grade 4</option>
-                            <option value="Grade 5">Grade 5</option>
+                            <option value="k">Kindergarten</option>
+                            <option value="1">1st Grade</option>
+                            <option value="2">2nd Grade</option>
+                            <option value="3">3rd Grade</option>
+                            <option value="4">4th Grade</option>
+                            <option value="5">5th Grade</option>
+                            <option value="6">6th Grade</option>
+                            <option value="7">7th Grade</option>
+                            <option value="8">8th Grade</option>
+                            <option value="9">9th Grade</option>
+                            <option value="10">10th Grade</option>
+                            <option value="11">11th Grade</option>
+                            <option value="12">12th Grade</option>
                         </select>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="curriculum">What curriculum do you use?</label>
-                        <input 
-                            type="text" 
-                            id="curriculum" 
-                            name="curriculum" 
-                            required
-                            aria-required="true"
-                            aria-label="Enter your curriculum"
-                            placeholder="Enter your curriculum"
-                        >
+                        <input type="text" id="curriculum" class="form-control" placeholder="Enter your curriculum" required>
                     </div>
-                    
-                    <div class="form-actions">
-                        <button 
-                            type="submit" 
-                            class="next-button" 
-                            aria-label="Submit form and proceed to chat"
-                        >NEXT</button>
-                    </div>
-                </div>
+
+                    <button type="submit" class="btn-next">
+                        Next
+                        <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next">
+                    </button>
+                </form>
             </div>
         </main>
 
-        <footer class="client-footer" role="contentinfo">
-            <span>Powered by Recursive Learning</span>
+        <footer class="client-footer">
+            Powered by Recursive Learning
         </footer>
     </div>
+
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
 </body>
 </html> 
