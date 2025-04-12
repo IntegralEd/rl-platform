@@ -7,17 +7,17 @@
     <title>Merit - Recursive Learning</title>
     
     <!-- Required client scripts -->
-    <script type="module" src="../../../shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="../../../shared/assets/js/client-auth.js"></script>
-    <script type="module" src="../../../shared/assets/js/client-router.js"></script>
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
     
     <!-- Base variables and custom styles -->
-    <link rel="stylesheet" href="../assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="../assets/css/client-elpl.css">
-    <link rel="stylesheet" href="assets/css/client-merit-chat.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+    <link rel="stylesheet" href="/clients/elpl/merit/assets/css/client-merit-chat.css">
     
     <!-- Merit specific logic -->
-    <script type="module" src="assets/js/client-merit-logic.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
     
     <!-- Preheader data span -->
     <span id="header-span" style="display:none" 
@@ -25,18 +25,21 @@
         data-user-name=""
         data-user-id=""
         data-access-level=""
-        data-last-login="">
+        data-last-login=""
+        data-version="1.0.1">
     </span>
 
     <script>
-        // Initialize version display
+        // Initialize version display with auto-increment
         document.addEventListener('DOMContentLoaded', () => {
             const versionDisplay = document.querySelector('.version-display');
-            if (versionDisplay) {
+            const headerSpan = document.getElementById('header-span');
+            if (versionDisplay && headerSpan) {
                 const now = new Date();
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-                versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`;
+                const version = headerSpan.dataset.version || '1.0.1';
+                versionDisplay.textContent = `v${version} (${hours}:${minutes})`;
             }
         });
     </script>
@@ -589,21 +592,22 @@
 
         .sidebar {
             width: 20%;
+            min-width: 200px;
             background: white;
             border-radius: var(--elpl-border-radius);
             padding: 1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: width 0.3s ease;
-        }
-
-        .sidebar.expanded {
-            width: 20%;
+            transition: all 0.3s ease;
+            opacity: 1;
+            visibility: visible;
         }
 
         .sidebar.collapsed {
             width: 0;
+            min-width: 0;
             padding: 0;
-            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
         }
 
         .sidebar-content {
@@ -611,141 +615,47 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
 
-        .sidebar-nav {
-            flex: 1;
+        .sidebar.collapsed .sidebar-content {
+            opacity: 0;
         }
 
-        .sidebar-toggle {
-            width: 30px;
-            height: 30px;
-            border: none;
-            background: var(--elpl-primary);
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1rem;
+        /* Main content layout */
+        .client-content {
+            display: grid;
+            grid-template-columns: minmax(200px, 20%) 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: var(--elpl-content-width);
+            margin: 0 auto;
+            width: 100%;
+            transition: all 0.3s ease;
         }
 
-        .toggle-icon {
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar.collapsed .toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .sidebar-nav a {
-            display: block;
-            padding: 10px;
-            color: var(--elpl-text);
-            text-decoration: none;
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-
-        .sidebar-nav a:hover,
-        .sidebar-nav a.active {
-            background: var(--elpl-primary);
-            color: white;
+        .client-content.sidebar-collapsed {
+            grid-template-columns: 0 1fr;
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
+            .client-content {
+                grid-template-columns: 1fr;
             }
-        }
 
-        /* Add these styles to fix the select dropdowns and navigation */
-        .select-wrapper {
-            position: relative;
-            width: 100%;
-        }
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: var(--elpl-header-height);
+                bottom: var(--elpl-footer-height);
+                z-index: 100;
+                transform: translateX(-100%);
+            }
 
-        .select-wrapper::after {
-            content: "▼";
-            color: var(--elpl-primary);
-            font-size: 24px;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            padding-right: 10px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--elpl-border);
-            border-radius: var(--elpl-border-radius);
-            font-size: 16px;
-            appearance: none;
-            background: white;
-            cursor: pointer;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--elpl-primary);
-            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
-        }
-
-        .nav-link {
-            display: block;
-            padding: 15px 20px;
-            color: var(--elpl-text);
-            text-decoration: none;
-            border-radius: var(--elpl-border-radius);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .nav-link:hover {
-            background: rgba(198, 18, 63, 0.1);
-        }
-
-        .nav-link.active {
-            background: var(--elpl-primary);
-            color: white;
-        }
-
-        /* Footer button styles */
-        .next-button, .send-button {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--elpl-primary);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 5px;
-            transition: background 0.2s ease;
-        }
-
-        .next-button:disabled {
-            background: var(--elpl-border);
-            cursor: not-allowed;
-        }
-
-        .button-icon {
-            font-size: 24px;
-        }
-
-        .playbar, .chatbar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 0 20px;
+            .sidebar.expanded {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -758,8 +668,8 @@
             </div>
         </header>
 
-        <main class="client-content" role="main">
-            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation">
+        <main class="client-content" role="main" id="mainContent">
+            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation" id="sidebar">
                 <div class="sidebar-content">
                     <div class="sidebar-nav">
                         <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
@@ -769,11 +679,12 @@
                             <span class="nav-text">Chat</span>
                         </a>
                     </div>
-                    <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
-                        <span class="toggle-icon">◀</span>
-                    </button>
                 </div>
             </nav>
+
+            <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
+                <span class="toggle-icon">◀</span>
+            </button>
 
             <div class="content-area" role="region" aria-label="Main content">
                 <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
@@ -835,64 +746,60 @@
     </div>
 
     <!-- Required client scripts with correct paths -->
-    <script type="module" src="../../../shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="../../../shared/assets/js/client-auth.js"></script>
-    <script type="module" src="../../../shared/assets/js/client-router.js"></script>
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
     
     <!-- Merit specific scripts -->
-    <script type="module" src="assets/js/client-merit-form.js"></script>
-    <script type="module" src="assets/js/client-merit-chat.js"></script>
-    <script type="module" src="assets/js/client-merit-logic.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-form.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-chat.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-logic.js"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Show playbar by default, hide chatbar
-        document.querySelector('.playbar').style.display = 'flex';
-        document.querySelector('.chatbar').style.display = 'none';
-        
-        // Enable next button when form is valid
-        const form = document.querySelector('.welcome-form');
-        const nextButton = document.querySelector('.next-button');
-        
-        if (form && nextButton) {
-            form.addEventListener('change', function() {
-                nextButton.disabled = !form.checkValidity();
+        try {
+            // Initialize sidebar
+            const mainContent = document.getElementById('mainContent');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            if (!mainContent || !sidebar || !sidebarToggle) {
+                throw new Error('Required elements not found');
+            }
+
+            // Get initial state
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            console.log(`Initial sidebar state: ${isCollapsed ? 'collapsed' : 'expanded'}`);
+
+            // Apply initial state
+            if (isCollapsed) {
+                sidebar.classList.remove('expanded');
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
+            }
+
+            // Add sidebar toggle handler
+            sidebarToggle.addEventListener('click', function() {
+                const isNowCollapsed = !sidebar.classList.contains('collapsed');
+                
+                // Update classes
+                sidebar.classList.toggle('collapsed', isNowCollapsed);
+                sidebar.classList.toggle('expanded', !isNowCollapsed);
+                mainContent.classList.toggle('sidebar-collapsed', isNowCollapsed);
+                
+                // Store state
+                localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                
+                // Update icon
+                this.querySelector('.toggle-icon').style.transform = 
+                    isNowCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+                
+                console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
             });
+        } catch (error) {
+            console.error('Error initializing sidebar:', error);
         }
-
-        // Initialize sidebar state
-        const mainContent = document.querySelector('.main-content');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-        
-        console.log(`Initial sidebar state: ${isCollapsed ? 'collapsed' : 'expanded'}`);
-        
-        if (isCollapsed) {
-            mainContent.classList.add('sidebar-collapsed');
-            sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
-        }
-
-        // Add sidebar toggle handler
-        sidebarToggle.addEventListener('click', function() {
-            const isNowCollapsed = mainContent.classList.toggle('sidebar-collapsed');
-            localStorage.setItem('sidebarCollapsed', isNowCollapsed);
-            
-            console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
-            
-            // Update icon rotation
-            this.querySelector('.toggle-icon').style.transform = 
-                isNowCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
-            
-            // Announce to screen readers
-            const announcement = isNowCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
-            const announcer = document.createElement('div');
-            announcer.setAttribute('role', 'status');
-            announcer.setAttribute('aria-live', 'polite');
-            announcer.className = 'sr-only';
-            announcer.textContent = announcement;
-            document.body.appendChild(announcer);
-            setTimeout(() => announcer.remove(), 1000);
-        });
     });
 
     function handleKeyPress(event) {
