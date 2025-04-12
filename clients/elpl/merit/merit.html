@@ -519,6 +519,59 @@
             white-space: nowrap;
             border: 0;
         }
+
+        .sidebar-toggle {
+            position: absolute;
+            left: calc(20% - 20px);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: none;
+            cursor: pointer;
+            z-index: 100;
+            transition: left 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-toggle .toggle-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .main-content {
+            position: relative;
+            display: grid;
+            grid-template-columns: 20% 1fr;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            grid-template-columns: 0% 1fr;
+        }
+
+        .main-content.sidebar-collapsed .sidebar-toggle {
+            left: 0;
+        }
+
+        .main-content.sidebar-collapsed .toggle-icon {
+            transform: rotate(0deg);
+        }
+
+        #sidebar {
+            transition: width 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sidebar-collapsed #sidebar {
+            width: 0;
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
@@ -529,43 +582,53 @@
         </header>
 
         <main class="client-content">
-            <nav class="client-nav">
-                <a href="#welcome" class="active">Welcome</a>
-                <a href="#chat">Chat</a>
-            </nav>
+            <div class="main-content">
+                <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                    <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" 
+                         alt="Toggle sidebar" 
+                         class="toggle-icon"
+                         style="transform: rotate(180deg);">
+                </button>
+                <div id="sidebar">
+                    <nav class="client-nav">
+                        <a href="#welcome" class="active">Welcome</a>
+                        <a href="#chat">Chat</a>
+                    </nav>
+                </div>
 
-            <div class="content-area">
-                <form class="welcome-form">
-                    <div class="form-group">
-                        <label for="grade-level">What grade level do you teach?</label>
-                        <select id="grade-level" class="form-control" required>
-                            <option value="">Select a grade level</option>
-                            <option value="k">Kindergarten</option>
-                            <option value="1">1st Grade</option>
-                            <option value="2">2nd Grade</option>
-                            <option value="3">3rd Grade</option>
-                            <option value="4">4th Grade</option>
-                            <option value="5">5th Grade</option>
-                            <option value="6">6th Grade</option>
-                            <option value="7">7th Grade</option>
-                            <option value="8">8th Grade</option>
-                            <option value="9">9th Grade</option>
-                            <option value="10">10th Grade</option>
-                            <option value="11">11th Grade</option>
-                            <option value="12">12th Grade</option>
-                        </select>
-                    </div>
+                <div class="content-area">
+                    <form class="welcome-form">
+                        <div class="form-group">
+                            <label for="grade-level">What grade level do you teach?</label>
+                            <select id="grade-level" class="form-control" required>
+                                <option value="">Select a grade level</option>
+                                <option value="k">Kindergarten</option>
+                                <option value="1">1st Grade</option>
+                                <option value="2">2nd Grade</option>
+                                <option value="3">3rd Grade</option>
+                                <option value="4">4th Grade</option>
+                                <option value="5">5th Grade</option>
+                                <option value="6">6th Grade</option>
+                                <option value="7">7th Grade</option>
+                                <option value="8">8th Grade</option>
+                                <option value="9">9th Grade</option>
+                                <option value="10">10th Grade</option>
+                                <option value="11">11th Grade</option>
+                                <option value="12">12th Grade</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="curriculum">What curriculum do you use?</label>
-                        <input type="text" id="curriculum" class="form-control" placeholder="Enter your curriculum" required>
-                    </div>
+                        <div class="form-group">
+                            <label for="curriculum">What curriculum do you use?</label>
+                            <input type="text" id="curriculum" class="form-control" placeholder="Enter your curriculum" required>
+                        </div>
 
-                    <button type="submit" class="btn-next">
-                        Next
-                        <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next">
-                    </button>
-                </form>
+                        <button type="submit" class="btn-next">
+                            Next
+                            <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next">
+                        </button>
+                    </form>
+                </div>
             </div>
         </main>
 
@@ -639,6 +702,40 @@
                 nextButton.disabled = !form.checkValidity();
             });
         }
+
+        // Initialize sidebar state
+        const mainContent = document.querySelector('.main-content');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        
+        console.log(`Initial sidebar state: ${isCollapsed ? 'collapsed' : 'expanded'}`);
+        
+        if (isCollapsed) {
+            mainContent.classList.add('sidebar-collapsed');
+            sidebarToggle.querySelector('.toggle-icon').style.transform = 'rotate(0deg)';
+        }
+
+        // Add sidebar toggle handler
+        sidebarToggle.addEventListener('click', function() {
+            const isNowCollapsed = mainContent.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+            
+            console.log(`Sidebar toggled: ${isNowCollapsed ? 'collapsed' : 'expanded'}`);
+            
+            // Update icon rotation
+            this.querySelector('.toggle-icon').style.transform = 
+                isNowCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+            
+            // Announce to screen readers
+            const announcement = isNowCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
+            const announcer = document.createElement('div');
+            announcer.setAttribute('role', 'status');
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.className = 'sr-only';
+            announcer.textContent = announcement;
+            document.body.appendChild(announcer);
+            setTimeout(() => announcer.remove(), 1000);
+        });
     });
 
     function handleKeyPress(event) {
@@ -672,6 +769,62 @@
             console.log('Sending message:', message);
             input.value = '';
         }
+    }
+
+    // Update existing showSection function with more logging
+    function showSection(index) {
+        console.group('Tab Navigation');
+        console.log(`Activating tab: ${index}`);
+        
+        const prevActive = document.querySelector('.section.active');
+        console.log(`Previous active tab: ${prevActive ? prevActive.dataset.index : 'none'}`);
+        
+        // Toggle sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach((section, i) => {
+            const wasActive = section.classList.contains('active');
+            section.classList.toggle('active', i === index);
+            if (wasActive !== (i === index)) {
+                console.log(`Section ${i}: ${wasActive ? 'deactivated' : 'activated'}`);
+            }
+        });
+
+        // Toggle footer state
+        const playbar = document.querySelector('.playbar');
+        const chatbar = document.querySelector('.chatbar');
+        
+        if (index === 0) {
+            console.log('Footer State: Welcome - Showing playbar, hiding chatbar');
+            playbar.style.display = 'flex';
+            chatbar.style.display = 'none';
+        } else {
+            console.log('Footer State: Chat - Showing chatbar, hiding playbar');
+            playbar.style.display = 'none';
+            chatbar.style.display = 'flex';
+        }
+        console.groupEnd();
+    }
+
+    // Update existing checkAffirmations function with more logging
+    function checkAffirmations() {
+        console.group('Form Validation');
+        const checkboxes = document.querySelectorAll('#teacher-context input[type="checkbox"]');
+        const nextButton = document.getElementById('next-button');
+        let selectedGrades = [];
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedGrades.push(checkbox.value);
+            }
+        });
+
+        const anyChecked = selectedGrades.length > 0;
+        console.log(`Selected grades: ${selectedGrades.join(', ') || 'none'}`);
+        console.log(`Next button ${anyChecked ? 'enabled' : 'disabled'}`);
+        
+        nextButton.disabled = !anyChecked;
+        nextButton.classList.toggle('enabled', anyChecked);
+        console.groupEnd();
     }
     </script>
 </body>
