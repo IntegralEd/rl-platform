@@ -339,6 +339,24 @@ function hasPermission(permission) {
   }
 }
 
+/**
+ * Get the current page type based on URL path
+ * @returns {string} Page type ('admin', 'client', or 'public')
+ */
+function getPageType() {
+  const path = window.location.pathname;
+  
+  if (path.startsWith('/admin')) {
+    return 'admin';
+  }
+  
+  if (path.startsWith('/clients/')) {
+    return 'client';
+  }
+  
+  return 'public';
+}
+
 // Export public API
 export {
   init,
@@ -347,5 +365,6 @@ export {
   getProjectIdFromUrl,
   getUserRole,
   hasPermission,
+  getPageType,
   API_CONFIG
 }; 
