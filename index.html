@@ -4,182 +4,166 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Platform</title>
+    <link rel="stylesheet" href="/clients/elpl/assets/variables.css">
+    <link rel="stylesheet" href="/clients/elpl/assets/css/elpl.custom.css">
     <style>
         :root {
-            --primary: #004080;
-            --secondary: #E87722;
-            --bg-light: #f5f5f5;
-            --text: #2b2b2b;
-            --header-height: 60px;
-            --card-bg: white;
-            --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            --card-radius: 8px;
-            --primary-dark: #002040;
-            --primary-light: #0060A0;
+            --primary-color: #211651;
+            --accent-color: #C6123F;
+            --text-color: #2C3E50;
+            --bg-gradient-start: #F9F9F9;
+            --bg-gradient-end: #E0E0E0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
             font-family: system-ui, -apple-system, sans-serif;
-            color: var(--text);
+            background: radial-gradient(circle at top, var(--bg-gradient-start), var(--bg-gradient-end));
+            margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background: var(--bg-light);
         }
 
-        .platform-header {
-            padding: 0.5rem 1rem;
+        .client-layout {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .client-header {
+            height: var(--header-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--primary-dark);
-            height: var(--header-height);
-            box-sizing: border-box;
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            display: none; /* Hide the text title */
-        }
-        
-        .header-logo {
-            height: 40px;
-            padding: 5px;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            padding: 0 2rem;
+            background: var(--primary-color);
             color: white;
         }
-        
-        .platform-info {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .version-info {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
 
-        .main-content {
+        .client-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 2rem;
-            max-width: 1200px;
+            max-width: var(--content-width);
             margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
             text-align: center;
         }
 
-        .content-card {
-            background: var(--card-bg);
-            border-radius: var(--card-radius);
-            box-shadow: var(--card-shadow);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .bottom-icons {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            gap: 16px;
-            z-index: 100;
-        }
-
-        .bottom-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
+        .client-footer {
+            height: var(--footer-height);
+            background: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .verb-container {
+            margin: 2rem 0;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            height: 3rem;
+        }
+
+        .cta-button {
+            padding: 1rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            color: white;
+            transition: background-color 0.3s ease;
             text-decoration: none;
+            margin: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .bottom-icon:hover {
-            transform: scale(1.1);
-            background: var(--primary-dark);
+        .cta-button:hover {
+            background: var(--accent-color);
         }
 
-        .bottom-icon svg {
-            width: 24px;
-            height: 24px;
+        .version {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
-        .bottom-icon-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            margin-bottom: 8px;
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
         }
 
-        .bottom-icon:hover .bottom-icon-tooltip {
-            opacity: 1;
+        .verb {
+            animation: fadeInOut 4s infinite;
         }
     </style>
 </head>
 <body>
-    <header class="platform-header">
-        <div class="header-left">
-            <h1 class="header-title">Recursive Learning Platform</h1>
-            <img src="/shared/assets/images/recursive-learning-logo.svg" alt="Recursive Learning" class="header-logo">
-        </div>
-        <div class="header-right">
-            <div class="platform-info">
-                <span class="version-info">v2025.04.09</span>
+    <div class="client-layout">
+        <header class="client-header">
+            <img src="/clients/elpl/assets/images/logo.png" alt="Recursive Learning" class="logo">
+            <span class="version">v1.0.0 (<span id="time">00:00</span>)</span>
+        </header>
+
+        <main class="client-content">
+            <img src="/clients/elpl/assets/images/avatar.png" alt="Avatar" class="logo">
+            <div class="verb-container">
+                <span class="verb">Listening...</span>
             </div>
-        </div>
-    </header>
+            <div>
+                <a href="/clients/elpl/merit/merit.html" class="cta-button">
+                    Start Learning
+                    <img src="/clients/elpl/assets/images/noun-next-5654311-FFFFFF.svg" alt="Next" width="24" height="24">
+                </a>
+                <a href="/admin/index.html" class="cta-button">Admin Portal</a>
+            </div>
+        </main>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2>Welcome to Recursive Learning</h2>
-            <p>A context-aware learning environment for personalized education.</p>
-        </div>
-    </main>
-
-    <div class="bottom-icons">
-        <a href="/clients/integraled/curious_intake.html" class="bottom-icon" title="Curious Intake Form">
-            <span class="bottom-icon-tooltip">Curious Intake Form</span>
-            <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
-                <use href="/shared/assets/images/noun-curious-41307-FFFFFF.svg#icon"/>
-            </svg>
-        </a>
-        <a href="/admin/index.html" class="bottom-icon" title="Admin Panel">
-            <span class="bottom-icon-tooltip">Admin Panel</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-            </svg>
-        </a>
+        <footer class="client-footer">
+            <span>&copy; 2025 Recursive Learning. All rights reserved.</span>
+        </footer>
     </div>
+
+    <script>
+        // Verb animation
+        const verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
+        const verbElement = document.querySelector('.verb');
+        let currentIndex = 0;
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % verbs.length;
+            verbElement.textContent = verbs[currentIndex];
+        }, 4000);
+
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('time').textContent = time;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000);
+    </script>
 </body>
 </html> 
