@@ -76,9 +76,47 @@
             color: white;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
+            padding: 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 0 1rem;
+            max-width: var(--elpl-content-width, 1200px);
+            margin: 0 auto;
+        }
+
+        .header-logo-container {
+            height: calc(var(--elpl-header-height) - 10px);
+            display: flex;
+            align-items: center;
+        }
+
+        .header-version-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .version-display {
+            font-size: 0.9em;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .header-logo {
+            max-height: 100%;
+            max-width: 100%;
+            height: auto;
+            width: auto;
+            padding: 0;
+            object-fit: contain;
         }
 
         .client-content {
@@ -92,171 +130,37 @@
             position: relative; /* Added for sidebar toggle positioning */
         }
 
-        .sidebar { /* Renamed from client-nav in original */
-            width: 20%; /* Adjusted from 200px */
-            min-width: 200px; /* Added */
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease; /* Added transition */
-            overflow: hidden; /* Added */
-            display: flex; /* Added */
-            flex-direction: column; /* Added */
-        }
-        
-        .sidebar.expanded {
-            width: 20%; /* Ensure expanded state is correct */
-             opacity: 1; /* Added */
-             visibility: visible; /* Added */
-        }
-
-        .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            min-width: 0; /* Added */
-            border: none; /* Added */
-            box-shadow: none; /* Added */
-             opacity: 0; /* Added */
-             visibility: hidden; /* Added */
-        }
-        
-        .sidebar-content { /* Added wrapper */
-             width: 100%;
-             height: 100%;
-             display: flex;
-             flex-direction: column;
-             opacity: 1; /* Added */
-            transition: opacity 0.3s ease; /* Added */
-        }
-        
-         .sidebar.collapsed .sidebar-content { /* Added */
-             opacity: 0;
-        }
-
-        .sidebar-nav { /* Added wrapper */
-            flex: 1; /* Allow nav to grow */
-            display: flex; /* Use flex */
-            flex-direction: column; /* Stack items vertically */
-            justify-content: center; /* Center items vertically */
-        }
-
-        .sidebar-nav a, .nav-link { /* Merged styles */
-            display: block;
-            padding: 15px 20px; /* Adjusted padding */
-            color: var(--elpl-text);
-            text-decoration: none;
-            border-radius: var(--elpl-border-radius); /* Use variable */
-            margin-bottom: 5px; /* Adjusted margin */
-            transition: all 0.2s ease; /* Use 'all' */
-            cursor: pointer;
-            font-size: 24px; /* Inactive font size */
-        }
-
-        .sidebar-nav a:hover, .nav-link:hover {
-             background: rgba(198, 18, 63, 0.1); /* Adjusted hover */
-        }
-        
-        .sidebar-nav a.active, .nav-link.active {
-            background: var(--elpl-primary);
-            color: white;
-            border-bottom: 3px solid var(--elpl-primary); /* Added underline */
-            padding-bottom: calc(15px - 3px); /* Adjust padding to keep text centered */
-            font-size: 36px; /* Active font size */
-            font-weight: bold; /* Make active bolder */
-        }
-
-        .sidebar-toggle { /* Styles added */
-            position: absolute; /* Changed from relative */
-            left: calc(20% - 20px); /* Position based on sidebar */
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px; /* Larger touch target */
-            height: 40px; /* Larger touch target */
-            border-radius: 50%;
-            background: var(--elpl-primary);
-            border: none;
-            color: white; /* Added color */
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100; /* Ensure it's above content */
-            transition: left 0.3s ease;
-        }
-
-        .toggle-icon { /* Added */
-            transition: transform 0.3s ease;
-        }
-
-        /* Style adjustments for when sidebar is collapsed */
-         .client-content.sidebar-collapsed { /* Target parent */
-             /* No grid changes needed as using flex */
-         }
-
-        .client-content.sidebar-collapsed .sidebar-toggle { /* Adjust toggle position */
-            left: 0px; /* Move to edge */
-        }
-        
-         .client-content.sidebar-collapsed .toggle-icon { /* Rotate icon */
-             transform: rotate(180deg); /* Point inwards */
-         }
-
-
-        .content-area {
-            flex: 1;
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-y: auto; /* Allow content scrolling */
-        }
-        
-        .section { /* Add padding to sections */
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-        }
-
         .client-footer {
             height: var(--elpl-footer-height);
             background: var(--elpl-primary);
-            /* margin-top: auto; */ /* Removed as it's fixed */
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             z-index: 100;
-            display: flex; /* Added */
-            align-items: center; /* Added */
-            justify-content: center; /* Added */
-             padding: 0 20px; /* Added padding like playbar/chatbar */
-             box-shadow: 0 -2px 6px rgba(0,0,0,0.1); /* Added shadow */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
         }
 
-        .footer-content { /* Container inside footer */
-             /* max-width: var(--elpl-content-width); */ /* Removed, let playbar/chatbar handle width */
-             /* margin: 0 auto; */ /* Removed */
-             height: 100%;
-             /* padding: 0 1rem; */ /* Removed */
-             display: flex;
-             align-items: center;
-             /* justify-content: center; */ /* Removed */
-             width: 100%; /* Added */
-             max-width: 800px; /* Added max-width similar to chat */
+        .footer-content {
+            height: 100%;
+            width: 100%;
+            max-width: 800px;
         }
         
-         /* Keep playbar/chatbar styles from original */
-         .playbar, .chatbar {
+        .playbar, .chatbar {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* Align button right */
-            /* padding: 0 20px; */ /* Removed, padding on footer */
+            justify-content: flex-end;
         }
 
         .chatbar {
-             justify-content: center; /* Center chat input */
+            justify-content: center;
         }
 
         .chat-input-container {
@@ -264,11 +168,9 @@
             align-items: center;
             gap: 1rem;
             width: 100%;
-            /* max-width: 800px; */ /* Let footer-content handle max-width */
             background: white;
             border-radius: 8px;
             padding: 0.5rem;
-            /* margin: 0.5rem; */ /* Removed margin */
         }
 
         .chat-input {
@@ -278,49 +180,48 @@
             font-size: 1rem;
             resize: none;
             background: transparent;
-            min-height: 36px; /* Added min-height */
+            min-height: 36px;
         }
 
         .chat-input:focus {
             outline: none;
         }
 
-        .send-button, .next-button { /* Merged styles */
-             width: 60px; /* Larger */
-             height: 60px; /* Larger */
-             border-radius: 50%; /* Circular */
-             background: var(--elpl-secondary); /* Use secondary for contrast */
-             border: none;
-             color: white;
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             cursor: pointer;
-             padding: 5px; /* Reset padding */
-             transition: background 0.2s ease;
-             flex-shrink: 0; /* Prevent shrinking */
+        .send-button, .next-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--elpl-secondary);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 5px;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
         }
         
-         .send-button:hover, .next-button:hover:not(:disabled) { /* Added hover */
-            background: #3a2c7e; /* Darken secondary */
+        .send-button:hover, .next-button:hover:not(:disabled) {
+            background: #3a2c7e;
         }
         
-         .next-button:disabled { /* Style disabled */
+        .next-button:disabled {
             background: var(--elpl-border);
             cursor: not-allowed;
-             opacity: 0.7; /* Added opacity */
+            opacity: 0.7;
         }
 
-        .button-icon { /* Style icons */
-             width: 30px; /* Larger icon */
-             height: 30px; /* Larger icon */
+        .button-icon {
+            width: 30px;
+            height: 30px;
         }
 
         [hidden] {
             display: none !important;
         }
         
-         /* Form styles from original */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -332,7 +233,7 @@
             font-weight: 500;
         }
         
-         .select-wrapper {
+        .select-wrapper {
             position: relative;
             width: 100%;
         }
@@ -351,45 +252,44 @@
 
         .form-control {
             width: 100%;
-            padding: 12px; /* Adjusted padding */
-            border: 1px solid var(--elpl-border); /* Adjusted border */
-            border-radius: var(--elpl-border-radius); /* Use variable */
-            font-size: 16px; /* Adjusted font size */
+            padding: 12px;
+            border: 1px solid var(--elpl-border);
+            border-radius: var(--elpl-border-radius);
+            font-size: 16px;
             appearance: none;
             background: white;
             cursor: pointer;
-             padding-right: 40px; /* Ensure space for caret */
+            padding-right: 40px;
         }
         
-         .form-control:focus { /* Added focus style */
+        .form-control:focus {
             outline: none;
             border-color: var(--elpl-primary);
             box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
         }
 
-        /* Loading State (simplified) */
         .loading-overlay {
-            position: fixed; /* Changed to fixed */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.8); /* Slightly less opaque */
+            background: rgba(255,255,255,0.8);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-             flex-direction: column; /* Added */
-             gap: 1rem; /* Added */
-             color: var(--elpl-secondary); /* Added */
-             font-size: 1.2rem; /* Added */
+            flex-direction: column;
+            gap: 1rem;
+            color: var(--elpl-secondary);
+            font-size: 1.2rem;
         }
 
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(33, 22, 81, 0.2); /* Lighter border */
-            border-top: 4px solid var(--elpl-secondary); /* Use secondary */
+            border: 4px solid rgba(33, 22, 81, 0.2);
+            border-top: 4px solid var(--elpl-secondary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -399,84 +299,78 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Error States (simplified) */
         .error-message {
-            color: var(--elpl-primary); /* Use primary for error */
-            font-size: 0.9rem; /* Smaller */
+            color: var(--elpl-primary);
+            font-size: 0.9rem;
             margin-top: 4px;
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .client-header { /* Adjust header padding */
-                 padding: 0 1rem;
+            .client-header {
+                padding: 0 1rem;
             }
            
             .client-content {
-                /* flex-direction: column; */ /* Keep sidebar for now */
-                 padding: 0.5rem; /* Reduce padding */
-                 gap: 0.5rem; /* Reduce gap */
+                padding: 0.5rem;
+                gap: 0.5rem;
             }
 
-            .sidebar { /* Make sidebar overlay */
-                 position: fixed;
-                 left: 0;
-                 top: var(--elpl-header-height);
-                 bottom: var(--elpl-footer-height);
-                 height: auto; /* Let it fill space */
-                 z-index: 200; /* Above content */
-                 transform: translateX(-100%);
-                 border-radius: 0 8px 8px 0; /* Round outer corner */
-                 width: 250px; /* Fixed width overlay */
-                 min-width: 250px; /* Fixed width overlay */
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: var(--elpl-header-height);
+                bottom: var(--elpl-footer-height);
+                height: auto;
+                z-index: 200;
+                transform: translateX(-100%);
+                border-radius: 0 8px 8px 0;
+                width: 250px;
+                min-width: 250px;
             }
-             .sidebar.expanded { /* Slide in */
+             .sidebar.expanded {
                  transform: translateX(0);
             }
-             .sidebar.collapsed { /* Slide out */
+             .sidebar.collapsed {
                  transform: translateX(-100%);
-                 /* Keep padding/opacity 0 from base collapsed */
             }
             
              .content-area {
-                 padding: 1rem; /* Reduce padding */
+                 padding: 1rem;
             }
             
-            .sidebar-toggle { /* Reposition toggle */
-                 position: fixed; /* Fixed position */
-                 top: calc(var(--elpl-header-height) + 10px); /* Below header */
-                 left: 10px; /* Near edge */
-                 background: var(--elpl-secondary); /* Different color? */
-                 z-index: 210; /* Above sidebar */
-                 transition: transform 0.3s ease; /* Add transition */
+            .sidebar-toggle {
+                position: fixed;
+                top: calc(var(--elpl-header-height) + 10px);
+                left: 10px;
+                background: var(--elpl-secondary);
+                z-index: 210;
+                transition: transform 0.3s ease;
             }
             
-             .client-content.sidebar-collapsed .sidebar-toggle { /* Adjust toggle position when closed */
-                 left: 10px; /* Keep near edge */
-                 transform: rotate(0deg); /* Icon rotation managed separately */
+             .client-content.sidebar-collapsed .sidebar-toggle {
+                 left: 10px;
+                 transform: rotate(0deg);
             }
-             /* No need for .client-content.sidebar-collapsed grid changes */
 
              .client-footer {
-                 padding: 0 1rem; /* Consistent padding */
-                 height: 70px; /* Slightly smaller footer */
-                 --elpl-footer-height: 70px; /* Update variable */
+                 padding: 0 1rem;
+                 height: 70px;
+                 --elpl-footer-height: 70px;
              }
              .chat-input-container {
-                 padding: 0.25rem; /* Tighter padding */
-                 gap: 0.5rem; /* Reduce gap */
+                 padding: 0.25rem;
+                 gap: 0.5rem;
              }
-              .send-button, .next-button { /* Smaller buttons */
+              .send-button, .next-button {
                  width: 50px;
                  height: 50px;
              }
-             .button-icon { /* Smaller icons */
+             .button-icon {
                  width: 24px;
                  height: 24px;
              }
         }
         
-        /* Added sr-only for accessibility */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -488,27 +382,23 @@
             border: 0;
         }
 
-        .header-logo {
-            height: calc(var(--elpl-header-height) - 10px); /* 5px padding top and bottom */
-            max-height: calc(var(--elpl-header-height) - 10px); /* Explicit max height */
-            padding: 5px;
-            object-fit: contain;
-        }
-
     </style>
 </head>
 <body>
-    <div class="client-layout" data-client-component="merit-page"> <!-- Keep component hook -->
+    <div class="client-layout" data-client-component="merit-page">
         <header class="client-header" role="banner">
             <div class="header-content">
-                <!-- Add menu toggle for mobile? -->
-                <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="logo" style="padding: 5px;">
-                <div class="version-display" aria-label="Version and time">v1.0.0</div>
+                <div class="header-logo-container"> 
+                     <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="header-logo">
+                </div>
+                <div class="header-version-container"> 
+                    <div class="version-display" aria-label="Version and time">v1.0.0</div>
+                </div>
             </div>
         </header>
 
-        <main class="client-content" role="main"> <!-- ID removed, class used -->
-            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation"> <!-- ID removed, class used -->
+        <main class="client-content" role="main">
+            <nav class="sidebar expanded" role="navigation" aria-label="Main navigation">
                 <div class="sidebar-content">
                     <div class="sidebar-nav">
                         <a href="#welcome" class="nav-link active" data-section="welcome" aria-current="page">
@@ -520,9 +410,8 @@
                     </div>
                  </div>
             </nav>
-             <!-- Moved toggle outside nav but inside main-content for positioning -->
              <button id="sidebarToggle" class="sidebar-toggle" aria-expanded="true" aria-label="Toggle Sidebar">
-                 <span class="toggle-icon">◀</span> <!-- Icon indicates collapse -->
+                 <span class="toggle-icon">◀</span>
              </button>
 
             <div class="content-area" role="region" aria-label="Main content">
@@ -553,7 +442,6 @@
                     </form>
                 </div>
                 <div class="section" data-section="chat" role="tabpanel" aria-labelledby="chat-tab" hidden>
-                    <!-- Chat interface content -->
                     <div class="chat-container">
                         <div class="messages" id="chat-messages"></div>
                     </div>
@@ -563,20 +451,20 @@
 
         <footer class="client-footer" role="contentinfo">
             <div class="footer-content">
-                <div class="playbar" id="playbar"> <!-- Keep ID for JS -->
-                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat"> <!-- Keep ID for JS -->
+                <div class="playbar" id="playbar">
+                    <button class="next-button" id="next-button" disabled aria-label="Continue to chat">
                         <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" alt="Next" class="button-icon">
                     </button>
                 </div>
-                <div class="chatbar" id="chatbar" hidden> <!-- Keep ID for JS -->
+                <div class="chatbar" id="chatbar" hidden>
                     <div class="chat-input-container">
                         <textarea class="chat-input" 
-                                 id="chat-input" <!-- Keep ID for JS -->
+                                 id="chat-input"
                                  aria-label="Type your message"
                                  placeholder="Type your message..."
                                  rows="1"
-                                 onkeypress="handleKeyPress(event)"></textarea> <!-- Added keypress handler -->
-                        <button class="send-button" id="send-button" aria-label="Send message"> <!-- Keep ID for JS -->
+                                 onkeypress="handleKeyPress(event)"></textarea>
+                        <button class="send-button" id="send-button" aria-label="Send message">
                             <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" alt="Send" class="button-icon">
                         </button>
                     </div>
@@ -585,10 +473,9 @@
         </footer>
     </div>
 
-    <!-- Merit specific scripts (order matters) -->
     <script type="module" src="assets/js/client-merit-form.js"></script>
     <script type="module" src="assets/js/client-merit-chat.js"></script>
-    <script type="module" src="assets/js/client-merit-logic.js"></script> <!-- Logic likely depends on form/chat -->
+    <script type="module" src="assets/js/client-merit-logic.js"></script>
 
 </body>
 </html> 
