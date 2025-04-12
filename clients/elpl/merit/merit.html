@@ -34,16 +34,31 @@
     </span>
 
     <script>
-        // Initialize version display
+        // Initialize version display with build counter
         document.addEventListener('DOMContentLoaded', () => {
             const versionDisplay = document.querySelector('.version-display');
             if (versionDisplay) {
                 const now = new Date();
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-                versionDisplay.textContent = `v1.0.0 (${hours}:${minutes})`; // Consider updating version source later
+                const buildNumber = 12; // Start at 12, increment with each build
+                const version = `v1.0.${buildNumber}`;
+                const datetime = `(${hours}:${minutes})`;
+                versionDisplay.textContent = `${version} ${datetime}`;
+                
+                // Store build number in localStorage for persistence
+                localStorage.setItem('meritBuildNumber', buildNumber);
+                localStorage.setItem('meritLastBuild', now.toISOString());
             }
         });
+
+        // Function to increment build number (call this when deploying)
+        function incrementBuildNumber() {
+            const currentBuild = parseInt(localStorage.getItem('meritBuildNumber')) || 12;
+            const newBuild = currentBuild + 1;
+            localStorage.setItem('meritBuildNumber', newBuild);
+            return newBuild;
+        }
     </script>
 
     <style>
@@ -408,7 +423,7 @@
                      <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" alt="EL Education Logo" class="header-logo">
                 </div>
                 <div class="header-version-container"> 
-                    <div class="version-display" aria-label="Version and time">v1.0.0</div>
+                    <div class="version-display" aria-label="Version and time"></div>
                 </div>
             </div>
         </header>
