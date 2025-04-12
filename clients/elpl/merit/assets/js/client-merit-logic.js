@@ -40,6 +40,7 @@ class MeritIntakeForm {
         this.initializeElements();
         this.setupEventListeners();
         this.updateNextButtonState();
+        this.initializeActiveSection();
     }
 
     initializeElements() {
@@ -57,6 +58,43 @@ class MeritIntakeForm {
         if (!this.form || !this.gradeLevelInput || !this.curriculumInput || !this.nextButton) {
             console.error("MeritIntakeForm: Required form elements not found");
             return;
+        }
+    }
+
+    initializeActiveSection() {
+        // Show welcome section by default
+        const welcomeSection = document.querySelector('[data-section="welcome"]');
+        if (welcomeSection) {
+            this.showSection(welcomeSection, 0);
+        }
+        
+        // Ensure correct footer state
+        if (this.playbar && this.chatbar) {
+            this.playbar.style.display = 'flex';
+            this.chatbar.style.display = 'none';
+        }
+    }
+
+    showSection(section, index) {
+        // Hide all sections first
+        this.sections.forEach(s => {
+            s.style.display = 'none';
+            s.classList.remove('active');
+        });
+
+        // Show and activate target section
+        section.style.display = 'block';
+        section.classList.add('active');
+
+        // Update footer visibility
+        if (this.playbar && this.chatbar) {
+            if (index === 0) {
+                this.playbar.style.display = 'flex';
+                this.chatbar.style.display = 'none';
+            } else {
+                this.playbar.style.display = 'none';
+                this.chatbar.style.display = 'flex';
+            }
         }
     }
 
@@ -134,24 +172,9 @@ class MeritIntakeForm {
         link.setAttribute('aria-current', 'page');
 
         // Show correct section
-        this.sections.forEach(section => {
-            section.hidden = true;
-            section.classList.remove('active');
-        });
-
         const targetSection = this.sections[index];
         if (targetSection) {
-            targetSection.hidden = false;
-            targetSection.classList.add('active');
-
-            // Update footer state
-            if (index === 0) {
-                this.playbar.style.display = 'flex';
-                this.chatbar.style.display = 'none';
-            } else {
-                this.playbar.style.display = 'none';
-                this.chatbar.style.display = 'flex';
-            }
+            this.showSection(targetSection, index);
         }
     }
 }
