@@ -187,29 +187,94 @@
         }
 
         .client-footer {
-            height: var(--elpl-footer-height);
-            background: var(--elpl-primary);
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
+            height: var(--elpl-footer-height);
+            background: var(--elpl-bg);
+            border-top: 1px solid var(--elpl-border);
             z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 20px;
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
         }
 
         .footer-content {
-            max-width: 800px;
-            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr minmax(auto, 700px) 150px;
             height: 100%;
+            max-width: var(--elpl-content-width);
+            margin: 0 auto;
+            padding: 0;
+            align-items: center;
+        }
+
+        /* Action Area (Next/Send button) */
+        .footer-action-area {
+            width: 150px;
+            height: 100%;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
+
+        .action-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--elpl-primary);
+            border: none;
+            padding: 5px;
+            margin: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-button:hover {
+            background: var(--elpl-secondary);
+        }
+
+        .action-button:disabled {
+            background: var(--elpl-border);
+            cursor: not-allowed;
+        }
+
+        .action-button img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        /* Chat Input Area */
+        .chat-input-container {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            padding: 10px 15px;
+        }
+
+        .chat-input {
+            width: 100%;
+            min-height: 40px;
+            max-height: 100px;
+            padding: 10px 15px;
+            border: 1px solid var(--elpl-border);
+            border-radius: var(--elpl-border-radius);
+            font-size: 16px;
+            line-height: 1.4;
+            resize: none;
+            overflow-y: auto;
+            background: var(--elpl-bg);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--elpl-primary);
+            box-shadow: 0 0 0 2px rgba(198, 18, 63, 0.1);
+        }
+
         .playbar, .chatbar {
             width: 100%;
             height: 100%;
@@ -545,11 +610,9 @@
         .chat-window {
             flex: 1;
             overflow-y: auto;
-            padding: var(--chat-container-padding);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            scroll-behavior: smooth;
+            padding: 20px;
+            margin-bottom: var(--elpl-footer-height);
+            height: calc(100vh - var(--elpl-header-height) - var(--elpl-footer-height));
         }
 
         .message {
@@ -803,23 +866,12 @@
                 role="contentinfo"
                 data-test-id="footer">
             <div class="footer-content">
-                <div class="playbar" id="playbar">
-                    <button class="next-button" 
-                            id="next-button" 
-                            disabled 
-                            aria-label="Continue to chat"
-                            data-test-id="next-button">
-                        <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
-                             alt="Next" 
-                             class="button-icon"
-                             loading="lazy">
-                    </button>
-                </div>
-                <div class="chatbar" 
-                     id="chatbar" 
-                     hidden
-                     data-test-id="chatbar">
-                    <div class="chat-input-container">
+                <!-- Left spacer -->
+                <div class="footer-spacer"></div>
+                
+                <!-- Center area - Chat input or empty -->
+                <div class="footer-center">
+                    <div id="chatbar" class="chat-input-container" hidden data-test-id="chatbar">
                         <textarea 
                             class="chat-input" 
                             id="chat-input"
@@ -832,17 +884,32 @@
                             data-enable-grammarly="false"
                             data-test-id="chat-input"
                         ></textarea>
-                        <button class="send-button" 
-                                id="send-button" 
-                                aria-label="Send message"
-                                data-test-id="send-button">
-                            <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
-                                 alt="Send" 
-                                 class="button-icon"
-                                 loading="lazy">
-                            <span class="sr-only">Send message</span>
-                        </button>
                     </div>
+                </div>
+                
+                <!-- Right action area - Next/Send button -->
+                <div class="footer-action-area">
+                    <button id="next-button" 
+                            class="action-button next-button" 
+                            disabled 
+                            aria-label="Continue to chat"
+                            data-test-id="next-button">
+                        <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
+                             alt="Next" 
+                             class="button-icon"
+                             loading="lazy">
+                    </button>
+                    
+                    <button id="send-button" 
+                            class="action-button send-button" 
+                            hidden
+                            aria-label="Send message"
+                            data-test-id="send-button">
+                        <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
+                             alt="Send" 
+                             class="button-icon"
+                             loading="lazy">
+                    </button>
                 </div>
             </div>
         </footer>
