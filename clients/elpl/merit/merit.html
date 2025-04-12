@@ -382,6 +382,20 @@
             border: 0;
         }
 
+        .sidebar.expanded {
+            width: 20%; /* Ensure expanded state is correct */
+            min-width: 200px; /* Ensure min-width is set */
+            padding: 1rem; /* Ensure padding is restored */
+            border-right: 1px solid var(--elpl-border); /* Restore border */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Restore shadow */
+             opacity: 1; /* Added */
+             visibility: visible; /* Added */
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
     </style>
 </head>
 <body>
@@ -416,6 +430,9 @@
 
             <div class="content-area" role="region" aria-label="Main content">
                 <div class="section active" data-section="welcome" role="tabpanel" aria-labelledby="welcome-tab">
+                    <h1>Welcome Teachers!</h1>
+                    <h2>I'm Merit, I'm here to help you navigate your EL Education curriculum.</h2>
+                    
                     <form class="welcome-form" id="welcome-form">
                         <div class="form-group">
                             <label for="grade-level">What grade level do you teach?</label>
