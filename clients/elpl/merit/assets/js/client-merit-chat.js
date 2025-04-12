@@ -8,6 +8,29 @@ class MeritChat {
         this.messageCount = 0;
         this.threadId = localStorage.getItem('threadId') || null;
         this.setupEventListeners();
+        this.initialize();
+    }
+
+    initialize() {
+        // Add welcome message
+        this.addMessageToUI("Welcome! I'm here to help you with your EL Education curriculum. What questions do you have?", 'assistant');
+        
+        // Show chat UI
+        const chatSection = document.querySelector('[data-section="chat"]');
+        const chatbar = document.getElementById('chatbar');
+        const playbar = document.getElementById('playbar');
+        
+        if (chatSection && chatbar && playbar) {
+            chatSection.hidden = false;
+            chatbar.hidden = false;
+            playbar.hidden = true;
+        }
+
+        // Focus chat input
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.focus();
+        }
     }
 
     setupEventListeners() {
@@ -141,11 +164,6 @@ class MeritChat {
         }).catch(console.error);
     }
 }
-
-// Initialize chat when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    new MeritChat();
-});
 
 // Export for use in other files
 export default MeritChat; 
