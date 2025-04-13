@@ -60,4 +60,59 @@ export const ADMIN_CONFIG = {
     tokenStorageKey: 'admin_token',
     assetsPath: '/admin/assets',
     pagesPath: '/admin/pages'
-}; 
+};
+
+// Admin Authentication Module
+export const AdminAuth = {
+    AUTH_KEY: 'rl_admin_auth',
+    AUTH_DURATION: 24 * 60 * 60 * 1000, // 24 hours
+
+    checkAuth() {
+        try {
+            const auth = JSON.parse(localStorage.getItem(this.AUTH_KEY));
+            if (!auth) return false;
+            
+            if (Date.now() > auth.expiry) {
+                this.clearAuth();
+                return false;
+            }
+            
+            return auth.authenticated;
+        } catch {
+            return false;
+        }
+    },
+
+    setAuth() {
+        const expiry = Date.now() + this.AUTH_DURATION;
+        localStorage.setItem(this.AUTH_KEY, JSON.stringify({
+            authenticated: true,
+            expiry
+        }));
+    },
+
+    clearAuth() {
+        localStorage.removeItem(this.AUTH_KEY);
+    },
+
+    requireAuth() {
+        if (!this.checkAuth()) {
+            window.location.href = '/admin/index.html?reauth=true';
+            return false;
+        }
+        return true;
+    },
+
+    redirectIfAuthed() {
+        if (this.checkAuth()) {
+            window.location.href = '/admin/dashboard.html';
+            return true;
+        }
+        return false;
+    }
+};
+
+// Auto-check auth on protected pages
+if (window.location.pathname !== '/admin/index.html') {
+    AdminAuth.requireAuth();
+} 

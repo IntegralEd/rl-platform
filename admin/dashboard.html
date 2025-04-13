@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Learning Admin Dashboard</title>
+    
+    <!-- Required Admin Scripts -->
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+    <script type="module" src="/admin/assets/js/admin-router.js"></script>
+    
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    
+    <script>
+        // Auth check
+        const AUTH_KEY = 'rl_admin_auth';
+        
+        function checkAuth() {
+            try {
+                const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
+                if (!auth) return false;
+                
+                if (Date.now() > auth.expiry) {
+                    localStorage.removeItem(AUTH_KEY);
+                    return false;
+                }
+                
+                return auth.authenticated;
+            } catch {
+                return false;
+            }
+        }
+
+        // Redirect if not authenticated
+        if (!checkAuth()) {
+            window.location.href = '/admin/index.html?reauth=true';
+        }
+    </script>
+
+    <style>
+        /* ... existing styles ... */
+    </style>
+</head>
+<body>
+    <!-- ... existing body content ... -->
+</body>
+</html> 

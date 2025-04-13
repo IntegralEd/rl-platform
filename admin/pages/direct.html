@@ -4,73 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin - Direct Access</title>
+    
+    <!-- Required Admin Scripts -->
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+    <script type="module" src="/admin/assets/js/admin-router.js"></script>
+    
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    
     <style>
         :root {
-            --primary: #004080;
-            --secondary: #E87722;
-            --bg-light: #f5f5f5;
-            --text: #2b2b2b;
-            --tree-width: 33%;
-            --content-width: 67%;
             --header-height: 60px;
+            --nav-width: 260px;
+            --admin-bg: #f4f5f7;
+            --admin-text: #2c3e50;
+            --admin-border: #e1e4e8;
+            --content-width: 1200px;
             --card-bg: white;
             --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
             --card-radius: 8px;
         }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-light);
-        }
-
-        .admin-container {
-            display: flex;
-            height: calc(100vh - var(--header-height));
-            position: relative;
+        .admin-layout {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "nav main";
+            grid-template-rows: var(--header-height) 1fr;
+            grid-template-columns: var(--nav-width) 1fr;
+            height: 100vh;
+            background: var(--admin-bg);
         }
 
         .admin-header {
-            background: var(--primary);
+            grid-area: header;
+            background: var(--admin-primary);
             color: white;
             padding: 0 20px;
-            height: var(--header-height);
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-
-        .temp-notice {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #FFC107;
-            padding: 8px 12px;
-            border-radius: 4px;
-            z-index: 1000;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        /* Admin Cards Styles */
-        .admin-cards {
-            width: 100%;
+        .admin-page-nav {
+            grid-area: nav;
+            background: white;
+            border-right: 1px solid var(--admin-border);
             padding: 20px;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+        }
+
+        .admin-content {
+            grid-area: main;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .version-display {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-left: auto;
+            padding-right: 20px;
+        }
+
+        /* Existing card styles preserved */
+        .admin-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
+            padding: 20px;
         }
 
         .admin-card {
@@ -78,133 +83,157 @@
             border-radius: var(--card-radius);
             padding: 20px;
             box-shadow: var(--card-shadow);
-            display: flex;
-            align-items: center;
-            gap: 24px;
         }
 
         .card-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--primary);
-            min-width: 200px;
+            color: var(--admin-primary);
+            margin-bottom: 16px;
         }
 
         .card-actions {
             display: flex;
             gap: 8px;
-            margin-left: auto;
+            flex-wrap: wrap;
         }
 
         .action-button {
             padding: 8px 12px;
-            background: var(--primary);
+            background: var(--admin-primary);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: background 0.2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            transition: all 0.2s;
         }
 
         .action-button:hover {
-            background: #003366;
+            background: var(--admin-primary-dark);
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
-    <!-- Temporary Admin Access Notice -->
-    <div class="temp-notice">⚠️ DIRECT ACCESS MODE - TEMPORARY</div>
-    
-    <!-- Admin Header -->
-    <div class="admin-header">
-        <div class="header-title">Recursive Learning Admin Dashboard (Direct Access)</div>
-        <div id="user-info">Logged in as: Admin</div>
-    </div>
-    
-    <!-- Admin Content -->
-    <div class="admin-container">
-        <!-- Admin Cards -->
-        <div class="admin-cards">
-            <!-- Airtable Test Card -->
-            <div class="admin-card">
-                <h2 class="card-title">Standup Reports</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="testAirtableStandup.queryReports()">
-                        Query Reports
-                    </button>
-                    <button class="action-button" onclick="testAirtableStandup.publishReport()">
-                        Publish Report
-                    </button>
-                </div>
-            </div>
+    <div class="admin-layout" data-admin-component="admin-page">
+        <header class="admin-header" role="banner">
+            <div class="header-title">Recursive Learning Admin</div>
+            <div class="version-display"></div>
+            <div id="user-info">Logged in as: Admin</div>
+        </header>
 
-            <!-- GoalSetter Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">Goal Setter</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/clients/st/goalsetter_admin.html'">
-                        Open Admin
-                    </button>
-                </div>
+        <nav class="admin-page-nav" role="navigation" aria-label="Admin Navigation">
+            <div class="nav-section">
+                <h2>Quick Access</h2>
+                <!-- Navigation items will be dynamically loaded -->
             </div>
+        </nav>
 
-            <!-- Merit System Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">Merit System</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/clients/elpl/merit_admin.html'">
-                        Open Admin
-                    </button>
-                    <button class="action-button" onclick="window.location.href='/clients/elpl/merit/merit_live.html'">
-                        View Live
-                    </button>
+        <main class="admin-content" role="main">
+            <div class="admin-cards">
+                <!-- Standup Reports -->
+                <div class="admin-card">
+                    <h2 class="card-title">Standup Reports</h2>
+                    <div class="card-actions">
+                        <button class="action-button" data-action="query-reports">
+                            Query Reports
+                        </button>
+                        <button class="action-button" data-action="publish-report">
+                            Publish Report
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- BHB Admin Card -->
-            <div class="admin-card">
-                <h2 class="card-title">BHB</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='/admin/pages/clients/bhb/admin.html'">
-                        Open Admin
-                    </button>
-                    <button class="action-button" onclick="window.location.href='/clients/bhb/bmorehealthybabies_live.html'">
-                        View Live
-                    </button>
+                <!-- GoalSetter Admin -->
+                <div class="admin-card">
+                    <h2 class="card-title">Goal Setter</h2>
+                    <div class="card-actions">
+                        <button class="action-button" data-href="/admin/pages/st/goalsetter/admin.html">
+                            Open Admin
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Report Back to Softr -->
-            <div class="admin-card">
-                <h2 class="card-title">Return to Mothership</h2>
-                <div class="card-actions">
-                    <button class="action-button" onclick="window.location.href='https://integral-mothership.softr.app/recursive-admin-dashboard'">
-                        Back to Mothership
-                    </button>
+                <!-- Merit System Admin -->
+                <div class="admin-card">
+                    <h2 class="card-title">Merit System</h2>
+                    <div class="card-actions">
+                        <button class="action-button" data-href="/admin/pages/elpl/merit/admin.html">
+                            Open Admin
+                        </button>
+                        <button class="action-button" data-href="/clients/elpl/merit/merit_live.html">
+                            View Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BHB Admin -->
+                <div class="admin-card">
+                    <h2 class="card-title">BHB</h2>
+                    <div class="card-actions">
+                        <button class="action-button" data-href="/admin/pages/bhb/admin.html">
+                            Open Admin
+                        </button>
+                        <button class="action-button" data-href="/clients/bhb/bmorehealthybabies_live.html">
+                            View Live
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Return to Softr -->
+                <div class="admin-card">
+                    <h2 class="card-title">Return to Mothership</h2>
+                    <div class="card-actions">
+                        <button class="action-button" data-href="https://integral-mothership.softr.app/recursive-admin-dashboard">
+                            Back to Mothership
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // Temporary bypass
-        console.log("⚠️ ADMIN ACCESS TEMPORARILY BYPASSED");
-        window.BYPASS_AUTH = true;
-        
-        // Simple simulate logged in user
-        window.simulatedUser = {
-            Name: "Admin",
-            IE_Role_Level: "Org Admin",
-            email: "admin@integral-ed.com"
-        };
-    </script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize version display
+            const versionDisplay = document.querySelector('.version-display');
+            const now = new Date();
+            const buildDate = now.toLocaleDateString('en-US', { 
+                month: '2-digit', 
+                day: '2-digit',
+                year: 'numeric'
+            }).replace(/\//g, '');
+            const buildTime = now.toLocaleTimeString('en-US', { 
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit'
+            }).toLowerCase();
+            const version = '1.0.0';
+            versionDisplay.textContent = `admin.html/${buildDate}.${buildTime}.v.${version}`;
 
-    <!-- Airtable Test Script -->
-    <script type="module" src="/admin/assets/js/test-standup-airtable.js"></script>
+            // Handle navigation
+            document.querySelectorAll('[data-href]').forEach(button => {
+                button.addEventListener('click', () => {
+                    window.location.href = button.dataset.href;
+                });
+            });
+
+            // Handle actions
+            document.querySelectorAll('[data-action]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.dataset.action;
+                    switch(action) {
+                        case 'query-reports':
+                            console.log('Querying reports...');
+                            break;
+                        case 'publish-report':
+                            console.log('Publishing report...');
+                            break;
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

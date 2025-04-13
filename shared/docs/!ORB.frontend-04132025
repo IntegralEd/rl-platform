@@ -1,14 +1,49 @@
 # Frontend ORB (One Ring to Bind)
-last update: 04132025.0339am.david@frontend_cursor
+last update: 04132025.0928am.david@frontend_cursor
 agent: claude@cursor_frontend_v3.5
 build: merit.html/04132025.09:28am.v.1.15
 
 ## The ORB Concept
 We are many humans and agents collaborating in a project of recursive learning. This document is the One Ring To Bind them... When you log into Cursor to work on a repo, you will need to consult the ORB to stay in alignment with other frontend devs AND with the evolving REST-API protocols as we expand CORS and permissions and add clients and expand our tree.
 
+## Asset Path Convention
+- Platform Assets: /shared/platform/* (core RL platform resources)
+  - CSS: /shared/platform/css/* (platform-wide styles)
+  - Images: /shared/platform/images/* (platform UI elements)
+  - JS: /shared/platform/js/* (platform core functionality)
+- Documentation: /shared/docs/* (documentation and rules)
+- Components: /shared/page_ingredients/* (reusable components)
+- Client Assets: /clients/{client}/assets/* (client-specific resources)
+- Admin Assets: /admin/assets/* (admin-specific resources)
+
+## Platform Resources
+### Core Platform Files
+- Must use prefix `platform-` for all files
+- Must follow naming: `platform-{purpose}-{variant}-{color}.{ext}`
+- Example: `platform-send-icon-white.svg`
+
+### Usage Scope
+1. Platform Core (Always Available)
+   - Base UI components
+   - Core utilities
+   - Shared functionality
+   - System icons/assets
+
+2. Access Patterns
+   - Available to all interfaces (admin/client/demo)
+   - No client-specific code
+   - No environment-specific logic
+   - Version controlled with platform
+
+3. Implementation Rules
+   - Keep flat directory structure
+   - Use clear descriptive names
+   - Document all platform assets
+   - Maintain backwards compatibility
+
 ## Deployment Path
-- Source: /admin/assets/rules/ORB.frontend-current
-- Public: /admin/assets/rules/rlp-orb.html
+- Source: /admin/pages/orb/orb-rulesets.html
+- Public: /shared/platform/orb/rlp-orb.html
 - Access: Managed via admin CORS for safe embedding
 - Distribution: Auto-piped to Slack and Softr instances
 - Updates: RSS-style notifications for changes
@@ -34,6 +69,12 @@ We are many humans and agents collaborating in a project of recursive learning. 
 @client-layout-structure-behavior
 @admin-layout-structure-behavior
 @redis-api-access-patterns
+@platform-asset-convention
+
+## Asset Naming Convention
+- Platform resources: `platform-{purpose}-{variant}-{color}.{ext}`
+- Example: `platform-send-icon-white.svg`
+- Usage: Core functionality across admin, client, and demo pages
 
 ## Wiki Structure [/admin/pages/wiki]
 The ORB feeds a live wiki system for team alignment:
