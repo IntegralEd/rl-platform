@@ -1,4 +1,19 @@
 # Cursor Frontend Ruleset (April 2025)
+last update: 04132025.0339am.david@frontend_cursor
+agent: claude@cursor_frontend_v3.5
+
+## Version Control [merit.html/04132025.09:28am.v.1.15]
+This ruleset follows Merit versioning standards:
+- Format: `{project}.html/MMDDYYYY.HH:MMam/pm.v.{version}`
+- Time Zone: America/Chicago (Central)
+- Current Build: merit.html/04132025.09:28am.v.1.15
+
+## Update Protocol
+1. Add your update signature in format:
+   `last update: MMDDYYYY.HHMMam/pm.username@team_cursor`
+2. Include agent signature if using AI assistance
+3. Maintain version alignment with Merit standards
+4. Document all rule changes in changelog
 
 ## Overview
 This document serves as the master ruleset for frontend development in the Recursive Learning platform. It combines layout patterns, state management, and integration rules to ensure consistent implementation across all components.
@@ -251,19 +266,6 @@ class NavigationController {
 - Usage examples
 - API documentation
 - Testing instructions
-
-## Version Control
-
-### Branch Strategy
-- Feature branches: `feature/component-name`
-- Release branches: `release/v1.x.x`
-- Hotfix branches: `hotfix/issue-description`
-
-### Commit Standards
-- Clear messages
-- Link to issues
-- Describe breaking changes
-- Include scope of changes
 
 ## Accessibility Requirements
 
