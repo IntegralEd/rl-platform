@@ -1,0 +1,8 @@
+:root {
+    --header-height: 60px;
+    --footer-height: 40px;
+    --client-bg: #ffffff;
+    --client-text: #2c3e50;
+    --client-border: #e1e4e8;
+    --content-width: 1200px;
+}
