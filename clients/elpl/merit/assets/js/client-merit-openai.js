@@ -1,54 +1,84 @@
 /**
  * @component MeritOpenAIClient
- * @description Handles OpenAI Assistant interactions for Merit chat
+ * @description Handles OpenAI Assistant interactions for Merit chat (Stage 0: Baseline)
  * @version 1.0.15
+ * 
+ * @questions
+ * - Q1: Should we implement retry logic for 429 rate limit responses?
+ * - Q2: What's the expected timeout for thread creation (currently set to default)?
+ * - Q3: Should we cache thread IDs in localStorage for session recovery?
  */
 class MeritOpenAIClient {
     constructor() {
         this.threadId = null;
         this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';
-        this.baseUrl = '/api/openai';
+        this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
         
-        // Required by client-layout-structure-behavior
+        // Stage 0: Basic state tracking
         this.state = {
             isLoading: false,
             hasError: false,
             errorMessage: null,
-            isPreloaded: false,
-            context: null
+            lastRequest: null,
+            lastResponse: null
         };
+
+        console.log('[Merit Flow] OpenAI client initialized for Stage 0');
+        console.log('[Merit Flow] Using Lambda endpoint:', this.baseUrl);
     }
 
     /**
-     * Creates a new thread and optionally preloads context
-     * @param {Object} context User context (grade, curriculum)
+     * Creates a new thread (Stage 0: Clean thread creation)
      * @returns {Promise<string>} Thread ID
+     * 
+     * @questions
+     * - Q4: What's the expected thread TTL for Stage 0?
+     * - Q5: Should we implement thread cleanup for abandoned sessions?
      */
-    async createThread(context = null) {
+    async createThread() {
         try {
             this.state.isLoading = true;
+            this.state.lastRequest = {
+                type: 'createThread',
+                timestamp: new Date().toISOString()
+            };
+
             console.log('[Merit Flow] Creating new thread');
 
-            const response = await fetch(`${this.baseUrl}/threads`, {
+            const response = await fetch(this.baseUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    assistantId: this.assistantId,
+                    threadId: null,
+                    message: 'Initialize thread'
+                })
             });
 
-            if (!response.ok) throw new Error('Failed to create thread');
-            
-            const { threadId } = await response.json();
-            this.threadId = threadId;
-            
-            console.log('[Merit Flow] Thread created:', threadId);
-
-            // Stage 1: Preload context if provided
-            if (context) {
-                await this.preloadContext(context);
-            } else {
-                console.log('[Merit Flow] No context loaded (Stage 0)');
+            if (!response.ok) {
+                console.error('[Merit Flow] Thread creation failed:', response.status);
+                throw new Error('Failed to create thread');
             }
+            
+            const data = await response.json();
+            this.state.lastResponse = {
+                type: 'createThread',
+                timestamp: new Date().toISOString(),
+                status: response.status,
+                threadId: data.Thread_ID
+            };
 
-            return threadId;
+            if (!data.Thread_ID) {
+                console.error('[Merit Flow] Invalid thread response:', data);
+                throw new Error('Invalid thread response');
+            }
+            
+            this.threadId = data.Thread_ID;
+            console.log('[Merit Flow] Thread created:', this.threadId);
+            console.log('[Merit Flow] No context loaded (Stage 0)');
+            console.log('[Merit Flow] Default onboarding active');
+
+            return this.threadId;
 
         } catch (error) {
             console.error('[Merit Flow] Thread creation error:', error);
@@ -84,35 +114,56 @@ class MeritOpenAIClient {
     }
 
     /**
-     * Sends a message to the assistant and gets response
-     * @param {string} content User message
-     * @param {Object} options Message options
+     * Sends a message to the assistant (Stage 0: Default behavior)
+     * @param {string} message User message
      * @returns {Promise<Object>} Assistant response
+     * 
+     * @questions
+     * - Q6: Should we implement message queue for rate limiting?
+     * - Q7: What's the expected message size limit?
      */
-    async sendMessage(content, options = { visible: true }) {
+    async sendMessage(message) {
+        if (!this.threadId) {
+            console.error('[Merit Flow] No active thread');
+            throw new Error('No active chat session');
+        }
+
         try {
-            if (!this.threadId) {
-                await this.createThread();
-            }
-
             this.state.isLoading = true;
-            console.log('[Merit Flow] Sending message');
+            this.state.lastRequest = {
+                type: 'sendMessage',
+                timestamp: new Date().toISOString(),
+                threadId: this.threadId,
+                message: message
+            };
 
-            const response = await fetch(`${this.baseUrl}/threads/${this.threadId}/messages`, {
+            console.log('[Merit Flow] Sending message:', message);
+
+            const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    content,
-                    visible: options.visible 
+                body: JSON.stringify({
+                    assistantId: this.assistantId,
+                    threadId: this.threadId,
+                    message: message
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to send message');
-            
-            const result = await response.json();
-            console.log('[Merit Flow] Message sent and response received');
-            
-            return result;
+            if (!response.ok) {
+                console.error('[Merit Flow] Message failed:', response.status);
+                throw new Error('Failed to send message');
+            }
+
+            const data = await response.json();
+            this.state.lastResponse = {
+                type: 'sendMessage',
+                timestamp: new Date().toISOString(),
+                status: response.status,
+                messageId: data.message_id
+            };
+
+            console.log('[Merit Flow] Response received');
+            return data;
 
         } catch (error) {
             console.error('[Merit Flow] Message error:', error);
@@ -125,28 +176,28 @@ class MeritOpenAIClient {
     }
 
     /**
-     * Gets the current context state
-     * @returns {Object} Current context state
+     * Gets current client state including request/response history
+     * @returns {Object} Current state
+     * 
+     * @questions
+     * - Q8: Should we implement state persistence between page reloads?
      */
     getState() {
-        return {
-            ...this.state,
-            threadId: this.threadId,
-            hasThread: !!this.threadId
-        };
+        return { ...this.state };
     }
 
     /**
-     * Cleans up resources when component is destroyed
+     * Cleans up client resources
+     * 
+     * @questions
+     * - Q9: Should we notify backend of client destruction?
      */
     destroy() {
         this.threadId = null;
         this.state.isLoading = false;
         this.state.hasError = false;
         this.state.errorMessage = null;
-        this.state.isPreloaded = false;
-        this.state.context = null;
-        console.log('[Merit Flow] OpenAI client cleaned up');
+        console.log('[Merit Flow] Client destroyed');
     }
 }
 

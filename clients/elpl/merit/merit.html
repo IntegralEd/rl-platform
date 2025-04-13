@@ -40,21 +40,34 @@
                 const now = new Date();
                 // Convert to Central Time
                 const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-                const hours = String(centralTime.getHours()).padStart(2, '0');
+                
+                // Format date as MMDDYYYY
+                const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+                const day = String(centralTime.getDate()).padStart(2, '0');
+                const year = centralTime.getFullYear();
+                const buildDate = `${month}${day}${year}`;
+                
+                // Format time as HH:MMam/pm
+                const hours = centralTime.getHours();
                 const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'pm' : 'am';
+                const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+                const buildTime = `${formattedHours}:${minutes}${ampm}`;
                 
-                // Version 1.0.15 represents:
-                // 1 = Major version (platform)
-                // 0 = Minor version (feature set)
-                // 15 = Build number (current sprint)
-                const version = 'v1.0.15';
-                const datetime = `CT ${hours}:${minutes}`;
-                versionDisplay.textContent = `${version} (${datetime})`;
+                // Version 1.0.15 simplified to 1.15
+                const version = '1.15';
                 
-                // Store for debugging
+                // Format: merit.html/04132024.09:09am.v.1.15
+                const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+                versionDisplay.textContent = displayVersion;
+                
+                // Store for debugging and build tracking
                 localStorage.setItem('meritVersion', version);
-                localStorage.setItem('meritLastBuild', now.toISOString());
-                localStorage.setItem('meritBuildTime', datetime);
+                localStorage.setItem('meritBuildDate', buildDate);
+                localStorage.setItem('meritBuildTime', buildTime);
+                localStorage.setItem('meritFullVersion', displayVersion);
+                
+                console.log('[Merit Flow] Build version:', displayVersion);
             }
         });
 
