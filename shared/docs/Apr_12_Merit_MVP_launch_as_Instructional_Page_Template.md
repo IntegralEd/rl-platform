@@ -824,159 +824,209 @@ client-merit-instructional-flow.js:308 Path: /clients/elpl/merit/merit.html#welc
    - [✗] Form submission not captured
    - [✗] Navigation events not completing
 
-### v1.0.15 (Next Build) Implementation [T]
+### v1.0.15 (23:45) Minimal Path to Live Chat [T]
 
-1. Fix Navigation System
+### 1. OpenAI Assistant Setup [IMMEDIATE]
 ```javascript
+// Merit Assistant Configuration
+const ASSISTANT_CONFIG = {
+    id: 'asst_merit_default', // Default assistant for MVP
+    model: 'gpt-4-turbo-preview',
+    name: 'Merit ELA Support',
+    threadTTL: 3600 // 1 hour for MVP
+};
+
+// Minimal Thread Management
+class ThreadManager {
+    constructor() {
+        this.threadId = null;
+        this.assistantId = ASSISTANT_CONFIG.id;
+    }
+
+    async createThread() {
+        const response = await fetch('/api/openai/threads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const { threadId } = await response.json();
+        this.threadId = threadId;
+        return threadId;
+    }
+
+    async sendMessage(content) {
+        if (!this.threadId) {
+            this.threadId = await this.createThread();
+        }
+
+        const response = await fetch(`/api/openai/threads/${this.threadId}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content })
+        });
+        return response.json();
+    }
+}
+```
+
+### 2. Minimal API Routes [IMMEDIATE]
+```javascript
+// /api/openai/threads
+app.post('/api/openai/threads', async (req, res) => {
+    const thread = await openai.beta.threads.create();
+    res.json({ threadId: thread.id });
+});
+
+// /api/openai/threads/:threadId/messages
+app.post('/api/openai/threads/:threadId/messages', async (req, res) => {
+    const { threadId } = req.params;
+    const { content } = req.body;
+
+    // Add message to thread
+    await openai.beta.threads.messages.create(threadId, {
+        role: 'user',
+        content
+    });
+
+    // Run assistant
+    const run = await openai.beta.threads.runs.create(threadId, {
+        assistant_id: ASSISTANT_CONFIG.id
+    });
+
+    // Wait for completion
+    let response = await waitForCompletion(threadId, run.id);
+    res.json(response);
+});
+```
+
+### 3. Frontend Integration [IMMEDIATE]
+```javascript
+// Update MeritInstructionalFlow
 class MeritInstructionalFlow {
-    #setupEventListeners() {
-        // Fix next button click handling
-        this.elements.nextButton?.addEventListener('click', () => {
-            console.log('[Merit Flow] Next button clicked');
-            this.navigateToSection('chat');
-        });
-
-        // Add form submission handling
-        this.elements.form?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            console.log('[Merit Flow] Form submitted');
-            this.navigateToSection('chat');
-        });
-
-        // Improve navigation logging
-        this.#logNavigation = (from, to) => {
-            console.log('[Merit Flow] Navigation:', { from, to });
-        };
+    constructor() {
+        this.threadManager = new ThreadManager();
+        this.setupChatHandlers();
     }
 
-    navigateToSection(section) {
-        const previousSection = this.state.currentSection;
-        this.state.currentSection = section;
-        
-        // Log navigation change
-        this.#logNavigation(previousSection, section);
-        
-        // Update UI with validation
-        this.#updateSectionVisibility(section);
-        this.#updateNavigationState(section);
-        this.#updateFooterState(section);
-        
-        // Verify navigation success
-        console.log('[Merit Flow] Navigation complete:', {
-            from: previousSection,
-            to: section,
-            success: true
+    setupChatHandlers() {
+        const sendButton = document.getElementById('send-button');
+        const chatInput = document.getElementById('chat-input');
+
+        sendButton.addEventListener('click', () => this.sendMessage());
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
         });
+    }
+
+    async sendMessage() {
+        const chatInput = document.getElementById('chat-input');
+        const content = chatInput.value.trim();
+        if (!content) return;
+
+        // Clear input
+        chatInput.value = '';
+
+        // Show user message
+        this.addMessage('user', content);
+
+        try {
+            // Show loading state
+            this.addMessage('loading', 'Assistant is thinking...');
+
+            // Send to API
+            const response = await this.threadManager.sendMessage(content);
+
+            // Remove loading message
+            this.removeLoadingMessage();
+
+            // Show assistant response
+            this.addMessage('assistant', response.content);
+
+        } catch (error) {
+            console.error('[Merit Flow] Chat error:', error);
+            this.removeLoadingMessage();
+            this.addMessage('error', 'Failed to get response. Please try again.');
+        }
+    }
+
+    addMessage(type, content) {
+        const chatWindow = document.getElementById('chat-window');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content;
+        chatWindow.appendChild(messageDiv);
+        messageDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    removeLoadingMessage() {
+        const loadingMessage = document.querySelector('.message.loading');
+        if (loadingMessage) loadingMessage.remove();
     }
 }
 ```
 
-2. Fix State Management
+### 4. Testing Sequence [T]
+1. Initial Chat Test
+   ```bash
+   # Expected Console Output
+   [Merit Flow] Creating new thread
+   [Merit Flow] Thread created: thread_abc123
+   [Merit Flow] Message sent: "Hello"
+   [Merit Flow] Assistant response received
+   ```
+
+2. Verification Points
+   - [ ] Thread creation successful
+   - [ ] Message sending works
+   - [ ] Assistant responds
+   - [ ] UI updates properly
+   - [ ] Error states handled
+
+### 5. Next Steps (v1.0.16)
+1. Add Form Data Integration
+   - [ ] Grade level context
+   - [ ] Curriculum mapping
+   - [ ] User preferences
+
+2. Add Proper Validation
+   - [ ] Form validation
+   - [ ] Navigation rules
+   - [ ] State management
+   - [ ] Error boundaries
+
+3. Add Redis Caching
+   - [ ] Thread caching
+   - [ ] Message history
+   - [ ] State persistence
+
+### Expected Console Output [T]
 ```javascript
-class MeritInstructionalFlow {
-    #state = {
-        currentSection: 'welcome',
-        formValid: false,
-        gradeLevel: null,
-        curriculum: 'ela',
-        navigationEnabled: false
-    };
-
-    #logState(action) {
-        console.log('[Merit Flow] State Update:', {
-            action,
-            section: this.#state.currentSection,
-            formValid: this.#state.formValid,
-            gradeLevel: this.#state.gradeLevel,
-            curriculum: this.#state.curriculum
-        });
-    }
-
-    #validateForm() {
-        const form = this.elements.form;
-        const gradeLevel = form?.querySelector('#grade-level')?.value;
-        const curriculum = form?.querySelector('#curriculum')?.value;
-        
-        this.#state.formValid = Boolean(gradeLevel && curriculum);
-        this.#state.gradeLevel = gradeLevel;
-        this.#state.curriculum = curriculum;
-        
-        this.#logState('Form Validation');
-        return this.#state.formValid;
-    }
+[Merit Flow] Initializing chat system
+[Merit Flow] Thread created: thread_abc123
+[Merit Flow] Message sent successfully
+[Merit Flow] Assistant response: {
+    type: 'message',
+    role: 'assistant',
+    content: 'Hi friend...'
 }
+[Merit Flow] Chat exchange complete
 ```
 
-3. Expected Console Output
-```javascript
-// Initialization
-[Merit Flow] Initializing instructional flow controller
-[Merit Flow] State Update: {
-    action: 'Initialization',
-    section: 'welcome',
-    formValid: false,
-    gradeLevel: null,
-    curriculum: 'ela'
-}
+### Implementation Notes
+1. Focus on core chat functionality first
+2. Skip complex validation for MVP
+3. Use default assistant for initial testing
+4. Add proper error handling
+5. Implement basic loading states
+6. Log all chat interactions
 
-// Form Selection
-[Merit Flow] State Update: {
-    action: 'Form Validation',
-    section: 'welcome',
-    formValid: true,
-    gradeLevel: 'Grade 1',
-    curriculum: 'ela'
-}
-
-// Navigation to Chat
-[Merit Flow] Next button clicked
-[Merit Flow] Navigation: {
-    from: 'welcome',
-    to: 'chat'
-}
-[Merit Flow] Navigation complete: {
-    from: 'welcome',
-    to: 'chat',
-    success: true
-}
-```
-
-4. Verification Points [T]
-- [ ] Clean initialization sequence
-- [ ] Proper state management
-- [ ] Working navigation flow
-- [ ] Consistent logging format
-- [ ] No duplicate logs
-- [ ] Proper type validation
-
-5. Testing Steps [T]
-1. Initial Load:
-   - [ ] Check console for clean initialization
-   - [ ] Verify initial state values
-   - [ ] Confirm no duplicate logs
-
-2. Form Interaction:
-   - [ ] Select grade level
-   - [ ] Verify state update logs
-   - [ ] Check form validation
-
-3. Navigation:
-   - [ ] Click next button
-   - [ ] Verify navigation logs
-   - [ ] Confirm section change
-   - [ ] Check final state
-
-6. Implementation Notes [T]
-- Added navigation event logging
-- Fixed state type validation
-- Improved logging consistency
-- Added navigation verification
-- Fixed button click handling
-- Added form submission capture
-
-7. Next Steps (v1.0.16)
-- [ ] Add error boundaries
-- [ ] Implement loading states
-- [ ] Add transition animations
-- [ ] Improve mobile responsiveness
-- [ ] Add accessibility enhancements
+### Critical Path
+1. ✓ Basic UI/UX working
+2. ✓ Navigation functional
+3. → Create OpenAI thread
+4. → Send/receive messages
+5. → Show responses
+6. → Handle errors
+7. Later: Add validation
