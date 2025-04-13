@@ -34,7 +34,8 @@ export class MeritInstructionalFlow {
         gradeLevel: null,
         curriculum: "ela",
         initialized: false,
-        chatReady: false
+        chatReady: false,
+        contextLoaded: false
     };
 
     /**
@@ -54,6 +55,12 @@ export class MeritInstructionalFlow {
         chatWindow: null
     };
 
+    /**
+     * OpenAI client instance
+     * @private
+     */
+    #openAIClient = null;
+
     // Private initialize method declaration
     #initialize = () => {
         if (!this.#initializeElements()) {
@@ -61,6 +68,7 @@ export class MeritInstructionalFlow {
             return;
         }
 
+        this.#openAIClient = new MeritOpenAIClient();
         this.#setupEventListeners();
         this.#loadPersistedState();
         this.#initializeActiveSection();
@@ -192,17 +200,22 @@ export class MeritInstructionalFlow {
     }
 
     /**
-     * Handles section navigation
+     * Handles section navigation with context loading
      * @private
      * @param {string} sectionId - The ID of the section to navigate to
      */
-    #handleNavigation(sectionId) {
+    async #handleNavigation(sectionId) {
         const previousSection = this.#state.currentSection;
         console.log('[Merit Flow] Navigation:', { from: previousSection, to: sectionId });
 
         // Update state first
         this.#state.currentSection = sectionId;
         
+        // If navigating to chat, ensure context is loaded
+        if (sectionId === 'chat' && !this.#state.contextLoaded) {
+            await this.#initializeChat();
+        }
+
         // Update sections
         this.#elements.sections?.forEach(section => {
             const isActive = section.dataset.section === sectionId;
@@ -233,6 +246,30 @@ export class MeritInstructionalFlow {
             to: sectionId,
             success: true
         });
+    }
+
+    /**
+     * Initialize chat with context
+     * @private
+     */
+    async #initializeChat() {
+        try {
+            // Get current form data
+            const context = {
+                gradeLevel: this.#state.gradeLevel,
+                curriculum: this.#state.curriculum
+            };
+
+            // Create thread with context (Stage 1)
+            await this.#openAIClient.createThread(context);
+            
+            this.#state.contextLoaded = true;
+            console.log('[Merit Flow] Chat initialized with context:', context);
+            
+        } catch (error) {
+            console.error('[Merit Flow] Chat initialization error:', error);
+            this.#addMessage('error', 'Failed to initialize chat. Please try again.');
+        }
     }
 
     /**
@@ -398,7 +435,7 @@ export class MeritInstructionalFlow {
             this.#addMessage('loading', 'Assistant is thinking...');
 
             // Get response from OpenAI
-            const response = await this.openAIClient.sendMessage(content);
+            const response = await this.#openAIClient.sendMessage(content);
             
             // Remove loading and show response
             this.#removeLoadingMessage();
