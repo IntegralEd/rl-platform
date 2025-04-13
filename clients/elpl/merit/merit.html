@@ -43,11 +43,11 @@
                 const hours = String(centralTime.getHours()).padStart(2, '0');
                 const minutes = String(centralTime.getMinutes()).padStart(2, '0');
                 
-                // Version 1.0.14 represents:
+                // Version 1.0.15 represents:
                 // 1 = Major version (platform)
                 // 0 = Minor version (feature set)
-                // 14 = Build number (current sprint)
-                const version = 'v1.0.14';
+                // 15 = Build number (current sprint)
+                const version = 'v1.0.15';
                 const datetime = `CT ${hours}:${minutes}`;
                 versionDisplay.textContent = `${version} (${datetime})`;
                 
@@ -60,7 +60,7 @@
 
         // MVP validation logging
         console.log('[Merit Flow] All validations passed for MVP testing');
-        console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.15');
+        console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.16');
         console.log('[Merit Flow] Form validation hardcoded to pass for testing');
         console.log('[Merit Flow] Navigation validation hardcoded to pass for testing');
     </script>
