@@ -6,6 +6,8 @@
  * @module client-merit-instructional-flow
  */
 
+import MeritOpenAIClient from './client-merit-openai.js';
+
 export class MeritInstructionalFlow {
     /**
      * Configuration for the instructional flow
@@ -380,21 +382,33 @@ export class MeritInstructionalFlow {
         }
     }
 
-    #sendMessage() {
-        const message = this.#elements.chatInput?.value.trim();
-        if (!message) return;
+    /**
+     * Sends a message to the OpenAI assistant
+     * @param {string} content Message content
+     * @returns {Promise<void>}
+     */
+    async #sendMessage() {
+        const content = this.#elements.chatInput?.value.trim();
+        if (!content) return;
 
-        // Clear input
-        this.#elements.chatInput.value = '';
+        try {
+            // Clear input and show user message
+            this.#elements.chatInput.value = '';
+            this.#addMessage('user', content);
+            this.#addMessage('loading', 'Assistant is thinking...');
 
-        // Add message to chat
-        this.#addMessage('user', message);
+            // Get response from OpenAI
+            const response = await this.openAIClient.sendMessage(content);
+            
+            // Remove loading and show response
+            this.#removeLoadingMessage();
+            this.#addMessage('assistant', response.content);
 
-        // Simulate response for MVP
-        setTimeout(() => {
-            this.#addMessage('assistant', 'Message received. This is a test response for MVP.');
-            console.log('[Merit Flow] Chat message exchange validated');
-        }, 1000);
+        } catch (error) {
+            console.error('[Merit Flow] Chat error:', error);
+            this.#removeLoadingMessage();
+            this.#addMessage('error', 'Failed to get response. Please try again.');
+        }
     }
 
     #addMessage(type, content) {
@@ -403,6 +417,11 @@ export class MeritInstructionalFlow {
         messageDiv.textContent = content;
         this.#elements.chatWindow?.appendChild(messageDiv);
         messageDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    #removeLoadingMessage() {
+        const loadingMessage = document.querySelector('.message.loading');
+        if (loadingMessage) loadingMessage.remove();
     }
 }
 
