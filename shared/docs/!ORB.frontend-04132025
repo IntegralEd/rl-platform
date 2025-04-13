@@ -1,0 +1,158 @@
+# Frontend ORB (One Ring to Bind)
+last update: 04132025.0339am.david@frontend_cursor
+agent: claude@cursor_frontend_v3.5
+build: merit.html/04132025.09:28am.v.1.15
+
+## The ORB Concept
+We are many humans and agents collaborating in a project of recursive learning. This document is the One Ring To Bind them... When you log into Cursor to work on a repo, you will need to consult the ORB to stay in alignment with other frontend devs AND with the evolving REST-API protocols as we expand CORS and permissions and add clients and expand our tree.
+
+## Deployment Path
+- Source: /admin/assets/rules/ORB.frontend-current
+- Public: /admin/assets/rules/rlp-orb.html
+- Access: Managed via admin CORS for safe embedding
+- Distribution: Auto-piped to Slack and Softr instances
+- Updates: RSS-style notifications for changes
+
+## Active Build Context [merit.html/04132025.09:28am.v.1.15]
+- Stage: 0 (Baseline)
+- Project: Merit MVP Chat
+- Version: v1.15
+- Focus: Lambda endpoint integration
+
+## Version Control
+- Format: `{project}.html/MMDDYYYY.HH:MMam/pm.v.{version}`
+- Time Zone: America/Chicago (Central)
+- Current: merit.html/04132025.09:28am.v.1.15
+
+## Update Protocol
+1. Update signature: `MMDDYYYY.HHMMam/pm.username@team_cursor`
+2. Include agent signature if using AI
+3. Maintain version alignment
+4. Reference existing behaviors with @ calls
+
+## Core References
+@client-layout-structure-behavior
+@admin-layout-structure-behavior
+@redis-api-access-patterns
+
+## Wiki Structure [/admin/pages/wiki]
+The ORB feeds a live wiki system for team alignment:
+
+### 1. Team Dashboard [/admin/pages/wiki/dashboard]
+- Live status cards for each component
+- CloudWatch metrics integration
+- Sprint progress tracking
+- Agent activity logs
+- Build status indicators
+
+### 2. Daily Standup Board [/admin/pages/wiki/standup]
+- HTML-based standup cards
+- Auto-generated from git activity
+- AI agent contribution tracking
+- Visual sprint burndown
+- Integration status updates
+
+### 3. Dev Knowledge Base [/admin/pages/wiki/kb]
+- Shared ruleset documentation
+- Architecture decisions
+- API endpoint catalog
+- Component library
+- Testing protocols
+
+### 4. Team Alignment Tools [/admin/pages/wiki/align]
+- Sprint planning board
+- Human-AI pairing schedule
+- Code review dashboard
+- Decision log
+- Risk register
+
+### 5. Monitoring Hub [/admin/pages/wiki/monitor]
+- Segmented CloudWatch dashboards
+- Error rate tracking
+- Performance metrics
+- API health status
+- Resource utilization
+
+## Future Contextual Rulesets
+The ORB system is designed to evolve with our platform. Future rulesets may include:
+
+### 1. Usage Contexts
+- School Environment Rules
+  - Block external web access
+  - Limit tool availability
+  - Enforce educational guidelines
+  - FERPA compliance checks
+
+- Clinical Setting Rules
+  - HIPAA compliance
+  - PHI data handling
+  - Audit trail requirements
+  - Secure messaging protocols
+
+### 2. Access Tiers
+- Free User Rules
+  - Feature limitations
+  - API rate limiting
+  - Basic tool access
+  - Community support only
+
+- Premium User Rules
+  - Advanced features
+  - Higher API limits
+  - Premium tool access
+  - Priority support access
+
+### 3. Client-Specific Rules
+- Educational Institutions
+  - Student data protection
+  - Grade level appropriate tools
+  - Parent portal access
+  - District-wide settings
+
+- Medical Practices
+  - Patient data security
+  - Appointment scheduling
+  - Insurance integration
+  - Compliance reporting
+
+### 4. Integration Rules
+- Softr Embedding
+  - CORS configurations
+  - Authentication flow
+  - Component visibility
+  - Update propagation
+
+- Slack Integration
+  - Notification rules
+  - Command permissions
+  - Update broadcasting
+  - User synchronization
+
+## Team Alignment Patterns
+For 2 humans + 4 AI agents:
+
+### 1. Daily Rhythm
+- Morning: Human review of AI overnight work
+- Midday: Paired programming sessions
+- Evening: AI task delegation and monitoring
+
+### 2. Communication Flow
+- Humans: High-level direction and review
+- Lead AI: Task distribution and coordination
+- Support AIs: Specialized tasks and monitoring
+- Wiki: Single source of truth
+
+### 3. Decision Making
+- Humans: Strategic decisions and approvals
+- AI Lead: Implementation proposals
+- Support AIs: Analysis and recommendations
+- All: Wiki documentation
+
+## Notes
+- Keep version display consistent
+- Reference behaviors with @ calls
+- Monitor CORS configurations
+- Validate deployment path
+- Check RSS feed status
+- Update wiki cards daily
+- Review AI agent logs 

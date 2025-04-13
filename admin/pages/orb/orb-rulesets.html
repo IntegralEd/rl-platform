@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ORB Rulesets - Frontend Development Rules and Guidelines">
+    <title>ORB Rulesets | Admin</title>
+
+    <!-- Required admin scripts -->
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+    <script type="module" src="/admin/assets/js/admin-router.js"></script>
+
+    <!-- ORB specific scripts -->
+    <script type="module" src="assets/js/admin-orb-manager.js"></script>
+    <script type="module" src="assets/js/admin-orb-dashboard.js"></script>
+
+    <!-- Admin styles -->
+    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    <link rel="stylesheet" href="assets/css/admin-orb.css">
+
+    <!-- Version display initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const versionDisplay = document.querySelector('.version-display');
+            if (versionDisplay) {
+                const now = new Date();
+                const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+                const buildDate = `${String(centralTime.getMonth() + 1).padStart(2, '0')}${String(centralTime.getDate()).padStart(2, '0')}${centralTime.getFullYear()}`;
+                const buildTime = `${String(centralTime.getHours() % 12 || 12).padStart(2, '0')}:${String(centralTime.getMinutes()).padStart(2, '0')}${centralTime.getHours() >= 12 ? 'pm' : 'am'}`;
+                const version = '1.0.0';
+                versionDisplay.textContent = `orb-admin.html/${buildDate}.${buildTime}.v.${version}`;
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="admin-layout" data-admin-component="orb-dashboard">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>ORB Rulesets</h1>
+                <div class="version-display"></div>
+            </div>
+        </header>
+
+        <nav class="admin-page-nav">
+            <div class="nav-section">
+                <h2>Core Rulesets</h2>
+                <a href="#dashboard" class="nav-card active">Dashboard</a>
+                <a href="#frontend" class="nav-card">Frontend Rules</a>
+                <a href="#admin" class="nav-card">Admin Rules</a>
+                <a href="#redis" class="nav-card">Redis Rules</a>
+            </div>
+            <div class="nav-section">
+                <h2>Team Tools</h2>
+                <a href="#standup" class="nav-card">Standup Board</a>
+                <a href="#burndown" class="nav-card">Sprint Burndown</a>
+                <a href="#metrics" class="nav-card">CloudWatch Metrics</a>
+            </div>
+            <div class="nav-section">
+                <h2>Documentation</h2>
+                <a href="#kitchen" class="nav-card">Kitchen Roles</a>
+                <a href="#roadmap" class="nav-card">Future Menu</a>
+                <a href="#husky" class="nav-card">Husky Help</a>
+            </div>
+        </nav>
+
+        <main class="admin-content">
+            <div class="content-section active" id="dashboard">
+                <div data-admin-component="orb-status-cards"></div>
+                <div data-admin-component="orb-activity-feed"></div>
+                <div data-admin-component="orb-metrics-summary"></div>
+            </div>
+
+            <div class="content-section" id="frontend">
+                <div data-admin-component="orb-ruleset-viewer" 
+                     data-ruleset="frontend"
+                     data-source="/shared/docs/!ORB.frontend-04132025"></div>
+            </div>
+
+            <div class="content-section" id="standup">
+                <div data-admin-component="orb-standup-board"
+                     data-sprint-id="current"></div>
+            </div>
+
+            <div class="content-section" id="burndown">
+                <div data-admin-component="orb-burndown-chart"
+                     data-sprint-id="current"></div>
+            </div>
+
+            <div class="content-section" id="metrics">
+                <div data-admin-component="orb-cloudwatch-dashboard"></div>
+            </div>
+
+            <div class="content-section" id="kitchen">
+                <div class="orb-section-content">
+                    <h2>The RLP Kitchen: Where Learning Gets Cooked Up</h2>
+                    <p class="lead">Like Danny Meyer's Union Square Hospitality Group, we operate at multiple levels - from Shake Shack to Eleven Madison Park. Each experience is crafted with care, whether it's a quick learning bite or a transformative educational feast.</p>
+                    
+                    <div class="kitchen-roles">
+                        <div class="role-card">
+                            <h3>Chef de Learning (Cara)</h3>
+                            <p>Crafting new HTML learning recipes like Goalsetter and Merit. Specializes in:</p>
+                            <ul>
+                                <li>Frontend development (the presentation kitchen)</li>
+                                <li>Professional learning programs (menu planning)</li>
+                                <li>User experience design (plating and service)</li>
+                            </ul>
+                        </div>
+
+                        <div class="role-card">
+                            <h3>Overnight Baker in Chief (David)</h3>
+                            <p>Working with backend REST API, Lambda, and Redis context - sourcing the flour and proofing the dough. Handles:</p>
+                            <ul>
+                                <li>Database architecture (the pantry)</li>
+                                <li>Platform logic (the recipes)</li>
+                                <li>System integration (kitchen equipment)</li>
+                            </ul>
+                        </div>
+
+                        <div class="role-card">
+                            <h3>Taster in Chief (Asha)</h3>
+                            <p>Our sommelier of user experience, ensuring coherence and accessibility. Focuses on:</p>
+                            <ul>
+                                <li>User empathy (tasting notes)</li>
+                                <li>Design coherence (wine pairing)</li>
+                                <li>Accessibility (service standards)</li>
+                            </ul>
+                        </div>
+
+                        <div class="role-card">
+                            <h3>Restaurant Group Director (Diane)</h3>
+                            <p>Deciding which concepts to launch - Shake Shack or Eleven Madison Park? Oversees:</p>
+                            <ul>
+                                <li>Brand strategy (restaurant concepts)</li>
+                                <li>Market positioning (location selection)</li>
+                                <li>Growth planning (expansion strategy)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="kitchen-zones">
+                        <h3>Our Kitchen Zones</h3>
+                        <ul>
+                            <li>JSON in the Kitchen: Where data gets prepped</li>
+                            <li>Text in the Dining Room: Where users consume content</li>
+                            <li>Assistants as Waiters: Delivering personalized service</li>
+                            <li>Redis as the Walk-in Cooler: Where context gets preserved</li>
+                            <li>Lambda as the Prep Station: Where tasks get processed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="roadmap">
+                <div class="orb-section-content">
+                    <h2>Future Menu (Summer 2025)</h2>
+                    
+                    <div class="menu-section">
+                        <h3>Main Courses</h3>
+                        <div class="feature-card">
+                            <h4>Merit Chat</h4>
+                            <p>Embedded in Storyline course for ELPL curriculum support</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>B'more for Healthy Babies</h4>
+                            <p>Platform-hosted with Wix integration for public health dialogue</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>ST Goalsetter</h4>
+                            <p>Structured interviews with PDF and Google Slides output</p>
+                        </div>
+                    </div>
+
+                    <div class="menu-section">
+                        <h3>Demo Tasting Menu</h3>
+                        <ul>
+                            <li>Environmental Ikigai: Climate Change Action Guide</li>
+                            <li>Career Ideation Ikigai: Best Practices Edition</li>
+                            <li>Borders in Time: Map-Based Timeline Game</li>
+                            <li>Math Balance: HTML5 Learning Game</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="husky">
+                <div class="orb-section-content">
+                    <h2>Husky Help is on the Way! 🐕</h2>
+                    
+                    <div class="feature-description">
+                        <h3>Q2/Q3 Automation Update</h3>
+                        <p>The ORB will serve as an index pointing to stable, lower-level rule files stored in fixed paths. Think of it as our kitchen's quality control system:</p>
+                        <ul>
+                            <li>Automated precommit checks via Husky</li>
+                            <li>Verification of required "latest" markers</li>
+                            <li>Missing/outdated link alerts</li>
+                            <li>Consistent change management</li>
+                        </ul>
+                    </div>
+
+                    <div class="harmony-section">
+                        <h3>Human and AI Agent Harmony</h3>
+                        <p>Like a well-orchestrated kitchen, humans and AI agents each have their strengths:</p>
+                        <div class="role-comparison">
+                            <div class="human-strengths">
+                                <h4>Human Chefs</h4>
+                                <ul>
+                                    <li>Visual pattern recognition</li>
+                                    <li>Intuitive file organization</li>
+                                    <li>Creative problem-solving</li>
+                                    <li>Strategic decision-making</li>
+                                </ul>
+                            </div>
+                            <div class="ai-strengths">
+                                <h4>AI Sous Chefs</h4>
+                                <ul>
+                                    <li>Consistent task execution</li>
+                                    <li>Rapid data processing</li>
+                                    <li>Pattern matching</li>
+                                    <li>24/7 availability</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

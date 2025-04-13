@@ -1,0 +1,384 @@
+/* ORB Admin Specific Styles */
+:root {
+    /* Extend admin core variables */
+    --orb-primary: var(--admin-primary, #2c3e50);
+    --orb-secondary: var(--admin-secondary, #34495e);
+    --orb-accent: var(--admin-accent, #3498db);
+    --orb-card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    /* Kitchen theme colors */
+    --kitchen-primary: #c6123f;
+    --kitchen-secondary: #211651;
+    --kitchen-accent: #3498db;
+    --kitchen-bg: #f8f9fa;
+    --kitchen-text: #2c3e50;
+}
+
+/* Status Cards Grid */
+.orb-status-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.orb-card {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1.5rem;
+    box-shadow: var(--orb-card-shadow);
+    transition: transform 0.2s ease;
+}
+
+.orb-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+/* Activity Feed */
+.orb-activity-feed {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--orb-card-shadow);
+}
+
+.activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--admin-border);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Metrics Summary */
+.orb-metrics-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-chart {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1.5rem;
+    box-shadow: var(--orb-card-shadow);
+    min-height: 300px;
+}
+
+/* Ruleset Viewer */
+.orb-ruleset-viewer {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+}
+
+.ruleset-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Standup Board */
+.orb-standup-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.standup-column {
+    background: var(--admin-bg-secondary, #f8f9fa);
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1rem;
+}
+
+.standup-card {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--orb-card-shadow);
+    cursor: pointer;
+}
+
+/* Burndown Chart */
+.orb-burndown-chart {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+    min-height: 400px;
+}
+
+/* CloudWatch Dashboard */
+.orb-cloudwatch-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-widget {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1.5rem;
+    box-shadow: var(--orb-card-shadow);
+    min-height: 300px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .orb-metrics-summary,
+    .orb-cloudwatch-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-widget {
+        min-height: 250px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .orb-card,
+    .orb-activity-feed,
+    .metric-chart,
+    .orb-ruleset-viewer,
+    .standup-card,
+    .metric-widget {
+        box-shadow: none;
+        border: 1px solid var(--admin-border);
+    }
+}
+
+/* Kitchen Roles Section */
+.orb-section-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.lead {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--kitchen-text);
+    margin-bottom: 2rem;
+}
+
+.kitchen-roles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.role-card {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 1.5rem;
+    box-shadow: var(--orb-card-shadow);
+    transition: transform 0.2s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.role-card h3 {
+    color: var(--kitchen-primary);
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+.role-card p {
+    color: var(--kitchen-text);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.role-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.role-card li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--kitchen-bg);
+    color: var(--kitchen-secondary);
+}
+
+.role-card li:last-child {
+    border-bottom: none;
+}
+
+.kitchen-zones {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+    margin-top: 2rem;
+}
+
+.kitchen-zones h3 {
+    color: var(--kitchen-primary);
+    margin-bottom: 1.5rem;
+}
+
+.kitchen-zones ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+}
+
+.kitchen-zones li {
+    padding: 1rem;
+    background: var(--kitchen-bg);
+    border-radius: 6px;
+    color: var(--kitchen-secondary);
+}
+
+/* Future Menu Section */
+.menu-section {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+    margin-bottom: 2rem;
+}
+
+.menu-section h3 {
+    color: var(--kitchen-primary);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--kitchen-bg);
+    padding-bottom: 0.5rem;
+}
+
+.feature-card {
+    background: var(--kitchen-bg);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h4 {
+    color: var(--kitchen-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    color: var(--kitchen-text);
+    font-size: 0.95rem;
+}
+
+.menu-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-section li {
+    padding: 1rem;
+    background: var(--kitchen-bg);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    color: var(--kitchen-secondary);
+}
+
+/* Husky Help Section */
+.feature-description {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+    margin-bottom: 2rem;
+}
+
+.feature-description h3 {
+    color: var(--kitchen-primary);
+    margin-bottom: 1rem;
+}
+
+.feature-description ul {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-description li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--kitchen-bg);
+    color: var(--kitchen-text);
+}
+
+.harmony-section {
+    background: white;
+    border-radius: var(--admin-border-radius, 8px);
+    padding: 2rem;
+    box-shadow: var(--orb-card-shadow);
+}
+
+.role-comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.human-strengths,
+.ai-strengths {
+    background: var(--kitchen-bg);
+    border-radius: 6px;
+    padding: 1.5rem;
+}
+
+.human-strengths h4,
+.ai-strengths h4 {
+    color: var(--kitchen-primary);
+    margin-bottom: 1rem;
+}
+
+.human-strengths ul,
+.ai-strengths ul {
+    list-style: none;
+    padding: 0;
+}
+
+.human-strengths li,
+.ai-strengths li {
+    padding: 0.5rem 0;
+    color: var(--kitchen-text);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .kitchen-roles,
+    .role-comparison {
+        grid-template-columns: 1fr;
+    }
+
+    .orb-section-content {
+        padding: 1rem;
+    }
+
+    .kitchen-zones ul {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .role-card,
+    .kitchen-zones,
+    .menu-section,
+    .feature-description,
+    .harmony-section {
+        box-shadow: none;
+        border: 1px solid var(--kitchen-text);
+    }
+} 
