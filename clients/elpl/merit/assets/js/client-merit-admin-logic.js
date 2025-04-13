@@ -1,6 +1,7 @@
 /**
  * Merit Instructional Flow Controller
  * Handles state transitions, Redis integration, and UI management
+ * @version 1.0.15
  */
 
 class MeritInstructionalFlow {
@@ -17,7 +18,7 @@ class MeritInstructionalFlow {
         this.initializeElements();
         this.setupEventListeners();
         this.initializeRedis();
-        this.logState('Initializing v1.0.14...');
+        this.logState('Initializing v1.0.15...');
     }
 
     initializeElements() {
