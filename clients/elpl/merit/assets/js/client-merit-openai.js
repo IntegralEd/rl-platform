@@ -40,14 +40,24 @@ class MeritOpenAIClient {
             this.state.isLoading = true;
             this.state.lastRequest = {
                 type: 'createThread',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                version: 'merit.html/04132025.09:28am.v.1.15'
             };
 
             console.log('[Merit Flow] Creating new thread');
+            console.log('[Merit Flow] Stage 0: Attempting Lambda endpoint connection');
 
-            const response = await fetch(this.baseUrl, {
+            // Add protocol if missing
+            const endpoint = this.baseUrl.startsWith('http') ? 
+                this.baseUrl : 
+                `https://${this.baseUrl}`;
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-merit-version': 'merit.html/04132025.09:28am.v.1.15'
+                },
                 body: JSON.stringify({
                     assistantId: this.assistantId,
                     threadId: null,
@@ -56,7 +66,11 @@ class MeritOpenAIClient {
             });
 
             if (!response.ok) {
-                console.error('[Merit Flow] Thread creation failed:', response.status);
+                console.error('[Merit Flow] Thread creation failed:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    endpoint: endpoint
+                });
                 throw new Error('Failed to create thread');
             }
             
@@ -65,7 +79,8 @@ class MeritOpenAIClient {
                 type: 'createThread',
                 timestamp: new Date().toISOString(),
                 status: response.status,
-                threadId: data.Thread_ID
+                threadId: data.Thread_ID,
+                version: 'merit.html/04132025.09:28am.v.1.15'
             };
 
             if (!data.Thread_ID) {
@@ -81,9 +96,37 @@ class MeritOpenAIClient {
             return this.threadId;
 
         } catch (error) {
-            console.error('[Merit Flow] Thread creation error:', error);
+            // Enhanced error handling for Stage 0
+            const errorDetails = {
+                type: error.name,
+                message: error.message,
+                timestamp: new Date().toISOString(),
+                version: 'merit.html/04132025.09:28am.v.1.15',
+                endpoint: this.baseUrl
+            };
+
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                console.error('[Merit Flow] Network error:', {
+                    ...errorDetails,
+                    suggestion: 'Check Lambda endpoint configuration and network connectivity'
+                });
+            } else {
+                console.error('[Merit Flow] Thread creation error:', errorDetails);
+            }
+
             this.state.hasError = true;
             this.state.errorMessage = 'Failed to start chat session';
+            this.state.lastError = errorDetails;
+
+            // Add user-friendly error message to chat window
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message error';
+                errorMessage.textContent = 'Unable to connect to chat service. Please try again later.';
+                chatWindow.appendChild(errorMessage);
+            }
+
             throw error;
         } finally {
             this.state.isLoading = false;
