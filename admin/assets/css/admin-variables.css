@@ -1,0 +1,36 @@
+:root {
+    /* Layout */
+    --header-height: 60px;
+    --nav-width: 260px;
+    --content-width: 1200px;
+    
+    /* Colors */
+    --admin-primary: #004080;
+    --admin-primary-dark: #003366;
+    --admin-secondary: #E87722;
+    --admin-bg: #f4f5f7;
+    --admin-text: #2c3e50;
+    --admin-border: #e1e4e8;
+    
+    /* Components */
+    --card-bg: white;
+    --card-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --card-radius: 8px;
+    
+    /* Typography */
+    --font-family: system-ui, -apple-system, sans-serif;
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Z-index layers */
+    --z-header: 100;
+    --z-nav: 90;
+    --z-overlay: 1000;
+} 

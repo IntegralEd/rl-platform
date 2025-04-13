@@ -4,318 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin</title>
-    <link rel="stylesheet" href="/admin/assets/css/admin.css">
-    <script type="module" src="/admin/components/admin-page-nav.js"></script>
-    <script src="/admin/assets/js/admin-common.js"></script>
-    <script src="/admin/assets/js/admin-nav.js"></script>
+    <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
     <style>
         :root {
-            --brand-color: #004080;
-            --accent-color: #007bff;
-            --surface: #ffffff;
-            --bg: #f4f4f4;
-            --border-radius: 16px;
-            --shadow: 0 1px 4px rgba(0,0,0,0.06);
-            --header-height: 50px;
+            --auth-bg: var(--rl-gray-100);
+            --auth-border: var(--rl-gray-300);
+            --auth-text: var(--rl-gray-900);
+            --auth-error: var(--rl-red-500);
         }
 
-        body {
-            margin: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: #222;
-            height: 100vh;
+        .auth-container {
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .admin-banner {
-            height: var(--header-height);
-            background: var(--brand-color);
-            padding: 0 24px;
-            display: flex;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
+            min-height: 100vh;
+            background: var(--auth-bg);
+            padding: 1rem;
         }
 
-        .admin-layout {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 24px;
-            padding: 24px;
-            overflow: hidden;
-            margin-top: var(--header-height);
-        }
-
-        .page-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            overflow-y: auto;
-            height: calc(100vh - var(--header-height) - 48px);
-        }
-
-        .page-card {
-            position: relative;
-            border-radius: var(--border-radius);
-            padding: 16px;
-            background: var(--surface);
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            overflow: hidden;
-            border-left: 6px solid var(--accent-color);
-        }
-
-        .page-card.collapsed {
-            height: 60px;
-            padding: 12px 16px;
-            background: #fafafa;
-            border-left: 6px solid #ffcc00;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .page-header h3 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .status-gems {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .gem-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .gem-dot.active {
-            background: #27ae60;
-            box-shadow: 0 0 0 2px rgba(39,174,96,0.2);
-        }
-
-        .gem-dot.warning {
-            background: #f39c12;
-            box-shadow: 0 0 0 2px rgba(243,156,18,0.2);
-        }
-
-        .page-content {
-            margin-top: 12px;
-            display: none;
-        }
-
-        .page-card.expanded .page-content {
-            display: block;
-        }
-
-        .feature-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .feature-list li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            font-weight: 500;
-            padding: 8px 12px;
+        .auth-card {
+            background: white;
+            padding: 2rem;
             border-radius: 8px;
-            border-left: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .feature-list li:hover {
-            background: #f8f9fa;
-        }
-
-        .feature-list li.active {
-            border-color: var(--accent-color);
-            background-color: #eef5ff;
-        }
-
-        .feature-list img {
-            width: 18px;
-            height: 18px;
-        }
-
-        .content-panel {
-            background: var(--surface);
-            padding: 24px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow-y: auto;
-            height: calc(100vh - var(--header-height) - 48px);
-        }
-
-        .tab-header {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 16px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 8px;
-        }
-
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: transparent;
-            border: none;
-            padding: 6px 14px;
-            font-size: 14px;
-            color: var(--brand-color);
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .tab.active {
-            border-bottom-color: var(--accent-color);
-            background-color: #eef5ff;
-        }
-
-        .tab img {
-            width: 16px;
-            height: 16px;
-        }
-
-        .logo {
-            height: 30px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: white;
-        }
-
-        .version-indicator {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
-
-        .callout-connector {
-            position: absolute;
-            width: 0;
-            height: 0;
-            top: 50%;
-            left: 100%;
-            transform: translateY(-50%);
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-left: 12px solid var(--accent-color);
-            display: none;
-        }
-
-        .page-card.expanded .callout-connector {
-            display: block;
-        }
-
-        .content-frame {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: var(--border-radius);
+            max-width: 400px;
+            border: 1px solid var(--auth-border);
         }
 
-        #ingredient-preview {
-            padding: 20px;
+        .auth-title {
+            color: var(--auth-text);
             text-align: center;
-            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
         }
 
-        .brand img {
-            height: 30px;
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .version {
+        .auth-input {
+            padding: 0.75rem;
+            border: 1px solid var(--auth-border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .auth-button {
+            padding: 0.75rem;
+            background: var(--rl-blue-500);
             color: white;
-            font-size: 14px;
-            opacity: 0.8;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .auth-button:hover {
+            background: var(--rl-blue-600);
+        }
+
+        .auth-error {
+            color: var(--auth-error);
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <header class="admin-banner">
-        <div class="brand">
-            <img src="/shared/assets/images/RecursiveLearningLockup_White.png" alt="Recursive Learning" height="30">
-        </div>
-        <div class="version" id="version-display">v1.0.0</div>
-    </header>
-
-    <div class="admin-layout">
-        <!-- Left Panel - Navigation -->
-        <nav class="page-panel">
-            <admin-page-nav></admin-page-nav>
-        </nav>
-
-        <!-- Right Panel - Content -->
-        <main class="content-panel">
-            <div id="ingredient-preview">
-                Select a page ingredient to preview
+    <div class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-title">Admin Access</h1>
+            <form class="auth-form" id="authForm">
+                <input type="password" 
+                       class="auth-input" 
+                       id="password" 
+                       placeholder="Enter password"
+                       required>
+                <button type="submit" class="auth-button">
+                    Access Admin
+                </button>
+            </form>
+            <div class="auth-error" id="authError">
+                Invalid password. Please try again.
             </div>
-        </main>
+        </div>
     </div>
 
-    <script>
-        // Update version display with current time
-        function updateVersionDisplay() {
-            const now = new Date();
-            const date = now.toLocaleDateString();
-            const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('version-display').textContent = `v1.0.0 (${date} ${time})`;
+    <script type="module">
+        import { AdminAuth } from './assets/js/admin-auth.js';
+
+        // Check if already authenticated
+        if (AdminAuth.redirectIfAuthed()) {
+            // User already authenticated, redirect handled
+            throw new Error('Redirecting...');
         }
 
-        // Update version every minute
-        updateVersionDisplay();
-        setInterval(updateVersionDisplay, 60000);
+        const form = document.getElementById('authForm');
+        const error = document.getElementById('authError');
 
-        // Handle ingredient selection
-        document.addEventListener('ingredient-selected', (e) => {
-            const { page, ingredient } = e.detail;
-            const preview = document.getElementById('ingredient-preview');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
             
-            // Load the ingredient component
-            import(`/admin/components/ingredients/${ingredient}.js`)
-                .then(module => {
-                    const IngredientComponent = module.default;
-                    preview.innerHTML = '';
-                    new IngredientComponent(page);
-                })
-                .catch(error => {
-                    preview.innerHTML = `Error loading ${ingredient} ingredient: ${error.message}`;
-                });
-        });
-
-        // Initialize admin navigation after DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.RecursiveAdmin && window.RecursiveAdmin.nav) {
-                window.RecursiveAdmin.nav.init();
+            if (password === 'r3curs1v3') {
+                AdminAuth.setAuth();
+                window.location.href = '/admin/dashboard.html';
+            } else {
+                error.style.display = 'block';
+                form.reset();
             }
         });
+
+        // Show re-auth message if needed
+        if (new URLSearchParams(window.location.search).get('reauth')) {
+            error.textContent = 'Session expired. Please re-authenticate.';
+            error.style.display = 'block';
+        }
     </script>
 </body>
 </html> 

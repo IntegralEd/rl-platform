@@ -49,7 +49,14 @@
                 <a href="#dashboard" class="nav-card active">Dashboard</a>
                 <a href="#frontend" class="nav-card">Frontend Rules</a>
                 <a href="#admin" class="nav-card">Admin Rules</a>
-                <a href="#redis" class="nav-card">Redis Rules</a>
+                <a href="#platform" class="nav-card">Platform Assets</a>
+            </div>
+            <div class="nav-section">
+                <h2>Platform Architecture</h2>
+                <a href="#airtable" class="nav-card">Airtable (Kitchen)</a>
+                <a href="#make" class="nav-card">Make.com (Chefs)</a>
+                <a href="#lambda" class="nav-card">Lambda (Expediter)</a>
+                <a href="#docs" class="nav-card">Docs (Dining Room)</a>
             </div>
             <div class="nav-section">
                 <h2>Team Tools</h2>
@@ -222,6 +229,147 @@
                                 </ul>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="airtable">
+                <div class="orb-section-content">
+                    <h2>Airtable: The Kitchen Where Data is Prepared</h2>
+                    <p class="lead">Like a well-organized kitchen, Airtable is where we store, prepare, and organize all our ingredients (data) before they're transformed into delicious learning experiences.</p>
+                    
+                    <div class="kitchen-zones">
+                        <h3>Data Storage Areas</h3>
+                        <ul>
+                            <li>Base Tables: Our pantry shelves</li>
+                            <li>Views: Our mise en place stations</li>
+                            <li>Formulas: Our recipe cards</li>
+                            <li>Automations: Our kitchen timers</li>
+                        </ul>
+                    </div>
+
+                    <div class="implementation-rules">
+                        <h3>Implementation Guidelines</h3>
+                        <ul>
+                            <li>Table Structure: Like organizing ingredients by type</li>
+                            <li>Field Naming: Clear labels for each ingredient</li>
+                            <li>View Organization: Different prep stations for different needs</li>
+                            <li>Access Control: Kitchen access permissions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="make">
+                <div class="orb-section-content">
+                    <h2>Make.com & Assistants: Our Master Chefs</h2>
+                    <p class="lead">Make.com and AI Assistants work together like a team of skilled chefs, transforming raw ingredients into sophisticated educational experiences.</p>
+                    
+                    <div class="chef-roles">
+                        <div class="role-card">
+                            <h3>Make.com (Head Chef)</h3>
+                            <ul>
+                                <li>Orchestrates workflows (recipes)</li>
+                                <li>Coordinates between systems (kitchen stations)</li>
+                                <li>Handles data transformation (food preparation)</li>
+                                <li>Manages automations (cooking timers)</li>
+                            </ul>
+                        </div>
+                        <div class="role-card">
+                            <h3>AI Assistants (Sous Chefs)</h3>
+                            <ul>
+                                <li>Process user requests (take orders)</li>
+                                <li>Generate responses (prepare dishes)</li>
+                                <li>Maintain context (follow recipes)</li>
+                                <li>Learn from interactions (improve techniques)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="lambda">
+                <div class="orb-section-content">
+                    <h2>AWS Lambda: The Kitchen Expediter</h2>
+                    <p class="lead">Like an expediter in a restaurant kitchen, Lambda functions coordinate the flow of information between the kitchen (backend) and dining room (frontend).</p>
+                    
+                    <div class="lambda-roles">
+                        <h3>Key Functions</h3>
+                        <ul>
+                            <li>Route requests (take orders to proper stations)</li>
+                            <li>Transform data (plate dishes)</li>
+                            <li>Handle errors (quality control)</li>
+                            <li>Manage timing (coordinate service)</li>
+                        </ul>
+                    </div>
+
+                    <div class="endpoint-map">
+                        <h3>Endpoint Configuration</h3>
+                        <ul>
+                            <li>Chat API: https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main</li>
+                            <li>Context API: https://api.recursivelearning.app/context</li>
+                            <li>Thread API: https://api.recursivelearning.app/threads</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="docs">
+                <div class="orb-section-content">
+                    <h2>Docs Directory: The Dining Room</h2>
+                    <p class="lead">The docs/ directory is our dining room where users interact with our platform. It's where all the behind-the-scenes work comes together into a cohesive experience.</p>
+                    
+                    <div class="structure-overview">
+                        <h3>Directory Structure</h3>
+                        <ul>
+                            <li>Frontend Code (table settings)</li>
+                            <li>User Interface (dining atmosphere)</li>
+                            <li>Interaction Patterns (service flow)</li>
+                            <li>Documentation (menu presentation)</li>
+                        </ul>
+                    </div>
+
+                    <div class="implementation-guide">
+                        <h3>Implementation Rules</h3>
+                        <ul>
+                            <li>Consistent styling (brand standards)</li>
+                            <li>Clear navigation (table layout)</li>
+                            <li>Responsive design (flexible seating)</li>
+                            <li>Accessibility (accommodating all guests)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="platform">
+                <div class="orb-section-content">
+                    <h2>Platform Assets: Core Resources</h2>
+                    <p class="lead">Platform-level assets that power the Recursive Learning experience across all interfaces.</p>
+                    
+                    <div class="platform-paths">
+                        <h3>Asset Organization</h3>
+                        <ul>
+                            <li><code>/shared/platform/css/</code> - Platform styling</li>
+                            <li><code>/shared/platform/images/</code> - Platform UI elements</li>
+                            <li><code>/shared/platform/js/</code> - Platform functionality</li>
+                        </ul>
+                    </div>
+
+                    <div class="naming-convention">
+                        <h3>Naming Convention</h3>
+                        <ul>
+                            <li>Format: <code>platform-{purpose}-{variant}-{color}.{ext}</code></li>
+                            <li>Example: <code>platform-send-icon-white.svg</code></li>
+                        </ul>
+                    </div>
+
+                    <div class="usage-levels">
+                        <h3>Usage Levels</h3>
+                        <ul>
+                            <li>Admin interfaces</li>
+                            <li>Client pages</li>
+                            <li>Demo/RLP pages</li>
+                        </ul>
                     </div>
                 </div>
             </div>

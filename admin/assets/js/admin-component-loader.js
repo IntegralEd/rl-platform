@@ -20,6 +20,113 @@ const loadingComponents = new Set();
 const loadedScripts = new Set();
 const loadedStyles = new Set();
 
+// Admin Component Loader
+class AdminComponentLoader {
+    constructor() {
+        this.components = new Map();
+        this.initialized = false;
+    }
+
+    async initialize() {
+        if (this.initialized) return;
+        
+        // Register standard components
+        this.registerComponent('admin-page', this.initAdminPage.bind(this));
+        this.registerComponent('admin-nav', this.initAdminNav.bind(this));
+        
+        // Initialize all components on page
+        await this.initializeComponents();
+        
+        this.initialized = true;
+        console.log('[Admin] Component loader initialized');
+    }
+
+    registerComponent(name, initializer) {
+        this.components.set(name, initializer);
+        console.log(`[Admin] Registered component: ${name}`);
+    }
+
+    async initializeComponents() {
+        const components = document.querySelectorAll('[data-admin-component]');
+        for (const element of components) {
+            const componentName = element.dataset.adminComponent;
+            const initializer = this.components.get(componentName);
+            
+            if (initializer) {
+                try {
+                    await initializer(element);
+                    console.log(`[Admin] Initialized component: ${componentName}`);
+                } catch (error) {
+                    console.error(`[Admin] Failed to initialize ${componentName}:`, error);
+                }
+            }
+        }
+    }
+
+    // Standard component initializers
+    async initAdminPage(element) {
+        // Initialize version display
+        const versionDisplay = element.querySelector('.version-display');
+        if (versionDisplay) {
+            const now = new Date();
+            const buildDate = now.toLocaleDateString('en-US', { 
+                month: '2-digit', 
+                day: '2-digit',
+                year: 'numeric'
+            }).replace(/\//g, '');
+            const buildTime = now.toLocaleTimeString('en-US', { 
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit'
+            }).toLowerCase();
+            const version = '1.0.0';
+            versionDisplay.textContent = `admin.html/${buildDate}.${buildTime}.v.${version}`;
+        }
+
+        // Initialize navigation
+        this.initializeNavigation(element);
+    }
+
+    async initAdminNav(element) {
+        // Initialize navigation state
+        const currentPath = window.location.pathname;
+        const navLinks = element.querySelectorAll('[data-href]');
+        
+        navLinks.forEach(link => {
+            if (link.dataset.href === currentPath) {
+                link.classList.add('active');
+            }
+            
+            link.addEventListener('click', () => {
+                window.location.href = link.dataset.href;
+            });
+        });
+    }
+
+    // Helper methods
+    initializeNavigation(element) {
+        const navButtons = element.querySelectorAll('[data-href]');
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                window.location.href = button.dataset.href;
+            });
+        });
+
+        const actionButtons = element.querySelectorAll('[data-action]');
+        actionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const action = button.dataset.action;
+                this.handleAction(action);
+            });
+        });
+    }
+
+    handleAction(action) {
+        console.log(`[Admin] Handling action: ${action}`);
+        // Add specific action handlers here
+    }
+}
+
 /**
  * Load an admin component by ID with all its dependencies
  */
@@ -293,6 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
       element.innerHTML = `<div class="component-error">Failed to load component: ${error.message}</div>`;
     });
   });
+});
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    window.adminLoader = new AdminComponentLoader();
+    window.adminLoader.initialize();
 });
 
 // Export the public API
