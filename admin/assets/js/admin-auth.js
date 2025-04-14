@@ -63,51 +63,78 @@ export const ADMIN_CONFIG = {
 };
 
 /**
- * Simple admin authentication module
- * Uses localStorage for session persistence
+ * Admin Authentication Module
+ * Version: 1.0.0
+ * Handles admin vault access and session management
  */
-export const AdminAuth = {
-    AUTH_KEY: 'admin_auth',
-    AUTH_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
-    TEMP_PASSWORD: 'r3curs1v3', // Temporary hardcoded password
+export class AdminAuth {
+    static #VAULT_KEY = 'rl_admin_vault_access';
+    static #SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    static #VAULT_CODE = 'RecursiveLearning2025!'; // This should be moved to environment config
 
-    checkAuth() {
-        const auth = localStorage.getItem(this.AUTH_KEY);
-        if (!auth) return false;
+    /**
+     * Validates the provided vault password
+     * @param {string} password - The password to validate
+     * @returns {boolean} - Whether the password is valid
+     */
+    static validatePassword(password) {
+        return password === this.#VAULT_CODE;
+    }
 
-        const { expiry } = JSON.parse(auth);
-        if (Date.now() > expiry) {
-            this.clearAuth();
+    /**
+     * Sets authentication state and timestamp
+     */
+    static setAuth() {
+        const authState = {
+            timestamp: Date.now(),
+            isAuthenticated: true
+        };
+        localStorage.setItem(this.#VAULT_KEY, JSON.stringify(authState));
+    }
+
+    /**
+     * Checks if user is currently authenticated
+     * @returns {boolean} - Authentication status
+     */
+    static isAuthenticated() {
+        const authState = localStorage.getItem(this.#VAULT_KEY);
+        if (!authState) return false;
+
+        try {
+            const { timestamp, isAuthenticated } = JSON.parse(authState);
+            const isExpired = Date.now() - timestamp > this.#SESSION_DURATION;
+            return isAuthenticated && !isExpired;
+        } catch (e) {
             return false;
         }
-        return true;
-    },
+    }
 
-    setAuth() {
-        const expiry = Date.now() + this.AUTH_DURATION;
-        localStorage.setItem(this.AUTH_KEY, JSON.stringify({ expiry }));
-    },
-
-    clearAuth() {
-        localStorage.removeItem(this.AUTH_KEY);
-    },
-
-    validatePassword(password) {
-        return password === this.TEMP_PASSWORD;
-    },
-
-    requireAuth() {
-        if (!this.checkAuth()) {
-            window.location.href = '/admin/index.html';
-        }
-    },
-
-    redirectIfAuthed() {
-        if (this.checkAuth()) {
+    /**
+     * Redirects to dashboard if authenticated
+     */
+    static redirectIfAuthed() {
+        if (this.isAuthenticated() && window.location.pathname !== '/admin/dashboard.html') {
             window.location.href = '/admin/dashboard.html';
         }
     }
-};
+
+    /**
+     * Redirects to login if not authenticated
+     */
+    static requireAuth() {
+        if (!this.isAuthenticated() && window.location.pathname !== '/admin/index.html') {
+            window.location.href = '/admin/index.html';
+        }
+    }
+
+    /**
+     * Clears authentication state
+     */
+    static logout() {
+        localStorage.removeItem(this.#VAULT_KEY);
+        window.location.href = '/admin/index.html';
+    }
+}
 
 // Auto-check auth on protected pages
 if (!window.location.pathname.includes('index.html')) {
