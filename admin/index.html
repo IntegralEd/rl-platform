@@ -7,20 +7,20 @@
     <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
     <style>
         :root {
-            --vault-primary: #211651;
-            --vault-secondary: #c6123f;
-            --vault-accent: #ffcc00;
-            --vault-bg: #1a1a2e;
-            --vault-text: #ffffff;
-            --vault-shadow: rgba(0, 0, 0, 0.3);
+            /* Using platform colors */
+            --vault-primary: var(--primary-color); /* #c6123f */
+            --vault-secondary: var(--secondary-color); /* #211651 */
+            --vault-accent: var(--tertiary-color); /* #ffa409 */
+            --vault-bg: var(--background-color);
+            --vault-text: var(--text-color);
         }
 
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: var(--vault-bg);
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: var(--vault-secondary);
+            font-family: var(--client-font-body);
             overflow: hidden;
             position: relative;
         }
@@ -49,8 +49,8 @@
             width: 300px;
             height: 300px;
             background: radial-gradient(circle at center, 
-                var(--vault-secondary) 0%,
-                var(--vault-primary) 70%,
+                var(--vault-primary) 0%,
+                var(--vault-secondary) 70%,
                 var(--vault-bg) 100%);
             border-radius: 50%;
             animation: portalPulse 3s infinite;
@@ -58,54 +58,26 @@
         }
 
         @keyframes portalPulse {
-            0% { box-shadow: 0 0 30px var(--vault-secondary); }
+            0% { box-shadow: 0 0 30px var(--vault-primary); }
             50% { box-shadow: 0 0 50px var(--vault-accent); }
-            100% { box-shadow: 0 0 30px var(--vault-secondary); }
+            100% { box-shadow: 0 0 30px var(--vault-primary); }
         }
 
-        /* Gatekeeper */
-        .gatekeeper {
+        /* Vault Lock */
+        .vault-lock {
             position: absolute;
             top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 200px;
-            height: 200px;
+            height: 240px;
             z-index: 2;
             filter: drop-shadow(0 0 10px var(--vault-accent));
         }
 
-        .gatekeeper-body {
-            position: relative;
+        .vault-lock object {
             width: 100%;
             height: 100%;
-            background: var(--vault-primary);
-            border-radius: 50%;
-            overflow: hidden;
-            animation: bounce 2s infinite;
-        }
-
-        .gatekeeper-eye {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: var(--vault-text);
-            border-radius: 50%;
-            top: 30%;
-            animation: blink 4s infinite;
-        }
-
-        .gatekeeper-eye.left { left: 25%; }
-        .gatekeeper-eye.right { right: 25%; }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes blink {
-            0%, 48%, 52%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.1); }
         }
 
         /* Login Card */
@@ -114,14 +86,14 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             padding: 2rem;
-            border-radius: 20px;
+            border-radius: var(--client-card-border-radius);
             width: 90%;
             max-width: 400px;
             margin: 0 auto;
             text-align: center;
             z-index: 3;
             border: 2px solid var(--vault-accent);
-            box-shadow: 0 0 20px var(--vault-shadow);
+            box-shadow: var(--shadow-lg);
             animation: cardFloat 3s infinite;
         }
 
@@ -132,7 +104,8 @@
 
         .vault-title {
             color: var(--vault-accent);
-            font-size: 2rem;
+            font-family: var(--client-font-h1);
+            font-size: var(--client-font-size-h1);
             margin-bottom: 2rem;
             text-shadow: 0 0 10px var(--vault-accent);
         }
@@ -144,43 +117,43 @@
         }
 
         .vault-input {
-            padding: 1rem;
+            padding: var(--client-button-padding);
             border: 2px solid var(--vault-accent);
-            border-radius: 10px;
+            border-radius: var(--client-button-radius);
             background: rgba(255, 255, 255, 0.1);
             color: var(--vault-text);
-            font-size: 1.2rem;
+            font-size: var(--client-font-size-body);
             text-align: center;
-            transition: all 0.3s;
+            transition: all var(--transition-base);
         }
 
         .vault-input:focus {
             outline: none;
-            border-color: var(--vault-secondary);
-            box-shadow: 0 0 15px var(--vault-secondary);
+            border-color: var(--vault-primary);
+            box-shadow: 0 0 15px var(--vault-primary);
         }
 
         .vault-button {
-            padding: 1rem;
+            padding: var(--client-button-padding);
             background: var(--vault-accent);
             color: var(--vault-bg);
             border: none;
-            border-radius: 10px;
-            font-size: 1.2rem;
+            border-radius: var(--client-button-radius);
+            font-size: var(--client-font-size-body);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--transition-base);
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .vault-button:hover {
-            background: var(--vault-secondary);
+            background: var(--vault-primary);
             color: var(--vault-text);
             transform: scale(1.05);
         }
 
         .vault-error {
-            color: var(--vault-secondary);
+            color: var(--vault-primary);
             margin-top: 1rem;
             display: none;
             animation: shake 0.5s;
@@ -226,28 +199,35 @@
 <body>
     <div class="stars"></div>
     <div class="portal"></div>
-    <div class="gatekeeper">
-        <div class="gatekeeper-body">
-            <div class="gatekeeper-eye left"></div>
-            <div class="gatekeeper-eye right"></div>
-        </div>
+    <div class="vault-lock">
+        <object data="/admin/assets/images/admin-vault-lock.svg" 
+                type="image/svg+xml" 
+                width="200" 
+                height="240"
+                aria-label="Animated vault lock">
+            <!-- Fallback for browsers that don't support SVG -->
+            <img src="/admin/assets/images/admin-vault-lock-fallback.png" 
+                 alt="Vault Lock" 
+                 width="200" 
+                 height="240">
+        </object>
     </div>
     
     <div class="auth-container">
         <div class="vault-card">
-            <h1 class="vault-title">The Vault Keeper</h1>
+            <h1 class="vault-title">The Vault</h1>
             <form class="vault-form" id="authForm">
                 <input type="password" 
                        class="vault-input" 
                        id="password" 
-                       placeholder="Speak friend and enter..."
+                       placeholder="Enter the secret code..."
                        required>
                 <button type="submit" class="vault-button">
-                    Open Sesame!
+                    Unlock Vault
                 </button>
             </form>
             <div class="vault-error" id="authError">
-                The Vault Keeper denies your entry! Try again...
+                Access Denied! Check your credentials...
             </div>
         </div>
     </div>
@@ -298,7 +278,7 @@
         const error = document.getElementById('authError');
         const input = document.getElementById('password');
         const portal = document.querySelector('.portal');
-        const gatekeeper = document.querySelector('.gatekeeper');
+        const vaultLock = document.querySelector('.vault-lock');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -307,8 +287,13 @@
             if (password === 'r3curs1v3') {
                 // Success animation
                 portal.style.animation = 'portalPulse 0.5s infinite';
-                gatekeeper.style.transform = 'translate(-50%, -50%) scale(0)';
+                vaultLock.style.transform = 'translate(-50%, -50%) scale(0)';
                 AdminAuth.setAuth();
+                
+                // Trigger unlock animation in SVG
+                const svgDoc = vaultLock.querySelector('object').contentDocument;
+                const unlockAnim = svgDoc.getElementById('unlock');
+                if (unlockAnim) unlockAnim.beginElement();
                 
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard.html';
@@ -317,17 +302,17 @@
                 error.style.display = 'block';
                 form.reset();
                 
-                // Angry gatekeeper animation
-                gatekeeper.style.animation = 'shake 0.5s';
+                // Shake animation
+                vaultLock.style.animation = 'shake 0.5s';
                 setTimeout(() => {
-                    gatekeeper.style.animation = 'bounce 2s infinite';
+                    vaultLock.style.animation = '';
                 }, 500);
             }
         });
 
         // Show re-auth message if needed
         if (new URLSearchParams(window.location.search).get('reauth')) {
-            error.textContent = 'Your portal pass has expired! Please re-authenticate...';
+            error.textContent = 'Your vault access has expired! Please re-authenticate...';
             error.style.display = 'block';
         }
     </script>
