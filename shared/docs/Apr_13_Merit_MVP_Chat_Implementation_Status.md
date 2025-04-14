@@ -119,6 +119,9 @@ Version: 1.0.17 [April 13, 2025 12:00 PM EDT]
    - Should we notify backend of client destruction?
    - How should we handle concurrent sessions?
 
+4. DNS & Network Issues
+   - The DNS error (ERR_NAME_NOT_RESOLVED) for the API endpoint indicates a potential misconfiguration or network DNS issue. Please verify the endpoint configuration and, if the error persists, coordinate with the DevOps team.
+
 ### 6. Redis Integration [PLANNED]
 - [ ] Configure Redis connection using:
   ```javascript
