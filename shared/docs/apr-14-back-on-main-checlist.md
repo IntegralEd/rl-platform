@@ -233,7 +233,7 @@ For each gate, add console screenshot showing:
 1. No errors
 2. Asset loading complete
 3. Feature verification
-4. GH Pages rebuild status
+4. GH Pages deployment status
 
 ## URLs for Verification
 - Platform: https://integral-ed.github.io/rl-platform/
@@ -253,3 +253,41 @@ For each gate, add console screenshot showing:
 - Will continue with Gate 3 (Merit MVP) after main branch stabilization
 - Dashboard now has proper console logging to indicate tab/component focus
 - Added diagnostic information in browser console for tracking component loading
+
+## Layout Page for Asha
+The ORB layouts documentation page needs further enhancement to better convey the layout structure to designers. Here are planned improvements:
+
+### Immediate Improvements
+- [ ] Add interactive layout schematics with labeled divs
+  - [ ] Create color-coded outlines for client layout elements
+  - [ ] Add hover states to show element names and relationships
+  - [ ] Include expandable code snippets with annotations
+- [ ] Improve visual examples of layout inheritance
+  - [ ] Add side-by-side comparison of platform vs client-specific styling
+  - [ ] Create visual representation of CSS cascade with arrows
+- [ ] Enhance responsive behavior demonstration
+  - [ ] Add toggle buttons to show layouts at different breakpoints
+  - [ ] Display grid alignment and flexbox behavior in real-time
+- [ ] Add common component library examples
+  - [ ] Show how shared components integrate into different layouts
+  - [ ] Include documentation on component prop customization
+
+### Figma Integration [FUTURE]
+- [ ] Connect Figma design system directly to documentation
+  - [ ] Embed live Figma components via iframe API integration
+  - [ ] Auto-generate code examples from Figma component instances
+- [ ] Create two-way sync between code and design
+  - [ ] Implement Figma plugin to pull real CSS variables from platform
+  - [ ] Develop visual editor for template configuration
+- [ ] Build layout prototype generator
+  - [ ] Create "playground" for trying different layout combinations
+  - [ ] Provide export functionality for code snippets
+- [ ] Add design token visualization
+  - [ ] Display color palettes, spacing system, and typography in use
+  - [ ] Show how tokens cascade from platform to client implementations
+- [ ] Enable collaborative annotation
+  - [ ] Allow designers to comment directly on layout examples
+  - [ ] Support versioning of layout documentation with design iterations
+- [ ] Implement A/B comparison tool
+  - [ ] Create split view of design vs. implementation
+  - [ ] Add pixel-perfect alignment verification
