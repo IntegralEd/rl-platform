@@ -261,6 +261,97 @@
             position: relative;
             z-index: 2;
         }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            text-decoration: none;
+        }
+
+        .header-logo img {
+            width: 100px;
+            height: auto;
+        }
+
+        .version-display {
+            margin-left: 1rem;
+            font-size: 0.8rem;
+            color: #fff;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            margin-left: 1rem;
+        }
+
+        .nav-item.active {
+            font-weight: bold;
+        }
+
+        .nav-item a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .nav-item a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-item.with-dropdown {
+            position: relative;
+        }
+
+        .nav-item.with-dropdown button {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item.with-dropdown button img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 5px;
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -286,6 +377,31 @@
             </form>
         </div>
     </div>
+
+    <header class="client-header">
+        <div class="header-left">
+            <a href="https://recursivelearning.app/" class="header-logo">
+                <img src="/platform/images/admin-logo.png" alt="Recursive Learning" />
+            </a>
+            <span class="version-display">v1.0.0</span>
+        </div>
+        <nav class="header-nav">
+            <a href="/platform/admin" class="nav-item active">Admin</a>
+            <div class="nav-item">
+                <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
+                    <img src="/platform/images/admin-developer-icon.svg" alt="Developer Hub" class="nav-icon with-ring">
+                </a>
+            </div>
+            <div class="nav-item with-dropdown">
+                <button class="icon-button tooltip" data-tooltip="Account">
+                    <img src="/platform/images/admin-account-icon.svg" alt="Account" class="nav-icon">
+                </button>
+                <div class="dropdown-menu">
+                    <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
+                </div>
+            </div>
+        </nav>
+    </header>
 
     <script type="module">
         import { AdminAuth } from '/admin/assets/js/admin-auth.js';

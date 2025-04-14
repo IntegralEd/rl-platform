@@ -122,20 +122,29 @@
 </head>
 <body>
     <div class="admin-layout">
-        <header class="admin-header">
-            <h1>Admin Dashboard</h1>
-            <div class="header-actions">
-                <button class="icon-button tooltip" data-tooltip="Developer Portal">
-                    <img src="../shared/platform/images/noun-one-ring-3560061-2C3E50.svg" 
-                         alt="Developer Portal"
-                         onclick="window.location.href='/orb'">
-                </button>
-                <button class="icon-button tooltip" data-tooltip="Account Portal">
-                    <img src="./assets/images/person-icon.svg" 
-                         alt="Account Portal"
-                         onclick="window.location.href='/account'">
-                </button>
+        <header class="client-header">
+            <div class="header-left">
+                <a href="https://recursivelearning.app/" class="header-logo">
+                    <img src="/platform/images/admin-logo.png" alt="Recursive Learning" />
+                </a>
+                <span class="version-display">v1.0.0</span>
             </div>
+            <nav class="header-nav">
+                <a href="/platform/admin" class="nav-item active">Admin</a>
+                <div class="nav-item">
+                    <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
+                        <img src="/platform/images/admin-developer-icon.svg" alt="Developer Hub" class="nav-icon with-ring">
+                    </a>
+                </div>
+                <div class="nav-item with-dropdown">
+                    <button class="icon-button tooltip" data-tooltip="Account">
+                        <img src="/platform/images/admin-account-icon.svg" alt="Account" class="nav-icon">
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </nav>
         </header>
         <nav class="admin-nav">
             <div data-admin-component="admin-nav">
