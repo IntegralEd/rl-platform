@@ -1,5 +1,5 @@
 # Merit MVP Launch - Instructional Page Template
-Version: 1.0.0 [April 12, 2025]
+Version: 1.0.1 [April 12, 2025]
 
 ## Overview
 This template defines the implementation pattern for instructional pages on the Recursive Learning platform, focusing on completing the UX/UI MVP and integrating with OpenAI Assistants through Redis handshake.
@@ -140,17 +140,124 @@ Path: /clients/elpl/merit/merit.html#welcome
   - [ ] Validate touch targets
 
 ### 2. Redis Handshake Integration [NEXT]
-- [ ] Implement Redis connection with VPC settings
-  - [ ] Use updated MVP TTL settings
-  - [ ] Configure user ID mapping
-  - [ ] Set up connection pooling
-  - [ ] Add reconnection logic
+```javascript
+// Merit Chat Integration
+class MeritChat {
+    constructor() {
+        this.baseUrl = 'https://api.recursivelearning.app/dev';
+        this.config = {
+            org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
+            assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
+            schema_version: '04102025.B01'
+        };
+        this.headers = {
+            'Content-Type': 'application/json',
+            'Origin': 'https://recursivelearning.app'
+        };
+    }
 
-- [ ] Thread Management
-  - [ ] Implement thread caching
-  - [ ] Handle persistence
-  - [ ] Manage state transitions
-  - [ ] Error recovery
+    async createThread() {
+        try {
+            const response = await fetch(this.baseUrl, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({
+                    action: 'create_thread',
+                    ...this.config
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Thread creation failed');
+            }
+            return response.json();
+        } catch (error) {
+            console.error('[Merit Flow] Create thread error:', error);
+            throw error;
+        }
+    }
+
+    async sendMessage(thread_id, message) {
+        if (!thread_id) {
+            throw new Error('thread_id is required');
+        }
+        try {
+            const response = await fetch(this.baseUrl, {
+                method: 'POST',
+                headers: this.headers,
+                body: JSON.stringify({
+                    message,
+                    thread_id,
+                    ...this.config
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Message send failed');
+            }
+            return response.json();
+        } catch (error) {
+            console.error('[Merit Flow] Send message error:', error);
+            throw error;
+        }
+    }
+}
+
+// Integration with MeritInstructionalFlow
+class MeritInstructionalFlow {
+    constructor() {
+        this.chat = new MeritChat();
+        this.threadId = null;
+        this.setupChatHandlers();
+    }
+
+    async setupChatHandlers() {
+        try {
+            // Create thread on initialization
+            const { thread_id } = await this.chat.createThread();
+            this.threadId = thread_id;
+            console.log('[Merit Flow] Thread created:', thread_id);
+            
+            // Enable chat UI
+            this.enableChatInterface();
+        } catch (error) {
+            console.error('[Merit Flow] Chat initialization failed:', error);
+            this.showError('Chat initialization failed. Please refresh the page.');
+        }
+    }
+
+    async sendMessage() {
+        const chatInput = document.getElementById('chat-input');
+        const content = chatInput.value.trim();
+        if (!content) return;
+
+        // Clear input
+        chatInput.value = '';
+
+        try {
+            // Show user message
+            this.addMessage('user', content);
+            this.showLoading();
+
+            // Send to API
+            const response = await this.chat.sendMessage(this.threadId, content);
+            
+            // Show assistant response
+            this.hideLoading();
+            this.addMessage('assistant', response.message);
+
+        } catch (error) {
+            console.error('[Merit Flow] Message error:', error);
+            this.hideLoading();
+            this.showError('Failed to send message. Please try again.');
+        }
+    }
+
+    // ... existing UI methods ...
+}
+```
 
 ### 3. Assistant Integration [ONGOING]
 - [ ] Configure grade-level assistants
