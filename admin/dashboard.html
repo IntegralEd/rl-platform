@@ -6,15 +6,16 @@
     <title>Recursive Learning Admin Dashboard</title>
     
     <!-- Required Admin Scripts -->
-    <script type="module" src="./assets/js/admin-component-loader.js"></script>
-    <script type="module" src="./assets/js/admin-auth.js"></script>
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
     
     <!-- Admin Styles -->
-    <link rel="stylesheet" href="./assets/css/admin-variables.css">
-    <link rel="stylesheet" href="./assets/css/admin-core.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
     
     <script type="module">
-        import { AdminAuth } from './assets/js/admin-auth.js';
+        import { AdminAuth } from '/admin/assets/js/admin-auth.js';
         
         // Redirect if not authenticated
         AdminAuth.requireAuth();
@@ -159,7 +160,7 @@
     </div>
 
     <script type="module">
-        import { AdminComponentLoader } from './assets/js/admin-component-loader.js';
+        import { AdminComponentLoader } from '/admin/assets/js/admin-component-loader.js';
         
         // Initialize component loader
         const loader = new AdminComponentLoader();
