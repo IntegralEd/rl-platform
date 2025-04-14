@@ -63,15 +63,9 @@ export class MeritInstructionalFlow {
         this.#setupEventListeners();
         this.#initializeActiveSection();
         
-        try {
-            // Create initial thread
-            await this.#openAIClient.createThread();
-            this.#state.chatReady = true;
-            console.log('[Merit Flow] Chat system initialized');
-        } catch (error) {
-            console.error('[Merit Flow] Chat initialization failed:', error);
-            this.#showError('Chat initialization failed. Please refresh the page.');
-        }
+        // Chat is ready immediately - thread will be created with first message
+        this.#state.chatReady = true;
+        console.log('[Merit Flow] Chat system initialized for new user session');
         
         this.#logState('Initialization complete');
     };
@@ -152,6 +146,12 @@ export class MeritInstructionalFlow {
         const content = this.#elements.chatInput?.value.trim();
         if (!content || !this.#state.chatReady) return;
 
+        console.log('[Merit Flow] Processing message:', {
+            content,
+            isNewThread: !this.#openAIClient.threadId,
+            gradeLevel: this.#state.gradeLevel
+        });
+
         // Clear input and disable
         this.#elements.chatInput.value = '';
         this.#elements.chatInput.disabled = true;
@@ -168,6 +168,12 @@ export class MeritInstructionalFlow {
             // Show assistant response
             this.#hideLoading();
             this.#addMessage('assistant', response.content);
+
+            // Log successful chat interaction
+            console.log('[Merit Flow] Chat exchange complete:', {
+                threadId: this.#openAIClient.threadId,
+                hasResponse: true
+            });
 
         } catch (error) {
             console.error('[Merit Flow] Message error:', error);
@@ -258,6 +264,14 @@ export class MeritInstructionalFlow {
         if (this.#elements.chatInput) {
             this.#elements.chatInput.disabled = !this.#state.chatReady;
         }
+        console.log('[Merit Flow] Action state updated:', {
+            nextButton: this.#elements.nextButton?.disabled,
+            sendButton: this.#elements.sendButton?.disabled,
+            chatInput: this.#elements.chatInput?.disabled,
+            chatReady: this.#state.chatReady,
+            formValid: this.#state.formValid,
+            currentSection: this.#state.currentSection
+        });
     }
 
     #initializeActiveSection() {
@@ -304,4 +318,35 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
         console.error('[Merit Flow] Error initializing:', error);
     }
-}); 
+});
+
+/*
+Immediate Client Layout Punch List (to be addressed promptly):
+1. Tidy up the chat container div structure for a more organized layout.
+2. Align chat input and send button consistently within the chatbar.
+3. Standardize spacing and margins for chat components.
+4. Improve alignment of chat messages for better readability.
+5. Optimize responsive design for chat sections on mobile devices.
+
+UX & Accessibility Tickets for v19 (to work on overnight):
+1. Refactor chat container divs for a tidier, more organized layout.
+2. Improve focus management and tab order for chat input and send button.
+3. Enhance color contrast and font sizes for better readability.
+4. Add ARIA roles and labels to all interactive elements in the chat interface.
+5. Standardize spacing and margins across chat messages and action buttons.
+6. Incorporate better animation and feedback on button hovers.
+7. Tidy up the chat header and version display alignment.
+8. Streamline error message display for improved accessibility.
+9. Implement lazy loading for chat message history.
+10. Improve loading state indicators with accessible announcements.
+11. Optimize responsive design layout for mobile view.
+12. Enhance button size consistency across various screen sizes.
+13. Add tooltips for clarity on button functions.
+14. Improve keyboard navigation support within the chat interface.
+15. Ensure all interactive elements have proper focus outlines.
+16. Optimize the streaming message indicator for clarity.
+17. Refactor event handling to reduce latency.
+18. Improve error recovery messaging in the chat window.
+19. Enhance the visual hierarchy of chat sections.
+20. Standardize use of web fonts and icons across the chat interface.
+*/ 
