@@ -81,7 +81,7 @@ class MeritOpenAIClient {
      */
     async createThread() {
         try {
-            console.log('[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})');
+            console.log(`[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})`);
             console.log('[Merit Flow] Using endpoint:', this.baseUrl);
             
             const response = await fetch(this.baseUrl, {
