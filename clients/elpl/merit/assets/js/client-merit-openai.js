@@ -1,7 +1,7 @@
 /**
  * @component MeritOpenAIClient
  * @description Handles OpenAI Assistant interactions for Merit chat (Stage 0: Baseline)
- * @version 1.0.15
+ * @version 1.0.17
  * 
  * @questions
  * - Q1: Should we implement retry logic for 429 rate limit responses?
@@ -15,9 +15,17 @@ class MeritOpenAIClient {
         this.baseUrl = 'https://api.recursivelearning.app/dev';
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
-            schema_version: '04102025.B01'
+            assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
+            schema_version: '04102025.B01',
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'  // OpenAI project pairing
         };
         
+        this.headers = {
+            'Content-Type': 'application/json',
+            'Origin': 'https://recursivelearning.app',
+            'X-Project-ID': this.config.project_id
+        };
+
         // Stage 0: Basic state tracking
         this.state = {
             isLoading: false,
@@ -26,11 +34,13 @@ class MeritOpenAIClient {
             lastRequest: null,
             lastResponse: null,
             isPreloaded: false,
-            context: null
+            context: null,
+            projectPaired: false
         };
 
         console.log('[Merit Flow] OpenAI client initialized for Stage 0');
         console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
+        console.log('[Merit Flow] Project ID:', this.config.project_id);
     }
 
     /**
@@ -44,28 +54,33 @@ class MeritOpenAIClient {
     async createThread() {
         try {
             console.log('[Merit Flow] Creating new thread');
-            const response = await fetch(`${this.baseUrl}/thread/create`, {
+            const response = await fetch(this.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Organization-ID': this.config.org_id,
-                    'X-Schema-Version': this.config.schema_version
-                },
+                headers: this.headers,
                 body: JSON.stringify({
-                    assistant_id: this.assistantId
+                    action: 'create_thread',
+                    project_id: this.config.project_id,
+                    ...this.config
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const error = await response.json();
+                if (error.statusCode === 403) {
+                    throw new Error('OpenAI project pairing required');
+                }
+                throw new Error(error.error || 'Thread creation failed');
             }
 
             const data = await response.json();
             this.threadId = data.thread_id;
+            this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
             return this.threadId;
         } catch (error) {
             console.error('[Merit Flow] Thread creation error:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message;
             throw error;
         }
     }
@@ -88,6 +103,8 @@ class MeritOpenAIClient {
             console.log('[Merit Flow] Context preloaded:', context);
         } catch (error) {
             console.error('[Merit Flow] Context preload error:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message;
             throw error;
         }
     }
@@ -103,27 +120,34 @@ class MeritOpenAIClient {
      */
     async sendMessage(message, options = {}) {
         if (!this.threadId) {
-            throw new Error('No active thread');
+            throw new Error('thread_id is required');
+        }
+
+        if (!this.state.projectPaired) {
+            throw new Error('OpenAI project must be paired before sending messages');
         }
 
         try {
             console.log('[Merit Flow] Sending message to thread:', this.threadId);
-            const response = await fetch(`${this.baseUrl}/thread/message`, {
+            const response = await fetch(this.baseUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Organization-ID': this.config.org_id,
-                    'X-Schema-Version': this.config.schema_version
-                },
+                headers: this.headers,
                 body: JSON.stringify({
+                    message,
                     thread_id: this.threadId,
-                    message: message,
+                    project_id: this.config.project_id,  // Required for project pairing
+                    ...this.config,
                     ...options
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const error = await response.json();
+                if (error.statusCode === 403) {
+                    this.state.projectPaired = false;
+                    throw new Error('OpenAI project pairing lost');
+                }
+                throw new Error(error.error || 'Message send failed');
             }
 
             const data = await response.json();
@@ -131,6 +155,8 @@ class MeritOpenAIClient {
             return data;
         } catch (error) {
             console.error('[Merit Flow] Message sending error:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message;
             throw error;
         }
     }
@@ -161,7 +187,8 @@ class MeritOpenAIClient {
             lastRequest: null,
             lastResponse: null,
             isPreloaded: false,
-            context: null
+            context: null,
+            projectPaired: false
         };
         console.log('[Merit Flow] Client destroyed');
     }
