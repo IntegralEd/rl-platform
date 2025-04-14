@@ -7,22 +7,103 @@
     <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
     <style>
         :root {
-            /* Using platform colors */
+            --portal-color: #211651;
+            --accent-color: #c6123f;
+            --error-color: #ff4444;
+            --success-color: #00C851;
             --vault-primary: var(--primary-color); /* #c6123f */
             --vault-secondary: var(--secondary-color); /* #211651 */
             --vault-accent: var(--tertiary-color); /* #ffa409 */
             --vault-bg: var(--background-color);
             --vault-text: var(--text-color);
+            --transition-portal: 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: var(--vault-secondary);
             font-family: var(--client-font-body);
             overflow: hidden;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, var(--portal-color) 0%, #000 100%);
+            color: white;
+        }
+
+        .admin-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/admin/assets/images/portal-beam.png');
+            background-size: cover;
+            background-position: center;
+            transition: all var(--transition-portal);
+            z-index: 0;
+        }
+
+        .admin-background.portal-forming {
+            background-image: url('/admin/assets/images/portal-beam-distance.png');
+            animation: portalBeam 1.5s ease-out forwards;
+        }
+
+        .admin-background.portal-opening {
+            background-image: url('/admin/assets/images/dna-parting.png');
+            animation: portalPart 1.5s ease-out forwards;
+        }
+
+        .admin-background.portal-unlocked {
+            background-image: url('/admin/assets/images/portal-unlocked.png');
+            animation: portalUnlock 1.5s ease-out forwards;
+        }
+
+        @keyframes portalBeam {
+            0% {
+                transform: scale(1);
+                filter: brightness(1) blur(0);
+            }
+            50% {
+                transform: scale(1.05);
+                filter: brightness(1.2) blur(2px);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1) blur(0);
+            }
+        }
+
+        @keyframes portalPart {
+            0% {
+                transform: scale(1);
+                filter: brightness(1) blur(0);
+            }
+            50% {
+                transform: scale(1.1);
+                filter: brightness(1.5) blur(3px);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1.2) blur(1px);
+            }
+        }
+
+        @keyframes portalUnlock {
+            0% {
+                transform: scale(1);
+                filter: brightness(1.2) blur(1px);
+            }
+            50% {
+                transform: scale(1.15);
+                filter: brightness(1.8) blur(4px);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1.5) blur(2px);
+            }
         }
 
         /* Floating Bubbles Animation */
@@ -40,44 +121,50 @@
             100% { transform: translateY(-100px) scale(1); opacity: 0; }
         }
 
-        /* Portal Effect */
-        .portal {
+        /* DNA Rung Easter Egg */
+        .dna-rung {
             position: absolute;
-            top: 50%;
+            bottom: 15%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle at center, 
-                var(--vault-primary) 0%,
-                var(--vault-secondary) 70%,
-                var(--vault-bg) 100%);
-            border-radius: 50%;
-            animation: portalPulse 3s infinite;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0.1;
+            transition: opacity 0.3s ease;
             z-index: 1;
         }
 
-        @keyframes portalPulse {
-            0% { box-shadow: 0 0 30px var(--vault-primary); }
-            50% { box-shadow: 0 0 50px var(--vault-accent); }
-            100% { box-shadow: 0 0 30px var(--vault-primary); }
+        .dna-rung:hover {
+            opacity: 0.5;
         }
 
-        /* Vault Lock */
-        .vault-lock {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 240px;
-            z-index: 2;
-            filter: drop-shadow(0 0 10px var(--vault-accent));
-        }
-
-        .vault-lock object {
+        .dna-rung img {
             width: 100%;
             height: 100%;
+            object-fit: contain;
+        }
+
+        /* Portal Window Effect */
+        .portal-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 80vw;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: all var(--transition-portal);
+            z-index: 4;
+        }
+
+        .portal-window.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            border-radius: 20px;
         }
 
         /* Login Card */
@@ -94,12 +181,13 @@
             z-index: 3;
             border: 2px solid var(--vault-accent);
             box-shadow: var(--shadow-lg);
-            animation: cardFloat 3s infinite;
+            transition: transform var(--transition-portal),
+                      opacity var(--transition-portal);
         }
 
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .vault-card.portal-active {
+            transform: scale(0);
+            opacity: 0;
         }
 
         .vault-title {
@@ -173,87 +261,79 @@
             position: relative;
             z-index: 2;
         }
-
-        /* Stars background */
-        .stars {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="portal"></div>
-    <div class="vault-lock">
-        <object data="/admin/assets/images/admin-vault-lock.svg" 
-                type="image/svg+xml" 
-                width="200" 
-                height="240"
-                aria-label="Animated vault lock">
-            <!-- Fallback for browsers that don't support SVG -->
-            <img src="/admin/assets/images/admin-vault-lock-fallback.png" 
-                 alt="Vault Lock" 
-                 width="200" 
-                 height="240">
-        </object>
-    </div>
+    <div class="admin-background"></div>
+    <div class="portal-window"></div>
     
+    <!-- DNA Rung Easter Egg -->
+    <div class="dna-rung">
+        <img src="/shared/platform/images/platform-logo-horizontal-white.svg" 
+             alt="Recursive Learning"
+             aria-hidden="true">
+    </div>
+
     <div class="auth-container">
         <div class="vault-card">
-            <h1 class="vault-title">The Vault</h1>
-            <form class="vault-form" id="authForm">
-                <input type="password" 
-                       class="vault-input" 
-                       id="password" 
-                       placeholder="Enter the secret code..."
-                       required>
-                <button type="submit" class="vault-button">
-                    Unlock Vault
-                </button>
+            <h1 class="vault-title">Recursive Learning Vault</h1>
+            <form id="loginForm" onsubmit="return false;">
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Enter the vault code" autocomplete="current-password">
+                </div>
+                <button type="submit">Enter Vault</button>
+                <div class="error-message" id="errorMessage"></div>
             </form>
-            <div class="vault-error" id="authError">
-                Access Denied! Check your credentials...
-            </div>
         </div>
     </div>
 
     <script type="module">
-        import { AdminAuth } from './assets/js/admin-auth.js';
+        import { AdminAuth } from '/admin/assets/js/admin-auth.js';
 
-        // Check if already authenticated
-        if (AdminAuth.redirectIfAuthed()) {
-            throw new Error('Redirecting...');
-        }
+        // Redirect if already authenticated
+        AdminAuth.redirectIfAuthed();
 
-        // Create stars
-        function createStars() {
-            const stars = document.querySelector('.stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = Math.random() * 3 + 'px';
-                star.style.height = star.style.width;
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 2 + 's';
-                stars.appendChild(star);
+        const form = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const background = document.querySelector('.admin-background');
+            const vaultCard = document.querySelector('.vault-card');
+            
+            if (AdminAuth.validatePassword(password)) {
+                // Start portal sequence
+                background.classList.add('portal-forming');
+                
+                setTimeout(() => {
+                    background.classList.add('portal-opening');
+                }, 1500);
+                
+                setTimeout(() => {
+                    background.classList.add('portal-unlocked');
+                    vaultCard.classList.add('portal-active');
+                }, 3000);
+                
+                // Set auth and redirect after animation
+                AdminAuth.setAuth();
+                setTimeout(() => {
+                    window.location.href = '/admin/dashboard.html';
+                }, 4500);
+            } else {
+                errorMessage.textContent = 'Invalid vault code';
+                document.getElementById('password').value = '';
+                background.classList.add('shake');
+                setTimeout(() => {
+                    background.classList.remove('shake');
+                }, 500);
             }
-        }
+        });
+
+        // Clear error on input
+        document.getElementById('password').addEventListener('input', () => {
+            errorMessage.textContent = '';
+        });
 
         // Create floating bubbles
         function createBubbles() {
@@ -270,51 +350,14 @@
             }, 500);
         }
 
-        // Initialize effects
-        createStars();
-        createBubbles();
-
-        const form = document.getElementById('authForm');
-        const error = document.getElementById('authError');
-        const input = document.getElementById('password');
-        const portal = document.querySelector('.portal');
-        const vaultLock = document.querySelector('.vault-lock');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const password = input.value;
-            
-            if (password === 'r3curs1v3') {
-                // Success animation
-                portal.style.animation = 'portalPulse 0.5s infinite';
-                vaultLock.style.transform = 'translate(-50%, -50%) scale(0)';
-                AdminAuth.setAuth();
-                
-                // Trigger unlock animation in SVG
-                const svgDoc = vaultLock.querySelector('object').contentDocument;
-                const unlockAnim = svgDoc.getElementById('unlock');
-                if (unlockAnim) unlockAnim.beginElement();
-                
-                setTimeout(() => {
-                    window.location.href = '/admin/dashboard.html';
-                }, 1500);
-            } else {
-                error.style.display = 'block';
-                form.reset();
-                
-                // Shake animation
-                vaultLock.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    vaultLock.style.animation = '';
-                }, 500);
-            }
+        // Handle DNA rung easter egg
+        const dnaRung = document.querySelector('.dna-rung');
+        dnaRung.addEventListener('click', () => {
+            window.location.href = '/clients/rlp/curious.html';
         });
 
-        // Show re-auth message if needed
-        if (new URLSearchParams(window.location.search).get('reauth')) {
-            error.textContent = 'Your vault access has expired! Please re-authenticate...';
-            error.style.display = 'block';
-        }
+        // Initialize effects
+        createBubbles();
     </script>
 </body>
 </html> 

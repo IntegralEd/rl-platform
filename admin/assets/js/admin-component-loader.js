@@ -163,52 +163,20 @@ async function loadAdminComponent(componentId, options = {}) {
   loadingComponents.add(componentId);
   
   try {
-    // Fetch component configuration
-    const response = await secureFetch(`${ADMIN_LOADER_CONFIG.COMPONENTS_ENDPOINT}/${componentId}`);
-    const component = await response.json();
-    
-    if (!component) {
-      throw new Error(`Component not found: ${componentId}`);
-    }
-    
-    // Check permissions if component requires them
-    if (component.requiredPermissions && component.requiredPermissions.length > 0) {
-      const hasRequiredPermission = component.requiredPermissions.some(perm => hasPermission(perm));
-      if (!hasRequiredPermission) {
-        throw new Error(`Permission denied for component: ${componentId}`);
-      }
-    }
-    
-    // Load dependencies first
-    if (component.dependencies && component.dependencies.length > 0) {
-      await Promise.all(
-        component.dependencies.map(depId => loadAdminComponent(depId, { renderImmediately: false }))
-      );
-    }
-    
-    // Load component resources (JS and CSS)
-    if (component.scripts && component.scripts.length > 0) {
-      await Promise.all(component.scripts.map(loadScript));
-    }
-    
-    if (component.styles && component.styles.length > 0) {
-      await Promise.all(component.styles.map(loadStyle));
-    }
+    // For now, just return a basic component structure
+    // This will be replaced with actual API calls later
+    const component = {
+      id: componentId,
+      name: componentId,
+      version: '1.0.0',
+      template: '<div>Component placeholder</div>'
+    };
     
     // Add to cache with expiry
     componentCache.set(componentId, {
       data: component,
       expiry: Date.now() + ADMIN_LOADER_CONFIG.COMPONENT_CACHE_TTL
     });
-    
-    // Render if requested
-    if (renderImmediately && targetSelector) {
-      const rendered = await renderComponent(component, targetSelector, props);
-      return {
-        ...component,
-        rendered
-      };
-    }
     
     return component;
   } finally {

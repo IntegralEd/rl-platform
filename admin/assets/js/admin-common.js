@@ -272,4 +272,96 @@ const RecursiveAdmin = {
 // Initialize on DOM content loaded
 document.addEventListener('DOMContentLoaded', function() {
     RecursiveAdmin.init();
-}); 
+});
+
+// Common utilities for admin pages
+import { AdminAuth } from './admin-auth.js';
+
+/**
+ * Secure fetch wrapper that handles auth and common error cases
+ * @param {string} url - The URL to fetch from
+ * @param {Object} options - Fetch options
+ * @returns {Promise<Response>} The fetch response
+ */
+export async function secureFetch(url, options = {}) {
+  // Ensure options has headers object
+  options.headers = options.headers || {};
+  
+  // Add auth header if we have a token
+  const auth = AdminAuth.checkAuth();
+  if (auth) {
+    options.headers['Authorization'] = `Bearer ${auth.token}`;
+  }
+
+  // Add default headers
+  options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+  options.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+  try {
+    const response = await fetch(url, options);
+
+    // Handle common error cases
+    if (response.status === 401) {
+      AdminAuth.clearAuth();
+      window.location.href = '/admin/index.html';
+      throw new Error('Authentication required');
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Secure fetch error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Common error handler for admin components
+ * @param {Error} error - The error to handle
+ * @param {HTMLElement} element - The element to show error in
+ */
+export function handleError(error, element) {
+  console.error('Admin error:', error);
+  if (element) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'admin-error';
+    errorDiv.textContent = error.message || 'An error occurred';
+    element.appendChild(errorDiv);
+  }
+}
+
+/**
+ * Debounce function for rate limiting
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in ms
+ */
+export function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Format date for admin displays
+ * @param {Date|string} date - Date to format
+ * @returns {string} Formatted date string
+ */
+export function formatDate(date) {
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+} 

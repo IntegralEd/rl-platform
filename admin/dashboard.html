@@ -6,45 +6,153 @@
     <title>Recursive Learning Admin Dashboard</title>
     
     <!-- Required Admin Scripts -->
-    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
-    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
-    <script type="module" src="/admin/assets/js/admin-router.js"></script>
+    <script type="module" src="./assets/js/admin-component-loader.js"></script>
+    <script type="module" src="./assets/js/admin-auth.js"></script>
     
     <!-- Admin Styles -->
-    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
-    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    <link rel="stylesheet" href="./assets/css/admin-variables.css">
+    <link rel="stylesheet" href="./assets/css/admin-core.css">
     
-    <script>
-        // Auth check
-        const AUTH_KEY = 'rl_admin_auth';
+    <script type="module">
+        import { AdminAuth } from './assets/js/admin-auth.js';
         
-        function checkAuth() {
-            try {
-                const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
-                if (!auth) return false;
-                
-                if (Date.now() > auth.expiry) {
-                    localStorage.removeItem(AUTH_KEY);
-                    return false;
-                }
-                
-                return auth.authenticated;
-            } catch {
-                return false;
-            }
-        }
-
         // Redirect if not authenticated
-        if (!checkAuth()) {
-            window.location.href = '/admin/index.html?reauth=true';
-        }
+        AdminAuth.requireAuth();
     </script>
 
     <style>
-        /* ... existing styles ... */
+        :root {
+            --header-height: 60px;
+            --nav-width: 260px;
+            --admin-bg: #f4f5f7;
+            --admin-text: #2c3e50;
+            --admin-border: #e1e4e8;
+            --content-width: 1200px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--admin-bg);
+            color: var(--admin-text);
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "nav main";
+            grid-template-columns: var(--nav-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            grid-area: header;
+            background: white;
+            border-bottom: 1px solid var(--admin-border);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .icon-button:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .admin-nav {
+            grid-area: nav;
+            background: white;
+            border-right: 1px solid var(--admin-border);
+            padding: 2rem;
+        }
+
+        .admin-content {
+            grid-area: main;
+            padding: 2rem;
+            max-width: var(--content-width);
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
-    <!-- ... existing body content ... -->
+    <div class="admin-layout">
+        <header class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <div class="header-actions">
+                <button class="icon-button tooltip" data-tooltip="Developer Portal">
+                    <img src="./assets/images/noun-one-ring-3560061-2C3E50.svg" 
+                         alt="Developer Portal"
+                         onclick="window.location.href='/orb'">
+                </button>
+                <button class="icon-button tooltip" data-tooltip="Account Portal">
+                    <img src="./assets/images/person-icon.svg" 
+                         alt="Account Portal"
+                         onclick="window.location.href='/account'">
+                </button>
+            </div>
+        </header>
+        <nav class="admin-nav">
+            <div data-admin-component="admin-nav">
+                <!-- Navigation will be loaded here -->
+            </div>
+        </nav>
+        <main class="admin-content">
+            <div data-admin-component="admin-page">
+                <!-- Page content will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // Initialize component loader
+        const loader = new AdminComponentLoader();
+        await loader.initialize();
+    </script>
 </body>
 </html> 
