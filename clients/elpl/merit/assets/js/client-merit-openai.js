@@ -7,6 +7,11 @@
  * - Q1: Should we implement retry logic for 429 rate limit responses?
  * - Q2: What's the expected timeout for thread creation (currently set to default)?
  * - Q3: Should we cache thread IDs in localStorage for session recovery?
+* @snippets: /* Update API endpoint */
+- this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
+- this.fallbackUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
++ this.baseUrl = 'https://api.recursivelearning.app/dev';
++ this.fallbackUrl = 'https://api.recursivelearning.app/dev';
  */
 class MeritOpenAIClient {
     constructor() {
