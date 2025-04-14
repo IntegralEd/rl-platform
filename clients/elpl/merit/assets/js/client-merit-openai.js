@@ -145,16 +145,19 @@ class MeritOpenAIClient {
     async sendMessage(message, options = {}) {
         console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
         
+        // 1. If we haven't paired yet, go ahead and create a thread
+        if (!this.state.projectPaired || !this.threadId) {
+            console.log('[Merit Flow] No thread found, creating new thread...');
+            await this.createThread();
+            // createThread() would set this.threadId and this.state.projectPaired = true
+        }
+
+        // 2. At this point, we should be "paired"
         if (!this.state.projectPaired) {
             throw new Error('OpenAI project must be paired before sending messages');
         }
 
         try {
-            // For new users or no thread, create one with the first message
-            if (!this.threadId) {
-                console.log('[Merit Flow] No thread found, creating new thread with initial message');
-            }
-
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
