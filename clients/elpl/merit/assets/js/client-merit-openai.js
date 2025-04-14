@@ -1,36 +1,38 @@
 /**
  * @component MeritOpenAIClient
- * @description Handles OpenAI Assistant interactions for Merit chat (Stage 0: Baseline)
+ * @description Handles OpenAI Assistant interactions for Merit chat
  * @version 1.0.17
  */
 class MeritOpenAIClient {
     constructor() {
+        // Core configuration
         this.threadId = null;
-        this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';  // Merit Assistant
-        this.userId = 'default_user';  // Hardcoded for MVP per checklist
+        this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';
+        this.userId = 'default_user';
         
-        // REST API Lambda Configuration
+        // API Configuration
         const ENDPOINTS = {
             PROD: 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main',
             DEV: 'https://api.recursivelearning.app/dev',
             contextPrefix: 'merit:ela:context',
             threadPrefix: 'merit:ela:thread'
         };
-        this.baseUrl = ENDPOINTS.PROD;  // Primary endpoint
-        this.fallbackUrl = ENDPOINTS.PROD;  // Using same production endpoint
         
+        this.baseUrl = ENDPOINTS.PROD;
+        this.fallbackUrl = ENDPOINTS.PROD;
         this.retryAttempts = 3;
         this.currentAttempt = 0;
+        
         this.config = {
-            org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
-            assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
-            model: 'gpt-4o', // Declared model from the OpenAI dashboard
+            org_id: 'recdg5Hlm3VVaBA2u',
+            assistant_id: this.assistantId,
+            model: 'gpt-4o',
             schema_version: '04102025.B01',
-            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',  // OpenAI project pairing
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
             ttl: {
-                session: 86400,  // 24 hours
-                cache: 3600,     // 1 hour
-                temp: 900       // 15 minutes
+                session: 86400,
+                cache: 3600,
+                temp: 900
             }
         };
         
@@ -39,7 +41,6 @@ class MeritOpenAIClient {
             'X-Project-ID': this.config.project_id
         };
 
-        // Stage 0: Basic state tracking
         this.state = {
             isLoading: false,
             hasError: false,
@@ -58,7 +59,7 @@ class MeritOpenAIClient {
                 user_context: null
             },
             system: {
-                schema_version: '04102025.B01',
+                schema_version: this.config.schema_version,
                 thread_id: null
             }
         };
@@ -69,7 +70,7 @@ class MeritOpenAIClient {
             schema: []
         };
 
-        console.log('[Merit Flow] OpenAI client initialized for Stage 0');
+        console.log('[Merit Flow] OpenAI client initialized');
         console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
         console.log('[Merit Flow] Project ID:', this.config.project_id);
     }
