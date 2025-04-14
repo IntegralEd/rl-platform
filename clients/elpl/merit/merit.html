@@ -105,7 +105,7 @@
             
             /* Component Sizing */
             --elpl-card-padding: 1.5rem;
-            --elpl-icon-size: 48px;
+            --elpl-icon-size: 96px;
             --elpl-border-radius: 12px;
             
             /* Chat Variables */
@@ -256,6 +256,7 @@
             overflow-y: auto;
             background: var(--elpl-bg);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            pointer-events: auto;
         }
 
         .chat-input:focus {
@@ -308,8 +309,8 @@
 
         .action-button {
             position: relative;
-            width: 60px;
-            height: 60px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             background: var(--elpl-secondary);
             border: none;
@@ -351,8 +352,8 @@
         }
 
         .action-button img {
-            width: 24px;
-            height: 24px;
+            width: 48px;
+            height: 48px;
             object-fit: contain;
         }
 
@@ -410,8 +411,8 @@
         }
 
         .button-icon {
-            width: 30px;
-            height: 30px;
+            width: 48px;
+            height: 48px;
         }
 
         [hidden] {
@@ -1041,13 +1042,11 @@
                                     placeholder="Type your message..."
                                     rows="1"
                                     maxlength="1000"
-                                    disabled
                                     data-test-id="chat-input"></textarea>
                         </div>
                         <button id="send-button" 
                                 class="action-button"
                                 aria-label="Send message"
-                                disabled
                                 data-test-id="send-button">
                             <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
                                  alt="Send" 
