@@ -6,7 +6,7 @@
     <title>Recursive Learning Platform</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/shared/platform/images/logo.ico">
+    <link rel="icon" type="image/x-icon" href="/shared/platform/images/platform-favicon.ico">
     
     <!-- Required platform styles -->
     <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
@@ -179,15 +179,15 @@
 <body>
     <div class="client-layout" data-client-component="landing-layout" role="application">
         <header class="client-header" role="banner">
-            <img src="/shared/platform/images/recursive-learning-logo-white.png" alt="Recursive Learning" class="logo">
+            <img src="/shared/platform/images/platform-logo-horizontal-white.svg" alt="Recursive Learning" class="logo">
             <div class="header-actions">
                 <span class="version-display" aria-live="polite">v1.0.0 (<span id="time">00:00</span>)</span>
                 <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
-                    <img src="/shared/platform/images/noun-code-651985-FFFFFF.svg" alt="Developer Hub" class="nav-icon">
+                    <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
                 </a>
                 <div class="nav-item with-dropdown">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/noun-account-2725744-FFFFFF.svg" alt="Account" class="nav-icon">
+                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
                     </button>
                     <div class="dropdown-menu">
                         <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
@@ -210,7 +210,7 @@
                 </div>
             </div>
             <a href="/admin" class="admin-button" role="button">
-                <img src="shared/platform/images/performance-icon-blue.svg" alt="Admin">
+                <img src="/shared/platform/images/platform-admin-icon-blue.svg" alt="Admin">
                 Admin Portal
             </a>
         </main>
@@ -223,9 +223,9 @@
     </div>
 
     <!-- Required platform scripts -->
-    <script type="module" src="shared/platform/js/component-loader.js"></script>
-    <script type="module" src="shared/platform/js/auth.js"></script>
-    <script type="module" src="shared/platform/js/url-resolver.js"></script>
+    <script type="module" src="/shared/platform/js/platform-component-loader.js"></script>
+    <script type="module" src="/shared/platform/js/platform-auth.js"></script>
+    <script type="module" src="/shared/platform/js/platform-url-resolver.js"></script>
 
     <script>
         // Component initialization and error handling
