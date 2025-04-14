@@ -6,7 +6,7 @@
     <title>Recursive Learning Platform</title>
     
     <!-- Required platform styles -->
-    <link rel="stylesheet" href="shared/platform/css/recursive-platform.css">
+    <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
     
     <style>
         :root {
@@ -36,6 +36,39 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-button {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-button img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .version-display {
+            font-size: 0.9em;
+            margin-right: 1rem;
         }
 
         .client-content {
@@ -139,8 +172,16 @@
 <body>
     <div class="client-layout" data-client-component="landing-layout" role="application">
         <header class="client-header" role="banner">
-            <img src="shared/platform/images/recursive-learning-logo-white.png" alt="Recursive Learning" class="logo">
-            <span class="version-display" aria-live="polite">v1.0.0 (<span id="time">00:00</span>)</span>
+            <img src="/shared/platform/images/recursive-learning-logo-white.png" alt="Recursive Learning" class="logo">
+            <div class="header-actions">
+                <span class="version-display" aria-live="polite">v1.0.0 (<span id="time">00:00</span>)</span>
+                <button class="icon-button tooltip" data-tooltip="Developer Portal">
+                    <img src="/shared/platform/images/noun-one-ring-3560061-2C3E50.svg" alt="Developer Portal">
+                </button>
+                <button class="icon-button tooltip" data-tooltip="Account Portal">
+                    <img src="/shared/platform/images/person-icon.svg" alt="Account Portal">
+                </button>
+            </div>
         </header>
 
         <main class="client-content" role="main">
