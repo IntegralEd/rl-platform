@@ -103,7 +103,7 @@ Version: 1.0.17 [April 13, 2025 12:00 PM EDT]
 - Enhanced error messaging
 ```
 
-### 5. Questions for Backend Team [URGENT]
+### 5. Questions for Backend Team [URGENT - 4/14/2024 will delay release]
 1. Thread Management
    - What's the expected thread TTL for Stage 0?
    - Should we implement thread cleanup for abandoned sessions?
