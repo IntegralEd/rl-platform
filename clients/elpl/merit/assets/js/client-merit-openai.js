@@ -12,7 +12,7 @@ class MeritOpenAIClient {
     constructor() {
         this.threadId = null;
         this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';  // Merit Assistant
-        this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
+        this.baseUrl = 'https://api.recursivelearning.app/dev';
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
             schema_version: '04102025.B01'
