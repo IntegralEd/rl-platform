@@ -13,8 +13,8 @@ class MeritOpenAIClient {
         this.threadId = null;
         this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';  // Merit Assistant
         this.userId = 'default_user';  // Hardcoded for MVP per checklist
-        this.baseUrl = 'https://api.recursivelearning.app/dev';
-        this.fallbackUrl = 'https://api.recursivelearning.app';  // Fallback without /dev
+        this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
+        this.fallbackUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';  // Using same production endpoint
         this.retryAttempts = 3;
         this.currentAttempt = 0;
         this.config = {
