@@ -62,57 +62,54 @@ export const ADMIN_CONFIG = {
     pagesPath: '/admin/pages'
 };
 
-// Admin Authentication Module
+/**
+ * Simple admin authentication module
+ * Uses localStorage for session persistence
+ */
 export const AdminAuth = {
-    AUTH_KEY: 'rl_admin_auth',
-    AUTH_DURATION: 24 * 60 * 60 * 1000, // 24 hours
+    AUTH_KEY: 'admin_auth',
+    AUTH_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    TEMP_PASSWORD: 'r3curs1v3', // Temporary hardcoded password
 
     checkAuth() {
-        try {
-            const auth = JSON.parse(localStorage.getItem(this.AUTH_KEY));
-            if (!auth) return false;
-            
-            if (Date.now() > auth.expiry) {
-                this.clearAuth();
-                return false;
-            }
-            
-            return auth.authenticated;
-        } catch {
+        const auth = localStorage.getItem(this.AUTH_KEY);
+        if (!auth) return false;
+
+        const { expiry } = JSON.parse(auth);
+        if (Date.now() > expiry) {
+            this.clearAuth();
             return false;
         }
+        return true;
     },
 
     setAuth() {
         const expiry = Date.now() + this.AUTH_DURATION;
-        localStorage.setItem(this.AUTH_KEY, JSON.stringify({
-            authenticated: true,
-            expiry
-        }));
+        localStorage.setItem(this.AUTH_KEY, JSON.stringify({ expiry }));
     },
 
     clearAuth() {
         localStorage.removeItem(this.AUTH_KEY);
     },
 
+    validatePassword(password) {
+        return password === this.TEMP_PASSWORD;
+    },
+
     requireAuth() {
         if (!this.checkAuth()) {
-            window.location.href = '/admin/index.html?reauth=true';
-            return false;
+            window.location.href = '/admin/index.html';
         }
-        return true;
     },
 
     redirectIfAuthed() {
         if (this.checkAuth()) {
             window.location.href = '/admin/dashboard.html';
-            return true;
         }
-        return false;
     }
 };
 
 // Auto-check auth on protected pages
-if (window.location.pathname !== '/admin/index.html') {
+if (!window.location.pathname.includes('index.html')) {
     AdminAuth.requireAuth();
 } 
