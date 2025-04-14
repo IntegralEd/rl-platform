@@ -1,0 +1,61 @@
+/**
+ * Platform Loading States
+ * Version: 1.0.17
+ * Core loading patterns and indicators
+ */
+
+/* Base Loading Container */
+.loading-base {
+    position: relative;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Standard Loading Indicator */
+.loading-indicator {
+    display: inline-block;
+    position: relative;
+    color: var(--client-text);
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.loading-indicator::after {
+    content: '...';
+    animation: dots 1s steps(5, end) infinite;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Loading Animation */
+.loading-animation {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--client-border);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+/* Accessibility */
+.loading-indicator[aria-hidden="true"] {
+    display: none;
+}
+
+.loading-screen[aria-hidden="true"] {
+    display: none;
+} 

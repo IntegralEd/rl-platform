@@ -14,9 +14,17 @@
     <!-- Required security - client level CORS and embed protection -->
     <script type="module" src="/clients/elpl/assets/elpl-security.js"></script>
     
-    <!-- Base variables and custom styles -->
+    <!-- Platform level styles -->
+    <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
+    
+    <!-- Client level styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+    
+    <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
     <!-- Merit specific logic - instructional flow controller -->
@@ -941,7 +949,7 @@
                          aria-label="Version and time"
                          data-test-id="version-display"></div>
                 </div>
-            </div>
+    </div>
         </header>
 
         <main class="client-content" role="main" data-test-id="main-content">
@@ -1066,11 +1074,11 @@
                         </button>
                     </div>
                     <div id="chatbar" class="chatbar" hidden data-test-id="chatbar">
-                        <div class="chat-input-container">
+            <div class="chat-input-container">
                             <textarea id="chat-input"
                                     class="chat-input"
                                     aria-label="Type your message"
-                                    placeholder="Type your message..."
+                    placeholder="Type your message..." 
                                     rows="1"
                                     maxlength="1000"
                                     data-test-id="chat-input"></textarea>

@@ -1,3 +1,9 @@
+/**
+ * Merit Chat Styles
+ * Version: 1.0.17
+ * Extends platform loading states and animations
+ */
+
 /* Chat Message Styles */
 .message {
     padding: 10px;
@@ -5,6 +11,7 @@
     margin: 5px 0;
     max-width: 70%;
     position: relative;
+    animation: messageAppear 0.3s ease-out;
 }
 
 .message.assistant {
@@ -102,6 +109,7 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s ease-out;
 }
 
 .affirmation-container label {
