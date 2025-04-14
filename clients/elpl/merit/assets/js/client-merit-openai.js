@@ -30,7 +30,7 @@ class MeritOpenAIClient {
         };
 
         console.log('[Merit Flow] OpenAI client initialized for Stage 0');
-        console.log('[Merit Flow] Using Lambda endpoint:', this.baseUrl);
+        console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
     }
 
     /**
@@ -43,44 +43,30 @@ class MeritOpenAIClient {
      */
     async createThread() {
         try {
-            this.state.isLoading = true;
             console.log('[Merit Flow] Creating new thread');
-
-            const response = await fetch(this.baseUrl, {
+            const response = await fetch(`${this.baseUrl}/thread/create`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'Origin': 'https://recursivelearning.app'
+                    'X-Organization-ID': this.config.org_id,
+                    'X-Schema-Version': this.config.schema_version
                 },
                 body: JSON.stringify({
-                    action: 'create_thread',
-                    assistant_id: this.assistantId,
-                    ...this.config
+                    assistant_id: this.assistantId
                 })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create thread');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
-            if (!data.thread_id) {
-                throw new Error('Invalid thread response');
-            }
-            
             this.threadId = data.thread_id;
             console.log('[Merit Flow] Thread created:', this.threadId);
-            console.log('[Merit Flow] No context loaded (Stage 0)');
-
             return this.threadId;
-
         } catch (error) {
             console.error('[Merit Flow] Thread creation error:', error);
-            this.state.hasError = true;
-            this.state.errorMessage = 'Failed to start chat session';
             throw error;
-        } finally {
-            this.state.isLoading = false;
         }
     }
 
@@ -115,50 +101,37 @@ class MeritOpenAIClient {
      * - Q6: Should we implement message queue for rate limiting?
      * - Q7: What's the expected message size limit?
      */
-    async sendMessage(message, options = { visible: true }) {
+    async sendMessage(message, options = {}) {
         if (!this.threadId) {
-            console.error('[Merit Flow] No active thread');
-            throw new Error('No active chat session');
+            throw new Error('No active thread');
         }
 
         try {
-            this.state.isLoading = true;
-            console.log('[Merit Flow] Sending message:', message);
-
-            const response = await fetch(this.baseUrl, {
+            console.log('[Merit Flow] Sending message to thread:', this.threadId);
+            const response = await fetch(`${this.baseUrl}/thread/message`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    'Origin': 'https://recursivelearning.app'
+                    'X-Organization-ID': this.config.org_id,
+                    'X-Schema-Version': this.config.schema_version
                 },
                 body: JSON.stringify({
-                    message,
                     thread_id: this.threadId,
-                    assistant_id: this.assistantId,
-                    ...this.config
+                    message: message,
+                    ...options
                 })
             });
 
             if (!response.ok) {
-                throw new Error('Failed to send message');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            this.state.lastResponse = data;
-
-            return {
-                type: 'message',
-                role: 'assistant',
-                content: data.message
-            };
-
+            console.log('[Merit Flow] Message sent successfully');
+            return data;
         } catch (error) {
-            console.error('[Merit Flow] Message error:', error);
-            this.state.hasError = true;
-            this.state.errorMessage = 'Failed to send message';
+            console.error('[Merit Flow] Message sending error:', error);
             throw error;
-        } finally {
-            this.state.isLoading = false;
         }
     }
 
