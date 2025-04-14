@@ -4,7 +4,6 @@
  */
 
 import { hasPermission } from './admin-auth.js';
-import { secureFetch } from './admin-common.js';
 
 // Configuration
 const ADMIN_LOADER_CONFIG = {
@@ -21,7 +20,7 @@ const loadedScripts = new Set();
 const loadedStyles = new Set();
 
 // Admin Component Loader
-class AdminComponentLoader {
+export class AdminComponentLoader {
     constructor() {
         this.components = new Map();
         this.initialized = false;
