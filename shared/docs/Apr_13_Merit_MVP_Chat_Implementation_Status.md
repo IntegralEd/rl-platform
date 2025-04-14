@@ -408,3 +408,25 @@ Version: 1.0.17 [April 13, 2025 12:00 PM EDT]
    - [ ] Test scroll performance
    - [ ] Verify loading states
    - [ ] Check memory usage 
+
+### 7. DNS Resolution Failure with net::ERR_NAME_NOT_RESOLVED
+
+**Context & Analysis**  
+We've encountered a "net::ERR_NAME_NOT_RESOLVED" error when creating new threads at https://api.recursivelearning.app/dev. The request fails with a DNS resolution error, indicating the domain cannot be resolved by the client environment. This is preventing chat messages from sending successfully.
+
+Here's the relevant snippet from the console logs:
+```
+client-merit-openai.js:61 [Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})
+client-merit-openai.js:62 [Merit Flow] Using endpoint: https://api.recursivelearning.app/dev
+POST https://api.recursivelearning.app/dev net::ERR_NAME_NOT_RESOLVED
+client-merit-openai.js:88 [Merit Flow] Thread creation error: TypeError: Failed to fetch
+client-merit-openai.js:99 [Merit Flow] Error details: {endpoint: 'https://api.recursivelearning.app/dev', attempt: 0, ...}
+```
+
+**Work Request for Backend Team**  
+1. Verify that "recursivelearning.app" is set up correctly in DNS and that "api.recursivelearning.app" resolves publicly.  
+2. Confirm the subdomain "/dev" environment is still valid and properly routed.  
+3. If you've changed the production environment or domain naming, update the code base accordingly.  
+4. Ensure the fallback URL (without "/dev") is also reachable, or adjust the fallback logic in our "createThread()" method to handle DNS errors.
+
+Until this is resolved, the chat initialization and message sending from new users will continue to fail due to DNS unreachability. 
