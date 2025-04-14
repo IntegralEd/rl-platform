@@ -151,6 +151,7 @@ export class PageCardsComponent extends HTMLElement {
         } else {
           ingredients.style.display = 'none';
         }
+
       });
     });
   }

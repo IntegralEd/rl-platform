@@ -5,14 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Learning Admin Dashboard</title>
     
-    <!-- Required Admin Scripts -->
-    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
-    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+    <!-- Platform CSS -->
+    <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
     
     <!-- Admin Styles -->
     <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
     <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
-    <link rel="stylesheet" href="/shared/platform/css/recursive-platform.css">
+    
+    <!-- Required Admin Scripts -->
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
     
     <script type="module">
         import { AdminAuth } from '/admin/assets/js/admin-auth.js';
@@ -29,6 +34,13 @@
             --admin-text: #2c3e50;
             --admin-border: #e1e4e8;
             --content-width: 1200px;
+            
+            /* Gem Status Colors */
+            --gem-ready: #22c55e;     /* Green */
+            --gem-progress: #eab308;   /* Yellow */
+            --gem-attention: #ef4444;  /* Red */
+            --gem-size: 8px;
+            --gem-glow: 4px;
         }
 
         body {
@@ -51,12 +63,48 @@
 
         .admin-header {
             grid-area: header;
-            background: white;
+            background: var(--brand-color, #004080);
+            color: #fff;
             border-bottom: 1px solid var(--admin-border);
             padding: 0 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .version-display {
+            font-size: 12px;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px 3px 0 0;
         }
 
         .header-actions {
@@ -104,6 +152,7 @@
             font-size: 0.75rem;
             white-space: nowrap;
             pointer-events: none;
+            z-index: 10;
         }
 
         .admin-nav {
@@ -111,6 +160,7 @@
             background: white;
             border-right: 1px solid var(--admin-border);
             padding: 2rem;
+            overflow-y: auto;
         }
 
         .admin-content {
@@ -118,23 +168,122 @@
             padding: 2rem;
             max-width: var(--content-width);
             margin: 0 auto;
+            overflow-y: auto;
+        }
+
+        /* Gem Status Indicators */
+        .gem-dot {
+            width: var(--gem-size);
+            height: var(--gem-size);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            position: relative;
+        }
+
+        .gem-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(var(--gem-size) + var(--gem-glow));
+            height: calc(var(--gem-size) + var(--gem-glow));
+            border-radius: 50%;
+            opacity: 0.4;
+            transition: all 0.2s ease;
+        }
+
+        .gem-dot:hover::after {
+            opacity: 0.6;
+            width: calc(var(--gem-size) + var(--gem-glow) * 2);
+            height: calc(var(--gem-size) + var(--gem-glow) * 2);
+        }
+
+        .gem-ready {
+            background-color: var(--gem-ready);
+        }
+        .gem-ready::after {
+            background-color: var(--gem-ready);
+        }
+
+        .gem-progress {
+            background-color: var(--gem-progress);
+        }
+        .gem-progress::after {
+            background-color: var(--gem-progress);
+        }
+
+        .gem-attention {
+            background-color: var(--gem-attention);
+        }
+        .gem-attention::after {
+            background-color: var(--gem-attention);
+        }
+
+        /* Card Status Display */
+        .status-gems {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--admin-text);
+            margin-right: auto;
+        }
+        
+        /* Component States */
+        .loading-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            70% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-layout">
-        <header class="client-header">
+        <header class="admin-header">
             <div class="header-left">
-                <a href="https://recursivelearning.app/" class="header-logo">
-                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" />
+                <a href="/admin/dashboard.html" class="header-logo">
+                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" />
                 </a>
-                <span class="version-display">v1.0.0</span>
+                <span class="version-display">v1.0.17</span>
             </div>
             <nav class="header-nav">
-                <a href="/platform/admin" class="nav-item active">Admin</a>
+                <a href="/admin/dashboard.html" class="nav-item active">Admin</a>
                 <div class="nav-item">
-                    <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
-                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon with-ring">
+                    <a href="/admin/pages/orb/orb-layouts.html" class="icon-button tooltip" data-tooltip="Developer Hub">
+                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
                     </a>
                 </div>
                 <div class="nav-item with-dropdown">
@@ -142,19 +291,52 @@
                         <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
                     </button>
                     <div class="dropdown-menu">
-                        <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
+                        <a href="/admin/auth/logout.html" class="dropdown-item">Log Out</a>
                     </div>
                 </div>
             </nav>
         </header>
         <nav class="admin-nav">
-            <div data-admin-component="admin-nav">
+            <div data-admin-component="page-cards">
                 <!-- Navigation will be loaded here -->
+                <div class="loading-state">
+                    <div class="pulse">Loading navigation...</div>
+                </div>
             </div>
         </nav>
         <main class="admin-content">
             <div data-admin-component="admin-page">
                 <!-- Page content will be loaded here -->
+                <div class="loading-state">
+                    <div class="pulse">Loading dashboard content...</div>
+                </div>
+            </div>
+            
+            <!-- Gem Status Example -->
+            <div class="demo-section" style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3>Status Gem Indicators</h3>
+                <div style="display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; padding: 8px 16px; background: #f8f9fa; border-radius: 6px;">
+                        <div class="gem-dot gem-ready"></div>
+                        <span>Ready/Active</span>
+                    </div>
+                    <div style="display: flex; align-items: center; padding: 8px 16px; background: #f8f9fa; border-radius: 6px;">
+                        <div class="gem-dot gem-progress"></div>
+                        <span>In Progress</span>
+                    </div>
+                    <div style="display: flex; align-items: center; padding: 8px 16px; background: #f8f9fa; border-radius: 6px;">
+                        <div class="gem-dot gem-attention"></div>
+                        <span>Needs Attention</span>
+                    </div>
+                </div>
+                <p>Implementation Note: These gem indicators are used to show client page status in the left navigation.</p>
+                <p>Card behavior:</p>
+                <ul>
+                    <li>Active tab: Gem visible in sidebar and tab header</li>
+                    <li>Inactive tab: Gem hidden in left sidebar</li>
+                    <li>Collapsed card: All gems hidden</li>
+                    <li>Alert state: Visible with pulse animation even when collapsed</li>
+                </ul>
             </div>
         </main>
     </div>
@@ -162,9 +344,62 @@
     <script type="module">
         import { AdminComponentLoader } from '/admin/assets/js/admin-component-loader.js';
         
-        // Initialize component loader
-        const loader = new AdminComponentLoader();
-        await loader.initialize();
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize component loader
+            const loader = new AdminComponentLoader();
+            await loader.initialize();
+            
+            console.log('[Admin Dashboard] v1.0.17 - Initialized');
+            console.log('[Admin Dashboard] Current focus: Merit - Dashboard Overview');
+            
+            // Register event listeners for navigation
+            document.addEventListener('ingredient-selected', (e) => {
+                const { page, ingredient } = e.detail;
+                console.log(`[Admin Dashboard] Focus changed: ${page} - ${ingredient}`);
+                console.log(`[Admin Dashboard] Loading component: ${page}-${ingredient}-component`);
+                
+                // Update content area based on selection
+                // This would be replaced with actual content loading
+                const contentArea = document.querySelector('[data-admin-component="admin-page"]');
+                if (contentArea) {
+                    contentArea.innerHTML = `
+                        <div style="padding: 24px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <h2>${page} - ${ingredient}</h2>
+                            <p>This is the content area for the ${ingredient} ingredient in the ${page} project.</p>
+                            <p>Version 1.0.17 - Updated April 14, 2025</p>
+                            
+                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+                                <h3>Component Status</h3>
+                                <p><strong>Path:</strong> /clients/${page}/${page}.html</p>
+                                <p><strong>Status:</strong> <span style="color: #22c55e;">Active</span></p>
+                                <p><strong>Last Updated:</strong> April 14, 2025</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    console.log(`[Admin Dashboard] Component loaded: ${page}-${ingredient}-component`);
+                    console.log(`[Admin Dashboard] Current focus: ${page} - ${ingredient}`);
+                }
+            });
+            
+            // Log navigation activity
+            const navItems = document.querySelectorAll('.admin-nav [data-admin-component] *[data-ingredient]');
+            if (navItems) {
+                console.log(`[Admin Dashboard] Navigation items loaded: ${navItems.length}`);
+                console.log('[Admin Dashboard] Available components:');
+                let components = {};
+                document.querySelectorAll('.page-card').forEach(card => {
+                    const page = card.querySelector('.page-card-header h2')?.textContent.trim().toLowerCase();
+                    if (page) {
+                        components[page] = [];
+                        card.querySelectorAll('.ingredient-item').forEach(item => {
+                            components[page].push(item.dataset.ingredient);
+                        });
+                    }
+                });
+                console.table(components);
+            }
+        });
     </script>
 </body>
 </html> 
