@@ -12,7 +12,11 @@ class MeritOpenAIClient {
     constructor() {
         this.threadId = null;
         this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';  // Merit Assistant
+        this.userId = 'default_user';  // Hardcoded for MVP per checklist
         this.baseUrl = 'https://api.recursivelearning.app/dev';
+        this.fallbackUrl = 'https://api.recursivelearning.app';  // Fallback without /dev
+        this.retryAttempts = 3;
+        this.currentAttempt = 0;
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
             assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
@@ -54,7 +58,9 @@ class MeritOpenAIClient {
      */
     async createThread() {
         try {
-            console.log('[Merit Flow] Creating new thread');
+            console.log('[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})');
+            console.log('[Merit Flow] Using endpoint:', this.baseUrl);
+            
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
@@ -80,6 +86,23 @@ class MeritOpenAIClient {
             return this.threadId;
         } catch (error) {
             console.error('[Merit Flow] Thread creation error:', error);
+            
+            // Check if it's a DNS error and we have retries left
+            if (error.message.includes('ERR_NAME_NOT_RESOLVED') && this.currentAttempt < this.retryAttempts) {
+                this.currentAttempt++;
+                console.log('[Merit Flow] DNS resolution failed, trying fallback endpoint');
+                this.baseUrl = this.fallbackUrl;
+                return this.createThread();  // Retry with fallback URL
+            }
+            
+            // Log detailed error info
+            console.error('[Merit Flow] Error details:', {
+                endpoint: this.baseUrl,
+                attempt: this.currentAttempt,
+                headers: this.headers,
+                error: error.message
+            });
+            
             this.state.hasError = true;
             this.state.errorMessage = error.message;
             throw error;
@@ -120,23 +143,26 @@ class MeritOpenAIClient {
      * - Q7: What's the expected message size limit?
      */
     async sendMessage(message, options = {}) {
-        if (!this.threadId) {
-            throw new Error('thread_id is required');
-        }
-
+        console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
+        
         if (!this.state.projectPaired) {
             throw new Error('OpenAI project must be paired before sending messages');
         }
 
         try {
-            console.log('[Merit Flow] Sending message to thread:', this.threadId);
+            // For new users or no thread, create one with the first message
+            if (!this.threadId) {
+                console.log('[Merit Flow] No thread found, creating new thread with initial message');
+            }
+
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify({
                     message,
-                    thread_id: this.threadId,
-                    project_id: this.config.project_id,  // Required for project pairing
+                    thread_id: this.threadId || null,  // Null for new thread creation
+                    user_id: this.userId,  // Always send user_id
+                    project_id: this.config.project_id,
                     ...this.config,
                     ...options
                 })
@@ -152,6 +178,11 @@ class MeritOpenAIClient {
             }
 
             const data = await response.json();
+            // If this was a new thread, capture the thread_id from response
+            if (!this.threadId && data.thread_id) {
+                this.threadId = data.thread_id;
+                console.log('[Merit Flow] New thread created:', this.threadId);
+            }
             console.log('[Merit Flow] Message sent successfully');
             return data;
         } catch (error) {
