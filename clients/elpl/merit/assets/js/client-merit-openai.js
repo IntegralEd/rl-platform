@@ -16,6 +16,7 @@ class MeritOpenAIClient {
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',  // EL Education
             assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
+            model: 'gpt-4o', // Declared model from the OpenAI dashboard
             schema_version: '04102025.B01',
             project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'  // OpenAI project pairing
         };
