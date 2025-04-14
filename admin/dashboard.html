@@ -268,6 +268,37 @@
                 opacity: 0.7;
             }
         }
+
+        /* SVG Size Constraints */
+        .header-logo img {
+            width: 160px;
+            height: auto;
+            max-height: 40px;
+            object-fit: contain;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+        
+        /* Additional logging styles */
+        .console-log-info {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #66ff66;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 9999;
+            max-width: 400px;
+            max-height: 200px;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
@@ -275,7 +306,7 @@
         <header class="admin-header">
             <div class="header-left">
                 <a href="/admin/dashboard.html" class="header-logo">
-                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" />
+                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
                 </a>
                 <span class="version-display">v1.0.17</span>
             </div>
@@ -283,12 +314,12 @@
                 <a href="/admin/dashboard.html" class="nav-item active">Admin</a>
                 <div class="nav-item">
                     <a href="/admin/pages/orb/orb-layouts.html" class="icon-button tooltip" data-tooltip="Developer Hub">
-                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
+                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
                     </a>
                 </div>
                 <div class="nav-item with-dropdown">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
+                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="24" height="24">
                     </button>
                     <div class="dropdown-menu">
                         <a href="/admin/auth/logout.html" class="dropdown-item">Log Out</a>
@@ -341,22 +372,69 @@
         </main>
     </div>
 
+    <div class="console-log-info" id="debugConsole"></div>
+
     <script type="module">
         import { AdminComponentLoader } from '/admin/assets/js/admin-component-loader.js';
         
         document.addEventListener('DOMContentLoaded', async () => {
+            // Debug console element
+            const debugConsole = document.getElementById('debugConsole');
+            
+            // Custom logging function that logs to both console and debug display
+            const logWithUI = (message, type = 'log') => {
+                console[type](`[Admin Dashboard] ${message}`);
+                
+                // Append to debug console if it exists
+                if (debugConsole) {
+                    const logItem = document.createElement('div');
+                    logItem.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+                    logItem.style.color = type === 'error' ? '#ff6666' : 
+                                         type === 'warn' ? '#ffcc66' : '#66ff66';
+                    debugConsole.appendChild(logItem);
+                    
+                    // Scroll to bottom
+                    debugConsole.scrollTop = debugConsole.scrollHeight;
+                    
+                    // Show debug console (can be toggled with Alt+D)
+                    if (type === 'error') {
+                        debugConsole.style.display = 'block';
+                    }
+                }
+            };
+            
             // Initialize component loader
             const loader = new AdminComponentLoader();
             await loader.initialize();
             
-            console.log('[Admin Dashboard] v1.0.17 - Initialized');
-            console.log('[Admin Dashboard] Current focus: Merit - Dashboard Overview');
+            logWithUI('v1.0.17 - Initialized');
+            logWithUI('Current focus: Merit - Dashboard Overview');
+            
+            // Gem status tracking
+            const gemStatuses = {
+                merit: 'ready',
+                goalsetter: 'progress',
+                bhb: 'attention'
+            };
+            
+            logWithUI(`Gem status initialized - Merit: ${gemStatuses.merit}, Goalsetter: ${gemStatuses.goalsetter}, BHB: ${gemStatuses.bhb}`);
+            
+            // Track active tab
+            const activeTab = {
+                page: 'merit',
+                ingredient: 'dashboard'
+            };
+            
+            logWithUI(`Active tab: ${activeTab.page} - ${activeTab.ingredient}`);
             
             // Register event listeners for navigation
             document.addEventListener('ingredient-selected', (e) => {
                 const { page, ingredient } = e.detail;
-                console.log(`[Admin Dashboard] Focus changed: ${page} - ${ingredient}`);
-                console.log(`[Admin Dashboard] Loading component: ${page}-${ingredient}-component`);
+                activeTab.page = page;
+                activeTab.ingredient = ingredient;
+                
+                logWithUI(`Focus changed: ${page} - ${ingredient}`);
+                logWithUI(`Loading component: ${page}-${ingredient}-component`);
                 
                 // Update content area based on selection
                 // This would be replaced with actual content loading
@@ -377,16 +455,68 @@
                         </div>
                     `;
                     
-                    console.log(`[Admin Dashboard] Component loaded: ${page}-${ingredient}-component`);
-                    console.log(`[Admin Dashboard] Current focus: ${page} - ${ingredient}`);
+                    logWithUI(`Component loaded: ${page}-${ingredient}-component`);
+                    logWithUI(`Current focus: ${page} - ${ingredient}`);
+                }
+            });
+            
+            // Initialize gem status observers
+            const observeGemStatus = () => {
+                const gems = document.querySelectorAll('.gem-dot');
+                logWithUI(`Observing ${gems.length} status gems`);
+                
+                gems.forEach(gem => {
+                    // Log initial status
+                    const status = gem.classList.contains('gem-ready') ? 'ready' : 
+                                 gem.classList.contains('gem-progress') ? 'progress' : 'attention';
+                    const card = gem.closest('.card-header, .page-card')?.querySelector('.card-title')?.textContent || 'Unknown';
+                    
+                    logWithUI(`Gem status for ${card}: ${status}`);
+                    
+                    // Monitor for status changes
+                    const observer = new MutationObserver(mutations => {
+                        mutations.forEach(mutation => {
+                            if (mutation.attributeName === 'class') {
+                                const newStatus = gem.classList.contains('gem-ready') ? 'ready' : 
+                                                gem.classList.contains('gem-progress') ? 'progress' : 'attention';
+                                logWithUI(`Gem status changed for ${card}: ${newStatus}`);
+                            }
+                        });
+                    });
+                    
+                    observer.observe(gem, { attributes: true });
+                });
+            };
+            
+            // Observe gem statuses after a short delay to ensure DOM is fully loaded
+            setTimeout(observeGemStatus, 1000);
+            
+            // Debug key commands
+            document.addEventListener('keydown', (e) => {
+                // Alt+D to toggle debug console
+                if (e.altKey && e.key === 'd') {
+                    debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
+                }
+                
+                // Alt+G to log gem statuses
+                if (e.altKey && e.key === 'g') {
+                    logWithUI('Current gem statuses:', 'info');
+                    for (const [page, status] of Object.entries(gemStatuses)) {
+                        logWithUI(`- ${page}: ${status}`, 'info');
+                    }
+                }
+                
+                // Alt+T to log active tab
+                if (e.altKey && e.key === 't') {
+                    logWithUI(`Active tab: ${activeTab.page} - ${activeTab.ingredient}`, 'info');
                 }
             });
             
             // Log navigation activity
             const navItems = document.querySelectorAll('.admin-nav [data-admin-component] *[data-ingredient]');
             if (navItems) {
-                console.log(`[Admin Dashboard] Navigation items loaded: ${navItems.length}`);
-                console.log('[Admin Dashboard] Available components:');
+                logWithUI(`Navigation items loaded: ${navItems.length}`);
+                logWithUI('Available components:');
                 let components = {};
                 document.querySelectorAll('.page-card').forEach(card => {
                     const page = card.querySelector('.page-card-header h2')?.textContent.trim().toLowerCase();
@@ -399,6 +529,8 @@
                 });
                 console.table(components);
             }
+            
+            logWithUI('Dashboard initialization complete', 'info');
         });
     </script>
 </body>
