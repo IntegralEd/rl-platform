@@ -126,7 +126,7 @@
             <h1>Admin Dashboard</h1>
             <div class="header-actions">
                 <button class="icon-button tooltip" data-tooltip="Developer Portal">
-                    <img src="./assets/images/noun-one-ring-3560061-2C3E50.svg" 
+                    <img src="../shared/platform/images/noun-one-ring-3560061-2C3E50.svg" 
                          alt="Developer Portal"
                          onclick="window.location.href='/orb'">
                 </button>
@@ -150,6 +150,8 @@
     </div>
 
     <script type="module">
+        import { AdminComponentLoader } from './assets/js/admin-component-loader.js';
+        
         // Initialize component loader
         const loader = new AdminComponentLoader();
         await loader.initialize();
