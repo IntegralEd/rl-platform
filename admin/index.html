@@ -39,7 +39,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/admin/assets/images/portal-beam.png');
+            background-image: url('/shared/platform/images/portal-beam.svg');
             background-size: cover;
             background-position: center;
             transition: all var(--transition-portal);
@@ -47,17 +47,17 @@
         }
 
         .admin-background.portal-forming {
-            background-image: url('/admin/assets/images/portal-beam-distance.png');
+            background-image: url('/shared/platform/images/portal-beam-distance.svg');
             animation: portalBeam 1.5s ease-out forwards;
         }
 
         .admin-background.portal-opening {
-            background-image: url('/admin/assets/images/dna-parting.png');
+            background-image: url('/shared/platform/images/dna-parting.svg');
             animation: portalPart 1.5s ease-out forwards;
         }
 
         .admin-background.portal-unlocked {
-            background-image: url('/admin/assets/images/portal-unlocked.png');
+            background-image: url('/shared/platform/images/portal-unlocked.svg');
             animation: portalUnlock 1.5s ease-out forwards;
         }
 
@@ -383,12 +383,12 @@
             <a href="https://recursivelearning.app/" class="header-logo">
                 <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" />
             </a>
-            <span class="version-display">v1.0.0</span>
+            <span class="version-display">v1.0.17</span>
         </div>
         <nav class="header-nav">
-            <a href="/platform/admin" class="nav-item active">Admin</a>
+            <a href="/admin" class="nav-item active">Admin</a>
             <div class="nav-item">
-                <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
+                <a href="/admin/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
                     <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon with-ring">
                 </a>
             </div>
@@ -397,7 +397,7 @@
                     <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
                 </button>
                 <div class="dropdown-menu">
-                    <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
+                    <a href="/admin/auth/logout" class="dropdown-item">Log Out</a>
                 </div>
             </div>
         </nav>
