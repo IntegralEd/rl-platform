@@ -1,16 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Backend Developer Guide
 **Version: 1.0.0 (April 2024)**
 
 This document provides technical specifications for backend developers to properly integrate with the RL Platform frontend. It covers URL conventions, authentication schemes, API endpoints, and data exchange formats.
 
 ## Table of Contents
-1. [URL Rules and Configuration](#url-rules-and-configuration)
-2. [Authentication and Validation](#authentication-and-validation)
-3. [API Communication Protocol](#api-communication-protocol)
-4. [Token Format and Headers](#token-format-and-headers)
-5. [Payload Body Format](#payload-body-format)
-6. [Lambda Implementation Guide](#lambda-implementation-guide)
-7. [Monitoring and Reporting](#monitoring-and-reporting)
+1. [URL Rules and Configuration](mdc:#url-rules-and-configuration)
+2. [Authentication and Validation](mdc:#authentication-and-validation)
+3. [API Communication Protocol](mdc:#api-communication-protocol)
+4. [Token Format and Headers](mdc:#token-format-and-headers)
+5. [Payload Body Format](mdc:#payload-body-format)
+6. [Lambda Implementation Guide](mdc:#lambda-implementation-guide)
+7. [Monitoring and Reporting](mdc:#monitoring-and-reporting)
 
 ## URL Rules and Configuration
 

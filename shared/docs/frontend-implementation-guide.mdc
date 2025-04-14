@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Frontend Implementation Guide for Backend Integration
 
 This guide provides practical steps for implementing the backend integration in frontend components of the Recursive Learning platform.
@@ -482,7 +487,7 @@ export { initMonitoring, logPerformanceMetric };
 
 ## Testing Your Integration
 
-Follow the [Backend Integration Test Plan](backend-integration-test-plan.mdc) to validate your implementation against the API.
+Follow the [Backend Integration Test Plan](mdc:backend-integration-test-plan.mdc) to validate your implementation against the API.
 
 ## Common Issues and Solutions
 
