@@ -137,6 +137,109 @@
         </footer>
     </div>
 
+    <script type="module">
+    // Add before the existing script import
+    const WEBHOOK_ENDPOINT = 'https://hook.us1.make.com/gp1ykvaa7e7q5e3xnvjym2g9dkg9vl4y';
+
+    document.getElementById('curious-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitButton = document.getElementById('submit-button');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+
+        try {
+            const formData = {
+                email: document.getElementById('signup-email').value,
+                sources: Array.from(document.querySelectorAll('input[name="source"]:checked'))
+                    .map(cb => ({
+                        type: cb.value,
+                        details: cb.parentElement.nextElementSibling?.value || null
+                    })),
+                timestamp: new Date().toISOString(),
+                version: 'curious.html/04132025.v.1.0'
+            };
+
+            const response = await fetch(WEBHOOK_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://recursivelearning.app'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('[Curious Flow] Form submitted:', result);
+            
+            // Show success message
+            const submitSection = document.querySelector('[data-step="3"]');
+            submitSection.innerHTML = `
+                <legend class="rlp-form__legend">Thank You!</legend>
+                <p class="rlp-form__helper">Your application has been received. We'll be in touch soon if you're selected for the beta.</p>
+                <div class="rlp-form__success">
+                    <svg viewBox="0 0 24 24" width="48" height="48">
+                        <path fill="#4CAF50" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                </div>
+            `;
+
+        } catch (error) {
+            console.error('[Curious Flow] Submission error:', error);
+            submitButton.textContent = 'Error - Try Again';
+            submitButton.disabled = false;
+            
+            // Show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'rlp-form__error';
+            errorDiv.textContent = 'Something went wrong. Please try again.';
+            submitButton.parentElement.insertBefore(errorDiv, submitButton);
+        }
+    });
+
+    // Test payload function
+    window.testCuriousForm = async () => {
+        const testPayload = {
+            email: 'test@recursivelearning.app',
+            sources: [
+                { type: 'friend', details: 'Test Referral' },
+                { type: 'alt_lms', details: 'Testing LMS Alternative' }
+            ],
+            timestamp: new Date().toISOString(),
+            version: 'curious.html/04132025.v.1.0'
+        };
+
+        try {
+            console.log('[Curious Flow] Sending test payload:', testPayload);
+            
+            const response = await fetch(WEBHOOK_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://recursivelearning.app'
+                },
+                body: JSON.stringify(testPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('[Curious Flow] Test successful:', result);
+            return result;
+
+        } catch (error) {
+            console.error('[Curious Flow] Test failed:', error);
+            throw error;
+        }
+    };
+    </script>
+
     <!-- Add link to new JS file -->
     <script type="module" src="/clients/rlp/curious/assets/js/client-curious-logic.js"></script>
 
