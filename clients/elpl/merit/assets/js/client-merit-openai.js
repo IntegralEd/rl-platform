@@ -2,24 +2,23 @@
  * @component MeritOpenAIClient
  * @description Handles OpenAI Assistant interactions for Merit chat (Stage 0: Baseline)
  * @version 1.0.17
- * 
- * @questions
- * - Q1: Should we implement retry logic for 429 rate limit responses?
- * - Q2: What's the expected timeout for thread creation (currently set to default)?
- * - Q3: Should we cache thread IDs in localStorage for session recovery?
-* @snippets: /* Update API endpoint */
-- this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
-- this.fallbackUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
-+ this.baseUrl = 'https://api.recursivelearning.app/dev';
-+ this.fallbackUrl = 'https://api.recursivelearning.app/dev';
  */
 class MeritOpenAIClient {
     constructor() {
         this.threadId = null;
         this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT';  // Merit Assistant
         this.userId = 'default_user';  // Hardcoded for MVP per checklist
-        this.baseUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
-        this.fallbackUrl = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';  // Using same production endpoint
+        
+        // REST API Lambda Configuration
+        const ENDPOINTS = {
+            PROD: 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main',
+            DEV: 'https://api.recursivelearning.app/dev',
+            contextPrefix: 'merit:ela:context',
+            threadPrefix: 'merit:ela:thread'
+        };
+        this.baseUrl = ENDPOINTS.PROD;  // Primary endpoint
+        this.fallbackUrl = ENDPOINTS.PROD;  // Using same production endpoint
+        
         this.retryAttempts = 3;
         this.currentAttempt = 0;
         this.config = {
@@ -27,12 +26,16 @@ class MeritOpenAIClient {
             assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',  // Merit Assistant
             model: 'gpt-4o', // Declared model from the OpenAI dashboard
             schema_version: '04102025.B01',
-            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'  // OpenAI project pairing
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',  // OpenAI project pairing
+            ttl: {
+                session: 86400,  // 24 hours
+                cache: 3600,     // 1 hour
+                temp: 900       // 15 minutes
+            }
         };
         
         this.headers = {
             'Content-Type': 'application/json',
-            'Origin': 'https://recursivelearning.app',
             'X-Project-ID': this.config.project_id
         };
 
@@ -48,18 +51,32 @@ class MeritOpenAIClient {
             projectPaired: false
         };
 
+        this.contextFields = {
+            intake: {
+                grade_level: null,
+                curriculum: 'ela',
+                user_context: null
+            },
+            system: {
+                schema_version: '04102025.B01',
+                thread_id: null
+            }
+        };
+
+        this.errors = {
+            validation: [],
+            cache: [],
+            schema: []
+        };
+
         console.log('[Merit Flow] OpenAI client initialized for Stage 0');
         console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
         console.log('[Merit Flow] Project ID:', this.config.project_id);
     }
 
     /**
-     * Creates a new thread (Stage 0: Clean thread creation)
+     * Creates a new thread
      * @returns {Promise<string>} Thread ID
-     * 
-     * @questions
-     * - Q4: What's the expected thread TTL for Stage 0?
-     * - Q5: Should we implement thread cleanup for abandoned sessions?
      */
     async createThread() {
         try {
@@ -85,7 +102,7 @@ class MeritOpenAIClient {
             }
 
             const data = await response.json();
-            this.threadId = data.thread_id;
+            this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
             this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
             return this.threadId;
@@ -142,10 +159,6 @@ class MeritOpenAIClient {
      * Sends a message to the assistant (Stage 0: Default behavior)
      * @param {string} message User message
      * @returns {Promise<Object>} Assistant response
-     * 
-     * @questions
-     * - Q6: Should we implement message queue for rate limiting?
-     * - Q7: What's the expected message size limit?
      */
     async sendMessage(message, options = {}) {
         console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
@@ -204,9 +217,6 @@ class MeritOpenAIClient {
     /**
      * Gets current client state including request/response history
      * @returns {Object} Current state
-     * 
-     * @questions
-     * - Q8: Should we implement state persistence between page reloads?
      */
     getState() {
         return { ...this.state };
@@ -214,9 +224,6 @@ class MeritOpenAIClient {
 
     /**
      * Cleans up client resources
-     * 
-     * @questions
-     * - Q9: Should we notify backend of client destruction?
      */
     destroy() {
         this.threadId = null;
