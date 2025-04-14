@@ -357,6 +357,16 @@ function getPageType() {
   return 'public';
 }
 
+/**
+ * Fetch component configuration from the API
+ * @param {string} componentId - Component identifier
+ * @returns {Promise<Object>} Component configuration
+ */
+async function getComponent(componentId) {
+  const url = `/api/v1/components/${componentId}`;
+  return await secureFetch(url);
+}
+
 // Export public API
 export {
   init,
@@ -366,5 +376,6 @@ export {
   getUserRole,
   hasPermission,
   getPageType,
+  getComponent,
   API_CONFIG
 }; 
