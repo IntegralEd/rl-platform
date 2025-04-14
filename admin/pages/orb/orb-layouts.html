@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recursive Layout & Cascading Overview</title>
+  
+  <!-- Platform CSS -->
+  <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
+  
+  <!-- Admin Styles -->
+  <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+  <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+  
+  <!-- Required Admin Scripts -->
+  <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+  <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+  
+  <script type="module">
+    import { AdminAuth } from '/admin/assets/js/admin-auth.js';
+    
+    // Redirect if not authenticated
+    AdminAuth.requireAuth();
+  </script>
+  
+  <style>
+    /* Additional ORB-specific styles */
+    .orb-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .orb-content h1 {
+      color: var(--brand-color, #004080);
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--admin-border, #e1e4e8);
+      padding-bottom: 0.75rem;
+    }
+    
+    .orb-content h2 {
+      margin-top: 2rem;
+      color: var(--admin-text, #2c3e50);
+      border-bottom: 1px solid var(--admin-border, #e1e4e8);
+      padding-bottom: 0.5rem;
+    }
+    
+    code, pre {
+      background: var(--admin-bg, #f8f9fa);
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      border: 1px solid var(--admin-border, #e1e4e8);
+      overflow-x: auto;
+    }
+    
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+    
+    .note {
+      background: #fff3cd;
+      border-left: 4px solid #ffeeba;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .diagram {
+      background: white;
+      border: 1px solid var(--admin-border, #e1e4e8);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+    }
+    
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid var(--admin-border, #e1e4e8);
+      margin: 1.5rem 0;
+      border-radius: 8px;
+    }
+    
+    .path-example {
+      font-family: monospace;
+      background: var(--admin-bg, #f8f9fa);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      color: var(--brand-color, #004080);
+      border: 1px solid var(--admin-border, #e1e4e8);
+    }
+    
+    .updated-note {
+      background: #d1e7dd;
+      border-left: 4px solid #5baa8f;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <header class="admin-header">
+      <div class="header-left">
+        <a href="/admin/dashboard.html" class="header-logo">
+          <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" />
+        </a>
+        <span class="version-display">v1.0.17</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/admin/dashboard.html" class="nav-item">Admin</a>
+        <div class="nav-item">
+          <a href="/admin/pages/orb/orb-layouts.html" class="icon-button tooltip active" data-tooltip="Developer Hub">
+            <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
+          </a>
+        </div>
+        <div class="nav-item with-dropdown">
+          <button class="icon-button tooltip" data-tooltip="Account">
+            <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
+          </button>
+          <div class="dropdown-menu">
+            <a href="/admin/auth/logout.html" class="dropdown-item">Log Out</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <nav class="admin-nav">
+      <div data-admin-component="page-cards">
+        <!-- Navigation will be loaded here -->
+        <div class="loading-state">
+          <div class="pulse">Loading navigation...</div>
+        </div>
+      </div>
+    </nav>
+    <main class="admin-content">
+      <div class="orb-content">
+        <h1>Recursive Layout & Cascading Style Overview</h1>
+      
+        <p>This document provides an overview of how layout structure and visual identity cascade across the Recursive Platform for both <strong>client-facing pages</strong> and <strong>admin views</strong>. Our goal is to balance consistency with customization, using a clear override model: Platform → Client → Page.</p>
+      
+        <div class="note">
+          <strong>Audience:</strong> This is for developers to understand how layout styling and structure work across tenants, and where creativity and overrides can be introduced without breaking the system.
+        </div>
+        
+        <div class="updated-note">
+          <strong>Updated:</strong> This document has been revised to reflect the new platform structure and naming conventions established in v1.0.17.
+        </div>
+      
+        <h2>Layout Structure</h2>
+      
+        <h3>Client Pages</h3>
+        <pre><code>&lt;div class="client-layout"&gt;
+  &lt;header class="client-header"&gt;...&lt;/header&gt;
+  &lt;main class="client-content"&gt;
+    &lt;nav class="sidebar"&gt;...&lt;/nav&gt;
+    &lt;div class="content-area"&gt;...&lt;/div&gt;
+  &lt;/main&gt;
+  &lt;footer class="client-footer"&gt;...&lt;/footer&gt;
+&lt;/div&gt;</code></pre>
+      
+        <iframe src="/clients/elpl/merit/merit.html" title="Client Layout Example"></iframe>
+      
+        <h3>Admin Pages</h3>
+        <pre><code>&lt;div class="admin-layout"&gt;
+  &lt;header class="admin-header"&gt;...&lt;/header&gt;
+  &lt;nav class="admin-nav"&gt;...&lt;/nav&gt;
+  &lt;main class="admin-content"&gt;...&lt;/main&gt;
+&lt;/div&gt;</code></pre>
+      
+        <iframe src="/admin/dashboard.html" title="Admin Layout Example"></iframe>
+      
+        <h2>Cascading Styles & Asset Paths</h2>
+      
+        <p>Each page loads CSS in the following order. The system falls back cleanly if a page or client doesn't define overrides:</p>
+      
+        <div class="diagram">
+          <strong>1. Platform Default</strong><br>
+          <span class="path-example">/shared/platform/css/platform-variables.css</span><br>
+          <span class="path-example">/shared/platform/css/platform-core.css</span><br>
+          <em>Global defaults, layout grid, base typography</em>
+      
+          <br><br><strong>2. Client-Wide Styles</strong><br>
+          <span class="path-example">/clients/elpl/assets/css/client-variables.css</span><br>
+          <span class="path-example">/clients/elpl/assets/css/client-core.css</span><br>
+          <em>Brand color, font, logo, and global tweaks</em>
+      
+          <br><br><strong>3. Page-Specific Overrides</strong><br>
+          <span class="path-example">/clients/elpl/merit/assets/css/client-merit-chat.css</span><br>
+          <em>Fine-tuned behavior and styles for this page only</em>
+        </div>
+      
+        <h2>Visual Identity</h2>
+      
+        <p>Each client can define their own look and feel using CSS variables and shared layout components. If they don't specify a value, we fall back to platform defaults.</p>
+      
+        <h3>Example Variables</h3>
+        <pre><code>:root {
+  --header-height: 60px;
+  --footer-height: 40px;
+  --primary-color: #c6123f;  /* Defined by client */
+  --font-body: 'Helvetica Neue', sans-serif;  /* Fallback from platform */
+}</code></pre>
+      
+        <h2>Design Philosophy</h2>
+      
+        <ul>
+          <li>Use platform styles to ensure consistency across tenants</li>
+          <li>Empower client-specific visual identity through CSS variables</li>
+          <li>Enable project-level specificity without duplication</li>
+          <li>Avoid redundant styles—override only what you need</li>
+          <li>Follow standardized naming conventions for all assets</li>
+          <li>Keep functionality and styling separate with clear responsibilities</li>
+        </ul>
+      
+        <h2>Asset Naming Conventions</h2>
+        
+        <h3>Platform Assets</h3>
+        <pre><code>CSS: platform-{purpose}-{variant}.css
+JS: platform-{purpose}-{action}.js
+Images: platform-{purpose}-{variant}-{color}.{ext}
+
+Examples:
+/shared/platform/css/platform-variables.css
+/shared/platform/js/platform-auth-validate.js
+/shared/platform/images/platform-logo-admin-white.svg</code></pre>
+
+        <h3>Client Assets</h3>
+        <pre><code>CSS: client-{client}-{purpose}.css
+JS: client-{purpose}.js
+Images: client-{client}-{purpose}-{variant}.{ext}
+
+Examples:
+/clients/elpl/assets/css/client-elpl-variables.css
+/clients/elpl/assets/js/client-auth.js
+/clients/elpl/assets/images/client-elpl-logo-color.svg</code></pre>
+
+        <h3>Page Ingredients</h3>
+        <pre><code>Location: /shared/page_ingredients/{component}/
+Format: {component}.{ext}
+
+Examples:
+/shared/page_ingredients/toggle/toggle.js
+/shared/page_ingredients/modal/modal.css</code></pre>
+      
+        <h2>Next Steps</h2>
+      
+        <ul>
+          <li>Visual identity audits for key clients</li>
+          <li>Create Figma variants that align with this structure</li>
+          <li>Document which components can be themed</li>
+          <li>Review client-merit-chat.css for opportunities to consolidate</li>
+          <li>Complete standardization of all client assets</li>
+          <li>Implement tree structure for client page organization</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { AdminComponentLoader } from '/admin/assets/js/admin-component-loader.js';
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize component loader
+      const loader = new AdminComponentLoader();
+      await loader.initialize();
+      
+      console.log('[ORB] Layout documentation v1.0.17 - Initialized');
+    });
+  </script>
+</body>
+</html>
