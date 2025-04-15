@@ -133,6 +133,8 @@
             padding: 0.5rem 1rem;
             white-space: normal;
             text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
         }
 
         .footer-link:hover {
@@ -252,7 +254,7 @@
                 </div>
             </div>
             <a href="/admin" class="admin-button" role="button">
-                <img src="/shared/platform/images/platform-admin-icon-white.svg" alt="Admin">
+                <img src="/shared/platform/images/admin-logo.png" alt="Admin">
                 Admin Portal
             </a>
         </main>
@@ -288,7 +290,15 @@
                     this.startVerbAnimation();
                     this.setupErrorHandling();
                     this.showContent();
-                    console.log('[Platform] Landing page initialized with build v1.0.0 (04.15.2024)');
+                    console.log('[Platform] Landing page initialized with build ' + new Date().toLocaleString('en-US', { 
+                        timeZone: 'America/Chicago',
+                        hour12: false,
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + ' CST:Frontend_Cursor/rl-platform');
                 } catch (error) {
                     console.error('Landing layout initialization failed:', error);
                     this.showError();
