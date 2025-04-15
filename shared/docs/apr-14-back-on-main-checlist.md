@@ -339,6 +339,13 @@ The ORB layouts documentation page needs further enhancement to better convey th
   - [ ] Create split view of design vs. implementation
   - [ ] Add pixel-perfect alignment verification
 
+## Apr14 10PM Build Status
+- Current integration blocked by authentication issues on main site
+- 404 errors for platform JavaScript files preventing proper initialization
+- Admin portal login modifications in progress but need asset migration
+- Primary focus on resolving auth flow before proceeding with Merit MVP
+- Required changes documented in punch list below
+
 ## Apr14 840pm punch list UX and Console items
 ### Site Tour Observations
 #### Root Landing Page (https://recursivelearning.app/)
@@ -369,38 +376,109 @@ The ORB layouts documentation page needs further enhancement to better convey th
   - [ ] Animation sequence can be more interactive
   - [ ] Version number (v1.0.17) positioning needs adjustment
 
+#### Merit Page (https://recursivelearning.app/clients/elpl/merit/merit.html#welcome)
+- **Console Output:**
+  - [x] [Merit Flow] All validations passed for MVP testing
+  - [x] [Merit Flow] Note: Proper validation will be implemented in v1.0.16
+  - [x] [Merit Flow] Form validation hardcoded to pass for testing
+  - [x] [Merit Flow] Navigation validation hardcoded to pass for testing
+  - [x] 404 Error: `GET https://recursivelearning.app/clients/elpl/assets/elpl-security.js net::ERR_ABORTED 404 (Not Found)`
+  - [x] [Merit Flow] Build version: merit.html/04142025.09:58pm.v.1.16
+  - [x] OpenAI integration initializing with:
+    - API endpoint: https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main
+    - Project ID: proj_V4lrL1OSfydWCFW0zjgwrFRT
+  - [x] Chat flow critical errors:
+    - Thread creation error: `POST https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main net::ERR_NAME_NOT_RESOLVED`
+    - Detailed error: `TypeError: Failed to fetch at MeritOpenAIClient.createThread`
+    - Error occurs despite retry attempts (configured for 3 retries)
+
+- **State Management Observations:**
+  - [x] Proper state tracking in console:
+    ```
+    [Merit Flow] Action state updated: {nextButton: true, sendButton: true, chatInput: true, chatReady: false, formValid: false, …}
+    [Merit Flow] Navigated to welcome {section: 'welcome', formValid: false, gradeLevel: null, curriculum: 'ela', chatReady: false}
+    [Merit Flow] Chat system initialized for new user session
+    [Merit Flow] Initialization complete {section: 'welcome', formValid: false, gradeLevel: null, curriculum: 'ela', chatReady: true}
+    ```
+  - [x] Selection state properly tracked through navigation
+  - [x] Form data preserved between sections
+
+- **UI/UX Issues:**
+  - [ ] Button states need improvement ("funky" states)
+  - [ ] Icons need to be significantly larger
+  - [ ] Remove blue overlay background (was meant as overlay only)
+  - [ ] Focus on hover states and active indicators
+  - [ ] Chat functionality shows errors when attempting to send messages
+  - [ ] Form dropdown selections need visual refinement
+  - [ ] Next button styling needs to match platform standards
+
+- **Priority Fixes:**
+  - [ ] Fix 404 error for elpl-security.js by renaming to client-security.js
+  - [ ] Resolve OpenAI API domain resolution issues:
+    - Verify API gateway endpoint is active and correctly configured
+    - Check for correct DNS resolution on server
+    - Add exponential backoff to retry logic
+    - Implement offline mode fallback for testing
+  - [ ] Fix form input validation with proper UX feedback
+  - [ ] Increase icon sizes across the interface
+  - [ ] Improve button state visual indicators
+  - [ ] Implement proper error handling with user-friendly messages 
+  - [ ] Add console logging to show which assistant is being called:
+    - Log assistant ID/model in initialization
+    - Add verbose logging for API requests
+    - Include assistant information in state tracking
+    - Add configuration logging on page load
+  - [ ] Fix user identification issue:
+    - Remove hardcoded "default_user" ID for new users
+    - Set userId to null until properly assigned by Airtable
+    - Implement proper user registration flow
+    - Add user context logging for debugging
+
 ## Ideas for UX fixes
 
 ### Admin Login Enhancements
-- [ ] **Layered SVG Animation (MVP Approach):**
-  - [ ] Preserve high-res watercolor PNG as primary background - ensure visibility
-  - [ ] Add simple animated elements that evoke primordial soup:
-    - [ ] Floating bubbles with limited opacity (3-8px size variation)
-    - [ ] Simple squiggles with varying pixel thickness (3-8px)
-    - [ ] Apply very limited opacity to all elements
-  - [ ] Implement basic animation cycle (no complex interactions for MVP)
-  - [ ] Ensure animations don't obscure the beautiful watercolor artwork
-  - [ ] Keep implementation simple - Asha will enhance post-MVP
+- [ ] **Admin Login Asset Renaming:**
+  - [ ] Rename treasure chest: `noun-treasure-chest-7723996-2C3E50.svg` → `platform-vault-chest-icon.svg`
+  - [ ] Rename helm: `noun-helm-3999893-2C3E50.svg` → `platform-vault-helm-icon.svg`
+  - [ ] Rename scroll: `noun-scroll-7757299-2C3E50.svg` → `platform-vault-scroll-input.svg`
+  - [ ] Rename background: `portal-beam.png` → `platform-vault-background-water.png`
+  - [ ] Move all assets to `/shared/platform/images/` directory
 
-- [ ] **Interactive Password Entry:**
-  - [ ] Rename assets to follow platform conventions:
-    - [ ] admin-treasurechest → platform-vault-chest-icon.svg
-    - [ ] admin-helm → platform-vault-helm-icon.svg
-    - [ ] admin-scroll → platform-vault-scroll-icon.svg
-  - [ ] Create "torn edge" effect on scroll for password field
-  - [ ] Implement chest spin animation when icon is clicked
-  - [ ] Add modal dialog that appears with scroll unfurling animation
-  - [ ] Create subtle glow effect on successful password entry
+- [ ] **Treasure Chest Interaction (Primary Focus):**
+  - [ ] Position treasure chest SVG at bottom of login screen
+  - [ ] Add subtle glow effect around chest
+  - [ ] Implement click handler to trigger chest animation
+  - [ ] Create chest opening animation (simple transform/rotate)
+  - [ ] Display scroll with password field after chest opens
+  - [ ] Add "Enter Vault" button styled to match theme
 
-- [ ] **Visual Feedback System:**
-  - [ ] Add subtle water/bubble animation in background during idle state
-  - [ ] Implement ripple effect when clicking anywhere on the screen
-  - [ ] Create "unlocking" animation sequence when credentials are verified
-  - [ ] Add treasure chest opening animation on successful login
-  - [ ] Implement smooth transition to dashboard after authentication
+- [ ] **Scroll Password Implementation:**
+  - [ ] Overlay password input on scroll SVG
+  - [ ] Style input field to blend with scroll design
+  - [ ] Create unfurling animation for scroll appearance
+  - [ ] Add subtle text glow on focus
+  - [ ] Implement validation with visual feedback
 
-- [ ] **Code Structure Improvements:**
-  - [ ] Organize animations into dedicated JS module
-  - [ ] Implement proper error handling with visual feedback
-  - [ ] Add accessibility support for animations (reduced motion)
-  - [ ] Create reusable animation components for other platform areas
+- [ ] **Login Authentication Updates:**
+  - [ ] Add email input field alongside password on scroll
+  - [ ] Implement email/password pair validation
+  - [ ] Add console logging for validation attempts
+  - [ ] Allow access for any *@integral-ed.com email address
+  - [ ] Update AdminAuth.js to check for valid domain
+  - [ ] Store validated email in session storage
+  - [ ] Add visual feedback for validation success/failure
+  - [ ] Preserve existing password-only fallback for testing
+
+- [ ] **Background Animation:**
+  - [ ] Keep high-res watercolor png background as primary visual
+  - [ ] Add simple bubble animations (3-8px varied sizes)
+  - [ ] Implement subtle floating motion for bubbles
+  - [ ] Add minimal squiggle animations to suggest underwater movement
+  - [ ] Ensure all animated elements maintain very low opacity
+
+- [ ] **Portal Opening Animation:**
+  - [ ] Preserve current portal effect on successful login
+  - [ ] Add helm icon rotation on password verification
+  - [ ] Create transition sequence to dashboard
+  - [ ] Add console logging for animation state changes
+  - [ ] Ensure smooth rendering on all supported browsers
