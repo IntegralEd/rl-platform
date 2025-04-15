@@ -178,6 +178,44 @@
         .verb {
             animation: fadeInOut 4s infinite;
         }
+
+        /* Add dropdown menu styles */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--primary-color);
+            border-radius: 4px;
+            padding: 0.5rem 0;
+            min-width: 120px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .nav-item.with-dropdown {
+            position: relative;
+        }
+
+        .nav-item.with-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
@@ -191,7 +229,7 @@
                 </a>
                 <div class="nav-item with-dropdown">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/platform-account-icon-white.png" alt="Account" class="nav-icon">
+                        <img src="/shared/platform/images/platform-account-icon-white.png" alt="Log Out" class="nav-icon">
                     </button>
                     <div class="dropdown-menu">
                         <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
