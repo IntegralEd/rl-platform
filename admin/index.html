@@ -377,6 +377,11 @@
 
     <div class="auth-container">
         <div class="vault-card">
+            <img src="/shared/platform/images/platform-logo-horizontal-white.svg" 
+                 alt="Recursive Learning" 
+                 class="platform-logo"
+                 width="200"
+                 height="50">
             <h1 class="vault-title">Recursive Learning Vault</h1>
             <form id="loginForm" onsubmit="return false;">
                 <div class="input-group">
@@ -387,31 +392,8 @@
             </form>
         </div>
     </div>
-
-    <header class="client-header">
-        <div class="header-left">
-            <a href="https://recursivelearning.app/" class="header-logo">
-                <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="100" height="30" />
-            </a>
-            <span class="version-display">v1.0.17</span>
-        </div>
-        <nav class="header-nav">
-            <a href="/admin" class="nav-item active">Admin</a>
-            <div class="nav-item">
-                <a href="/admin/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
-                    <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon with-ring" width="20" height="20">
-                </a>
-            </div>
-            <div class="nav-item with-dropdown">
-                <button class="icon-button tooltip" data-tooltip="Account">
-                    <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="20" height="20">
-                </button>
-                <div class="dropdown-menu">
-                    <a href="/admin/auth/logout" class="dropdown-item">Log Out</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    
+    <span class="version-display">v1.0.17</span>
 
     <script type="module">
         import { AdminAuth } from '/admin/assets/js/admin-auth.js';
