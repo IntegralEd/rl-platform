@@ -3,6 +3,34 @@ Version: 1.0.4 [April 14, 2025 6:30 PM EDT]
 
 ## Key Learnings from April 14 Implementation
 
+🧠 Core Insight: Bridging Visual and Logical Processing
+
+### I. The Disconnect
+| Humans (Visual) | vs | AI (Logical) |
+|----------------|-----|--------------|
+| Intuitively process spatial and visual info | | Parse patterns, not images |
+| Interface through sight and layout | | Interface through tokens and logic |
+| Can "see" meaning | | Must be told what's meaningful |
+
+🧨 Design Tension:
+We build visual interfaces for visual beings using tools that can't see.
+
+### II. The Collaboration Opportunity
+
+#### 🔄 Human → AI
+| What Humans Do | Why It Helps AI |
+|---------------|----------------|
+| Describe what they see | Makes spatial patterns legible |
+| Translate images to language | Enables AI parsing |
+| Impose structure on chaos | Gives AI consistent rules |
+
+#### 🔄 AI → Human
+| What AI Does | Why It Helps Humans |
+|-------------|-------------------|
+| Generate metaphors | Simplifies abstraction |
+| Use verbal imagery | Bridges visual gaps |
+| Narrate patterns | Enhances human understanding |
+
 ### Core Challenge: Visual vs Logical Processing
 - [x] Fundamental disconnect identified:
   - Humans: Naturally process visual information and spatial relationships
