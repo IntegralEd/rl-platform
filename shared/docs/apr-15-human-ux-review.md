@@ -523,3 +523,23 @@ Required fixes:
 4. Fix version display format
 5. Enhance OpenAI integration
 6. Add error boundaries and loading states
+
+from bACKEND RESTAPI TEAM
+
+I couldn’t directly locate a file named “merit.html” in the workspace. However, based on our previous notes in the MVP Chat Implementation Status document and other relevant documentation, here’s what we know:
+The merit chat page on recursivelearning.app is set up to use the API endpoint currently configured as:
+DEV endpoint: https://api.recursivelearning.app/dev
+PRODUCTION fallback: previously using the PROD endpoint (https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main), though recent changes in the client code have switched the DEV endpoint as the primary URL.
+The insights about the non-working API endpoint were tied to the fact that the endpoint in the client (as seen in client-merit-openai.js) was misconfigured, leading to 404 errors. We updated the client code to point to the correct API endpoint.
+For production traffic from the merit chat page on recursivelearning.app the following should be confirmed:
+The API endpoint for production traffic should be updated from the DEV version (https://api.recursivelearning.app/dev) to the production endpoint if required.
+It’s important that production traffic routes to the stable, high-performance instance.
+Testing the API endpoint using a curl command or Postman with an origin header of https://recursivelearning.app is recommended. For instance, testing with:
+Apply
+Run
+'
+This should confirm if the endpoint returns a valid thread ID.
+Next Steps:
+If the production traffic is intended to use a separate production endpoint rather than our DEV endpoint, then the client code needs to update this.baseUrl and this.fallbackUrl accordingly before deploying to production.
+Additionally, double-check the DNS resolution, CORS configuration, and error logging on the production side to ensure that requests from the merit chat page (i.e., from https://recursivelearning.app) are being handled correctly.
+Based on our latest commit on the fix/merit-endpoints branch and the current insights from the Merit MVP Chat Implementation Status document, everything seems on track—but we need to verify production settings.
