@@ -183,15 +183,15 @@
 <body>
     <div class="client-layout" data-client-component="landing-layout" role="application">
         <header class="client-header" role="banner">
-            <img src="/shared/platform/images/platform-logo-horizontal-white.svg" alt="Recursive Learning" class="logo">
+            <img src="/shared/platform/images/platform-logo-horizontal-white.png" alt="Recursive Learning" class="logo">
             <div class="header-actions">
                 <span class="version-display" aria-live="polite">v1.0.0 (04.15.2024)</span>
                 <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
-                    <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
+                    <img src="/shared/platform/images/platform-dev-icon-white.png" alt="Developer Hub" class="nav-icon">
                 </a>
                 <div class="nav-item with-dropdown">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
+                        <img src="/shared/platform/images/platform-account-icon-white.png" alt="Account" class="nav-icon">
                     </button>
                     <div class="dropdown-menu">
                         <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
@@ -214,7 +214,7 @@
                 </div>
             </div>
             <a href="/admin" class="admin-button" role="button">
-                <img src="/shared/platform/images/platform-admin-icon-white.svg" alt="Admin">
+                <img src="/shared/platform/images/admin-logo.png" alt="Admin">
                 Admin Portal
             </a>
         </main>
@@ -235,10 +235,6 @@
         // Component initialization and error handling
         class LandingLayout {
             constructor() {
-                console.log('[Platform] Landing page constructor initialized');
-                console.log('[Platform] Current URL:', window.location.href);
-                console.log('[Platform] Build version: v1.0.0 (04.15.2024)');
-                
                 this.verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
                 this.currentIndex = 0;
                 this.verbElement = document.querySelector('.verb');
@@ -246,57 +242,34 @@
                 this.errorState = document.querySelector('.error-state');
                 this.contentState = document.querySelector('.content-state');
                 
-                console.log('[Platform] DOM elements initialized:', {
-                    verbElement: !!this.verbElement,
-                    loadingState: !!this.loadingState,
-                    errorState: !!this.errorState,
-                    contentState: !!this.contentState
-                });
-                
                 this.init();
             }
 
             init() {
                 try {
-                    console.log('[Platform] Starting initialization sequence');
                     this.startVerbAnimation();
                     this.setupErrorHandling();
                     this.showContent();
-                    console.log('[Platform] Landing page fully initialized');
-                    console.log('[Platform] Active components:', {
-                        animation: 'running',
-                        errorHandling: 'active',
-                        contentState: 'visible'
-                    });
+                    console.log('[Platform] Landing page initialized with build v1.0.0 (04.15.2024)');
                 } catch (error) {
-                    console.error('[Platform] Landing layout initialization failed:', error);
+                    console.error('Landing layout initialization failed:', error);
                     this.showError();
                 }
             }
 
             startVerbAnimation() {
-                console.log('[Platform] Starting verb animation with words:', this.verbs);
                 setInterval(() => {
                     this.currentIndex = (this.currentIndex + 1) % this.verbs.length;
                     this.verbElement.textContent = this.verbs[this.currentIndex];
-                    console.log('[Platform] Verb updated to:', this.verbs[this.currentIndex]);
                 }, 4000);
             }
 
             setupErrorHandling() {
-                console.log('[Platform] Setting up error handlers');
-                window.addEventListener('error', (event) => {
-                    console.error('[Platform] Global error caught:', event.error);
-                    this.showError();
-                });
-                window.addEventListener('unhandledrejection', (event) => {
-                    console.error('[Platform] Unhandled promise rejection:', event.reason);
-                    this.showError();
-                });
+                window.addEventListener('error', () => this.showError());
+                window.addEventListener('unhandledrejection', () => this.showError());
             }
 
             showLoading() {
-                console.log('[Platform] Showing loading state');
                 this.loadingState.setAttribute('aria-hidden', 'false');
                 this.errorState.setAttribute('aria-hidden', 'true');
                 this.contentState.setAttribute('aria-hidden', 'true');
@@ -306,7 +279,6 @@
             }
 
             showError() {
-                console.error('[Platform] Showing error state');
                 this.loadingState.setAttribute('aria-hidden', 'true');
                 this.errorState.setAttribute('aria-hidden', 'false');
                 this.contentState.setAttribute('aria-hidden', 'true');
@@ -316,7 +288,6 @@
             }
 
             showContent() {
-                console.log('[Platform] Showing content state');
                 this.loadingState.setAttribute('aria-hidden', 'true');
                 this.errorState.setAttribute('aria-hidden', 'true');
                 this.contentState.setAttribute('aria-hidden', 'false');
@@ -328,7 +299,6 @@
 
         // Initialize landing layout component
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('[Platform] DOM Content Loaded - Starting LandingLayout initialization');
             new LandingLayout();
         });
     </script>
