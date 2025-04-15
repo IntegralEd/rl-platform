@@ -100,7 +100,7 @@
         .scroll-background {
             width: 100%;
             height: 150px;
-            background-image: url('/shared/platform/images/platform-vault-scroll.png');
+            background-image: url('/shared/platform/images/noun-scroll-7757299-2C3E50.svg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -209,6 +209,60 @@
             50% { opacity: 0.3; }
             100% { transform: translateY(-100px) scale(1); opacity: 0; }
         }
+
+        /* Helm Icon */
+        .helm-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .helm-icon.rotating {
+            animation: helmRotate 2s ease-in-out infinite;
+        }
+
+        @keyframes helmRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Underwater Squiggles */
+        .squiggle {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: squiggle 8s ease-in-out infinite;
+        }
+
+        @keyframes squiggle {
+            0% { transform: translateY(0) scaleX(1); opacity: 0; }
+            50% { transform: translateY(-100px) scaleX(1.5); opacity: 0.3; }
+            100% { transform: translateY(-200px) scaleX(1); opacity: 0; }
+        }
+
+        /* Enhanced Portal Transition */
+        .portal-active .admin-background {
+            transform: scale(1.2);
+            filter: brightness(1.8) blur(5px);
+            opacity: 0.9;
+        }
+
+        .portal-active .treasure-chest {
+            transform: translateX(-50%) scale(0.8);
+            opacity: 0;
+        }
+
+        .portal-active .scroll-container {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
@@ -216,7 +270,7 @@
     <span class="version-display">v1.0.0 (04.15.2024)</span>
 
     <div class="treasure-chest" id="treasureChest">
-        <img src="/shared/platform/images/platform-vault-chest.png" 
+        <img src="/shared/platform/images/noun-treasure-chest-7723996-2C3E50.svg" 
              alt="Vault Access" 
              width="120" 
              height="120">
@@ -243,6 +297,12 @@
             </form>
         </div>
     </div>
+
+    <img src="/shared/platform/images/noun-helm-3999893-2C3E50.svg" 
+         alt="Navigation Helm" 
+         class="helm-icon"
+         width="40"
+         height="40">
 
     <script type="module">
         import { AdminAuth } from '/admin/assets/js/admin-auth.js';
@@ -298,20 +358,35 @@
 
             if (AdminAuth.validatePassword(password)) {
                 console.log('[Admin Vault] Access granted for:', email);
+                console.log('[Admin Vault] Starting portal sequence');
+                
                 const background = document.querySelector('.admin-background');
+                const helmIcon = document.querySelector('.helm-icon');
                 
                 // Start portal sequence
-                background.style.transform = 'scale(1.1)';
-                background.style.filter = 'brightness(1.5) blur(3px)';
+                document.body.classList.add('portal-active');
+                helmIcon.classList.add('rotating');
+                
+                // Create underwater effect
+                for (let i = 0; i < 5; i++) {
+                    const squiggle = document.createElement('div');
+                    squiggle.className = 'squiggle';
+                    squiggle.style.left = Math.random() * 100 + '%';
+                    squiggle.style.animationDelay = (Math.random() * 2) + 's';
+                    document.body.appendChild(squiggle);
+                }
                 
                 // Store email in session
                 sessionStorage.setItem('admin_email', email);
+                console.log('[Admin Vault] Email stored in session');
                 
                 // Set auth and redirect
                 AdminAuth.setAuth();
+                console.log('[Admin Vault] Authentication set, redirecting to dashboard');
+                
                 setTimeout(() => {
                     window.location.href = '/admin/dashboard.html';
-                }, 1500);
+                }, 2000);
             } else {
                 showError('Invalid credentials');
                 passwordInput.value = '';
