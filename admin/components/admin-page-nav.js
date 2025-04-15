@@ -3,6 +3,9 @@ template.innerHTML = `
   <style>
     .admin-page-nav {
       padding: 20px;
+      height: 100%;
+      background: var(--client-bg, #ffffff);
+      border-right: 1px solid var(--client-border, #e1e4e8);
     }
 
     .page-card {
@@ -11,6 +14,12 @@ template.innerHTML = `
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       margin-bottom: 20px;
       overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .page-card.active {
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
     }
 
     .page-header {
@@ -18,6 +27,9 @@ template.innerHTML = `
       background: var(--admin-bg, #f8f9fa);
       border-bottom: 1px solid var(--admin-border, #e1e4e8);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .page-header h2 {
@@ -27,17 +39,72 @@ template.innerHTML = `
       color: var(--admin-text, #2c3e50);
     }
 
+    .page-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gem-dot {
+      width: var(--gem-size, 8px);
+      height: var(--gem-size, 8px);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .gem-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(var(--gem-size, 8px) + var(--gem-glow, 4px));
+      height: calc(var(--gem-size, 8px) + var(--gem-glow, 4px));
+      border-radius: 50%;
+      opacity: 0.4;
+      transition: all 0.2s ease;
+    }
+
+    .gem-ready {
+      background-color: var(--gem-ready, #22c55e);
+    }
+    .gem-ready::after {
+      background-color: var(--gem-ready, #22c55e);
+    }
+
+    .gem-progress {
+      background-color: var(--gem-progress, #eab308);
+    }
+    .gem-progress::after {
+      background-color: var(--gem-progress, #eab308);
+    }
+
+    .gem-attention {
+      background-color: var(--gem-attention, #ef4444);
+    }
+    .gem-attention::after {
+      background-color: var(--gem-attention, #ef4444);
+    }
+
     .ingredient-list {
       padding: 0;
       margin: 0;
       list-style: none;
+      display: none;
+    }
+
+    .page-card.active .ingredient-list {
+      display: block;
     }
 
     .ingredient-item {
       padding: 12px 16px;
       border-bottom: 1px solid var(--admin-border, #e1e4e8);
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .ingredient-item:last-child {
@@ -51,52 +118,111 @@ template.innerHTML = `
     .ingredient-item.active {
       background-color: var(--admin-bg, #f8f9fa);
       font-weight: 500;
+      color: var(--brand-color, #004080);
+    }
+
+    .ingredient-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+
+    .ingredient-item.active .ingredient-icon {
+      opacity: 1;
+    }
+
+    .version-tag {
+      font-size: 12px;
+      padding: 2px 6px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 4px;
+      margin-left: auto;
     }
   </style>
 
   <div class="admin-page-nav">
-    <!-- Goalsetter -->
-    <div class="page-card">
-      <div class="page-header">
-        <h2>Goalsetter</h2>
-      </div>
-      <ul class="ingredient-list">
-        <li class="ingredient-item" data-ingredient="toggle">Toggle</li>
-        <li class="ingredient-item" data-ingredient="iframe">Iframe</li>
-        <li class="ingredient-item" data-ingredient="comments">Comments</li>
-        <li class="ingredient-item" data-ingredient="change-order">Change Orders</li>
-        <li class="ingredient-item" data-ingredient="lrs">LRS</li>
-        <li class="ingredient-item" data-ingredient="status">Status</li>
-      </ul>
-    </div>
-
-    <!-- Merit -->
-    <div class="page-card">
+    <!-- Merit (Active) -->
+    <div class="page-card active" data-page="merit">
       <div class="page-header">
         <h2>Merit</h2>
+        <div class="page-status">
+          <div class="gem-dot gem-ready" title="Ready"></div>
+        </div>
       </div>
       <ul class="ingredient-list">
-        <li class="ingredient-item" data-ingredient="toggle">Toggle</li>
-        <li class="ingredient-item" data-ingredient="iframe">Iframe</li>
-        <li class="ingredient-item" data-ingredient="comments">Comments</li>
-        <li class="ingredient-item" data-ingredient="change-order">Change Orders</li>
-        <li class="ingredient-item" data-ingredient="lrs">LRS</li>
-        <li class="ingredient-item" data-ingredient="status">Status</li>
+        <li class="ingredient-item active" data-ingredient="dashboard">
+          <img src="/shared/platform/images/platform-dashboard-icon.svg" alt="" class="ingredient-icon">
+          Dashboard
+          <span class="version-tag">v1.0.17</span>
+        </li>
+        <li class="ingredient-item" data-ingredient="content">
+          <img src="/shared/platform/images/platform-content-icon.svg" alt="" class="ingredient-icon">
+          Content
+        </li>
+        <li class="ingredient-item" data-ingredient="settings">
+          <img src="/shared/platform/images/platform-settings-icon.svg" alt="" class="ingredient-icon">
+          Settings
+        </li>
+        <li class="ingredient-item" data-ingredient="analytics">
+          <img src="/shared/platform/images/platform-analytics-icon.svg" alt="" class="ingredient-icon">
+          Analytics
+        </li>
       </ul>
     </div>
 
-    <!-- BHB -->
-    <div class="page-card">
+    <!-- Goalsetter (Inactive) -->
+    <div class="page-card" data-page="goalsetter">
       <div class="page-header">
-        <h2>BHB</h2>
+        <h2>Goalsetter</h2>
+        <div class="page-status">
+          <div class="gem-dot gem-progress" title="In Progress"></div>
+        </div>
       </div>
       <ul class="ingredient-list">
-        <li class="ingredient-item" data-ingredient="toggle">Toggle</li>
-        <li class="ingredient-item" data-ingredient="iframe">Iframe</li>
-        <li class="ingredient-item" data-ingredient="comments">Comments</li>
-        <li class="ingredient-item" data-ingredient="change-order">Change Orders</li>
-        <li class="ingredient-item" data-ingredient="lrs">LRS</li>
-        <li class="ingredient-item" data-ingredient="status">Status</li>
+        <li class="ingredient-item" data-ingredient="dashboard">
+          <img src="/shared/platform/images/platform-dashboard-icon.svg" alt="" class="ingredient-icon">
+          Dashboard
+        </li>
+        <li class="ingredient-item" data-ingredient="content">
+          <img src="/shared/platform/images/platform-content-icon.svg" alt="" class="ingredient-icon">
+          Content
+        </li>
+        <li class="ingredient-item" data-ingredient="settings">
+          <img src="/shared/platform/images/platform-settings-icon.svg" alt="" class="ingredient-icon">
+          Settings
+        </li>
+        <li class="ingredient-item" data-ingredient="analytics">
+          <img src="/shared/platform/images/platform-analytics-icon.svg" alt="" class="ingredient-icon">
+          Analytics
+        </li>
+      </ul>
+    </div>
+
+    <!-- BHB (Inactive) -->
+    <div class="page-card" data-page="bhb">
+      <div class="page-header">
+        <h2>BHB</h2>
+        <div class="page-status">
+          <div class="gem-dot gem-attention" title="Needs Attention"></div>
+        </div>
+      </div>
+      <ul class="ingredient-list">
+        <li class="ingredient-item" data-ingredient="dashboard">
+          <img src="/shared/platform/images/platform-dashboard-icon.svg" alt="" class="ingredient-icon">
+          Dashboard
+        </li>
+        <li class="ingredient-item" data-ingredient="content">
+          <img src="/shared/platform/images/platform-content-icon.svg" alt="" class="ingredient-icon">
+          Content
+        </li>
+        <li class="ingredient-item" data-ingredient="settings">
+          <img src="/shared/platform/images/platform-settings-icon.svg" alt="" class="ingredient-icon">
+          Settings
+        </li>
+        <li class="ingredient-item" data-ingredient="analytics">
+          <img src="/shared/platform/images/platform-analytics-icon.svg" alt="" class="ingredient-icon">
+          Analytics
+        </li>
       </ul>
     </div>
   </div>
@@ -105,7 +231,10 @@ template.innerHTML = `
 /**
  * AdminPageNav Component
  * Handles navigation between admin pages and their ingredients
- * Used in the admin panel to manage different project pages (Goalsetter, Merit, BHB)
+ * Used in the admin panel to manage different project pages
+ * 
+ * @version 1.0.17
+ * @implements {HTMLElement}
  */
 export class AdminPageNav extends HTMLElement {
   constructor() {
@@ -116,6 +245,25 @@ export class AdminPageNav extends HTMLElement {
   connectedCallback() {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     this.setupEventListeners();
+    this.initializeState();
+  }
+
+  initializeState() {
+    // Set initial active states
+    const activePage = this.shadowRoot.querySelector('.page-card.active');
+    if (activePage) {
+      const activeIngredient = activePage.querySelector('.ingredient-item.active');
+      if (activeIngredient) {
+        this.dispatchEvent(new CustomEvent('ingredient-selected', {
+          detail: {
+            page: activePage.dataset.page,
+            ingredient: activeIngredient.dataset.ingredient
+          },
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
   }
 
   setupEventListeners() {
@@ -128,19 +276,27 @@ export class AdminPageNav extends HTMLElement {
         );
         
         // Add active class to clicked item
-        e.target.classList.add('active');
+        e.target.closest('.ingredient-item').classList.add('active');
         
-        // Dispatch event with selected page and ingredient
-        const page = e.target.closest('.page-card')
-                          .querySelector('.page-header h2')
-                          .textContent.toLowerCase();
-        const ingredient = e.target.dataset.ingredient;
+        // Get page and ingredient info
+        const pageCard = e.target.closest('.page-card');
+        const page = pageCard.dataset.page;
+        const ingredient = e.target.closest('.ingredient-item').dataset.ingredient;
         
+        // Update active states
+        this.shadowRoot.querySelectorAll('.page-card').forEach(card => 
+          card.classList.toggle('active', card === pageCard)
+        );
+        
+        // Dispatch event
         this.dispatchEvent(new CustomEvent('ingredient-selected', {
           detail: { page, ingredient },
           bubbles: true,
           composed: true
         }));
+
+        // Log state change
+        console.log(`[Admin Navigation] Selected ${page}/${ingredient}`);
       });
     });
 
@@ -148,14 +304,14 @@ export class AdminPageNav extends HTMLElement {
     this.shadowRoot.querySelectorAll('.page-header').forEach(header => {
       header.addEventListener('click', (e) => {
         const card = e.target.closest('.page-card');
-        const ingredients = card.querySelector('.ingredient-list');
         
-        // Toggle visibility of ingredients
-        if (ingredients.style.display === 'none') {
-          ingredients.style.display = 'block';
-        } else {
-          ingredients.style.display = 'none';
-        }
+        // Toggle active state
+        this.shadowRoot.querySelectorAll('.page-card').forEach(c => {
+          c.classList.toggle('active', c === card);
+        });
+
+        // Log state change
+        console.log(`[Admin Navigation] Toggled ${card.dataset.page} card`);
       });
     });
   }
