@@ -369,6 +369,70 @@
                     <li>Alert state: Visible with pulse animation even when collapsed</li>
                 </ul>
             </div>
+            
+            <!-- Post-Merit Implementation Issues -->
+            <div class="demo-section" style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3>Post-Merit Implementation Tasks</h3>
+                
+                <div style="margin: 20px 0;">
+                    <h4>Component Loading Issues</h4>
+                    <ul style="color: #666;">
+                        <li>Fix duplicate component registration logs:
+                            <pre style="background: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 12px;">
+[Admin] Registered component: admin-page (duplicate)
+[Admin] Registered component: admin-nav (duplicate)</pre>
+                        </li>
+                        <li>Resolve component initialization sequence to prevent double loading</li>
+                        <li>Add proper error boundaries for component loading failures</li>
+                    </ul>
+
+                    <h4>Navigation State Management</h4>
+                    <ul style="color: #666;">
+                        <li>Fix "Navigation items loaded: 0" issue in console</li>
+                        <li>Implement proper state tracking for navigation components</li>
+                        <li>Add loading state indicators for navigation items</li>
+                    </ul>
+
+                    <h4>Gem Status Tracking</h4>
+                    <ul style="color: #666;">
+                        <li>Fix "Unknown" labels in gem status logs:
+                            <pre style="background: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 12px;">
+[Admin Dashboard] Gem status for Unknown: ready
+[Admin Dashboard] Gem status for Unknown: progress
+[Admin Dashboard] Gem status for Unknown: attention</pre>
+                        </li>
+                        <li>Implement proper card title detection for gem status logging</li>
+                        <li>Add visual indicators for gem status changes</li>
+                    </ul>
+
+                    <h4>Version Management</h4>
+                    <ul style="color: #666;">
+                        <li>Standardize version display format across pages</li>
+                        <li>Current inconsistency:
+                            <pre style="background: #f5f5f5; padding: 8px; border-radius: 4px; font-size: 12px;">
+Header shows: v1.0.0 (04.15.2024)
+Console shows: v1.0.17</pre>
+                        </li>
+                        <li>Implement centralized version management</li>
+                    </ul>
+
+                    <h4>Console Logging</h4>
+                    <ul style="color: #666;">
+                        <li>Implement structured logging format</li>
+                        <li>Add log levels (INFO, WARN, ERROR)</li>
+                        <li>Include timestamps in all log messages</li>
+                        <li>Add component context to log messages</li>
+                    </ul>
+
+                    <h4>Performance Optimization</h4>
+                    <ul style="color: #666;">
+                        <li>Reduce duplicate component initialization</li>
+                        <li>Implement lazy loading for dashboard sections</li>
+                        <li>Add performance monitoring for component loading</li>
+                        <li>Optimize gem status observer implementation</li>
+                    </ul>
+                </div>
+            </div>
         </main>
     </div>
 
