@@ -18,6 +18,7 @@ export async function initAdminAuth() {
     }
     // Production authentication logic will go here
     return false;
+
 }
 
 // Admin login - Development bypass
