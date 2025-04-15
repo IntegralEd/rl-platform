@@ -11,12 +11,13 @@
             --accent-color: #c6123f;
             --error-color: #ff4444;
             --success-color: #00C851;
-            --vault-primary: var(--primary-color); /* #c6123f */
-            --vault-secondary: var(--secondary-color); /* #211651 */
-            --vault-accent: var(--tertiary-color); /* #ffa409 */
+            --vault-primary: var(--primary-color);
+            --vault-secondary: var(--secondary-color);
+            --vault-accent: var(--tertiary-color);
             --vault-bg: var(--background-color);
             --vault-text: var(--text-color);
             --transition-portal: 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --chest-glow: 0 0 20px rgba(255, 164, 9, 0.4);
         }
 
         body {
@@ -39,180 +40,92 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/shared/platform/images/platform-portal-beam.svg');
+            background-image: url('/shared/platform/images/platform-vault-background-water.png');
             background-size: cover;
             background-position: center;
             transition: all var(--transition-portal);
             z-index: 0;
+            opacity: 0.8;
         }
 
-        .admin-background.portal-forming {
-            background-image: url('/shared/platform/images/portal-beam-distance.svg');
-            animation: portalBeam 1.5s ease-out forwards;
-        }
-
-        .admin-background.portal-opening {
-            background-image: url('/shared/platform/images/dna-parting.svg');
-            animation: portalPart 1.5s ease-out forwards;
-        }
-
-        .admin-background.portal-unlocked {
-            background-image: url('/shared/platform/images/portal-unlocked.svg');
-            animation: portalUnlock 1.5s ease-out forwards;
-        }
-
-        @keyframes portalBeam {
-            0% {
-                transform: scale(1);
-                filter: brightness(1) blur(0);
-            }
-            50% {
-                transform: scale(1.05);
-                filter: brightness(1.2) blur(2px);
-            }
-            100% {
-                transform: scale(1);
-                filter: brightness(1) blur(0);
-            }
-        }
-
-        @keyframes portalPart {
-            0% {
-                transform: scale(1);
-                filter: brightness(1) blur(0);
-            }
-            50% {
-                transform: scale(1.1);
-                filter: brightness(1.5) blur(3px);
-            }
-            100% {
-                transform: scale(1);
-                filter: brightness(1.2) blur(1px);
-            }
-        }
-
-        @keyframes portalUnlock {
-            0% {
-                transform: scale(1);
-                filter: brightness(1.2) blur(1px);
-            }
-            50% {
-                transform: scale(1.15);
-                filter: brightness(1.8) blur(4px);
-            }
-            100% {
-                transform: scale(1);
-                filter: brightness(1.5) blur(2px);
-            }
-        }
-
-        /* Floating Bubbles Animation */
-        .bubble {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 8s infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-100px) scale(1); opacity: 0; }
-        }
-
-        /* DNA Rung Easter Egg */
-        .dna-rung {
-            position: absolute;
-            bottom: 15%;
+        /* Treasure Chest */
+        .treasure-chest {
+            position: fixed;
+            bottom: 10%;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 20px;
+            width: 120px;
+            height: 120px;
             cursor: pointer;
-            opacity: 0.1;
-            transition: opacity 0.3s ease;
-            z-index: 1;
+            transition: transform 0.3s ease;
+            z-index: 2;
         }
 
-        .dna-rung:hover {
-            opacity: 0.5;
-        }
-
-        .dna-rung img {
+        .treasure-chest img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            filter: drop-shadow(var(--chest-glow));
         }
 
-        /* Portal Window Effect */
-        .portal-window {
-            position: fixed;
+        .treasure-chest:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .treasure-chest.opening {
+            animation: chestOpen 1s ease forwards;
+        }
+
+        @keyframes chestOpen {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2) rotate(-5deg); }
+            100% { transform: translateX(-50%) scale(1) rotate(0); }
+        }
+
+        /* Scroll Password Input */
+        .scroll-container {
+            position: relative;
+            width: 300px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .scroll-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-background {
+            width: 100%;
+            height: 150px;
+            background-image: url('/shared/platform/images/platform-vault-scroll-input.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+        }
+
+        .input-group {
+            position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            width: 80vw;
-            height: 80vh;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            transition: all var(--transition-portal);
-            z-index: 4;
-        }
-
-        .portal-window.active {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            border-radius: 20px;
-        }
-
-        /* Login Card */
-        .vault-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: var(--client-card-border-radius);
-            width: 90%;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
-            z-index: 3;
-            border: 2px solid var(--vault-accent);
-            box-shadow: var(--shadow-lg);
-            transition: transform var(--transition-portal),
-                      opacity var(--transition-portal);
-        }
-
-        .vault-card.portal-active {
-            transform: scale(0);
-            opacity: 0;
-        }
-
-        .vault-title {
-            color: var(--vault-accent);
-            font-family: var(--client-font-h1);
-            font-size: var(--client-font-size-h1);
-            margin-bottom: 2rem;
-            text-shadow: 0 0 10px var(--vault-accent);
-        }
-
-        .vault-form {
+            transform: translate(-50%, -50%);
+            width: 80%;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 10px;
         }
 
         .vault-input {
-            padding: var(--client-button-padding);
-            border: 2px solid var(--vault-accent);
-            border-radius: var(--client-button-radius);
             background: rgba(255, 255, 255, 0.1);
-            color: var(--vault-text);
-            font-size: var(--client-font-size-body);
+            border: 2px solid var(--vault-accent);
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: white;
             text-align: center;
-            transition: all var(--transition-base);
+            transition: all 0.3s ease;
         }
 
         .vault-input:focus {
@@ -221,179 +134,115 @@
             box-shadow: 0 0 15px var(--vault-primary);
         }
 
+        .vault-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Version Display */
+        .version-display {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        /* Error Message */
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .error-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Logo */
+        .platform-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 2rem;
+        }
+
+        /* Enter Button */
         .vault-button {
-            padding: var(--client-button-padding);
             background: var(--vault-accent);
-            color: var(--vault-bg);
+            color: white;
             border: none;
-            border-radius: var(--client-button-radius);
-            font-size: var(--client-font-size-body);
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all var(--transition-base);
             font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .vault-button:hover {
             background: var(--vault-primary);
-            color: var(--vault-text);
-            transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .vault-error {
-            color: var(--vault-primary);
-            margin-top: 1rem;
-            display: none;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            position: relative;
-            z-index: 2;
-        }
-
-        .client-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .header-logo {
-            text-decoration: none;
-        }
-
-        .header-logo img {
-            width: 100px;
-            height: auto;
-            max-height: 30px;
-            object-fit: contain;
-        }
-
-        .version-display {
-            margin-left: 1rem;
-            font-size: 0.8rem;
-            color: #fff;
-        }
-
-        .header-nav {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-item {
-            margin-left: 1rem;
-        }
-
-        .nav-item.active {
-            font-weight: bold;
-        }
-
-        .nav-item a {
-            text-decoration: none;
-            color: #fff;
-        }
-
-        .nav-item a:hover {
-            text-decoration: underline;
-        }
-
-        .nav-item.with-dropdown {
-            position: relative;
-        }
-
-        .nav-item.with-dropdown button {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-item.with-dropdown button img {
-            width: 20px;
-            height: 20px;
-        }
-
-        .dropdown-menu {
-            display: none;
+        /* Floating Bubbles */
+        .bubble {
             position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 5px;
-            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 8s infinite;
         }
 
-        .dropdown-item {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 0.5rem;
-            text-decoration: none;
-            color: #fff;
-        }
-
-        .dropdown-item:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.3; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div class="admin-background"></div>
-    <div class="portal-window"></div>
-    
-    <!-- DNA Rung Easter Egg -->
-    <div class="dna-rung">
-        <img src="/shared/platform/images/platform-logo-horizontal-white.svg" 
-             alt="Recursive Learning"
-             aria-hidden="true"
-             width="100"
-             height="20">
+    <span class="version-display">v1.0.17</span>
+
+    <div class="treasure-chest" id="treasureChest">
+        <img src="/shared/platform/images/platform-vault-chest-icon.svg" 
+             alt="Vault Access" 
+             width="120" 
+             height="120">
     </div>
 
-    <div class="auth-container">
-        <div class="vault-card">
-            <img src="/shared/platform/images/platform-logo-horizontal-white.svg" 
-                 alt="Recursive Learning" 
-                 class="platform-logo"
-                 width="200"
-                 height="50">
-            <h1 class="vault-title">Recursive Learning Vault</h1>
+    <div class="scroll-container" id="loginContainer">
+        <div class="scroll-background">
             <form id="loginForm" onsubmit="return false;">
                 <div class="input-group">
-                    <input type="password" id="password" placeholder="Enter the vault code" autocomplete="current-password">
+                    <input type="email" 
+                           id="email" 
+                           class="vault-input" 
+                           placeholder="Enter your @integral-ed.com email"
+                           pattern="[a-z0-9._%+-]+@integral-ed\.com$"
+                           required>
+                    <input type="password" 
+                           id="password" 
+                           class="vault-input" 
+                           placeholder="Enter the vault code" 
+                           required>
+                    <button type="submit" class="vault-button">Enter Vault</button>
                 </div>
-                <button type="submit">Enter Vault</button>
                 <div class="error-message" id="errorMessage"></div>
             </form>
         </div>
     </div>
-    
-    <span class="version-display">v1.0.17</span>
 
     <script type="module">
         import { AdminAuth } from '/admin/assets/js/admin-auth.js';
@@ -401,47 +250,15 @@
         // Redirect if already authenticated
         AdminAuth.redirectIfAuthed();
 
+        const treasureChest = document.getElementById('treasureChest');
+        const loginContainer = document.getElementById('loginContainer');
         const form = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const password = document.getElementById('password').value;
-            const background = document.querySelector('.admin-background');
-            const vaultCard = document.querySelector('.vault-card');
-            
-            if (AdminAuth.validatePassword(password)) {
-                // Start portal sequence
-                background.classList.add('portal-forming');
-                
-                setTimeout(() => {
-                    background.classList.add('portal-opening');
-                }, 1500);
-                
-                setTimeout(() => {
-                    background.classList.add('portal-unlocked');
-                    vaultCard.classList.add('portal-active');
-                }, 3000);
-                
-                // Set auth and redirect after animation
-                AdminAuth.setAuth();
-                setTimeout(() => {
-                    window.location.href = '/admin/dashboard.html';
-                }, 4500);
-            } else {
-                errorMessage.textContent = 'Invalid vault code';
-                document.getElementById('password').value = '';
-                background.classList.add('shake');
-                setTimeout(() => {
-                    background.classList.remove('shake');
-                }, 500);
-            }
-        });
-
-        // Clear error on input
-        document.getElementById('password').addEventListener('input', () => {
-            errorMessage.textContent = '';
-        });
+        // Initialize with chest closed
+        loginContainer.style.display = 'none';
 
         // Create floating bubbles
         function createBubbles() {
@@ -449,28 +266,81 @@
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
                 bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.width = Math.random() * 50 + 20 + 'px';
+                bubble.style.width = Math.random() * 8 + 3 + 'px';
                 bubble.style.height = bubble.style.width;
                 document.body.appendChild(bubble);
-                
-                // Remove bubble after animation
                 setTimeout(() => bubble.remove(), 8000);
             }, 500);
         }
 
-        // Handle DNA rung easter egg
-        const dnaRung = document.querySelector('.dna-rung');
-        dnaRung.addEventListener('click', () => {
-            window.location.href = '/clients/rlp/curious.html';
+        // Handle chest click
+        treasureChest.addEventListener('click', () => {
+            treasureChest.classList.add('opening');
+            setTimeout(() => {
+                loginContainer.style.display = 'block';
+                setTimeout(() => {
+                    loginContainer.classList.add('visible');
+                }, 100);
+            }, 500);
+        });
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // Validate email domain
+            if (!email.endsWith('@integral-ed.com')) {
+                showError('Please use your @integral-ed.com email address');
+                return;
+            }
+
+            if (AdminAuth.validatePassword(password)) {
+                console.log('[Admin Vault] Access granted for:', email);
+                const background = document.querySelector('.admin-background');
+                
+                // Start portal sequence
+                background.style.transform = 'scale(1.1)';
+                background.style.filter = 'brightness(1.5) blur(3px)';
+                
+                // Store email in session
+                sessionStorage.setItem('admin_email', email);
+                
+                // Set auth and redirect
+                AdminAuth.setAuth();
+                setTimeout(() => {
+                    window.location.href = '/admin/dashboard.html';
+                }, 1500);
+            } else {
+                showError('Invalid credentials');
+                passwordInput.value = '';
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('visible');
+            setTimeout(() => {
+                errorMessage.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Clear error on input
+        emailInput.addEventListener('input', () => {
+            errorMessage.classList.remove('visible');
+        });
+
+        passwordInput.addEventListener('input', () => {
+            errorMessage.classList.remove('visible');
         });
 
         // Initialize effects
         createBubbles();
         
-        // Add console logging
+        // Console logging
         console.log('[Admin Vault] v1.0.17 - Initialized');
-        console.log('[Admin Vault] Login screen active with portal animations');
-        console.log('[Admin Vault] SVG assets constrained with dimensions');
+        console.log('[Admin Vault] Login screen active with vault animations');
     </script>
 </body>
 </html> 
