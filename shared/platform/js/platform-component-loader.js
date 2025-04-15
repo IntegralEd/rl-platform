@@ -5,7 +5,7 @@
  */
 
 import { secureFetch, getClientIdFromUrl, getComponent } from './api-client.js';
-import { hasPermission } from './auth.js';
+import { hasPermission } from './platform-auth.js';
 
 // Configuration
 const LOADER_CONFIG = {
