@@ -9,6 +9,10 @@
 - [x] Use format: `"Update {component} - {change} [MMDDhhmm.YYYY]"` for commits
 - [x] Handle precise git commands to prevent typos
 - [x] Focus on one file at a time to maintain clear diffs
+- [!] CRITICAL: AI cannot save files in Cursor - only humans can save changes
+- [!] AI cannot detect unsaved changes in Cursor editor
+- [!] AI can only see changes after human saves them to disk
+- [!] AI will add "🛑 STOP AND READ" after each file change
 
 ## Human Reviewer Rules
 - [hu] Verify visual changes in browser before approving
@@ -17,6 +21,22 @@
 - [x] Note any new issues discovered during review
 - [x] Lead decisions on folder restructuring
 - [x] Handle quick file renames through IDE
+- [x] Always save files after making changes (unsaved changes are lost if tab is closed)
+- [x] Look for the dot indicator in tabs to identify unsaved changes
+- [x] Verify 'M' appears in file tree after saving to confirm git tracking
+- [!] ENABLE AUTO-SAVE: Open Cursor CLI and enable auto-save setting
+
+🛑 STOP AND READ: Don't close any tabs until you've saved all changes! Enable auto-save in Cursor CLI to prevent data loss.
+
+## Cursor Save/Sync Behavior Notes
+- Changes in editor are not written to disk until explicitly saved
+- Unsaved changes show as a dot next to the file tab name
+- Closing a tab with unsaved changes will lose those changes
+- Git cannot see changes until they are saved to disk
+- 'M' indicator in file tree confirms changes are saved and tracked
+- Always save before git operations to ensure changes are tracked
+- Multiple unsaved files can cause confusing git states
+- Save one file at a time to maintain clear git history
 
 ## Today's Process
 1. AI proposes code change
