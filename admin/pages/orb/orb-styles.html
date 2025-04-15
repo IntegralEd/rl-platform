@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ORB Style System - Cascading Variables and Theme Management">
+    <title>ORB Style System | Admin</title>
+
+    <!-- Required admin scripts -->
+    <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
+    <script type="module" src="/admin/assets/js/admin-auth.js"></script>
+    <script type="module" src="/admin/assets/js/admin-router.js"></script>
+
+    <!-- Admin styles -->
+    <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+
+    <style>
+        .style-diagram {
+            background: white;
+            border: 1px solid var(--admin-border);
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .cascade-level {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-left: 4px solid;
+        }
+
+        .platform-level { border-color: #2C3E50; }
+        .client-level { border-color: #E74C3C; }
+        .page-level { border-color: #3498DB; }
+
+        .variables-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+
+        .variables-table th,
+        .variables-table td {
+            padding: 1rem;
+            border: 1px solid var(--admin-border);
+            text-align: left;
+        }
+
+        .variables-table th {
+            background: var(--admin-bg);
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--admin-border);
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .theme-card {
+            background: white;
+            border: 1px solid var(--admin-border);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .future-feature {
+            background: #FFF3CD;
+            border-left: 4px solid #FFE69C;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>ORB Style System</h1>
+                <div class="version-display">v1.0.17</div>
+            </div>
+        </header>
+
+        <main class="admin-content">
+            <div class="orb-section-content">
+                <h1>Cascading Styles</h1>
+                <p class="lead">Our style system uses a cascading hierarchy where more specific styles override platform defaults, allowing for flexible theming while maintaining consistency.</p>
+
+                <div class="style-diagram">
+                    <h3>Style Cascade Priority</h3>
+                    <div class="cascade-level platform-level">
+                        <h4>1. Platform Level</h4>
+                        <p>Base variables and defaults in <code>/shared/platform/css/platform-variables.css</code></p>
+                        <ul>
+                            <li>Core typography</li>
+                            <li>Layout grid</li>
+                            <li>Component basics</li>
+                        </ul>
+                    </div>
+
+                    <div class="cascade-level client-level">
+                        <h4>2. Client Level</h4>
+                        <p>Brand-specific overrides in <code>/clients/{client}/assets/css/client-variables.css</code></p>
+                        <ul>
+                            <li>Brand colors</li>
+                            <li>Typography</li>
+                            <li>Logo assets</li>
+                        </ul>
+                    </div>
+
+                    <div class="cascade-level page-level">
+                        <h4>3. Page Level</h4>
+                        <p>Page-specific styles in <code>/clients/{client}/{project}/assets/css/page-variables.css</code></p>
+                        <ul>
+                            <li>Feature-specific UI</li>
+                            <li>Interactive elements</li>
+                            <li>Assistant theming</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2>Style Application Domains</h2>
+                <div class="theme-card">
+                    <h3>Admin Interface</h3>
+                    <p>Platform styles with admin-specific overrides for management interfaces</p>
+                    <ul>
+                        <li>Dashboard layouts</li>
+                        <li>Data visualization</li>
+                        <li>Management tools</li>
+                    </ul>
+                </div>
+
+                <div class="theme-card">
+                    <h3>Public/Shared Landing</h3>
+                    <p>Platform styles with minimal branding for public-facing pages</p>
+                    <ul>
+                        <li>Marketing sites</li>
+                        <li>Documentation</li>
+                        <li>Public resources</li>
+                    </ul>
+                </div>
+
+                <div class="theme-card">
+                    <h3>Demo Pieces</h3>
+                    <p>Flexible theming for showcasing different possibilities:</p>
+                    <ul>
+                        <li>"Borders in Time" - Gameplay aesthetics</li>
+                        <li>"Corporate Training" - Professional look</li>
+                        <li>"Early Learning" - Playful design</li>
+                    </ul>
+                </div>
+
+                <div class="future-feature">
+                    <h3>Future Theme Sets</h3>
+                    <p>Asha is developing preset theme collections that clients can choose from:</p>
+                    <ul>
+                        <li>"Earth Tones" - Natural, calming palette</li>
+                        <li>"Playful Learning" - Engaging, vibrant design</li>
+                        <li>"Professional Suite" - Corporate, refined aesthetic</li>
+                        <li>"STEM Focus" - Technical, precise styling</li>
+                    </ul>
+                </div>
+
+                <h2>Variables at Play</h2>
+                <p>Our variables.css structure is designed for flexibility and future client customization.</p>
+
+                <div class="future-feature">
+                    <h3>Coming Soon: Client Style Portal</h3>
+                    <p>Clients will be able to:</p>
+                    <ul>
+                        <li>Update brand colors and typography</li>
+                        <li>Upload and manage assets</li>
+                        <li>Preview changes in real-time</li>
+                        <li>Trigger automated rebuilds</li>
+                        <li>Download updated brand guidelines</li>
+                    </ul>
+                    <p>Changes will be processed via Make.com automations, triggering async rebuilds of affected pages.</p>
+                </div>
+
+                <h3>Current Variable Structure</h3>
+                <table class="variables-table">
+                    <thead>
+                        <tr>
+                            <th>Variable Name</th>
+                            <th>Description</th>
+                            <th>Control Level</th>
+                            <th>ELPL/Merit Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>--primary-color</code></td>
+                            <td>Main brand color</td>
+                            <td>Client</td>
+                            <td><span class="color-swatch" style="background: #C6123F"></span>#C6123F</td>
+                        </tr>
+                        <tr>
+                            <td><code>--font-family-body</code></td>
+                            <td>Main text font</td>
+                            <td>Client</td>
+                            <td>Helvetica Neue, sans-serif</td>
+                        </tr>
+                        <tr>
+                            <td><code>--assistant-avatar</code></td>
+                            <td>Chat assistant image</td>
+                            <td>Page</td>
+                            <td>Merit Guide Avatar</td>
+                        </tr>
+                        <tr>
+                            <td><code>--header-height</code></td>
+                            <td>Navigation height</td>
+                            <td>Platform</td>
+                            <td>60px</td>
+                        </tr>
+                        <tr>
+                            <td><code>--chat-bg</code></td>
+                            <td>Chat interface background</td>
+                            <td>Page</td>
+                            <td><span class="color-swatch" style="background: #F8F9FA"></span>#F8F9FA</td>
+                        </tr>
+                        <tr>
+                            <td><code>--logo-width</code></td>
+                            <td>Header logo size</td>
+                            <td>Client</td>
+                            <td>180px</td>
+                        </tr>
+                        <tr>
+                            <td><code>--button-radius</code></td>
+                            <td>Button corner roundness</td>
+                            <td>Platform</td>
+                            <td>4px</td>
+                        </tr>
+                        <tr>
+                            <td><code>--accent-color</code></td>
+                            <td>Secondary brand color</td>
+                            <td>Client</td>
+                            <td><span class="color-swatch" style="background: #2C3E50"></span>#2C3E50</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[ORB] Style system documentation v1.0.17 - Initialized');
+        });
+    </script>
+</body>
+</html>
