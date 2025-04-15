@@ -141,7 +141,7 @@
 
         .admin-button {
             position: fixed;
-            bottom: 60px;
+            bottom: calc(var(--footer-height) + 20px);
             right: 20px;
             background: var(--accent-color);
             color: white;
@@ -154,10 +154,14 @@
             text-decoration: none;
             font-size: 14px;
             transition: opacity 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .admin-button:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
         }
 
         .admin-button img {
@@ -181,7 +185,7 @@
         <header class="client-header" role="banner">
             <img src="/shared/platform/images/platform-logo-horizontal-white.svg" alt="Recursive Learning" class="logo">
             <div class="header-actions">
-                <span class="version-display" aria-live="polite">v1.0.0 (<span id="time">00:00</span>)</span>
+                <span class="version-display" aria-live="polite">v1.0.0 (04.15.2024)</span>
                 <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
                     <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
                 </a>
@@ -234,7 +238,6 @@
                 this.verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
                 this.currentIndex = 0;
                 this.verbElement = document.querySelector('.verb');
-                this.timeElement = document.getElementById('time');
                 this.loadingState = document.querySelector('.loading-state');
                 this.errorState = document.querySelector('.error-state');
                 this.contentState = document.querySelector('.content-state');
@@ -245,9 +248,9 @@
             init() {
                 try {
                     this.startVerbAnimation();
-                    this.startTimeUpdate();
                     this.setupErrorHandling();
                     this.showContent();
+                    console.log('[Platform] Landing page initialized with build v1.0.0 (04.15.2024)');
                 } catch (error) {
                     console.error('Landing layout initialization failed:', error);
                     this.showError();
@@ -259,21 +262,6 @@
                     this.currentIndex = (this.currentIndex + 1) % this.verbs.length;
                     this.verbElement.textContent = this.verbs[this.currentIndex];
                 }, 4000);
-            }
-
-            startTimeUpdate() {
-                const updateTime = () => {
-                    const now = new Date();
-                    const time = now.toLocaleTimeString('en-US', { 
-                        hour12: false,
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    this.timeElement.textContent = time;
-                };
-                
-                updateTime();
-                setInterval(updateTime, 60000);
             }
 
             setupErrorHandling() {
