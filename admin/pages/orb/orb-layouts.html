@@ -214,6 +214,25 @@
       
         <h2>Design Philosophy</h2>
       
+        <div class="note">
+          <strong>Retree Collaboration Note:</strong> Directory restructuring requires careful human-AI collaboration:
+          <ul>
+            <li>AI assistants may suggest incorrect folder structures without full repository context</li>
+            <li>Humans lose Git change visibility when folders are collapsed (file beacons hidden)</li>
+            <li>Best Practice: Keep files in their current locations unless absolutely necessary to move</li>
+            <li>When restructuring is needed, humans should lead the process with AI support</li>
+          </ul>
+        </div>
+
+        <div class="diagram">
+          <strong>Example: Clear Human-AI Handoff via Git Status</strong>
+          <pre><code>Changes not staged for commit:
+  modified:   admin/pages/orb/orb-layouts.html    # AI documentation updates
+  deleted:    shared/docs/apr-14-back-on-main-checlist.md
+
+Untracked files:
+  shared/docs/apr-15-human-ux-review.md    # Human's new review file</code></pre>
+          <p><em>This Git status shows clear delineation of work: AI making documented changes to existing files while humans lead new file creation and major restructuring.</em></p>
         <ul>
           <li>Use platform styles to ensure consistency across tenants</li>
           <li>Empower client-specific visual identity through CSS variables</li>
@@ -224,6 +243,10 @@
         </ul>
       
         <h2>Asset Naming Conventions</h2>
+        
+        <div class="note">
+          <strong>Pro Tip:</strong> While AI assistants may be slower at renaming files, humans can quickly rename files by right-clicking and typing the new name directly in their IDE or file explorer. This is often the most efficient way to handle bulk file renaming tasks.
+        </div>
         
         <h3>Platform Assets</h3>
         <pre><code>CSS: platform-{purpose}-{variant}.css
