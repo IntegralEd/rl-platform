@@ -1,5 +1,5 @@
 # April 14 Main Branch Reconciliation Checklist
-Version: 1.0.3 [April 14, 2025 2:00 PM EDT]
+Version: 1.0.4 [April 14, 2025 6:30 PM EDT]
 
 ## Gate 1: Platform Structure 🏗️
 ### Preparation
@@ -79,6 +79,10 @@ Version: 1.0.3 [April 14, 2025 2:00 PM EDT]
 - [x] Test auth routes [commit: admin-auth-test]
   - [x] Console screenshot verified
   - [x] Paths updated to use /shared/platform/
+- [x] Remove header from login page [commit: admin-login-clean]
+  - [x] Keep version display on page
+  - [x] Ensure login form displays correctly
+  - [x] Maintain portal animation effects
 
 ### Dashboard Layout
 - [x] Update structure [commit: admin-layout-update]
@@ -157,7 +161,7 @@ Version: 1.0.3 [April 14, 2025 2:00 PM EDT]
 - [x] Navigation working with dropdowns
 - [x] Version updated to 1.0.17
 
-## Gate 3: Merit MVP 🎯 [IN PROGRESS]
+## Gate 3: Merit MVP 🎯 [READY TO START]
 ### Client Asset Standardization
 - [x] Rename JavaScript files [commit: client-js-rename]
   - [x] Root assets:
@@ -167,36 +171,58 @@ Version: 1.0.3 [April 14, 2025 2:00 PM EDT]
   - [x] JS directory:
     - [x] chat.js → client-chat.js
     - [x] feedback-bubble.js → client-feedback.js
-- [ ] Move modal components [pending]
+- [ ] Move modal components [HIGH PRIORITY]
   - [ ] Transfer to /shared/page_ingredients/modal/
   - [ ] Update import paths
   - [ ] Verify functionality
-- [ ] Consolidate CSS [pending]
+- [ ] Consolidate CSS [HIGH PRIORITY]
   - [ ] Merge variables.css files
   - [ ] Update import paths
   - [ ] Verify styles
-- [ ] Image optimization [pending]
+- [ ] Image optimization [MEDIUM PRIORITY]
   - [ ] Convert PNGs to SVGs where possible
   - [ ] Remove duplicate assets
   - [ ] Verify all prefixes
 
+### Merit Page Implementation
+- [ ] Create core structure [HIGH PRIORITY]
+  - [ ] Implement header with Merit branding
+  - [ ] Add navigation sidebar with status gems
+  - [ ] Build content area with card components
+  - [ ] Create footer with version display
+- [ ] Develop metrics dashboard [HIGH PRIORITY]
+  - [ ] Add KPI cards with visualization
+  - [ ] Implement data loading states
+  - [ ] Create summary section with highlights
+  - [ ] Add export functionality
+- [ ] Build user management [MEDIUM PRIORITY]
+  - [ ] Create user listing with filters
+  - [ ] Add role assignment interface
+  - [ ] Implement permission editor
+  - [ ] Build audit logging
+- [ ] Implement report generator [MEDIUM PRIORITY]
+  - [ ] Create template selection interface
+  - [ ] Add data source configuration
+  - [ ] Build preview functionality
+  - [ ] Implement scheduling options
+
 ### OpenAI Integration
-- [ ] Update client [commit: merit-openai-update]
+- [ ] Update client [HIGH PRIORITY]
   - [ ] Fix endpoint configuration
   - [ ] Update error handling
   - [ ] Add state management
-- [ ] Test chat flow [commit: merit-chat-test]
+- [ ] Test chat flow [HIGH PRIORITY]
   - [ ] Thread creation
   - [ ] Message sending
   - [ ] Error scenarios
   - [ ] Console screenshot
 
 ### Asset References
-- [ ] Update paths [commit: merit-asset-update]
+- [ ] Update paths [HIGH PRIORITY]
   - [ ] Image sources
   - [ ] Script imports
   - [ ] Style references
-- [ ] Test functionality [commit: merit-final-test]
+- [ ] Test functionality [HIGH PRIORITY]
   - [ ] Form validation
   - [ ] Navigation
   - [ ] Chat operations
@@ -246,13 +272,19 @@ For each gate, add console screenshot showing:
 - Document any deviations or issues
 - Update implementation status doc after each gate
 
-## Next Steps [UPDATED: April 14, 2025]
-- Ready to push back to Main branch now that Gates 1 and 2 are complete
-- After merging to main, we will trigger a GitHub Pages build
-- Console logs will be added to the dashboard to indicate what components are in focus
-- Will continue with Gate 3 (Merit MVP) after main branch stabilization
-- Dashboard now has proper console logging to indicate tab/component focus
-- Added diagnostic information in browser console for tracking component loading
+## Next Steps [UPDATED: April 14, 2025 6:30 PM]
+- [x] Push clean version to Main branch with Gates 1 and 2 complete
+- [x] Remove header from admin login page while retaining version display
+- [x] Trigger a GitHub Pages build for latest changes
+- [ ] Begin Merit MVP implementation with the following priorities:
+  1. Client asset standardization - focus on modal components and CSS consolidation first
+  2. Core Merit page structure with header, navigation, and content areas
+  3. Implement metrics dashboard with KPI visualization
+  4. Fix OpenAI integration for chat functionality
+  5. Complete asset reference updates and testing
+- [ ] Schedule design review for Merit dashboard UI components
+- [ ] Plan user testing session for initial Merit MVP features
+- [ ] Create documentation for Merit-specific components and usage patterns
 
 ## SVG Path Adjustments [UPDATED: 5:43PM Build]
 - [x] Fix admin page SVG rendering and constraints
@@ -306,3 +338,69 @@ The ORB layouts documentation page needs further enhancement to better convey th
 - [ ] Implement A/B comparison tool
   - [ ] Create split view of design vs. implementation
   - [ ] Add pixel-perfect alignment verification
+
+## Apr14 840pm punch list UX and Console items
+### Site Tour Observations
+#### Root Landing Page (https://recursivelearning.app/)
+- **Console Errors:**
+  - [x] 404 errors for JavaScript files:
+    - GET https://recursivelearning.app/shared/platform/js/platform-component-loader.js
+    - GET https://recursivelearning.app/shared/platform/js/platform-auth.js
+    - GET https://recursivelearning.app/shared/platform/js/platform-url-resolver.js
+    
+- **UI/UX Issues:**
+  - [ ] Admin button is obscured by other elements and needs to be moved up
+  - [ ] Version number: Replace dynamic time with datetime of the build
+  - [ ] Top navigation: Account icon should display dropdown on click/hover
+  - [ ] Temporary UX: Clicking account icon should directly log user out (session shortcut)
+  - [ ] Session life remains set at 24hr in security at the admin root level
+  - [ ] Header logo: Horizontal logo in top-left is missing correct path
+  - [ ] Logo container: SVG needs to be pinned inside a div box with 5px buffer from the edges
+
+#### Admin Login Page (https://recursivelearning.app/admin/index.html)
+- **Console Output:**
+  - [x] [Admin Vault] v1.0.17 - Initialized
+  - [x] [Admin Vault] Login screen active with portal animations
+  - [x] [Admin Vault] SVG assets constrained with dimensions
+
+- **UI/UX Issues:**
+  - [ ] SVG rendering needs enhancement with background effects
+  - [ ] Password entry could be improved with themed design
+  - [ ] Animation sequence can be more interactive
+  - [ ] Version number (v1.0.17) positioning needs adjustment
+
+## Ideas for UX fixes
+
+### Admin Login Enhancements
+- [ ] **Layered SVG Animation (MVP Approach):**
+  - [ ] Preserve high-res watercolor PNG as primary background - ensure visibility
+  - [ ] Add simple animated elements that evoke primordial soup:
+    - [ ] Floating bubbles with limited opacity (3-8px size variation)
+    - [ ] Simple squiggles with varying pixel thickness (3-8px)
+    - [ ] Apply very limited opacity to all elements
+  - [ ] Implement basic animation cycle (no complex interactions for MVP)
+  - [ ] Ensure animations don't obscure the beautiful watercolor artwork
+  - [ ] Keep implementation simple - Asha will enhance post-MVP
+
+- [ ] **Interactive Password Entry:**
+  - [ ] Rename assets to follow platform conventions:
+    - [ ] admin-treasurechest → platform-vault-chest-icon.svg
+    - [ ] admin-helm → platform-vault-helm-icon.svg
+    - [ ] admin-scroll → platform-vault-scroll-icon.svg
+  - [ ] Create "torn edge" effect on scroll for password field
+  - [ ] Implement chest spin animation when icon is clicked
+  - [ ] Add modal dialog that appears with scroll unfurling animation
+  - [ ] Create subtle glow effect on successful password entry
+
+- [ ] **Visual Feedback System:**
+  - [ ] Add subtle water/bubble animation in background during idle state
+  - [ ] Implement ripple effect when clicking anywhere on the screen
+  - [ ] Create "unlocking" animation sequence when credentials are verified
+  - [ ] Add treasure chest opening animation on successful login
+  - [ ] Implement smooth transition to dashboard after authentication
+
+- [ ] **Code Structure Improvements:**
+  - [ ] Organize animations into dedicated JS module
+  - [ ] Implement proper error handling with visual feedback
+  - [ ] Add accessibility support for animations (reduced motion)
+  - [ ] Create reusable animation components for other platform areas
