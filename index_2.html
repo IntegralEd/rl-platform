@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursive Learning - 4/15 2025</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/shared/platform/images/platform-favicon.ico">
+    
+    <!-- Required platform styles -->
+    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+    
+    <style>
+        :root {
+            /* Required CSS Variables */
+            --header-height: 60px;
+            --footer-height: 30px;
+            --client-bg: #ffffff;
+            --client-text: #2c3e50;
+            --client-border: #e1e4e8;
+            --content-width: 1200px;
+            --primary-color: #211651;
+            --accent-color: #C6123F;
+        }
+
+        .client-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--client-bg);
+        }
+
+        .client-header {
+            height: var(--header-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-button {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .icon-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-button img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .version-display {
+            font-size: 0.9em;
+            margin-right: 1rem;
+        }
+
+        .client-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            max-width: var(--content-width);
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .client-footer {
+            height: auto;
+            min-height: var(--footer-height);
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 1rem 2rem;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow: visible;
+            z-index: 10;
+        }
+
+        .logo {
+            max-height: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-avatar {
+            display: none;
+        }
+
+        .verb-container {
+            margin: 2rem 0;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            height: 3rem;
+        }
+
+        .footer-link {
+            height: auto;
+            min-height: var(--footer-height);
+            display: inline-flex;
+            align-items: center;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-family: "Courier New", monospace;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+            padding: 0.5rem 1rem;
+            white-space: normal;
+            text-align: center;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+        }
+
+        .admin-button {
+            position: fixed;
+            bottom: calc(var(--footer-height) + 20px);
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .admin-button img {
+            height: 20px;
+            width: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+
+        .verb {
+            animation: fadeInOut 4s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="client-layout" data-client-component="landing-layout" role="application">
+        <header class="client-header" role="banner">
+            <img src="/shared/platform/images/platform-logo-horizontal-white.svg" alt="Recursive Learning" class="logo">
+            <div class="header-actions">
+                <span class="version-display" aria-live="polite">v1.0.0 (04.15.2024)</span>
+                <a href="/platform/orb" class="icon-button tooltip" data-tooltip="Developer Hub">
+                    <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon">
+                </a>
+                <div class="nav-item with-dropdown">
+                    <button class="icon-button tooltip" data-tooltip="Account">
+                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon">
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/platform/auth/logout" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="client-content" role="main">
+            <div class="loading-state" aria-hidden="true">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="error-state" hidden aria-hidden="true">
+                <p>An error occurred. Please try again.</p>
+                <button onclick="window.location.reload()">Reload</button>
+            </div>
+            <div class="content-state">
+                <div class="verb-container" aria-live="polite">
+                    <span class="verb">Teaching...</span>
+                </div>
+            </div>
+            <a href="/admin" class="admin-button" role="button">
+                <img src="/shared/platform/images/platform-admin-icon-white.svg" alt="Admin">
+                Admin Portal
+            </a>
+        </main>
+
+        <footer class="client-footer" role="contentinfo">
+            <a href="/clients/rlp/curious/curious.html" class="footer-link" role="button">
+                🧬 Launching in 2026, Recursive Learning is a new platform built on human wisdom.... curious? join our list -->
+            </a>
+        </footer>
+    </div>
+
+    <!-- Required platform scripts -->
+    <script type="module" src="/shared/platform/js/platform-component-loader.js"></script>
+    <script type="module" src="/shared/platform/js/platform-auth.js"></script>
+    <script type="module" src="/shared/platform/js/platform-url-resolver.js"></script>
+
+    <script>
+        // Component initialization and error handling
+        class LandingLayout {
+            constructor() {
+                console.log('[Platform] Landing page constructor initialized');
+                console.log('[Platform] Current URL:', window.location.href);
+                console.log('[Platform] Build version: v1.0.0 (04.15.2024)');
+                
+                this.verbs = ["Listening...", "Reflecting...", "Teaching...", "Growing...", "Evolving..."];
+                this.currentIndex = 0;
+                this.verbElement = document.querySelector('.verb');
+                this.loadingState = document.querySelector('.loading-state');
+                this.errorState = document.querySelector('.error-state');
+                this.contentState = document.querySelector('.content-state');
+                
+                console.log('[Platform] DOM elements initialized:', {
+                    verbElement: !!this.verbElement,
+                    loadingState: !!this.loadingState,
+                    errorState: !!this.errorState,
+                    contentState: !!this.contentState
+                });
+                
+                this.init();
+            }
+
+            init() {
+                try {
+                    console.log('[Platform] Starting initialization sequence');
+                    this.startVerbAnimation();
+                    this.setupErrorHandling();
+                    this.showContent();
+                    console.log('[Platform] Landing page fully initialized');
+                    console.log('[Platform] Active components:', {
+                        animation: 'running',
+                        errorHandling: 'active',
+                        contentState: 'visible'
+                    });
+                } catch (error) {
+                    console.error('[Platform] Landing layout initialization failed:', error);
+                    this.showError();
+                }
+            }
+
+            startVerbAnimation() {
+                console.log('[Platform] Starting verb animation with words:', this.verbs);
+                setInterval(() => {
+                    this.currentIndex = (this.currentIndex + 1) % this.verbs.length;
+                    this.verbElement.textContent = this.verbs[this.currentIndex];
+                    console.log('[Platform] Verb updated to:', this.verbs[this.currentIndex]);
+                }, 4000);
+            }
+
+            setupErrorHandling() {
+                console.log('[Platform] Setting up error handlers');
+                window.addEventListener('error', (event) => {
+                    console.error('[Platform] Global error caught:', event.error);
+                    this.showError();
+                });
+                window.addEventListener('unhandledrejection', (event) => {
+                    console.error('[Platform] Unhandled promise rejection:', event.reason);
+                    this.showError();
+                });
+            }
+
+            showLoading() {
+                console.log('[Platform] Showing loading state');
+                this.loadingState.setAttribute('aria-hidden', 'false');
+                this.errorState.setAttribute('aria-hidden', 'true');
+                this.contentState.setAttribute('aria-hidden', 'true');
+                this.loadingState.hidden = false;
+                this.errorState.hidden = true;
+                this.contentState.hidden = true;
+            }
+
+            showError() {
+                console.error('[Platform] Showing error state');
+                this.loadingState.setAttribute('aria-hidden', 'true');
+                this.errorState.setAttribute('aria-hidden', 'false');
+                this.contentState.setAttribute('aria-hidden', 'true');
+                this.loadingState.hidden = true;
+                this.errorState.hidden = false;
+                this.contentState.hidden = true;
+            }
+
+            showContent() {
+                console.log('[Platform] Showing content state');
+                this.loadingState.setAttribute('aria-hidden', 'true');
+                this.errorState.setAttribute('aria-hidden', 'true');
+                this.contentState.setAttribute('aria-hidden', 'false');
+                this.loadingState.hidden = true;
+                this.errorState.hidden = true;
+                this.contentState.hidden = false;
+            }
+        }
+
+        // Initialize landing layout component
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Platform] DOM Content Loaded - Starting LandingLayout initialization');
+            new LandingLayout();
+        });
+    </script>
+</body>
+</html> 
