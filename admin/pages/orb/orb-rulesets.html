@@ -74,9 +74,60 @@
 
         <main class="admin-content">
             <div class="content-section active" id="dashboard">
-                <div data-admin-component="orb-status-cards"></div>
-                <div data-admin-component="orb-activity-feed"></div>
-                <div data-admin-component="orb-metrics-summary"></div>
+                <div class="orb-section-content">
+                    <h1>Human-AI Collaboration - Rulesets of Engagement</h1>
+                    
+                    <div class="collaboration-patterns">
+                        <h2>Complementary Strengths</h2>
+                        
+                        <div class="pattern-grid">
+                            <div class="human-strengths">
+                                <h3>🧠 Human Superpowers</h3>
+                                <ul>
+                                    <li><strong>Visual Operations:</strong> Quick file renaming through IDE/explorer</li>
+                                    <li><strong>Git Change Tracking:</strong> Can see file beacons in collapsed trees</li>
+                                    <li><strong>Context Awareness:</strong> Understand full repository structure</li>
+                                    <li><strong>UX Decisions:</strong> Intuitive grasp of user needs</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="ai-strengths">
+                                <h3>🤖 AI Superpowers</h3>
+                                <ul>
+                                    <li><strong>Command Precision:</strong> Accurate git commands without typos</li>
+                                    <li><strong>Documentation:</strong> Thorough change tracking</li>
+                                    <li><strong>Pattern Recognition:</strong> Consistent naming conventions</li>
+                                    <li><strong>Code Generation:</strong> Rapid implementation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="collaboration-examples">
+                            <h3>🤝 Optimal Handoffs</h3>
+                            <div class="example-card">
+                                <h4>File Operations</h4>
+                                <p><strong>Human:</strong> Visual operations (rename, move, delete files)</p>
+                                <p><strong>AI:</strong> Git commands and documentation updates</p>
+                            </div>
+                            
+                            <div class="example-card">
+                                <h4>Directory Structure</h4>
+                                <p><strong>Human:</strong> Lead restructuring decisions (can see Git beacons)</p>
+                                <p><strong>AI:</strong> Document changes and maintain consistency</p>
+                            </div>
+                            
+                            <div class="example-card">
+                                <h4>Code Changes</h4>
+                                <p><strong>Human:</strong> Review and approve changes</p>
+                                <p><strong>AI:</strong> Generate and document implementations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-admin-component="orb-status-cards"></div>
+                    <div data-admin-component="orb-activity-feed"></div>
+                    <div data-admin-component="orb-metrics-summary"></div>
+                </div>
             </div>
 
             <div class="content-section" id="frontend">
