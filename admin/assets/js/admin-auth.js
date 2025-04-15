@@ -70,7 +70,7 @@ export const ADMIN_CONFIG = {
 export class AdminAuth {
     static #VAULT_KEY = 'rl_admin_vault_access';
     static #SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-    static #VAULT_CODE = 'RecursiveLearning2025!'; // This should be moved to environment config
+    static #VAULT_CODE = 'r3curs!v3'; // Simple password as requested
 
     /**
      * Validates the provided vault password
