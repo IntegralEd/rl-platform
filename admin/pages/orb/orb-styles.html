@@ -207,6 +207,36 @@
             margin: 1rem 0;
             border-radius: 0 4px 4px 0;
         }
+
+        /* Add dropdown menu styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--admin-border);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+            min-width: 120px;
+        }
+
+        .nav-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--admin-text);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--admin-bg);
+        }
     </style>
 </head>
 <body>
@@ -214,21 +244,23 @@
         <header class="admin-header">
             <div class="header-left">
                 <a href="/admin/dashboard.html" class="header-logo">
-                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
+                    <img src="/shared/platform/images/platform-logo-horizontal-white.png" alt="Recursive Learning" width="160" height="40" />
                 </a>
-                <span class="version-display">v1.0.0 (04.15.2024)</span>
             </div>
             <nav class="header-nav">
                 <a href="/admin/dashboard.html" class="nav-item">Admin</a>
-                <div class="nav-item active">
-                    <a href="/admin/pages/orb/index.html" class="icon-button tooltip" data-tooltip="Developer Hub">
-                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
+                <div class="nav-item">
+                    <a href="/admin/pages/orb/index.html" class="icon-button tooltip active" data-tooltip="Developer Hub">
+                        <img src="/shared/platform/images/platform-dev-icon-white.png" alt="Developer Hub" class="nav-icon" width="24" height="24">
                     </a>
                 </div>
                 <div class="nav-item">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="24" height="24">
+                        <img src="/shared/platform/images/platform-account-icon-white.png" alt="Account" class="nav-icon" width="24" height="24">
                     </button>
+                    <div class="dropdown-menu">
+                        <a href="/admin/auth/logout.html" class="dropdown-item">Log Out</a>
+                    </div>
                 </div>
             </nav>
         </header>
