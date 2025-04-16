@@ -230,3 +230,96 @@ export default MeritOpenAIClient;
 4. Review the console output to verify thread creation, message sending, state updates, and error handling.
 
 This test suite helps correlate our current integration changes in openai.js with the expected behavior logged in the frontend (see console output in client-merit-instructional-flow.js). 
+Explanation of Endpoints:
+
+Lambda Endpoint:
+This is the main endpoint where your serverless functions run. It handles your core business logic. In production, your frontend calls this endpoint when it needs to perform tasks like creating a thread or processing a message.
+
+API Fallback (_dev) Endpoint:
+This endpoint is used as a backup or during development if the lambda endpoint is not set properly. It may serve as an alternative or test endpoint, but it is not meant to replace the lambda endpoint in a production environment.
+
+Redis Endpoint:
+This endpoint is designed for caching or storing session data rather than for direct business logic operations. It helps speed up your application by providing fast access to frequently used data.
+
+When to Use Each Endpoint:
+
+Use the lambda endpoint for all main operations where business logic should be executed.
+
+Use the API fallback (_dev) endpoint only if the lambda endpoint is missing or during development/testing when a full production setup is not available.
+
+Use the Redis endpoint for tasks like caching results or managing sessions to reduce the load on your primary backend services.
+
+Below is a complete code snippet that shows how you might configure and use these endpoints:
+
+js
+Copy
+// Configuration using environment variables with fallback values
+const CONFIG = {
+  // Primary backend endpoint for business logic processing
+  lambdaEndpoint: process.env.LAMBDA_ENDPOINT || 'https://lambda.example.com/api',
+
+  // Fallback development endpoint, intended only for testing
+  apiFallbackEndpoint: process.env.API_FALLBACK_ENDPOINT || 'https://api.recursivelearning.app/dev',
+
+  // Redis endpoint used for caching and session management
+  redisEndpoint: process.env.REDIS_ENDPOINT || 'redis://redis.example.com:6379'
+};
+
+// Function to decide the endpoint for API calls
+function getPrimaryEndpoint() {
+  // In production, the lambda endpoint should always be used.
+  // Fallback is available if lambdaEndpoint is not set.
+  return CONFIG.lambdaEndpoint || CONFIG.apiFallbackEndpoint;
+}
+
+// Example function for creating a thread (using the primary API endpoint)
+async function createThread(payload) {
+  const endpoint = getPrimaryEndpoint();
+  try {
+    const response = await fetch(`${endpoint}/createThread`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Thread creation error:', error);
+    throw error;
+  }
+}
+
+// Example function for caching data using Redis
+async function cacheData(key, data) {
+  const redis = require('redis');
+  const client = redis.createClient({ url: CONFIG.redisEndpoint });
+  await client.connect();
+  await client.set(key, JSON.stringify(data));
+  await client.quit();
+}
+
+// Example usage: Create a thread then optionally cache the thread ID
+async function createAndCacheThread(message) {
+  try {
+    const thread = await createThread({ message });
+    if (thread && thread.id) {
+      await cacheData('latestThread', thread.id);
+    }
+  } catch (error) {
+    console.error('Error during create and cache thread process:', error);
+  }
+}
+Bullet Summary of Changes and Recommendations:
+
+Clarification:
+Clearly define each endpoint in documentation to avoid confusion. The lambda endpoint is for business logic, the fallback is for development, and Redis is for caching.
+
+Configuration:
+Use environment variables for setting endpoints and avoid hardcoding fallback endpoints if the lambda endpoint is available.
+
+Usage:
+Always use the lambda endpoint as the primary target for operations. Reserve the fallback endpoint for testing scenarios and use Redis only for caching, not for business logic operations.
+
+This explanation and code should help communicate the roles and proper usage of these endpoints in a README or similar documentation.

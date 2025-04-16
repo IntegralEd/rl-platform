@@ -1,4 +1,4 @@
-import { AUTH_CONFIG, getAuthHeaders, isTokenValid } from './elpl-auth.js';
+import { AUTH_CONFIG, getAuthHeaders, isTokenValid } from './js/client-auth.js';
 
 // User authentication state management
 let currentUserToken = null;
