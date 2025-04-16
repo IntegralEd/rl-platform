@@ -8,12 +8,17 @@ The `_dev` suffix in endpoints is strictly forbidden in production code. It was 
 
 ### 1. Lambda Endpoint (REQUIRED)
 ```javascript
-const LAMBDA_ENDPOINT = process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app';
+const ENDPOINTS = {
+    lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
+    contextPrefix: 'merit:ela:context',
+    threadPrefix: 'merit:ela:thread'
+};
 ```
 - **Primary endpoint for ALL business logic**
 - Handles thread creation, message processing, and user management
 - Must be used in production
 - No fallbacks allowed
+- Includes standardized prefixes for context and thread management
 
 ### 2. Redis Endpoint (Caching Only)
 ```javascript
@@ -32,22 +37,43 @@ const REDIS_CONFIG = {
 
 ```javascript
 // ✅ CORRECT: Single source of truth
-const API_CONFIG = {
-    endpoint: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
-    projectId: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'
-};
-
-// ✅ CORRECT: Simple API call
-async function callAPI(action, payload) {
-    const response = await fetch(API_CONFIG.endpoint, {
-        method: 'POST',
-        headers: {
+class MeritOpenAIClient {
+    constructor() {
+        const ENDPOINTS = {
+            lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
+            contextPrefix: 'merit:ela:context',
+            threadPrefix: 'merit:ela:thread'
+        };
+        
+        this.baseUrl = ENDPOINTS.lambda;
+        this.headers = {
             'Content-Type': 'application/json',
-            'X-Project-ID': API_CONFIG.projectId
-        },
+            'X-Project-ID': this.config.project_id
+        };
+    }
+}
+
+// ✅ CORRECT: Error handling with detailed logging
+try {
+    const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: this.headers,
         body: JSON.stringify({ action, ...payload })
     });
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('[Merit Flow] Error details:', {
+            endpoint: this.baseUrl,
+            headers: this.headers,
+            error: error.message
+        });
+        throw error;
+    }
     return response.json();
+} catch (error) {
+    this.state.hasError = true;
+    this.state.errorMessage = error.message;
+    throw error;
 }
 ```
 
@@ -69,37 +95,29 @@ if (error.code === 'ERR_NAME_NOT_RESOLVED') {
 ## Environment Configuration
 
 ```bash
-# Development
-LAMBDA_ENDPOINT=https://api.recursivelearning.app
-
-# Production
+# Both Development and Production use the same endpoint
 LAMBDA_ENDPOINT=https://api.recursivelearning.app
 ```
 
-## Error Handling
-
+## Thread ID Format
 ```javascript
-// ✅ CORRECT: Proper error handling
-try {
-    const response = await callAPI('create_thread', payload);
-    return response;
-} catch (error) {
-    console.error('API Error:', {
-        endpoint: API_CONFIG.endpoint,
-        error: error.message
-    });
-    throw error;
-}
+// ✅ CORRECT: Standardized thread ID format
+const threadId = `threads:${orgId}:${userId}:${threadId}`;
 ```
 
-## Redis Usage (For Caching Only)
-
+## State Management
 ```javascript
-// ✅ CORRECT: Redis for caching
-async function cacheThreadId(threadId) {
-    const key = `${REDIS_CONFIG.prefix}:${REDIS_CONFIG.threadKey}:${threadId}`;
-    await redis.set(key, threadId, 'EX', REDIS_CONFIG.ttl);
-}
+// ✅ CORRECT: Proper state tracking
+this.state = {
+    isLoading: false,
+    hasError: false,
+    errorMessage: null,
+    lastRequest: null,
+    lastResponse: null,
+    isPreloaded: false,
+    context: null,
+    projectPaired: false
+};
 ```
 
 ## Migration Guide

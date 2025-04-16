@@ -1,14 +1,18 @@
 /**
  * @component MeritOpenAIClient
  * @description Handles OpenAI Assistant interactions for Merit chat
- * @version 1.0.19
+ * @version 1.0.21
  */
 class MeritOpenAIClient {
     constructor() {
-        // Core configuration
-        this.threadId = null;
-        this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
-        this.userId = 'default_user';
+        // OpenAI Configuration
+        const OPENAI_CONFIG = {
+            assistant: {
+                id: 'asst_QoAA395ibbyMImFJERbG2hKT',
+                project: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+                model: 'gpt-4o'
+            }
+        };
 
         // API Configuration - Single source of truth for endpoint
         const ENDPOINTS = {
@@ -17,13 +21,18 @@ class MeritOpenAIClient {
             threadPrefix: 'merit:ela:thread'
         };
         
+        // Core state
+        this.threadId = null;
+        this.userId = 'default_user';
         this.baseUrl = ENDPOINTS.lambda;
+        
+        // Project configuration
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',
-            assistant_id: this.assistantId,
-            model: 'gpt-4o',
+            assistant_id: OPENAI_CONFIG.assistant.id,
+            project_id: OPENAI_CONFIG.assistant.project,
+            model: OPENAI_CONFIG.assistant.model,
             schema_version: '04102025.B01',
-            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
             ttl: {
                 session: 3600, // 1 hour for MVP phase
                 cache: 3600,
@@ -31,11 +40,14 @@ class MeritOpenAIClient {
             }
         };
         
+        // Request headers
         this.headers = {
             'Content-Type': 'application/json',
-            'X-Project-ID': this.config.project_id
+            'X-Project-ID': OPENAI_CONFIG.assistant.project,
+            'X-Assistant-ID': OPENAI_CONFIG.assistant.id
         };
 
+        // State management
         this.state = {
             isLoading: false,
             hasError: false,
@@ -47,9 +59,11 @@ class MeritOpenAIClient {
             projectPaired: false
         };
 
-        console.log('[Merit Flow] OpenAI client initialized');
-        console.log('[Merit Flow] Using lambda endpoint:', this.baseUrl);
-        console.log('[Merit Flow] Project ID:', this.config.project_id);
+        console.log('[Merit Flow] OpenAI client initialized', {
+            assistant: OPENAI_CONFIG.assistant.id,
+            project: OPENAI_CONFIG.assistant.project,
+            endpoint: this.baseUrl
+        });
     }
 
     /**
@@ -80,7 +94,7 @@ class MeritOpenAIClient {
             }
 
             const data = await response.json();
-            this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
+            this.threadId = `${ENDPOINTS.threadPrefix}:${this.config.org_id}:${this.userId}:${data.thread_id}`;
             this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
             return this.threadId;
