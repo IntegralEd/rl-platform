@@ -3,230 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ORB: One Ruleset to Bind Them</title>
+  <title>ORB: Developer Hub | Admin</title>
+  <meta name="description" content="One Ruleset to Bind Them - Developer Documentation and Guidelines">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/shared/platform/images/platform-dev-icon-white.svg">
   
   <!-- Platform CSS -->
-  <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
+  <link rel="stylesheet" href="/shared/platform/css/variables.css">
+  <link rel="stylesheet" href="/shared/platform/css/core.css">
+  <link rel="stylesheet" href="/shared/platform/css/loading.css">
+  <link rel="stylesheet" href="/shared/platform/css/animations.css">
   
   <!-- Admin Styles -->
-  <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
-  <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+  <link rel="stylesheet" href="/admin/assets/css/admin.css">
   
   <style>
-    /* Inline styles to supplement platform styling */
     .admin-layout {
       display: grid;
-      grid-template-areas: 
-        "header header"
-        "nav main";
-      grid-template-columns: var(--nav-width, 260px) 1fr;
-      grid-template-rows: var(--header-height, 60px) 1fr;
-      min-height: 100vh;
+      grid-template-rows: var(--header-height) 1fr;
+      grid-template-columns: var(--nav-width) 1fr;
+      height: 100vh;
+      width: 100vw;
     }
+
     .admin-header {
-      grid-area: header;
-      background: var(--brand-color, #004080);
-      color: #fff;
-      padding: 0 2rem;
+      grid-column: 1 / -1;
+      grid-row: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--admin-border);
+      padding: 0 1rem;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border-color);
     }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .version-display {
-      font-size: 12px;
-      opacity: 0.8;
-      background: rgba(255,255,255,0.1);
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .header-nav {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-item {
-      position: relative;
-    }
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -12px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: #fff;
-      border-radius: 3px 3px 0 0;
-    }
-    .icon-button {
-      background: none;
-      border: none;
-      padding: 0.5rem;
-      cursor: pointer;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .icon-button img {
-      width: 24px;
-      height: 24px;
-      transition: transform 0.2s ease;
-    }
-    .icon-button:hover img {
-      transform: scale(1.1);
-    }
-    /* Tooltip styles */
-    .tooltip {
-      position: relative;
-    }
-    .tooltip:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 0.5rem;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      white-space: nowrap;
-      pointer-events: none;
-      z-index: 10;
-    }
+
     .admin-nav {
-      grid-area: nav;
-      background: white;
-      border-right: 1px solid var(--admin-border);
-      padding: 2rem;
+      grid-column: 1;
+      grid-row: 2;
+      background: var(--surface-1);
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      padding: 1rem;
     }
+
     .admin-content {
-      grid-area: main;
+      grid-column: 2;
+      grid-row: 2;
+      overflow-y: auto;
       padding: 2rem;
-      max-width: var(--content-width, 1200px);
-      margin: 0 auto;
     }
-    #wiki-summary ul {
-      list-style-type: disc;
-      padding-left: 20px;
-    }
-    .header-logo img {
-      width: 160px;
-      height: auto;
-      max-height: 40px;
-      object-fit: contain;
-    }
-    .nav-icon {
-      width: 24px;
-      height: 24px;
-      object-fit: contain;
-    }
-    
-    /* GitHub Tree Styles */
+
+    /* Tree Navigation Styles */
     .gh-tree {
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-      font-size: 14px;
+      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, monospace;
+      font-size: 0.875rem;
       line-height: 1.5;
     }
-    
+
     .gh-tree ul {
       list-style: none;
-      padding-left: 20px;
+      padding-left: 1.25rem;
       margin: 0;
     }
-    
-    .gh-tree > ul {
-      padding-left: 0;
-    }
-    
+
     .gh-tree li {
-      position: relative;
-      padding: 2px 0;
+      margin: 0.25rem 0;
     }
-    
+
     .gh-tree .folder,
     .gh-tree .file {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 8px;
+      gap: 0.5rem;
+      padding: 0.25rem 0.5rem;
       border-radius: 4px;
       cursor: pointer;
-      color: var(--admin-text);
+      color: var(--text-1);
       text-decoration: none;
     }
-    
+
     .gh-tree .folder:hover,
     .gh-tree .file:hover {
-      background: var(--admin-bg);
+      background: var(--surface-2);
     }
-    
-    .gh-tree .folder::before,
-    .gh-tree .file::before {
-      content: '';
+
+    .gh-tree .folder.active,
+    .gh-tree .file.active {
+      background: var(--primary-transparent);
+      color: var(--primary);
+    }
+
+    .gh-tree .folder::before {
+      content: "";
+      display: inline-block;
       width: 16px;
       height: 16px;
-      background-size: contain;
-      background-repeat: no-repeat;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236e7681'%3E%3Cpath d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z'/%3E%3C/svg%3E") no-repeat center;
     }
-    
-    .gh-tree .folder::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z'/%3E%3C/svg%3E");
-    }
-    
+
     .gh-tree .file::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M3.75 1.5a.25.25 0 00-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25V6H9.75A1.75 1.75 0 018 4.25V1.5H3.75zm5.75.56v2.19c0 .138.112.25.25.25h2.19L9.5 2.06zM2 1.75C2 .784 2.784 0 3.75 0h5.086c.464 0 .909.184 1.237.513l3.414 3.414c.329.328.513.773.513 1.237v8.086A1.75 1.75 0 0112.25 15h-8.5A1.75 1.75 0 012 13.25V1.75z'/%3E%3C/svg%3E");
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236e7681'%3E%3Cpath fill-rule='evenodd' d='M3.75 1.5a.25.25 0 00-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25V6H9.75A1.75 1.75 0 018 4.25V1.5H3.75zm5.75.56v2.19c0 .138.112.25.25.25h2.19L9.5 2.06zM2 1.75C2 .784 2.784 0 3.75 0h5.086c.464 0 .909.184 1.237.513l3.414 3.414c.329.328.513.773.513 1.237v8.086A1.75 1.75 0 0112.25 15h-8.5A1.75 1.75 0 012 13.25V1.75z'/%3E%3C/svg%3E") no-repeat center;
     }
-    
+
     .gh-tree .folder.open::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z M13.5 4.75v8.5a.25.25 0 01-.25.25H2.75a.25.25 0 01-.25-.25V5.5h11z'/%3E%3C/svg%3E");
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236e7681'%3E%3Cpath d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z' fill-opacity='0.4'/%3E%3C/svg%3E") no-repeat center;
     }
-    
-    .gh-tree .indent {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: -16px;
-      border-left: 1px solid var(--admin-border);
-    }
-    
+
     /* ORB Header Styles */
     .orb-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--admin-border);
+      text-align: center;
+      margin-bottom: 3rem;
     }
-    
+
     .orb-header img {
-      width: 48px;
-      height: 48px;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1rem;
     }
-    
+
     .orb-header h1 {
-      margin: 0;
-      font-size: 24px;
-      color: var(--brand-color);
+      font-size: 2.5rem;
+      margin: 0 0 0.5rem;
+      color: var(--text-1);
     }
-    
+
     .orb-header p {
-      margin: 4px 0 0;
-      color: var(--admin-text);
-      opacity: 0.8;
+      font-size: 1.25rem;
+      color: var(--text-2);
+      margin: 0;
     }
   </style>
 </head>
@@ -257,66 +166,35 @@
       <div class="gh-tree">
         <ul>
           <li>
-            <div class="folder open">
-              <span>frontend/</span>
-            </div>
+            <span class="folder open">admin/</span>
             <ul>
+              <li><a href="/admin/index.html" class="file">index.html</a></li>
+              <li><a href="/admin/dashboard.html" class="file">dashboard.html</a></li>
               <li>
-                <div class="folder open">
-                  <span>admin/</span>
-                </div>
+                <span class="folder open">pages/</span>
                 <ul>
                   <li>
-                    <div class="folder">
-                      <span>assets/</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="folder open">
-                      <span>pages/</span>
-                    </div>
+                    <span class="folder open">orb/</span>
                     <ul>
-                      <li>
-                        <div class="folder open">
-                          <span>orb/</span>
-                        </div>
-                        <ul>
-                          <li>
-                            <a href="index.html" class="file">
-                              <span>index.html</span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="orb-layouts.html" class="file">
-                              <span>orb-layouts.html</span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="orb-styles.html" class="file">
-                              <span>orb-styles.html</span>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="orb-rulesets.html" class="file">
-                              <span>orb-rulesets.html</span>
-                            </a>
-                          </li>
-                        </ul>
-                      </li>
+                      <li><a href="/admin/pages/orb/index.html" class="file active">index.html</a></li>
+                      <li><a href="/admin/pages/orb/orb-layouts.html" class="file">orb-layouts.html</a></li>
+                      <li><a href="/admin/pages/orb/orb-styles.html" class="file">orb-styles.html</a></li>
+                      <li><a href="/admin/pages/orb/orb-rulesets.html" class="file">orb-rulesets.html</a></li>
                     </ul>
                   </li>
                 </ul>
               </li>
-              <li>
-                <div class="folder">
-                  <span>clients/</span>
-                </div>
-              </li>
-              <li>
-                <div class="folder">
-                  <span>shared/</span>
-                </div>
-              </li>
+              <li><span class="folder">components/</span></li>
+              <li><span class="folder">assets/</span></li>
+            </ul>
+          </li>
+          <li>
+            <span class="folder">shared/</span>
+            <ul>
+              <li><span class="folder">docs/</span></li>
+              <li><span class="folder">platform/</span></li>
+              <li><span class="folder">page_ingredients/</span></li>
+              <li><span class="folder">templates/</span></li>
             </ul>
           </li>
         </ul>
@@ -324,11 +202,9 @@
     </nav>
     <main class="admin-content">
       <div class="orb-header">
-        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="ORB Icon">
-        <div>
-          <h1>ORB: One Ruleset to Bind Them</h1>
-          <p>Developer and Designer Collab Hub</p>
-        </div>
+        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="ORB Logo">
+        <h1>ORB: One Ruleset to Bind Them</h1>
+        <p>Developer and Designer Collab Hub</p>
       </div>
       <section id="wiki-summary">
         <h2>Subpage Summaries</h2>
@@ -342,21 +218,24 @@
     </main>
   </div>
 
-  <script type="module">
-    // Add folder toggle functionality
-    document.addEventListener('DOMContentLoaded', () => {
-      const folders = document.querySelectorAll('.gh-tree .folder');
-      folders.forEach(folder => {
-        folder.addEventListener('click', (e) => {
-          e.preventDefault();
-          const li = folder.closest('li');
-          const ul = li.querySelector('ul');
-          if (ul) {
-            folder.classList.toggle('open');
-            ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
-          }
-        });
+  <script>
+    // Tree Navigation Functionality
+    document.querySelectorAll('.gh-tree .folder').forEach(folder => {
+      folder.addEventListener('click', () => {
+        folder.classList.toggle('open');
+        const ul = folder.nextElementSibling;
+        if (ul && ul.tagName === 'UL') {
+          ul.style.display = folder.classList.contains('open') ? 'block' : 'none';
+        }
       });
+    });
+
+    // Initialize open/closed states
+    document.querySelectorAll('.gh-tree .folder').forEach(folder => {
+      const ul = folder.nextElementSibling;
+      if (ul && ul.tagName === 'UL') {
+        ul.style.display = folder.classList.contains('open') ? 'block' : 'none';
+      }
     });
   </script>
 </body>
