@@ -255,7 +255,7 @@
     </div>
 
     <script type="module">
-        import { AdminAuth } from '/admin/assets/js/admin-auth.js';
+        import { AdminAuth, loginAdmin } from '/admin/assets/js/admin-auth.js';
 
         // Redirect if already authenticated
         AdminAuth.redirectIfAuthed();
@@ -269,6 +269,7 @@
 
         // Initialize with chest closed
         loginContainer.style.display = 'none';
+        console.log('[Admin Vault] v1.0.17 - Login screen initialized');
 
         // Create floating bubbles
         function createBubbles() {
@@ -285,11 +286,13 @@
 
         // Handle chest click
         treasureChest.addEventListener('click', () => {
+            console.log('[Admin Vault] Treasure chest activated');
             treasureChest.classList.add('opening');
             setTimeout(() => {
                 loginContainer.style.display = 'block';
                 setTimeout(() => {
                     loginContainer.classList.add('visible');
+                    emailInput.focus();
                 }, 100);
             }, 500);
         });
@@ -297,16 +300,24 @@
         // Form submission
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = emailInput.value;
+            const email = emailInput.value.toLowerCase().trim();
             const password = passwordInput.value;
+
+            console.log('[Admin Vault] Login attempt initiated for:', email);
+
+            // Clear any existing auth first
+            AdminAuth.clearAuth();
 
             // Validate email domain
             if (!email.endsWith('@integral-ed.com')) {
+                console.warn('[Admin Vault] Invalid email domain:', email);
                 showError('Please use your @integral-ed.com email address');
                 return;
             }
 
-            if (AdminAuth.validatePassword(password)) {
+            // Attempt login
+            const loginSuccess = await loginAdmin(email, password);
+            if (loginSuccess) {
                 console.log('[Admin Vault] Access granted for:', email);
                 const background = document.querySelector('.admin-background');
                 
@@ -323,12 +334,14 @@
                     window.location.href = '/admin/dashboard.html';
                 }, 1500);
             } else {
+                console.warn('[Admin Vault] Access denied for:', email);
                 showError('Invalid credentials');
                 passwordInput.value = '';
             }
         });
 
         function showError(message) {
+            console.warn('[Admin Vault] Error:', message);
             errorMessage.textContent = message;
             errorMessage.classList.add('visible');
             setTimeout(() => {
@@ -348,9 +361,8 @@
         // Initialize effects
         createBubbles();
         
-        // Console logging
-        console.log('[Admin Vault] v1.0.17 - Initialized');
-        console.log('[Admin Vault] Login screen active with vault animations');
+        console.log('[Admin Vault] v1.0.17 - Login screen ready');
+        console.log('[Admin Vault] Email validation: @integral-ed.com domain only');
     </script>
 </body>
 </html> 

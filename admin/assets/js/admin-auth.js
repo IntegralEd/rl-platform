@@ -1,33 +1,38 @@
 // Development version - Authentication bypass
-const DEV_MODE = true; // Toggle this for production
+const DEV_MODE = false; // Disabled for production
 
 // Admin authentication state
-let adminToken = 'dev_token';
-let adminData = {
-    id: 'dev_admin',
-    name: 'Development Admin',
-    role: 'super_admin'
-};
-let adminPermissions = ['*']; // All permissions in dev mode
+let adminToken = null;
+let adminData = null;
+let adminPermissions = [];
 
 // Initialize admin authentication
 export async function initAdminAuth() {
+    console.log('[Admin Auth] Initializing authentication system');
     if (DEV_MODE) {
-        console.warn('Running in development mode - authentication is bypassed');
-        return true;
+        console.warn('[Admin Auth] Development mode is disabled');
+        return false;
     }
-    // Production authentication logic will go here
     return false;
-
 }
 
-// Admin login - Development bypass
-export async function loginAdmin(credentials) {
-    if (DEV_MODE) {
-        console.warn('Development mode - auto-login enabled');
+// Admin login validation
+export async function loginAdmin(email, password) {
+    console.log('[Admin Auth] Login attempt:', email);
+    
+    // Validate email domain
+    if (!email.endsWith('@integral-ed.com')) {
+        console.warn('[Admin Auth] Invalid email domain:', email);
+        return false;
+    }
+
+    // Validate credentials
+    if (AdminAuth.validatePassword(password)) {
+        console.log('[Admin Auth] Login successful for:', email);
         return true;
     }
-    // Production login logic will go here
+
+    console.warn('[Admin Auth] Login failed for:', email);
     return false;
 }
 
@@ -69,70 +74,107 @@ export const ADMIN_CONFIG = {
  * Handles admin vault access and session management
  */
 export class AdminAuth {
-    static #VAULT_KEY = 'rl_admin_vault_access';
+    static #VAULT_KEY = 'admin_vault_key';
     static #SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
-    static #VAULT_CODE = 'r3curs!v3'; // Simple password as requested
 
     /**
-     * Validates the provided vault password
-     * @param {string} password - The password to validate
-     * @returns {boolean} - Whether the password is valid
+     * Validate admin password
      */
     static validatePassword(password) {
-        return password === this.#VAULT_CODE;
+        // Temporary password validation for @integral-ed.com emails
+        return password === 'temp_vault_2024!';
     }
 
     /**
-     * Sets authentication state and timestamp
+     * Set authentication state
      */
     static setAuth() {
-        const authState = {
+        const email = sessionStorage.getItem('admin_email');
+        console.log('[Admin Auth] Setting auth state for:', email);
+        
+        const authData = {
+            token: 'auth_' + Date.now(),
             timestamp: Date.now(),
-            isAuthenticated: true
+            email: email
         };
-        localStorage.setItem(this.#VAULT_KEY, JSON.stringify(authState));
+        
+        localStorage.setItem(this.#VAULT_KEY, JSON.stringify(authData));
+        adminToken = authData.token;
+        adminData = {
+            email: email,
+            role: 'admin'
+        };
+        adminPermissions = ['admin'];
+        
+        console.log('[Admin Auth] Auth state set successfully');
     }
 
     /**
-     * Checks if user is currently authenticated
-     * @returns {boolean} - Authentication status
+     * Check if user is authenticated
      */
     static isAuthenticated() {
-        const authState = localStorage.getItem(this.#VAULT_KEY);
-        if (!authState) return false;
-
         try {
-            const { timestamp, isAuthenticated } = JSON.parse(authState);
-            const isExpired = Date.now() - timestamp > this.#SESSION_DURATION;
-            return isAuthenticated && !isExpired;
-        } catch (e) {
+            const authData = JSON.parse(localStorage.getItem(this.#VAULT_KEY));
+            if (!authData) {
+                console.log('[Admin Auth] No auth data found');
+                return false;
+            }
+
+            // Check session expiration
+            if (Date.now() - authData.timestamp > this.#SESSION_DURATION) {
+                console.log('[Admin Auth] Session expired');
+                this.clearAuth();
+                return false;
+            }
+
+            // Validate stored email domain
+            if (!authData.email?.endsWith('@integral-ed.com')) {
+                console.warn('[Admin Auth] Invalid email in stored auth:', authData.email);
+                this.clearAuth();
+                return false;
+            }
+
+            console.log('[Admin Auth] Valid session for:', authData.email);
+            return true;
+        } catch (error) {
+            console.error('[Admin Auth] Error checking auth state:', error);
             return false;
         }
     }
 
     /**
-     * Redirects to dashboard if authenticated
+     * Redirect if authenticated
      */
     static redirectIfAuthed() {
-        if (this.isAuthenticated() && window.location.pathname !== '/admin/dashboard.html') {
+        if (this.isAuthenticated()) {
+            const authData = JSON.parse(localStorage.getItem(this.#VAULT_KEY));
+            console.log('[Admin Auth] Redirecting authenticated user:', authData.email);
             window.location.href = '/admin/dashboard.html';
         }
     }
 
     /**
-     * Redirects to login if not authenticated
+     * Clears all authentication state
      */
-    static requireAuth() {
-        if (!this.isAuthenticated() && window.location.pathname !== '/admin/index.html') {
-            window.location.href = '/admin/index.html';
-        }
+    static clearAuth() {
+        const email = sessionStorage.getItem('admin_email');
+        console.log('[Admin Auth] Clearing auth state for:', email);
+        
+        localStorage.removeItem(this.#VAULT_KEY);
+        sessionStorage.removeItem('admin_email');
+        adminToken = null;
+        adminData = null;
+        adminPermissions = [];
     }
 
     /**
-     * Clears authentication state
+     * Logs out user and clears all auth state
      */
     static logout() {
-        localStorage.removeItem(this.#VAULT_KEY);
+        const email = sessionStorage.getItem('admin_email');
+        console.log('[Admin Auth] Logging out user:', email);
+        
+        this.clearAuth();
         window.location.href = '/admin/index.html';
     }
 }
