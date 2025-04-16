@@ -18,7 +18,8 @@ class MeritOpenAIClient {
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',
             assistant_id: this.assistantId,
-            schema_version: '04102025.B01'
+            schema_version: '04102025.B01',
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'
         };
         
         this.headers = {
@@ -35,7 +36,9 @@ class MeritOpenAIClient {
 
         console.log('[Merit Flow] OpenAI client initialized');
         console.log('[Merit Flow] Using development endpoint:', this.baseUrl);
+        console.log('[Merit Flow] Assistant ID:', this.assistantId);
         console.log('[Merit Flow] Project ID:', this.config.project_id);
+        console.log('[Merit Flow] Organization:', this.config.org_id);
     }
 
     /**
