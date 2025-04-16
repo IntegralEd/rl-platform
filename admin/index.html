@@ -40,7 +40,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('/shared/platform/images/platform-vault-background-water.png');
+            background-image: url('/shared/platform/images/platform-vault-background.png');
             background-size: cover;
             background-position: center;
             transition: all var(--transition-portal);
@@ -59,6 +59,7 @@
             cursor: pointer;
             transition: transform 0.3s ease;
             z-index: 2;
+            filter: drop-shadow(var(--chest-glow));
         }
 
         .treasure-chest img {
@@ -70,6 +71,7 @@
 
         .treasure-chest:hover {
             transform: translateX(-50%) scale(1.1);
+            filter: drop-shadow(0 0 25px rgba(255, 164, 9, 0.6));
         }
 
         .treasure-chest.opening {
@@ -94,6 +96,7 @@
             backdrop-filter: blur(5px);
             border-radius: 8px;
             padding: 20px;
+            z-index: 3;
         }
 
         .scroll-container.visible {
@@ -104,7 +107,7 @@
         .scroll-background {
             width: 100%;
             height: 200px;
-            background-image: url('/shared/platform/images/noun-scroll-7757299-2C3E50.svg');
+            background-image: url('/shared/platform/images/platform-vault-scroll-input.svg');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -133,6 +136,7 @@
             transition: all 0.3s ease;
             font-size: 16px;
             letter-spacing: 0.5px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
 
         .vault-input:focus {
@@ -144,19 +148,6 @@
 
         .vault-input::placeholder {
             color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* Version Display */
-        .version-display {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 8px;
-            border-radius: 4px;
-            z-index: 10;
         }
 
         /* Error Message */
@@ -175,13 +166,6 @@
             transform: translateY(0);
         }
 
-        /* Logo */
-        .platform-logo {
-            width: 200px;
-            height: auto;
-            margin-bottom: 2rem;
-        }
-
         /* Enter Button */
         .vault-button {
             background: var(--vault-accent);
@@ -197,12 +181,18 @@
             letter-spacing: 1.5px;
             font-size: 16px;
             width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .vault-button:hover {
             background: var(--vault-primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .vault-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         /* Floating Bubbles */
@@ -212,6 +202,7 @@
             border-radius: 50%;
             pointer-events: none;
             animation: float 8s infinite;
+            backdrop-filter: blur(2px);
         }
 
         @keyframes float {
@@ -223,7 +214,6 @@
 </head>
 <body>
     <div class="admin-background"></div>
-    <span class="version-display">v1.0.17</span>
 
     <div class="treasure-chest" id="treasureChest">
         <img src="/shared/platform/images/platform-vault-chest-icon.svg" 
@@ -269,7 +259,6 @@
 
         // Initialize with chest closed
         loginContainer.style.display = 'none';
-        console.log('[Admin Vault] v1.0.17 - Login screen initialized');
 
         // Create floating bubbles
         function createBubbles() {
@@ -286,7 +275,6 @@
 
         // Handle chest click
         treasureChest.addEventListener('click', () => {
-            console.log('[Admin Vault] Treasure chest activated');
             treasureChest.classList.add('opening');
             setTimeout(() => {
                 loginContainer.style.display = 'block';
@@ -303,14 +291,11 @@
             const email = emailInput.value.toLowerCase().trim();
             const password = passwordInput.value;
 
-            console.log('[Admin Vault] Login attempt initiated for:', email);
-
             // Clear any existing auth first
             AdminAuth.clearAuth();
 
             // Validate email domain
             if (!email.endsWith('@integral-ed.com')) {
-                console.warn('[Admin Vault] Invalid email domain:', email);
                 showError('Please use your @integral-ed.com email address');
                 return;
             }
@@ -318,7 +303,6 @@
             // Attempt login
             const loginSuccess = await loginAdmin(email, password);
             if (loginSuccess) {
-                console.log('[Admin Vault] Access granted for:', email);
                 const background = document.querySelector('.admin-background');
                 
                 // Start portal sequence
@@ -334,14 +318,12 @@
                     window.location.href = '/admin/dashboard.html';
                 }, 1500);
             } else {
-                console.warn('[Admin Vault] Access denied for:', email);
                 showError('Invalid credentials');
                 passwordInput.value = '';
             }
         });
 
         function showError(message) {
-            console.warn('[Admin Vault] Error:', message);
             errorMessage.textContent = message;
             errorMessage.classList.add('visible');
             setTimeout(() => {
@@ -360,9 +342,6 @@
 
         // Initialize effects
         createBubbles();
-        
-        console.log('[Admin Vault] v1.0.17 - Login screen ready');
-        console.log('[Admin Vault] Email validation: @integral-ed.com domain only');
     </script>
 </body>
 </html> 
