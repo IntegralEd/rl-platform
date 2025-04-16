@@ -142,6 +142,57 @@ export class MeritInstructionalFlow {
         this.#updateActionState();
     }
 
+    async #handleNavigation(section) {
+        if (!this.#config.sections.includes(section)) {
+            console.error('[Merit Flow] Invalid section:', section);
+            return;
+        }
+
+        // If moving to chat, create user session first
+        if (section === 'chat' && !this.#state.contextLoaded) {
+            try {
+                const email = document.querySelector('#header-span')?.dataset?.userEmail || 'default@integral-ed.com';
+                const context = {
+                    gradeLevel: this.#state.gradeLevel,
+                    curriculum: this.#state.curriculum
+                };
+                
+                // Create Redis user session
+                const userData = await this.#openAIClient.createUserSession(email, context);
+                console.log('[Merit Flow] User session created:', userData);
+                
+                this.#state.contextLoaded = true;
+            } catch (error) {
+                console.error('[Merit Flow] Failed to create user session:', error);
+                this.#showError('Failed to initialize chat. Please try again.');
+                return;
+            }
+        }
+
+        // Update active section
+        this.#state.currentSection = section;
+        this.#elements.sections?.forEach(s => {
+            s.classList.toggle('active', s.id === section);
+        });
+
+        // Update navigation
+        this.#elements.navLinks?.forEach(link => {
+            link.classList.toggle('active', link.dataset.section === section);
+        });
+
+        // Update footer visibility and content
+        if (section === 'chat') {
+            this.#elements.playbar?.setAttribute('hidden', '');
+            this.#elements.chatbar?.removeAttribute('hidden');
+            this.#elements.chatInput?.focus();
+        } else {
+            this.#elements.chatbar?.setAttribute('hidden', '');
+            this.#elements.playbar?.removeAttribute('hidden');
+        }
+
+        this.#logState(`Navigated to ${section}`);
+    }
+
     async #sendMessage() {
         const content = this.#elements.chatInput?.value.trim();
         if (!content || !this.#state.chatReady) return;
@@ -165,6 +216,14 @@ export class MeritInstructionalFlow {
             // Send to API
             const response = await this.#openAIClient.sendMessage(content);
             
+            // If this created a new thread, update user record
+            if (response.thread_id && !this.#openAIClient.threadId) {
+                const email = document.querySelector('#header-span')?.dataset?.userEmail;
+                if (email) {
+                    await this.#openAIClient.updateUserThread(email, response.thread_id);
+                }
+            }
+
             // Show assistant response
             this.#hideLoading();
             this.#addMessage('assistant', response.content);
@@ -214,44 +273,6 @@ export class MeritInstructionalFlow {
         errorDiv.textContent = message;
         this.#elements.chatWindow?.appendChild(errorDiv);
         errorDiv.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    #handleNavigation(section) {
-        if (!this.#config.sections.includes(section)) {
-            console.error('[Merit Flow] Invalid section:', section);
-            return;
-        }
-
-        // Update state
-        this.#state.currentSection = section;
-        
-        // Update sections
-        this.#elements.sections?.forEach(el => {
-            const isActive = el.dataset.section === section;
-            el.hidden = !isActive;
-            el.classList.toggle('active', isActive);
-        });
-
-        // Update navigation
-        this.#elements.navLinks?.forEach(link => {
-            const isActive = link.dataset.section === section;
-            link.classList.toggle('active', isActive);
-            link.setAttribute('aria-current', isActive ? 'page' : 'false');
-        });
-
-        // Update footer
-        if (this.#elements.playbar) {
-            this.#elements.playbar.hidden = section !== 'welcome';
-        }
-        if (this.#elements.chatbar) {
-            this.#elements.chatbar.hidden = section !== 'chat';
-        }
-
-        // Update URL without reload
-        history.pushState({}, '', `#${section}`);
-        
-        this.#updateActionState();
-        this.#logState(`Navigated to ${section}`);
     }
 
     #updateActionState() {

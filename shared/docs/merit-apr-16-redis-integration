@@ -1,0 +1,232 @@
+# APr 16 Frontend Merit Integration Test Suite
+
+This package contains end-to-end (e2e) test scripts for the Merit frontend integration. It was designed to validate the updated OpenAI client configuration (in client-merit-openai.js) alongside the instructional flow (client-merit-instructional-flow.js).
+
+## Overview
+
+The tests verify:
+- The integration of the OpenAI client with proper fallback and error handling when DNS issues occur.
+- That the instructional flow logs and state updates (e.g. navigation, form validation, message processing) match expected behavior.
+- Consistency with our staged tests (adapted from our e2e suite) and reference in the [Merit repository](https://github.com/IntegralEd/rl-platform/tree/main/clients/elpl/merit).
+
+--compare your frontend @merit- openai and instructional logic js files here..
+/Users/Shared/Repositories/rl-platform/clients/elpl/merit
+--
+
+/*
+ * @component MeritOpenAIClient
+ * @description Handles OpenAI Assistant interactions for Merit chat
+ * @version 1.0.18
+ */
+
+class MeritOpenAIClient {
+  constructor() {
+    // Core configuration
+    this.threadId = null;
+    this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
+    // TODO: Replace 'default_user' with the actual user ID from IE_ALL_Users once available.
+    this.userId = 'default_user';
+
+    // API Configuration
+    const ENDPOINTS = {
+      // Updated to use DEV endpoint as production endpoint until DNS for PROD is fixed
+      PROD: 'https://api.recursivelearning.app/dev',
+      DEV: 'https://api.recursivelearning.app/dev',
+      contextPrefix: 'merit:ela:context',
+      threadPrefix: 'merit:ela:thread'
+    };
+    this.baseUrl = ENDPOINTS.PROD;
+    this.fallbackUrl = ENDPOINTS.PROD;
+    this.retryAttempts = 3;
+    this.currentAttempt = 0;
+    this.config = {
+      org_id: 'recdg5Hlm3VVaBA2u',
+      assistant_id: this.assistantId,
+      model: 'gpt-4o',
+      schema_version: '04102025.B01',
+      project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+      ttl: {
+        session: 86400,
+        cache: 3600,
+        temp: 900
+      }
+    };
+    this.headers = {
+      'Content-Type': 'application/json',
+      'X-Project-ID': this.config.project_id
+    };
+
+    this.state = {
+      isLoading: false,
+      hasError: false,
+      errorMessage: null,
+      lastRequest: null,
+      lastResponse: null,
+      isPreloaded: false,
+      context: null,
+      projectPaired: false
+    };
+
+    this.contextFields = {
+      intake: {
+        grade_level: null,
+        curriculum: 'ela',
+        user_context: null
+      },
+      system: {
+        schema_version: this.config.schema_version,
+        thread_id: null
+      }
+    };
+    this.errors = {
+      validation: [],
+      cache: [],
+      schema: []
+    };
+
+    console.log('[Merit Flow] OpenAI client initialized');
+    console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
+    console.log('[Merit Flow] Project ID:', this.config.project_id);
+  }
+
+  async createThread() {
+    try {
+      console.log(`[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})`);
+      console.log('[Merit Flow] Using endpoint:', this.baseUrl);
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify({
+          action: 'create_thread',
+          project_id: this.config.project_id,
+          ...this.config
+        })
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.statusCode === 403) {
+          throw new Error('OpenAI project pairing required');
+        }
+        throw new Error(error.error || 'Thread creation failed');
+      }
+      const data = await response.json();
+      this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
+      this.state.projectPaired = true;
+      console.log('[Merit Flow] Thread created:', this.threadId);
+      return this.threadId;
+    } catch (error) {
+      console.error('[Merit Flow] Thread creation error:', error);
+      if (error.message.includes('ERR_NAME_NOT_RESOLVED') && this.currentAttempt < this.retryAttempts) {
+        this.currentAttempt++;
+        console.log('[Merit Flow] DNS resolution failed, trying fallback endpoint');
+        this.baseUrl = this.fallbackUrl;
+        return this.createThread();
+      }
+      console.error('[Merit Flow] Error details:', {
+        endpoint: this.baseUrl,
+        attempt: this.currentAttempt,
+        headers: this.headers,
+        error: error.message
+      });
+      this.state.hasError = true;
+      this.state.errorMessage = error.message;
+      throw error;
+    }
+  }
+
+  async preloadContext(context) {
+    try {
+      console.log('[Merit Flow] Preloading context');
+      const preloadMessage = `Hi, I'm your guide. I'll be helping with ${context.curriculum.toUpperCase()} for ${context.gradeLevel}.`;
+      await this.sendMessage(preloadMessage, { visible: false });
+      this.state.isPreloaded = true;
+      this.state.context = context;
+      console.log('[Merit Flow] Context preloaded:', context);
+    } catch (error) {
+      console.error('[Merit Flow] Context preload error:', error);
+      this.state.hasError = true;
+      this.state.errorMessage = error.message;
+      throw error;
+    }
+  }
+
+  async sendMessage(message, options = {}) {
+    console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
+    if (!this.state.projectPaired || !this.threadId) {
+      console.log('[Merit Flow] No thread found, creating new thread...');
+      await this.createThread();
+    }
+    if (!this.state.projectPaired) {
+      throw new Error('OpenAI project must be paired before sending messages');
+    }
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify({
+          message,
+          thread_id: this.threadId || null,
+          user_id: this.userId,
+          project_id: this.config.project_id,
+          ...this.config,
+          ...options
+        })
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.statusCode === 403) {
+          this.state.projectPaired = false;
+          throw new Error('OpenAI project pairing lost');
+        }
+        throw new Error(error.error || 'Message send failed');
+      }
+      const data = await response.json();
+      if (!this.threadId && data.thread_id) {
+        this.threadId = data.thread_id;
+        console.log('[Merit Flow] New thread created:', this.threadId);
+      }
+      console.log('[Merit Flow] Message sent successfully');
+      return data;
+    } catch (error) {
+      console.error('[Merit Flow] Message sending error:', error);
+      this.state.hasError = true;
+      this.state.errorMessage = error.message;
+      throw error;
+    }
+  }
+
+  getState() {
+    return { ...this.state };
+  }
+
+  destroy() {
+    this.threadId = null;
+    this.state = {
+      isLoading: false,
+      hasError: false,
+      errorMessage: null,
+      lastRequest: null,
+      lastResponse: null,
+      isPreloaded: false,
+      context: null,
+      projectPaired: false
+    };
+    console.log('[Merit Flow] Client destroyed');
+  }
+}
+
+export default MeritOpenAIClient; 
+
+## Running Tests
+
+1. Ensure Node.js is installed.
+2. Open a terminal and navigate to this directory.
+3. Run the test suite by executing:
+
+   ```sh
+   sh run-e2e.sh
+   ```
+
+4. Review the console output to verify thread creation, message sending, state updates, and error handling.
+
+This test suite helps correlate our current integration changes in openai.js with the expected behavior logged in the frontend (see console output in client-merit-instructional-flow.js). 
