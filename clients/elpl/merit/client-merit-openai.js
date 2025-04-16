@@ -13,8 +13,7 @@ class MeritOpenAIClient {
 
     // API Configuration
     const ENDPOINTS = {
-      PROD: 'https://api.recursivelearning.app/dev',
-      DEV: 'https://api.recursivelearning.app/dev',
+      lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
       REDIS: 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
@@ -34,10 +33,7 @@ class MeritOpenAIClient {
       }
     };
 
-    this.baseUrl = ENDPOINTS.PROD;
-    this.fallbackUrl = ENDPOINTS.PROD;
-    this.retryAttempts = 3;
-    this.currentAttempt = 0;
+    this.baseUrl = ENDPOINTS.lambda;
     this.config = {
       org_id: 'recdg5Hlm3VVaBA2u',
       assistant_id: this.assistantId,
@@ -145,7 +141,7 @@ class MeritOpenAIClient {
         return this.threadId;
       }
 
-      console.log(`[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})`);
+      console.log('[Merit Flow] Creating new thread');
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: this.headers,
@@ -158,6 +154,11 @@ class MeritOpenAIClient {
 
       if (!response.ok) {
         const error = await response.json();
+        console.error('[Merit Flow] Error details:', {
+          endpoint: this.baseUrl,
+          headers: this.headers,
+          error: error.message
+        });
         if (error.statusCode === 403) {
           throw new Error('OpenAI project pairing required');
         }
@@ -179,12 +180,6 @@ class MeritOpenAIClient {
       return this.threadId;
     } catch (error) {
       console.error('[Merit Flow] Thread creation error:', error);
-      if (error.message.includes('ERR_NAME_NOT_RESOLVED') && this.currentAttempt < this.retryAttempts) {
-        this.currentAttempt++;
-        console.log('[Merit Flow] DNS resolution failed, trying fallback endpoint');
-        this.baseUrl = this.fallbackUrl;
-        return this.createThread();
-      }
       this.state.hasError = true;
       this.state.errorMessage = error.message;
       throw error;
