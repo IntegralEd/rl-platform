@@ -299,6 +299,36 @@
             max-height: 200px;
             overflow: auto;
         }
+
+        /* Add dropdown menu styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--admin-border);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+            min-width: 120px;
+        }
+
+        .nav-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--admin-text);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--admin-bg);
+        }
     </style>
 </head>
 <body>
@@ -306,20 +336,19 @@
         <header class="admin-header">
             <div class="header-left">
                 <a href="/admin/dashboard.html" class="header-logo">
-                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
+                    <img src="/shared/platform/images/platform-logo-horizontal-white.png" alt="Recursive Learning" width="160" height="40" />
                 </a>
-                <span class="version-display">v1.0.0 (04.15.2024)</span>
             </div>
             <nav class="header-nav">
                 <a href="/admin/dashboard.html" class="nav-item active">Admin</a>
                 <div class="nav-item">
-                    <a href="/admin/pages/orb/orb-layouts.html" class="icon-button tooltip" data-tooltip="Developer Hub">
-                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
+                    <a href="/admin/pages/orb/index.html" class="icon-button tooltip" data-tooltip="Developer Hub">
+                        <img src="/shared/platform/images/platform-dev-icon-white.png" alt="Developer Hub" class="nav-icon" width="24" height="24">
                     </a>
                 </div>
-                <div class="nav-item with-dropdown">
+                <div class="nav-item">
                     <button class="icon-button tooltip" data-tooltip="Account">
-                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="24" height="24">
+                        <img src="/shared/platform/images/platform-account-icon-white.png" alt="Account" class="nav-icon" width="24" height="24">
                     </button>
                     <div class="dropdown-menu">
                         <a href="/admin/auth/logout.html" class="dropdown-item">Log Out</a>
@@ -441,6 +470,9 @@ Console shows: v1.0.17</pre>
     <script type="module">
         import { AdminComponentLoader } from '/admin/assets/js/admin-component-loader.js';
         
+        // Component registry to prevent duplicates
+        const registeredComponents = new Set();
+        
         document.addEventListener('DOMContentLoaded', async () => {
             // Debug console element
             const debugConsole = document.getElementById('debugConsole');
@@ -449,39 +481,66 @@ Console shows: v1.0.17</pre>
             const logWithUI = (message, type = 'log') => {
                 console[type](`[Admin Dashboard] ${message}`);
                 
-                // Append to debug console if it exists
                 if (debugConsole) {
                     const logItem = document.createElement('div');
                     logItem.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
                     logItem.style.color = type === 'error' ? '#ff6666' : 
-                                         type === 'warn' ? '#ffcc66' : '#66ff66';
+                                        type === 'warn' ? '#ffcc66' : '#66ff66';
                     debugConsole.appendChild(logItem);
-                    
-                    // Scroll to bottom
                     debugConsole.scrollTop = debugConsole.scrollHeight;
                     
-                    // Show debug console (can be toggled with Alt+D)
                     if (type === 'error') {
                         debugConsole.style.display = 'block';
                     }
                 }
             };
             
-            // Initialize component loader
-            const loader = new AdminComponentLoader();
+            // Initialize component loader with deduplication
+            const loader = new AdminComponentLoader({
+                onRegister: (componentName) => {
+                    if (registeredComponents.has(componentName)) {
+                        logWithUI(`Skipping duplicate registration of ${componentName}`, 'warn');
+                        return false;
+                    }
+                    registeredComponents.add(componentName);
+                    logWithUI(`Registered component: ${componentName}`);
+                    return true;
+                }
+            });
+            
             await loader.initialize();
-            
             logWithUI('v1.0.17 - Initialized');
-            logWithUI('Current focus: Merit - Dashboard Overview');
             
-            // Gem status tracking
-            const gemStatuses = {
-                merit: 'ready',
-                goalsetter: 'progress',
-                bhb: 'attention'
+            // Define known client pages and their statuses
+            const clientPages = {
+                merit: {
+                    title: 'Merit',
+                    status: 'ready',
+                    description: 'Learning Merit System'
+                },
+                goalsetter: {
+                    title: 'Goalsetter',
+                    status: 'progress',
+                    description: 'Goal Setting Interface'
+                },
+                bhb: {
+                    title: 'BHB',
+                    status: 'attention',
+                    description: 'Borders in History'
+                }
             };
             
-            logWithUI(`Gem status initialized - Merit: ${gemStatuses.merit}, Goalsetter: ${gemStatuses.goalsetter}, BHB: ${gemStatuses.bhb}`);
+            // Initialize gem status tracking with known page info
+            logWithUI('Current focus: Merit - Dashboard Overview');
+            
+            const gemStatuses = Object.entries(clientPages).reduce((acc, [key, value]) => {
+                acc[key] = value.status;
+                return acc;
+            }, {});
+            
+            logWithUI(`Gem status initialized - ${Object.entries(clientPages)
+                .map(([key, value]) => `${value.title}: ${value.status}`)
+                .join(', ')}`);
             
             // Track active tab
             const activeTab = {
@@ -491,51 +550,44 @@ Console shows: v1.0.17</pre>
             
             logWithUI(`Active tab: ${activeTab.page} - ${activeTab.ingredient}`);
             
-            // Register event listeners for navigation
-            document.addEventListener('ingredient-selected', (e) => {
-                const { page, ingredient } = e.detail;
-                activeTab.page = page;
-                activeTab.ingredient = ingredient;
-                
-                logWithUI(`Focus changed: ${page} - ${ingredient}`);
-                logWithUI(`Loading component: ${page}-${ingredient}-component`);
-                
-                // Update content area based on selection
-                // This would be replaced with actual content loading
-                const contentArea = document.querySelector('[data-admin-component="admin-page"]');
-                if (contentArea) {
-                    contentArea.innerHTML = `
-                        <div style="padding: 24px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <h2>${page} - ${ingredient}</h2>
-                            <p>This is the content area for the ${ingredient} ingredient in the ${page} project.</p>
-                            <p>Version 1.0.17 - Updated April 14, 2025</p>
-                            
-                            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-                                <h3>Component Status</h3>
-                                <p><strong>Path:</strong> /clients/${page}/${page}.html</p>
-                                <p><strong>Status:</strong> <span style="color: #22c55e;">Active</span></p>
-                                <p><strong>Last Updated:</strong> April 14, 2025</p>
-                            </div>
-                        </div>
-                    `;
-                    
-                    logWithUI(`Component loaded: ${page}-${ingredient}-component`);
-                    logWithUI(`Current focus: ${page} - ${ingredient}`);
+            // Register navigation items
+            const navItems = document.querySelectorAll('.admin-nav [data-admin-component] *[data-ingredient]');
+            logWithUI(`Navigation items loaded: ${navItems.length}`);
+            
+            // Log available components with proper structure
+            logWithUI('Available components:');
+            const components = {};
+            
+            document.querySelectorAll('.page-card').forEach(card => {
+                const pageId = card.dataset.pageId;
+                const pageInfo = clientPages[pageId];
+                if (pageInfo) {
+                    components[pageInfo.title] = {
+                        status: pageInfo.status,
+                        description: pageInfo.description,
+                        ingredients: Array.from(card.querySelectorAll('.ingredient-item'))
+                            .map(item => item.dataset.ingredient)
+                    };
                 }
             });
             
-            // Initialize gem status observers
+            console.table(components);
+            
+            // Initialize gem status observers with known page info
             const observeGemStatus = () => {
                 const gems = document.querySelectorAll('.gem-dot');
                 logWithUI(`Observing ${gems.length} status gems`);
                 
                 gems.forEach(gem => {
-                    // Log initial status
                     const status = gem.classList.contains('gem-ready') ? 'ready' : 
                                  gem.classList.contains('gem-progress') ? 'progress' : 'attention';
-                    const card = gem.closest('.card-header, .page-card')?.querySelector('.card-title')?.textContent || 'Unknown';
+                                
+                    const cardElement = gem.closest('.card-header, .page-card');
+                    const pageId = cardElement?.dataset.pageId;
+                    const pageInfo = pageId && clientPages[pageId];
+                    const title = pageInfo ? pageInfo.title : 'Unknown';
                     
-                    logWithUI(`Gem status for ${card}: ${status}`);
+                    logWithUI(`Gem status for ${title}: ${status}`);
                     
                     // Monitor for status changes
                     const observer = new MutationObserver(mutations => {
@@ -543,7 +595,7 @@ Console shows: v1.0.17</pre>
                             if (mutation.attributeName === 'class') {
                                 const newStatus = gem.classList.contains('gem-ready') ? 'ready' : 
                                                 gem.classList.contains('gem-progress') ? 'progress' : 'attention';
-                                logWithUI(`Gem status changed for ${card}: ${newStatus}`);
+                                logWithUI(`Gem status changed for ${title}: ${newStatus}`);
                             }
                         });
                     });
@@ -552,47 +604,8 @@ Console shows: v1.0.17</pre>
                 });
             };
             
-            // Observe gem statuses after a short delay to ensure DOM is fully loaded
+            // Observe gem statuses after a short delay
             setTimeout(observeGemStatus, 1000);
-            
-            // Debug key commands
-            document.addEventListener('keydown', (e) => {
-                // Alt+D to toggle debug console
-                if (e.altKey && e.key === 'd') {
-                    debugConsole.style.display = debugConsole.style.display === 'none' ? 'block' : 'none';
-                }
-                
-                // Alt+G to log gem statuses
-                if (e.altKey && e.key === 'g') {
-                    logWithUI('Current gem statuses:', 'info');
-                    for (const [page, status] of Object.entries(gemStatuses)) {
-                        logWithUI(`- ${page}: ${status}`, 'info');
-                    }
-                }
-                
-                // Alt+T to log active tab
-                if (e.altKey && e.key === 't') {
-                    logWithUI(`Active tab: ${activeTab.page} - ${activeTab.ingredient}`, 'info');
-                }
-            });
-            
-            // Log navigation activity
-            const navItems = document.querySelectorAll('.admin-nav [data-admin-component] *[data-ingredient]');
-            if (navItems) {
-                logWithUI(`Navigation items loaded: ${navItems.length}`);
-                logWithUI('Available components:');
-                let components = {};
-                document.querySelectorAll('.page-card').forEach(card => {
-                    const page = card.querySelector('.page-card-header h2')?.textContent.trim().toLowerCase();
-                    if (page) {
-                        components[page] = [];
-                        card.querySelectorAll('.ingredient-item').forEach(item => {
-                            components[page].push(item.dataset.ingredient);
-                        });
-                    }
-                });
-                console.table(components);
-            }
             
             logWithUI('Dashboard initialization complete', 'info');
         });
