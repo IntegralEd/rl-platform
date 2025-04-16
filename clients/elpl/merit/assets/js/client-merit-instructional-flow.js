@@ -60,8 +60,22 @@ export class MeritInstructionalFlow {
         }
 
         this.#openAIClient = new MeritOpenAIClient();
+        
+        // Ensure welcome section and form are visible
+        const welcomeSection = document.querySelector('[data-section="welcome"]');
+        if (welcomeSection) {
+            welcomeSection.classList.add('active');
+            welcomeSection.removeAttribute('hidden');
+            console.log('[Merit Flow] Welcome section activated');
+        }
+
+        const welcomeForm = document.getElementById('welcome-form');
+        if (welcomeForm) {
+            welcomeForm.style.display = 'block';
+            console.log('[Merit Flow] Welcome form displayed');
+        }
+
         this.#setupEventListeners();
-        this.#initializeActiveSection();
         
         // Chat is ready immediately - thread will be created with first message
         this.#state.chatReady = true;
@@ -95,6 +109,9 @@ export class MeritInstructionalFlow {
         }
 
         this.#elements = elements;
+        
+        // Log element initialization
+        console.log('[Merit Flow] Elements initialized:', Object.keys(elements));
         return true;
     }
 
