@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORB: One Ruleset to Bind Them</title>
+  <link rel="stylesheet" href="/admin/assets/css/platform.css">
+  <style>
+    /* Inline styles to supplement platform styling */
+    .admin-layout {
+      display: grid;
+      grid-template-areas: 
+        "header header"
+        "nav main";
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+    }
+    .admin-header {
+      grid-area: header;
+      background-color: var(--admin-bg, #f4f5f7);
+      padding: 20px;
+      border-bottom: 1px solid var(--admin-border, #e1e4e8);
+    }
+    .admin-page-nav {
+      grid-area: nav;
+      background-color: var(--admin-bg, #f4f5f7);
+      padding: 20px;
+      border-right: 1px solid var(--admin-border, #e1e4e8);
+    }
+    .admin-page-nav ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .admin-page-nav li {
+      margin-bottom: 10px;
+    }
+    .admin-page-nav a {
+      text-decoration: none;
+      color: var(--admin-text, #2c3e50);
+    }
+    .admin-content {
+      grid-area: main;
+      padding: 20px;
+    }
+    #wiki-summary ul {
+      list-style-type: disc;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <header class="admin-header">
+      <h1>ORB: One Ruleset to Bind Them</h1>
+      <p>Developer and Designer Collab Hub</p>
+    </header>
+    <nav class="admin-page-nav">
+      <ul>
+        <li><a href="/admin/dashboard.html">Dashboard</a></li>
+        <li><a href="/admin/pages/orb/index.html">ORB Home</a></li>
+        <!-- Additional navigation items can be added here -->
+      </ul>
+    </nav>
+    <main class="admin-content">
+      <section id="wiki-summary">
+        <h2>Subpage Summaries</h2>
+        <p>This is the ORB landing page. As our documentation evolves, summaries of subpages will be dynamically added here.</p>
+        <ul>
+          <li><strong>Getting Started</strong>: Overview of ORB rules and setup instructions.</li>
+          <li><strong>Design Guidelines</strong>: Principles and best practices for our platform design.</li>
+          <li><strong>Development Standards</strong>: Coding guidelines and architectural decisions.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+</body>
+</html> 
