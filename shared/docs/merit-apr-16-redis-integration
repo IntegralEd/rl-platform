@@ -1,423 +1,150 @@
-# APr 16 Frontend Merit Integration Test Suite
+# Apr 16 Frontend Merit Integration Test Suite - Status Update
 
-This package contains end-to-end (e2e) test scripts for the Merit frontend integration. It was designed to validate the updated OpenAI client configuration (in client-merit-openai.js) alongside the instructional flow (client-merit-instructional-flow.js).
+## Integration Progress
 
-## Overview
+### ✅ Completed
+1. Basic OpenAI client setup
+   - Assistant ID configuration
+   - Project ID pairing
+   - Lambda endpoint configuration
+   - Error handling implementation
 
-The tests verify:
-- The integration of the OpenAI client with proper fallback and error handling when DNS issues occur.
-- That the instructional flow logs and state updates (e.g. navigation, form validation, message processing) match expected behavior.
-- Consistency with our staged tests (adapted from our e2e suite) and reference in the [Merit repository](https://github.com/IntegralEd/rl-platform/tree/main/clients/elpl/merit).
+2. Redis configuration
+   - Key structure defined
+   - TTL settings (3600s)
+   - Context prefixing
 
-## Merit Assistant Integration Steps
+3. Endpoint Documentation
+   - Removed _dev endpoints
+   - Standardized lambda endpoint usage
+   - Added security headers
 
-### 1. Assistant Configuration & Preflight
-```javascript
-const MERIT_ASSISTANT_CONFIG = {
-    instructions: `You are Merit, an expert in EL Education's curriculum for English Language Arts. 
-                  Limit your file searches to the guide aligned with the user's grade level.
-                  Always maintain a supportive, educational tone.`,
-    name: "Merit ELA Guide",
-    tools: [{ type: "file_search" }],
-    model: "gpt-4o",
-    metadata: {
-        curriculum: "ela",
-        provider: "el_education"
-    }
-};
+### 🏗️ In Progress
+1. Assistant Configuration
+   - [x] Basic setup
+   - [x] Project pairing
+   - [ ] File search tool configuration
+   - [ ] Initial message templating
 
-// Preflight curl equivalent in our system
-const preflightHeaders = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-    'OpenAI-Beta': 'assistants=v2',
-    'X-Project-ID': OPENAI_CONFIG.assistant.project
-};
-```
+2. Redis Integration
+   - [x] Context key structure
+   - [x] TTL implementation
+   - [ ] Context storage patterns
+   - [ ] Thread ID management
 
-### 2. Redis Context Setup
-```javascript
-const REDIS_CONTEXT = {
-    prefix: 'merit:ela',
-    keys: {
-        user: (userId) => `${prefix}:user:${userId}`,
-        grade: (userId) => `${prefix}:grade:${userId}`,
-        curriculum: (userId) => `${prefix}:curriculum:${userId}`
-    },
-    ttl: 3600
-};
-```
+3. Search Implementation
+   - [x] Basic file search setup
+   - [ ] Search tool configuration
+   - [ ] Result processing
+   - [ ] Context boundaries
 
-### 3. Integration Flow Steps
+### 📋 Next Steps (Priority Order)
 
-1. **Initial Page Load**
-   - Load grade level selection
-   - Initialize Redis context store
-   - Prepare assistant configuration
-
-2. **Grade Level Selection**
+1. **Assistant Setup** (High Priority)
    ```javascript
-   // Store in Redis
-   await redis.set(
-       REDIS_CONTEXT.keys.grade(userId),
-       gradeLevel,
-       'EX',
-       REDIS_CONTEXT.ttl
-   );
-   ```
-
-3. **Assistant Initialization**
-   - Create thread with grade-specific context
-   - Send automated welcome message (hidden)
-   ```javascript
-   const welcomeMessage = `Hi I'm Merit, I'm here to answer questions about EL Education's ${gradeLevel} curriculum for English Language Arts. If that's not going to meet your goals, go back to Welcome tab and choose another grade level.`;
-   ```
-
-4. **Context Preparation**
-   ```javascript
-   const contextPayload = {
-       grade_level: gradeLevel,
-       curriculum: 'ela',
-       provider: 'el_education',
-       thread_id: threadId
+   const MERIT_ASSISTANT_CONFIG = {
+       instructions: `You are Merit, an expert in EL Education's curriculum for English Language Arts. 
+                     Help teachers understand and implement the curriculum effectively.`,
+       name: "Merit ELA Guide",
+       tools: [{ type: "file_search" }],
+       model: "gpt-4o"
    };
    ```
+   - [ ] Configure file search tool
+   - [ ] Set up initial message template
+   - [ ] Implement context handling
 
-5. **First Hidden Message**
+2. **Redis Context Flow** (High Priority)
    ```javascript
-   await sendMessage({
-       content: `Initialize as an ELA curriculum expert for grade ${gradeLevel}. Limit file searches to this grade's materials.`,
-       visible: false
-   });
-   ```
-
-### 4. Testing Scenarios
-
-1. **Grade Level Context**
-   - Verify Redis storage of grade level
-   - Confirm context in assistant messages
-   - Test grade level switching
-
-2. **Welcome Message**
-   - Verify automated welcome appears
-   - Check grade level in message
-   - Test message visibility flags
-
-3. **File Search Boundaries**
-   - Verify searches limited to grade level
-   - Test cross-grade search blocking
-   - Validate search tool configuration
-
-4. **Redis Integration**
-   - Test context key creation
-   - Verify TTL implementation
-   - Check key cleanup
-
-### 5. Implementation Checklist
-
-- [ ] Update OpenAI client with preflight configuration
-- [ ] Implement Redis context storage
-- [ ] Add automated welcome message
-- [ ] Configure file search tool
-- [ ] Add grade level validation
-- [ ] Implement context switching
-- [ ] Add test coverage for all scenarios
-
-### 6. Error Handling
-
-```javascript
-try {
-    await initializeAssistant(gradeLevel);
-} catch (error) {
-    if (error.code === 'REDIS_CONTEXT_ERROR') {
-        // Retry Redis context setup
-        await retryContextSetup();
-    } else if (error.code === 'ASSISTANT_INIT_ERROR') {
-        // Fallback to default configuration
-        await initializeWithDefaults();
-    }
-    console.error('[Merit Flow] Initialization error:', error);
-}
-```
-
-### 7. Monitoring Points
-
-- Redis context creation success rate
-- Assistant initialization time
-- Welcome message delivery confirmation
-- Grade level context switches
-- File search boundary enforcement
-- Error rates by type
-
-### 8. File Search Customization
-
-#### Search Configuration
-```javascript
-const SEARCH_CONFIG = {
-    // Grade level namespaces
-    namespaces: {
-        k2: 'k2-curriculum-guide',
-        g3_5: 'g3-5-curriculum-guide',
-        g6_8: 'g6-8-curriculum-guide'
-    },
-    
-    // Search parameters
-    parameters: {
-        limit: 5,  // Number of results per query
-        threshold: 0.7,  // Relevance threshold
-        search_distance: 3  // Paragraphs around match
-    }
-};
-
-// Grade-specific search configuration
-const getGradeSearchConfig = (gradeLevel) => {
-    let namespace;
-    if (gradeLevel <= 2) namespace = SEARCH_CONFIG.namespaces.k2;
-    else if (gradeLevel <= 5) namespace = SEARCH_CONFIG.namespaces.g3_5;
-    else namespace = SEARCH_CONFIG.namespaces.g6_8;
-
-    return {
-        namespace,
-        ...SEARCH_CONFIG.parameters
-    };
-};
-```
-
-#### Search Tool Configuration
-```javascript
-const MERIT_SEARCH_TOOL = {
-    type: "file_search",
-    settings: {
-        // Enable grade-level specific search
-        enable_namespace: true,
-        // Customize result format
-        result_format: {
-            include_metadata: true,
-            include_snippets: true,
-            max_snippets: 3
-        }
-    }
-};
-```
-
-#### Integration Tasks
-
-1. **Namespace Setup**
-   - [ ] Create grade-level namespaces in file system
-   - [ ] Tag curriculum documents with appropriate namespace
-   - [ ] Verify namespace boundaries
-   - [ ] Test cross-namespace isolation
-
-2. **Search Tuning**
-   - [ ] Adjust relevance threshold per grade level
-   - [ ] Fine-tune search distance for context
-   - [ ] Optimize result limits
-   - [ ] Test search precision
-
-3. **Result Processing**
-   - [ ] Format snippets for grade-appropriate display
-   - [ ] Handle metadata in responses
-   - [ ] Implement citation formatting
-   - [ ] Add source validation
-
-4. **Context Integration**
-   ```javascript
-   // Example: Integrating search with context
-   const searchContext = {
-       grade_level: gradeLevel,
-       search_config: getGradeSearchConfig(gradeLevel),
-       allowed_namespaces: [`grade-${gradeLevel}-curriculum`]
+   const REDIS_CONTEXT = {
+       prefix: 'merit:ela',
+       keys: {
+           context: (userId) => `${prefix}:context:${userId}`,
+           thread: (userId) => `${prefix}:thread:${userId}`
+       },
+       ttl: 3600
    };
    ```
+   - [ ] Implement context storage
+   - [ ] Add thread management
+   - [ ] Set up state tracking
 
-5. **Search Boundaries**
+3. **Search Integration** (Medium Priority)
+   - [ ] Configure search boundaries
+   - [ ] Implement result processing
+   - [ ] Add context validation
+
+4. **Testing Implementation** (Medium Priority)
+   - [ ] Add integration tests
+   - [ ] Implement search validation
+   - [ ] Add context verification
+
+5. **Monitoring Setup** (Low Priority)
+   - [ ] Add performance tracking
+   - [ ] Implement error logging
+   - [ ] Set up usage metrics
+
+### 🔄 Required Changes
+
+1. **OpenAI Client Updates**
    ```javascript
-   // Example: Enforcing search boundaries
-   const validateSearchRequest = (query, gradeLevel) => {
-       const config = getGradeSearchConfig(gradeLevel);
-       return {
-           query,
-           namespace: config.namespace,
-           metadata_filters: {
-               grade_level: gradeLevel,
-               curriculum_type: 'ela'
+   // Add to client-merit-openai.js
+   const SEARCH_CONFIG = {
+       tools: [{
+           type: "file_search",
+           settings: {
+               include_metadata: true,
+               include_snippets: true,
+               max_snippets: 3
            }
-       };
+       }]
    };
    ```
 
-#### Testing Matrix
+2. **Redis Integration**
+   ```javascript
+   // Add to client configuration
+   const REDIS_CONFIG = {
+       prefix: 'merit:ela',
+       ttl: 3600,
+       patterns: {
+           context: 'context:*',
+           thread: 'thread:*'
+       }
+   };
+   ```
 
-| Test Case | Description | Success Criteria |
-|-----------|-------------|------------------|
-| Namespace Isolation | Verify searches stay within grade level | No cross-grade results |
-| Relevance Scoring | Check result quality | Score > 0.7 |
-| Context Boundary | Test paragraph context | 3 paragraphs max |
-| Citation Format | Verify source references | Complete citations |
-| Performance | Measure search latency | < 500ms response |
+### 📊 Testing Matrix
 
-#### Monitoring Metrics
+| Component | Status | Next Action |
+|-----------|---------|-------------|
+| Assistant Config | 🏗️ In Progress | Complete search tool setup |
+| Redis Integration | 🏗️ In Progress | Implement context storage |
+| Search Tool | 📋 Pending | Begin implementation |
+| Testing Suite | 📋 Pending | Create test cases |
+| Monitoring | 📋 Pending | Set up basic metrics |
 
-1. **Search Quality**
-   - Relevance scores
-   - Result precision
-   - Context accuracy
-   - Citation completeness
+### 🎯 Today's Focus
+1. Complete assistant configuration with search tool
+2. Implement Redis context storage
+3. Begin search tool integration
 
-2. **Performance**
-   - Search latency
-   - Cache hit rate
-   - Result count
-   - Error frequency
-
-3. **Usage Patterns**
-   - Popular queries
-   - Common grade levels
-   - Result utilization
-   - User satisfaction
-
-#### Implementation Example
-```javascript
-class MeritSearchTool {
-    constructor(gradeLevel) {
-        this.config = getGradeSearchConfig(gradeLevel);
-        this.searchContext = {
-            grade_level: gradeLevel,
-            namespace: this.config.namespace
-        };
-    }
-
-    async search(query) {
-        const validatedRequest = validateSearchRequest(query, this.searchContext.grade_level);
-        
-        try {
-            const results = await this.performSearch(validatedRequest);
-            return this.processResults(results);
-        } catch (error) {
-            console.error('[Merit Search] Error:', error);
-            throw new Error('Search failed: ' + error.message);
-        }
-    }
-
-    processResults(results) {
-        return results.map(result => ({
-            content: result.snippet,
-            source: this.formatCitation(result),
-            relevance: result.score,
-            metadata: {
-                grade_level: this.searchContext.grade_level,
-                section: result.metadata.section,
-                unit: result.metadata.unit
-            }
-        }));
-    }
-}
-```
+### 🔜 Tomorrow's Goals
+1. Complete search implementation
+2. Add comprehensive tests
+3. Set up monitoring
 
 ## Running Tests
 
-1. Ensure Node.js is installed.
-2. Open a terminal and navigate to this directory.
-3. Run the test suite by executing:
-
+1. Ensure Node.js is installed
+2. Navigate to Merit directory
+3. Run:
    ```sh
    sh run-e2e.sh
    ```
 
-4. Review the console output to verify thread creation, message sending, state updates, and error handling.
-
-This test suite helps correlate our current integration changes in openai.js with the expected behavior logged in the frontend (see console output in client-merit-instructional-flow.js).
-
-Explanation of Endpoints:
-
-Lambda Endpoint:
-This is the main endpoint where your serverless functions run. It handles your core business logic. In production, your frontend calls this endpoint when it needs to perform tasks like creating a thread or processing a message.
-
-API Fallback (_dev) Endpoint:
-This endpoint is used as a backup or during development if the lambda endpoint is not set properly. It may serve as an alternative or test endpoint, but it is not meant to replace the lambda endpoint in a production environment.
-
-Redis Endpoint:
-This endpoint is designed for caching or storing session data rather than for direct business logic operations. It helps speed up your application by providing fast access to frequently used data.
-
-When to Use Each Endpoint:
-
-Use the lambda endpoint for all main operations where business logic should be executed.
-
-Use the API fallback (_dev) endpoint only if the lambda endpoint is missing or during development/testing when a full production setup is not available.
-
-Use the Redis endpoint for tasks like caching results or managing sessions to reduce the load on your primary backend services.
-
-Below is a complete code snippet that shows how you might configure and use these endpoints:
-
-js
-Copy
-// Configuration using environment variables with fallback values
-const CONFIG = {
-  // Primary backend endpoint for business logic processing
-  lambdaEndpoint: process.env.LAMBDA_ENDPOINT || 'https://lambda.example.com/api',
-
-  // Fallback development endpoint, intended only for testing
-  apiFallbackEndpoint: process.env.API_FALLBACK_ENDPOINT || 'https://api.recursivelearning.app/dev',
-
-  // Redis endpoint used for caching and session management
-  redisEndpoint: process.env.REDIS_ENDPOINT || 'redis://redis.example.com:6379'
-};
-
-// Function to decide the endpoint for API calls
-function getPrimaryEndpoint() {
-  // In production, the lambda endpoint should always be used.
-  // Fallback is available if lambdaEndpoint is not set.
-  return CONFIG.lambdaEndpoint || CONFIG.apiFallbackEndpoint;
-}
-
-// Example function for creating a thread (using the primary API endpoint)
-async function createThread(payload) {
-  const endpoint = getPrimaryEndpoint();
-  try {
-    const response = await fetch(`${endpoint}/createThread`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Thread creation error:', error);
-    throw error;
-  }
-}
-
-// Example function for caching data using Redis
-async function cacheData(key, data) {
-  const redis = require('redis');
-  const client = redis.createClient({ url: CONFIG.redisEndpoint });
-  await client.connect();
-  await client.set(key, JSON.stringify(data));
-  await client.quit();
-}
-
-// Example usage: Create a thread then optionally cache the thread ID
-async function createAndCacheThread(message) {
-  try {
-    const thread = await createThread({ message });
-    if (thread && thread.id) {
-      await cacheData('latestThread', thread.id);
-    }
-  } catch (error) {
-    console.error('Error during create and cache thread process:', error);
-  }
-}
-Bullet Summary of Changes and Recommendations:
-
-Clarification:
-Clearly define each endpoint in documentation to avoid confusion. The lambda endpoint is for business logic, the fallback is for development, and Redis is for caching.
-
-Configuration:
-Use environment variables for setting endpoints and avoid hardcoding fallback endpoints if the lambda endpoint is available.
-
-Usage:
-Always use the lambda endpoint as the primary target for operations. Reserve the fallback endpoint for testing scenarios and use Redis only for caching, not for business logic operations.
-
-This explanation and code should help communicate the roles and proper usage of these endpoints in a README or similar documentation.
+## Notes
+- Focus on teacher-oriented responses
+- Maintain consistent error handling
+- Keep Redis TTL at 3600s for MVP
+- Use standard lambda endpoint
