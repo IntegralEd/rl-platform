@@ -409,66 +409,137 @@
 ## Merit Page Review (04.15.2024)
 ### URL: https://recursivelearning.app/clients/elpl/merit/merit.html#welcome
 
-#### Recent Updates
-- [x] Created security module with CORS and embed protection
-- [x] Updated footer styling to remove blue background
-- [x] Fixed send button styling and layout
-- [x] Updated API endpoint to use development URL
-- [x] Improved chat UI with cleaner layout
-
-#### Remaining Issues
-
-##### API Configuration
-- [ ] Verify development endpoint is functioning:
-  ```javascript
-  Current endpoint: https://api.recursivelearning.app/dev
-  Status: net::ERR_NAME_NOT_RESOLVED
+#### Security Module Issue
+- [ ] Fix 404 error for security module:
   ```
-- [ ] Implement proper error handling for API failures
-- [ ] Add retry logic with exponential backoff
-- [ ] Create offline mode fallback for testing
+  GET https://recursivelearning.app/clients/elpl/assets/elpl-security.js net::ERR_ABORTED 404 (Not Found)
+  ```
+  - Required Fix: Create missing security module
+  - Path: `/clients/elpl/assets/elpl-security.js`
+  - Implementation: Add CORS and embed protection
 
-##### UI/UX Improvements
-- [ ] Increase icon sizes throughout interface
-- [ ] Improve button state indicators
-- [ ] Refine form dropdown selections
-- [ ] Add loading states for API calls
-- [ ] Implement proper error messages for users
+#### Version Display Inconsistency
+- [ ] Current display: `merit.html/04152025.03:55pm.v.1.16`
+- [ ] Format issues:
+  - Year shows as 2025 instead of 2024
+  - Version format differs from admin (v1.0.0 vs v.1.16)
+  - Build timestamp needs standardization
 
-##### State Management
-- [ ] Fix form validation with proper UX feedback
-- [ ] Implement proper state persistence
-- [ ] Add loading indicators for state transitions
-- [ ] Create proper error boundaries
+#### Validation States
+Current console output shows temporary validation bypasses:
+```javascript
+[Merit Flow] All validations passed for MVP testing
+[Merit Flow] Note: Proper validation will be implemented in v1.0.16
+[Merit Flow] Form validation hardcoded to pass for testing
+[Merit Flow] Navigation validation hardcoded to pass for testing
+```
+Required fixes:
+- [ ] Implement proper form validation
+- [ ] Add navigation state validation
+- [ ] Remove hardcoded validation passes
+- [ ] Add validation error handling
 
-##### Console Logging
-- [ ] Add structured logging format
-- [ ] Include assistant information in logs
-- [ ] Add configuration logging on page load
-- [ ] Implement proper error tracking
+#### OpenAI Integration
+Current initialization shows:
+```javascript
+[Merit Flow] OpenAI client initialized
+[Merit Flow] Using API endpoint: https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main
+[Merit Flow] Project ID: proj_V4lrL1OSfydWCFW0zjgwrFRT
+```
+Required fixes:
+- [ ] Move API endpoint to configuration
+- [ ] Add error handling for API failures
+- [ ] Implement retry logic
+- [ ] Add offline mode fallback
+
+#### State Management
+Current state tracking shows:
+```javascript
+[Merit Flow] Action state updated: {
+  nextButton: true, 
+  sendButton: true, 
+  chatInput: true, 
+  chatReady: false, 
+  formValid: false
+}
+[Merit Flow] Navigated to welcome {
+  section: 'welcome',
+  formValid: false,
+  gradeLevel: null,
+  curriculum: 'ela',
+  chatReady: false
+}
+```
+Required fixes:
+- [ ] Add proper state persistence
+- [ ] Implement form validation
+- [ ] Add loading states for chat readiness
+- [ ] Fix initial state management
 
 #### Implementation Priority
-1. API Configuration
-   - Verify DNS resolution for development endpoint
-   - Implement proper error handling
-   - Add retry logic
-   - Create offline fallback
+1. Security Module Creation
+   - Create elpl-security.js
+   - Implement CORS protection
+   - Add embed validation
 
-2. UI/UX Refinement
-   - Fix remaining button states
-   - Increase icon sizes
-   - Improve visual feedback
+2. Form Validation
+   - Remove hardcoded passes
+   - Implement proper validation
+   - Add error states
    - Add loading indicators
 
 3. State Management
-   - Implement proper validation
-   - Add state persistence
-   - Fix transition states
-   - Add error boundaries
+   - Fix initial states
+   - Add persistence
+   - Implement proper transitions
+
+4. Version Display
+   - Fix year display
+   - Standardize format
+   - Add build tracking
+
+5. OpenAI Integration
+   - Add configuration
+   - Implement error handling
+   - Add retry logic
+   - Create offline mode
+
+#### Required Files
+```plaintext
+/clients/elpl/assets/
+  ├── elpl-security.js (new)
+  ├── js/
+  │   ├── client-merit-validation.js (new)
+  │   ├── client-merit-state.js (new)
+  │   └── client-merit-config.js (new)
+  └── css/
+      └── client-merit-states.css (new)
+```
 
 #### Next Steps
-1. Test development API endpoint functionality
-2. Complete remaining UI/UX improvements
-3. Implement proper state management
-4. Enhance error handling and user feedback
-5. Add comprehensive logging
+1. Create security module with proper CORS
+2. Implement form validation system
+3. Add proper state management
+4. Fix version display format
+5. Enhance OpenAI integration
+6. Add error boundaries and loading states
+
+from bACKEND RESTAPI TEAM
+
+I couldn’t directly locate a file named “merit.html” in the workspace. However, based on our previous notes in the MVP Chat Implementation Status document and other relevant documentation, here’s what we know:
+The merit chat page on recursivelearning.app is set up to use the API endpoint currently configured as:
+DEV endpoint: https://api.recursivelearning.app/dev
+PRODUCTION fallback: previously using the PROD endpoint (https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main), though recent changes in the client code have switched the DEV endpoint as the primary URL.
+The insights about the non-working API endpoint were tied to the fact that the endpoint in the client (as seen in client-merit-openai.js) was misconfigured, leading to 404 errors. We updated the client code to point to the correct API endpoint.
+For production traffic from the merit chat page on recursivelearning.app the following should be confirmed:
+The API endpoint for production traffic should be updated from the DEV version (https://api.recursivelearning.app/dev) to the production endpoint if required.
+It’s important that production traffic routes to the stable, high-performance instance.
+Testing the API endpoint using a curl command or Postman with an origin header of https://recursivelearning.app is recommended. For instance, testing with:
+Apply
+Run
+'
+This should confirm if the endpoint returns a valid thread ID.
+Next Steps:
+If the production traffic is intended to use a separate production endpoint rather than our DEV endpoint, then the client code needs to update this.baseUrl and this.fallbackUrl accordingly before deploying to production.
+Additionally, double-check the DNS resolution, CORS configuration, and error logging on the production side to ensure that requests from the merit chat page (i.e., from https://recursivelearning.app) are being handled correctly.
+Based on our latest commit on the fix/merit-endpoints branch and the current insights from the Merit MVP Chat Implementation Status document, everything seems on track—but we need to verify production settings.
