@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EL Merit Chat (Embed)</title>
+    
+    <!-- Merit specific logic - instructional flow controller -->
+    <script type="module">
+        import { MeritInstructionalFlow } from './assets/js/client-merit-instructional-flow.js';
+        
+        // Initialize flow controller when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.meritFlow = new MeritInstructionalFlow();
+            console.log('[Merit Embed] Instructional flow initialized');
+        });
+    </script>
+    
     <style>
         :root {
             --primary-color: #C6123F;
@@ -22,7 +34,7 @@
             overflow: hidden;
         }
 
-        .storyline-embed {
+        .client-layout {
             height: 100%;
             width: 100%;
             display: flex;
@@ -110,7 +122,7 @@
         }
 
         /* Grade selection */
-        .grade-selection {
+        .section {
             display: none;
             flex-direction: column;
             padding: 1rem;
@@ -119,14 +131,20 @@
             height: 100%;
         }
 
-        .grade-selection.active {
+        .section.active {
             display: flex;
         }
 
-        .grade-selection h2 {
+        .section h2 {
             color: var(--secondary-color);
             font-size: 1.25rem;
             margin: 0;
+        }
+
+        .welcome-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
         .grade-options {
@@ -173,14 +191,14 @@
         }
 
         /* Chat container */
-        .chat-container {
+        .section {
             display: none;
             flex: 1;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .chat-container.active {
+        .section.active {
             display: flex;
         }
 
@@ -243,7 +261,7 @@
     </style>
 </head>
 <body>
-    <div class="storyline-embed">
+    <div class="client-layout" data-client-component="merit-page" data-test-id="page-container">
         <header class="app-header" role="banner">
             <div class="header-content">
                 <img src="/clients/elpl/images/lockup_white_logo.png" 
@@ -252,41 +270,43 @@
                 
                 <div class="menu-dropdown">
                     <button class="menu-trigger" aria-haspopup="true" 
-                            aria-expanded="false" onclick="toggleMenu()">
+                            aria-expanded="false" data-action="toggle-menu">
                         Menu
                         <svg class="menu-caret" width="10" height="6" viewBox="0 0 10 6">
                             <path d="M1 1L5 5L9 1" stroke="white" stroke-width="2" fill="none"/>
                         </svg>
                     </button>
                     <div class="menu-content" id="menuContent">
-                        <a href="#" class="menu-link" onclick="showGradeSelection()">Select Grade</a>
-                        <a href="#" class="menu-link" onclick="startOver()">Start Over</a>
+                        <a href="#" class="menu-link" data-section="welcome">Select Grade</a>
+                        <a href="#" class="menu-link" data-action="reset">Start Over</a>
                         <a href="#" class="menu-link">Help</a>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="grade-selection active" id="gradeSelection">
+        <div class="section active" data-section="welcome" id="gradeSelection">
             <h2>Select Your Grade Level</h2>
-            <div class="grade-options">
-                <div class="grade-option" onclick="selectGrade(this, 'K')">Kindergarten</div>
-                <div class="grade-option" onclick="selectGrade(this, '1')">Grade 1</div>
-                <div class="grade-option" onclick="selectGrade(this, '2')">Grade 2</div>
-                <div class="grade-option" onclick="selectGrade(this, '3')">Grade 3</div>
-                <div class="grade-option" onclick="selectGrade(this, '4')">Grade 4</div>
-                <div class="grade-option" onclick="selectGrade(this, '5')">Grade 5</div>
-            </div>
-            <button class="next-button" id="nextButton" onclick="startChat()">Start Chat</button>
+            <form class="welcome-form" id="welcome-form">
+                <div class="grade-options">
+                    <div class="grade-option" data-grade="K">Kindergarten</div>
+                    <div class="grade-option" data-grade="1">Grade 1</div>
+                    <div class="grade-option" data-grade="2">Grade 2</div>
+                    <div class="grade-option" data-grade="3">Grade 3</div>
+                    <div class="grade-option" data-grade="4">Grade 4</div>
+                    <div class="grade-option" data-grade="5">Grade 5</div>
+                </div>
+                <button type="button" id="next-button" class="next-button" disabled>Start Chat</button>
+            </form>
         </div>
 
-        <div class="chat-container" id="chatContainer">
+        <div class="section" data-section="chat" id="chatContainer">
             <div class="chat-window" id="chat-window">
                 <div class="message assistant">Welcome to EL Merit Chat. How can I help you today?</div>
             </div>
             <div class="input-area">
                 <input type="text" id="chat-input" placeholder="Type your message here...">
-                <button class="send-button" onclick="sendMessage()">
+                <button class="send-button" id="send-button">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
                     </svg>
@@ -332,7 +352,7 @@
             });
             element.classList.add('selected');
             selectedGrade = grade;
-            document.getElementById('nextButton').classList.add('enabled');
+            document.getElementById('next-button').classList.remove('disabled');
         }
 
         function showGradeSelection() {
@@ -372,6 +392,9 @@
             const requestBody = {
                 message: input.value,
                 grade: selectedGrade,
+                org_id: 'recdg5Hlm3VVaBA2u',
+                assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
+                schema_version: '04102025.B01',
                 ...(window.threadId && { threadId: window.threadId })
             };
             
@@ -391,10 +414,11 @@
             chatWindow.appendChild(transmissionIndicator);
 
             // Send to Lambda
-            fetch('https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main', {
+            fetch('https://api.recursivelearning.app/dev', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://recursivelearning.app'
                 },
                 body: JSON.stringify(requestBody)
             })
