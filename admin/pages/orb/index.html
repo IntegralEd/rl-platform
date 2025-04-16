@@ -4,7 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ORB: One Ruleset to Bind Them</title>
-  <link rel="stylesheet" href="/admin/assets/css/platform.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/shared/platform/images/platform-dev-icon-white.svg">
+  
+  <!-- Platform CSS -->
+  <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
+  
+  <!-- Admin Styles -->
+  <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
+  <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+  
   <style>
     /* Inline styles to supplement platform styling */
     .admin-layout {
@@ -12,57 +25,311 @@
       grid-template-areas: 
         "header header"
         "nav main";
-      grid-template-columns: 260px 1fr;
-      grid-template-rows: auto 1fr;
+      grid-template-columns: var(--nav-width, 260px) 1fr;
+      grid-template-rows: var(--header-height, 60px) 1fr;
       min-height: 100vh;
     }
     .admin-header {
       grid-area: header;
-      background-color: var(--admin-bg, #f4f5f7);
-      padding: 20px;
-      border-bottom: 1px solid var(--admin-border, #e1e4e8);
+      background: var(--brand-color, #004080);
+      color: #fff;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--admin-border);
     }
-    .admin-page-nav {
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .version-display {
+      font-size: 12px;
+      opacity: 0.8;
+      background: rgba(255,255,255,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-item {
+      position: relative;
+    }
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #fff;
+      border-radius: 3px 3px 0 0;
+    }
+    .icon-button {
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-button img {
+      width: 24px;
+      height: 24px;
+      transition: transform 0.2s ease;
+    }
+    .icon-button:hover img {
+      transform: scale(1.1);
+    }
+    /* Tooltip styles */
+    .tooltip {
+      position: relative;
+    }
+    .tooltip:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.5rem;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .admin-nav {
       grid-area: nav;
-      background-color: var(--admin-bg, #f4f5f7);
-      padding: 20px;
-      border-right: 1px solid var(--admin-border, #e1e4e8);
-    }
-    .admin-page-nav ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    .admin-page-nav li {
-      margin-bottom: 10px;
-    }
-    .admin-page-nav a {
-      text-decoration: none;
-      color: var(--admin-text, #2c3e50);
+      background: white;
+      border-right: 1px solid var(--admin-border);
+      padding: 2rem;
     }
     .admin-content {
       grid-area: main;
-      padding: 20px;
+      padding: 2rem;
+      max-width: var(--content-width, 1200px);
+      margin: 0 auto;
     }
     #wiki-summary ul {
       list-style-type: disc;
       padding-left: 20px;
+    }
+    .header-logo img {
+      width: 160px;
+      height: auto;
+      max-height: 40px;
+      object-fit: contain;
+    }
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+    
+    /* GitHub Tree Styles */
+    .gh-tree {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .gh-tree ul {
+      list-style: none;
+      padding-left: 20px;
+      margin: 0;
+    }
+    
+    .gh-tree > ul {
+      padding-left: 0;
+    }
+    
+    .gh-tree li {
+      position: relative;
+      padding: 2px 0;
+    }
+    
+    .gh-tree .folder,
+    .gh-tree .file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--admin-text);
+      text-decoration: none;
+    }
+    
+    .gh-tree .folder:hover,
+    .gh-tree .file:hover {
+      background: var(--admin-bg);
+    }
+    
+    .gh-tree .folder::before,
+    .gh-tree .file::before {
+      content: '';
+      width: 16px;
+      height: 16px;
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    
+    .gh-tree .folder::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z'/%3E%3C/svg%3E");
+    }
+    
+    .gh-tree .file::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M3.75 1.5a.25.25 0 00-.25.25v11.5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25V6H9.75A1.75 1.75 0 018 4.25V1.5H3.75zm5.75.56v2.19c0 .138.112.25.25.25h2.19L9.5 2.06zM2 1.75C2 .784 2.784 0 3.75 0h5.086c.464 0 .909.184 1.237.513l3.414 3.414c.329.328.513.773.513 1.237v8.086A1.75 1.75 0 0112.25 15h-8.5A1.75 1.75 0 012 13.25V1.75z'/%3E%3C/svg%3E");
+    }
+    
+    .gh-tree .folder.open::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23666' d='M1.75 1A1.75 1.75 0 000 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0016 13.25v-8.5A1.75 1.75 0 0014.25 3H7.5a.25.25 0 01-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75z M13.5 4.75v8.5a.25.25 0 01-.25.25H2.75a.25.25 0 01-.25-.25V5.5h11z'/%3E%3C/svg%3E");
+    }
+    
+    .gh-tree .indent {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      border-left: 1px solid var(--admin-border);
+    }
+    
+    /* ORB Header Styles */
+    .orb-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--admin-border);
+    }
+    
+    .orb-header img {
+      width: 48px;
+      height: 48px;
+    }
+    
+    .orb-header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: var(--brand-color);
+    }
+    
+    .orb-header p {
+      margin: 4px 0 0;
+      color: var(--admin-text);
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
   <div class="admin-layout">
     <header class="admin-header">
-      <h1>ORB: One Ruleset to Bind Them</h1>
-      <p>Developer and Designer Collab Hub</p>
+      <div class="header-left">
+        <a href="/admin/dashboard.html" class="header-logo">
+          <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
+        </a>
+        <span class="version-display">v1.0.0 (04.15.2024)</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/admin/dashboard.html" class="nav-item">Admin</a>
+        <div class="nav-item active">
+          <a href="/admin/pages/orb/index.html" class="icon-button tooltip" data-tooltip="Developer Hub">
+            <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
+          </a>
+        </div>
+        <div class="nav-item">
+          <button class="icon-button tooltip" data-tooltip="Account">
+            <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="24" height="24">
+          </button>
+        </div>
+      </nav>
     </header>
-    <nav class="admin-page-nav">
-      <ul>
-        <li><a href="/admin/dashboard.html">Dashboard</a></li>
-        <li><a href="/admin/pages/orb/index.html">ORB Home</a></li>
-        <!-- Additional navigation items can be added here -->
-      </ul>
+    <nav class="admin-nav">
+      <div class="gh-tree">
+        <ul>
+          <li>
+            <div class="folder open">
+              <span>frontend/</span>
+            </div>
+            <ul>
+              <li>
+                <div class="folder open">
+                  <span>admin/</span>
+                </div>
+                <ul>
+                  <li>
+                    <div class="folder">
+                      <span>assets/</span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="folder open">
+                      <span>pages/</span>
+                    </div>
+                    <ul>
+                      <li>
+                        <div class="folder open">
+                          <span>orb/</span>
+                        </div>
+                        <ul>
+                          <li>
+                            <a href="index.html" class="file">
+                              <span>index.html</span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="orb-layouts.html" class="file">
+                              <span>orb-layouts.html</span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="orb-styles.html" class="file">
+                              <span>orb-styles.html</span>
+                            </a>
+                          </li>
+                          <li>
+                            <a href="orb-rulesets.html" class="file">
+                              <span>orb-rulesets.html</span>
+                            </a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <div class="folder">
+                  <span>clients/</span>
+                </div>
+              </li>
+              <li>
+                <div class="folder">
+                  <span>shared/</span>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </nav>
     <main class="admin-content">
+      <div class="orb-header">
+        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="ORB Icon">
+        <div>
+          <h1>ORB: One Ruleset to Bind Them</h1>
+          <p>Developer and Designer Collab Hub</p>
+        </div>
+      </div>
       <section id="wiki-summary">
         <h2>Subpage Summaries</h2>
         <p>This is the ORB landing page. As our documentation evolves, summaries of subpages will be dynamically added here.</p>
@@ -74,5 +341,23 @@
       </section>
     </main>
   </div>
+
+  <script type="module">
+    // Add folder toggle functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const folders = document.querySelectorAll('.gh-tree .folder');
+      folders.forEach(folder => {
+        folder.addEventListener('click', (e) => {
+          e.preventDefault();
+          const li = folder.closest('li');
+          const ul = li.querySelector('ul');
+          if (ul) {
+            folder.classList.toggle('open');
+            ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html> 
