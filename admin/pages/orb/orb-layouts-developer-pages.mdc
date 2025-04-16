@@ -1,0 +1,120 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# ORB Developer Pages Layout Structure
+
+## Overview
+These rules define the standard structure and behavior for ORB (One Ruleset to Bind Them) developer documentation pages. Unlike other admin pages that use card-based navigation, ORB pages use a GitHub-style tree navigation to better represent the frontend codebase structure.
+
+## Always Apply
+- [ ] All ORB pages must follow these structural and behavioral patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled
+
+## Directory Structure
+- [ ] All ORB pages must be in `/admin/pages/orb/`
+- [ ] Supporting assets in `/admin/pages/orb/assets/`
+- [ ] Documentation files must use `.mdc` extension
+- [ ] HTML files must use `orb-` prefix
+
+## Navigation Structure
+- [ ] Left sidebar must use GitHub-style tree navigation
+- [ ] Tree must reflect actual frontend repository structure
+- [ ] Tree must use monospace font (ui-monospace, SFMono-Regular)
+- [ ] Folders must be collapsible/expandable
+- [ ] Current page must be highlighted in tree
+
+## Required Components
+```html
+<!-- Tree Navigation Structure -->
+<div class="gh-tree">
+  <ul>
+    <li>
+      <div class="folder open">
+        <span>directory-name/</span>
+      </div>
+      <ul>
+        <li>
+          <a href="file-name.html" class="file">
+            <span>file-name.html</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+```
+
+## Visual Elements
+- [ ] Folder icons must indicate open/closed state
+- [ ] File icons must reflect file type
+- [ ] Tree indentation must use connecting lines
+- [ ] Active file must be highlighted
+- [ ] Hover states for all interactive elements
+
+## Required CSS Variables
+```css
+:root {
+  --tree-indent: 20px;
+  --tree-line-color: var(--admin-border);
+  --tree-font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --tree-font-size: 14px;
+  --tree-line-height: 1.5;
+}
+```
+
+## Header Structure
+- [ ] Must include ORB icon
+- [ ] Must show version number
+- [ ] Must maintain admin navigation
+- [ ] Must include developer hub icon
+
+## Page Content
+- [ ] Must use wiki-style documentation
+- [ ] Must support markdown formatting
+- [ ] Must include section navigation
+- [ ] Must maintain responsive layout
+
+## JavaScript Requirements
+- [ ] Tree state must persist in session
+- [ ] Folder toggle must be animated
+- [ ] Navigation must support keyboard
+- [ ] Must handle deep linking
+
+## Error States
+- [ ] Missing files must show 404 in tree
+- [ ] Invalid paths must be grayed out
+- [ ] Load errors must be indicated
+- [ ] Network issues must be handled
+
+## Performance
+- [ ] Tree must load progressively
+- [ ] Folders must lazy-load content
+- [ ] Navigation must be cached
+- [ ] State changes must be efficient
+
+## Accessibility
+- [ ] Tree must be keyboard navigable
+- [ ] Must support screen readers
+- [ ] Must maintain focus states
+- [ ] Must use semantic markup
+
+## Documentation
+- [ ] Each page must have clear purpose
+- [ ] Navigation must be intuitive
+- [ ] Changes must be tracked
+- [ ] Examples must be provided
+
+## Testing Requirements
+- [ ] Tree navigation must be tested
+- [ ] Keyboard access must work
+- [ ] State persistence must work
+- [ ] Error states must be verified
+
+## Implementation Notes
+- This is the only admin subdirectory using tree navigation
+- Tree structure reflects actual codebase organization
+- Navigation state persists within session
+- Supports future documentation expansion 
