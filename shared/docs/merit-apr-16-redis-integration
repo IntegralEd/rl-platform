@@ -9,213 +9,310 @@ The tests verify:
 - That the instructional flow logs and state updates (e.g. navigation, form validation, message processing) match expected behavior.
 - Consistency with our staged tests (adapted from our e2e suite) and reference in the [Merit repository](https://github.com/IntegralEd/rl-platform/tree/main/clients/elpl/merit).
 
---compare your frontend @merit- openai and instructional logic js files here..
-/Users/Shared/Repositories/rl-platform/clients/elpl/merit
---
+## Merit Assistant Integration Steps
 
-/*
- * @component MeritOpenAIClient
- * @description Handles OpenAI Assistant interactions for Merit chat
- * @version 1.0.18
- */
-
-class MeritOpenAIClient {
-  constructor() {
-    // Core configuration
-    this.threadId = null;
-    this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
-    // TODO: Replace 'default_user' with the actual user ID from IE_ALL_Users once available.
-    this.userId = 'default_user';
-
-    // API Configuration
-    const ENDPOINTS = {
-      // Updated to use DEV endpoint as production endpoint until DNS for PROD is fixed
-      PROD: 'https://api.recursivelearning.app/dev',
-      DEV: 'https://api.recursivelearning.app/dev',
-      contextPrefix: 'merit:ela:context',
-      threadPrefix: 'merit:ela:thread'
-    };
-    this.baseUrl = ENDPOINTS.PROD;
-    this.fallbackUrl = ENDPOINTS.PROD;
-    this.retryAttempts = 3;
-    this.currentAttempt = 0;
-    this.config = {
-      org_id: 'recdg5Hlm3VVaBA2u',
-      assistant_id: this.assistantId,
-      model: 'gpt-4o',
-      schema_version: '04102025.B01',
-      project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-      ttl: {
-        session: 86400,
-        cache: 3600,
-        temp: 900
-      }
-    };
-    this.headers = {
-      'Content-Type': 'application/json',
-      'X-Project-ID': this.config.project_id
-    };
-
-    this.state = {
-      isLoading: false,
-      hasError: false,
-      errorMessage: null,
-      lastRequest: null,
-      lastResponse: null,
-      isPreloaded: false,
-      context: null,
-      projectPaired: false
-    };
-
-    this.contextFields = {
-      intake: {
-        grade_level: null,
-        curriculum: 'ela',
-        user_context: null
-      },
-      system: {
-        schema_version: this.config.schema_version,
-        thread_id: null
-      }
-    };
-    this.errors = {
-      validation: [],
-      cache: [],
-      schema: []
-    };
-
-    console.log('[Merit Flow] OpenAI client initialized');
-    console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
-    console.log('[Merit Flow] Project ID:', this.config.project_id);
-  }
-
-  async createThread() {
-    try {
-      console.log(`[Merit Flow] Creating new thread (Attempt ${this.currentAttempt + 1}/${this.retryAttempts})`);
-      console.log('[Merit Flow] Using endpoint:', this.baseUrl);
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({
-          action: 'create_thread',
-          project_id: this.config.project_id,
-          ...this.config
-        })
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        if (error.statusCode === 403) {
-          throw new Error('OpenAI project pairing required');
-        }
-        throw new Error(error.error || 'Thread creation failed');
-      }
-      const data = await response.json();
-      this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
-      this.state.projectPaired = true;
-      console.log('[Merit Flow] Thread created:', this.threadId);
-      return this.threadId;
-    } catch (error) {
-      console.error('[Merit Flow] Thread creation error:', error);
-      if (error.message.includes('ERR_NAME_NOT_RESOLVED') && this.currentAttempt < this.retryAttempts) {
-        this.currentAttempt++;
-        console.log('[Merit Flow] DNS resolution failed, trying fallback endpoint');
-        this.baseUrl = this.fallbackUrl;
-        return this.createThread();
-      }
-      console.error('[Merit Flow] Error details:', {
-        endpoint: this.baseUrl,
-        attempt: this.currentAttempt,
-        headers: this.headers,
-        error: error.message
-      });
-      this.state.hasError = true;
-      this.state.errorMessage = error.message;
-      throw error;
+### 1. Assistant Configuration & Preflight
+```javascript
+const MERIT_ASSISTANT_CONFIG = {
+    instructions: `You are Merit, an expert in EL Education's curriculum for English Language Arts. 
+                  Limit your file searches to the guide aligned with the user's grade level.
+                  Always maintain a supportive, educational tone.`,
+    name: "Merit ELA Guide",
+    tools: [{ type: "file_search" }],
+    model: "gpt-4o",
+    metadata: {
+        curriculum: "ela",
+        provider: "el_education"
     }
-  }
+};
 
-  async preloadContext(context) {
-    try {
-      console.log('[Merit Flow] Preloading context');
-      const preloadMessage = `Hi, I'm your guide. I'll be helping with ${context.curriculum.toUpperCase()} for ${context.gradeLevel}.`;
-      await this.sendMessage(preloadMessage, { visible: false });
-      this.state.isPreloaded = true;
-      this.state.context = context;
-      console.log('[Merit Flow] Context preloaded:', context);
-    } catch (error) {
-      console.error('[Merit Flow] Context preload error:', error);
-      this.state.hasError = true;
-      this.state.errorMessage = error.message;
-      throw error;
-    }
-  }
+// Preflight curl equivalent in our system
+const preflightHeaders = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+    'OpenAI-Beta': 'assistants=v2',
+    'X-Project-ID': OPENAI_CONFIG.assistant.project
+};
+```
 
-  async sendMessage(message, options = {}) {
-    console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
-    if (!this.state.projectPaired || !this.threadId) {
-      console.log('[Merit Flow] No thread found, creating new thread...');
-      await this.createThread();
-    }
-    if (!this.state.projectPaired) {
-      throw new Error('OpenAI project must be paired before sending messages');
-    }
-    try {
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({
-          message,
-          thread_id: this.threadId || null,
-          user_id: this.userId,
-          project_id: this.config.project_id,
-          ...this.config,
-          ...options
-        })
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        if (error.statusCode === 403) {
-          this.state.projectPaired = false;
-          throw new Error('OpenAI project pairing lost');
-        }
-        throw new Error(error.error || 'Message send failed');
-      }
-      const data = await response.json();
-      if (!this.threadId && data.thread_id) {
-        this.threadId = data.thread_id;
-        console.log('[Merit Flow] New thread created:', this.threadId);
-      }
-      console.log('[Merit Flow] Message sent successfully');
-      return data;
-    } catch (error) {
-      console.error('[Merit Flow] Message sending error:', error);
-      this.state.hasError = true;
-      this.state.errorMessage = error.message;
-      throw error;
-    }
-  }
+### 2. Redis Context Setup
+```javascript
+const REDIS_CONTEXT = {
+    prefix: 'merit:ela',
+    keys: {
+        user: (userId) => `${prefix}:user:${userId}`,
+        grade: (userId) => `${prefix}:grade:${userId}`,
+        curriculum: (userId) => `${prefix}:curriculum:${userId}`
+    },
+    ttl: 3600
+};
+```
 
-  getState() {
-    return { ...this.state };
-  }
+### 3. Integration Flow Steps
 
-  destroy() {
-    this.threadId = null;
-    this.state = {
-      isLoading: false,
-      hasError: false,
-      errorMessage: null,
-      lastRequest: null,
-      lastResponse: null,
-      isPreloaded: false,
-      context: null,
-      projectPaired: false
-    };
-    console.log('[Merit Flow] Client destroyed');
-  }
+1. **Initial Page Load**
+   - Load grade level selection
+   - Initialize Redis context store
+   - Prepare assistant configuration
+
+2. **Grade Level Selection**
+   ```javascript
+   // Store in Redis
+   await redis.set(
+       REDIS_CONTEXT.keys.grade(userId),
+       gradeLevel,
+       'EX',
+       REDIS_CONTEXT.ttl
+   );
+   ```
+
+3. **Assistant Initialization**
+   - Create thread with grade-specific context
+   - Send automated welcome message (hidden)
+   ```javascript
+   const welcomeMessage = `Hi I'm Merit, I'm here to answer questions about EL Education's ${gradeLevel} curriculum for English Language Arts. If that's not going to meet your goals, go back to Welcome tab and choose another grade level.`;
+   ```
+
+4. **Context Preparation**
+   ```javascript
+   const contextPayload = {
+       grade_level: gradeLevel,
+       curriculum: 'ela',
+       provider: 'el_education',
+       thread_id: threadId
+   };
+   ```
+
+5. **First Hidden Message**
+   ```javascript
+   await sendMessage({
+       content: `Initialize as an ELA curriculum expert for grade ${gradeLevel}. Limit file searches to this grade's materials.`,
+       visible: false
+   });
+   ```
+
+### 4. Testing Scenarios
+
+1. **Grade Level Context**
+   - Verify Redis storage of grade level
+   - Confirm context in assistant messages
+   - Test grade level switching
+
+2. **Welcome Message**
+   - Verify automated welcome appears
+   - Check grade level in message
+   - Test message visibility flags
+
+3. **File Search Boundaries**
+   - Verify searches limited to grade level
+   - Test cross-grade search blocking
+   - Validate search tool configuration
+
+4. **Redis Integration**
+   - Test context key creation
+   - Verify TTL implementation
+   - Check key cleanup
+
+### 5. Implementation Checklist
+
+- [ ] Update OpenAI client with preflight configuration
+- [ ] Implement Redis context storage
+- [ ] Add automated welcome message
+- [ ] Configure file search tool
+- [ ] Add grade level validation
+- [ ] Implement context switching
+- [ ] Add test coverage for all scenarios
+
+### 6. Error Handling
+
+```javascript
+try {
+    await initializeAssistant(gradeLevel);
+} catch (error) {
+    if (error.code === 'REDIS_CONTEXT_ERROR') {
+        // Retry Redis context setup
+        await retryContextSetup();
+    } else if (error.code === 'ASSISTANT_INIT_ERROR') {
+        // Fallback to default configuration
+        await initializeWithDefaults();
+    }
+    console.error('[Merit Flow] Initialization error:', error);
 }
+```
 
-export default MeritOpenAIClient; 
+### 7. Monitoring Points
+
+- Redis context creation success rate
+- Assistant initialization time
+- Welcome message delivery confirmation
+- Grade level context switches
+- File search boundary enforcement
+- Error rates by type
+
+### 8. File Search Customization
+
+#### Search Configuration
+```javascript
+const SEARCH_CONFIG = {
+    // Grade level namespaces
+    namespaces: {
+        k2: 'k2-curriculum-guide',
+        g3_5: 'g3-5-curriculum-guide',
+        g6_8: 'g6-8-curriculum-guide'
+    },
+    
+    // Search parameters
+    parameters: {
+        limit: 5,  // Number of results per query
+        threshold: 0.7,  // Relevance threshold
+        search_distance: 3  // Paragraphs around match
+    }
+};
+
+// Grade-specific search configuration
+const getGradeSearchConfig = (gradeLevel) => {
+    let namespace;
+    if (gradeLevel <= 2) namespace = SEARCH_CONFIG.namespaces.k2;
+    else if (gradeLevel <= 5) namespace = SEARCH_CONFIG.namespaces.g3_5;
+    else namespace = SEARCH_CONFIG.namespaces.g6_8;
+
+    return {
+        namespace,
+        ...SEARCH_CONFIG.parameters
+    };
+};
+```
+
+#### Search Tool Configuration
+```javascript
+const MERIT_SEARCH_TOOL = {
+    type: "file_search",
+    settings: {
+        // Enable grade-level specific search
+        enable_namespace: true,
+        // Customize result format
+        result_format: {
+            include_metadata: true,
+            include_snippets: true,
+            max_snippets: 3
+        }
+    }
+};
+```
+
+#### Integration Tasks
+
+1. **Namespace Setup**
+   - [ ] Create grade-level namespaces in file system
+   - [ ] Tag curriculum documents with appropriate namespace
+   - [ ] Verify namespace boundaries
+   - [ ] Test cross-namespace isolation
+
+2. **Search Tuning**
+   - [ ] Adjust relevance threshold per grade level
+   - [ ] Fine-tune search distance for context
+   - [ ] Optimize result limits
+   - [ ] Test search precision
+
+3. **Result Processing**
+   - [ ] Format snippets for grade-appropriate display
+   - [ ] Handle metadata in responses
+   - [ ] Implement citation formatting
+   - [ ] Add source validation
+
+4. **Context Integration**
+   ```javascript
+   // Example: Integrating search with context
+   const searchContext = {
+       grade_level: gradeLevel,
+       search_config: getGradeSearchConfig(gradeLevel),
+       allowed_namespaces: [`grade-${gradeLevel}-curriculum`]
+   };
+   ```
+
+5. **Search Boundaries**
+   ```javascript
+   // Example: Enforcing search boundaries
+   const validateSearchRequest = (query, gradeLevel) => {
+       const config = getGradeSearchConfig(gradeLevel);
+       return {
+           query,
+           namespace: config.namespace,
+           metadata_filters: {
+               grade_level: gradeLevel,
+               curriculum_type: 'ela'
+           }
+       };
+   };
+   ```
+
+#### Testing Matrix
+
+| Test Case | Description | Success Criteria |
+|-----------|-------------|------------------|
+| Namespace Isolation | Verify searches stay within grade level | No cross-grade results |
+| Relevance Scoring | Check result quality | Score > 0.7 |
+| Context Boundary | Test paragraph context | 3 paragraphs max |
+| Citation Format | Verify source references | Complete citations |
+| Performance | Measure search latency | < 500ms response |
+
+#### Monitoring Metrics
+
+1. **Search Quality**
+   - Relevance scores
+   - Result precision
+   - Context accuracy
+   - Citation completeness
+
+2. **Performance**
+   - Search latency
+   - Cache hit rate
+   - Result count
+   - Error frequency
+
+3. **Usage Patterns**
+   - Popular queries
+   - Common grade levels
+   - Result utilization
+   - User satisfaction
+
+#### Implementation Example
+```javascript
+class MeritSearchTool {
+    constructor(gradeLevel) {
+        this.config = getGradeSearchConfig(gradeLevel);
+        this.searchContext = {
+            grade_level: gradeLevel,
+            namespace: this.config.namespace
+        };
+    }
+
+    async search(query) {
+        const validatedRequest = validateSearchRequest(query, this.searchContext.grade_level);
+        
+        try {
+            const results = await this.performSearch(validatedRequest);
+            return this.processResults(results);
+        } catch (error) {
+            console.error('[Merit Search] Error:', error);
+            throw new Error('Search failed: ' + error.message);
+        }
+    }
+
+    processResults(results) {
+        return results.map(result => ({
+            content: result.snippet,
+            source: this.formatCitation(result),
+            relevance: result.score,
+            metadata: {
+                grade_level: this.searchContext.grade_level,
+                section: result.metadata.section,
+                unit: result.metadata.unit
+            }
+        }));
+    }
+}
+```
 
 ## Running Tests
 
@@ -229,7 +326,8 @@ export default MeritOpenAIClient;
 
 4. Review the console output to verify thread creation, message sending, state updates, and error handling.
 
-This test suite helps correlate our current integration changes in openai.js with the expected behavior logged in the frontend (see console output in client-merit-instructional-flow.js). 
+This test suite helps correlate our current integration changes in openai.js with the expected behavior logged in the frontend (see console output in client-merit-instructional-flow.js).
+
 Explanation of Endpoints:
 
 Lambda Endpoint:
