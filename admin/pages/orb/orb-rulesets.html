@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ORB Rulesets - Frontend Development Rules and Guidelines">
-    <title>ORB Rulesets | Admin</title>
+    <title>ORB: Rulesets</title>
 
     <!-- CRITICAL SETUP: Enable Cursor Auto-Save -->
     <!-- 
@@ -25,8 +25,15 @@
     <script type="module" src="assets/js/admin-orb-dashboard.js"></script>
 
     <!-- Admin styles -->
+    <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
     <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
     <link rel="stylesheet" href="assets/css/admin-orb.css">
+
+    <!-- Platform CSS -->
+    <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+    <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
 
     <!-- Version display initialization -->
     <script>
@@ -42,15 +49,157 @@
             }
         });
     </script>
+
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-areas:
+                "header header"
+                "nav main";
+            grid-template-columns: var(--nav-width, 260px) 1fr;
+            grid-template-rows: var(--header-height, 60px) 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            grid-area: header;
+            background: var(--brand-color, #004080);
+            color: #fff;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--admin-border);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .version-display {
+            font-size: 12px;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #fff;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .icon-button:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .admin-nav {
+            grid-area: nav;
+            background: white;
+            border-right: 1px solid var(--admin-border);
+            padding: 2rem;
+        }
+
+        .admin-content {
+            grid-area: main;
+            padding: 2rem;
+            max-width: var(--content-width, 1200px);
+            margin: 0 auto;
+        }
+
+        .header-logo img {
+            width: 160px;
+            height: auto;
+            max-height: 40px;
+            object-fit: contain;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-layout" data-admin-component="orb-dashboard">
+    <div class="admin-layout">
         <header class="admin-header">
-            <div class="header-content">
-                <h1>ORB Rulesets</h1>
-                <div class="version-display"></div>
+            <div class="header-left">
+                <a href="/admin/dashboard.html" class="header-logo">
+                    <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
+                </a>
+                <span class="version-display">v1.0.0 (04.15.2024)</span>
             </div>
-  </header>
+            <nav class="header-nav">
+                <a href="/admin/dashboard.html" class="nav-item">Admin</a>
+                <div class="nav-item active">
+                    <a href="/admin/pages/orb/index.html" class="icon-button tooltip" data-tooltip="Developer Hub">
+                        <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <button class="icon-button tooltip" data-tooltip="Account">
+                        <img src="/shared/platform/images/platform-account-icon-white.svg" alt="Account" class="nav-icon" width="24" height="24">
+                    </button>
+                </div>
+            </nav>
+        </header>
 
         <nav class="admin-page-nav">
             <div class="nav-section">
