@@ -1,5 +1,5 @@
 // Chat Core Configuration
-const LAMBDA_ENDPOINT = 'https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main';
+const LAMBDA_ENDPOINT = 'https://api.recursivelearning.app/dev';
 
 // State Management
 let messageCount = 0;
