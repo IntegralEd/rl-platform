@@ -342,6 +342,14 @@
 
         // Initialize effects
         createBubbles();
+
+        const email = sessionStorage.getItem('admin_email');
+        // or
+        const authData = JSON.parse(localStorage.getItem('admin_vault_key'));
+        const email = authData?.email;
+        if (email) {
+            console.log('[Admin Session] Current user:', email);
+        }
     </script>
 </body>
 </html> 
