@@ -409,117 +409,66 @@
 ## Merit Page Review (04.15.2024)
 ### URL: https://recursivelearning.app/clients/elpl/merit/merit.html#welcome
 
-#### Security Module Issue
-- [ ] Fix 404 error for security module:
+#### Recent Updates
+- [x] Created security module with CORS and embed protection
+- [x] Updated footer styling to remove blue background
+- [x] Fixed send button styling and layout
+- [x] Updated API endpoint to use development URL
+- [x] Improved chat UI with cleaner layout
+
+#### Remaining Issues
+
+##### API Configuration
+- [ ] Verify development endpoint is functioning:
+  ```javascript
+  Current endpoint: https://api.recursivelearning.app/dev
+  Status: net::ERR_NAME_NOT_RESOLVED
   ```
-  GET https://recursivelearning.app/clients/elpl/assets/elpl-security.js net::ERR_ABORTED 404 (Not Found)
-  ```
-  - Required Fix: Create missing security module
-  - Path: `/clients/elpl/assets/elpl-security.js`
-  - Implementation: Add CORS and embed protection
+- [ ] Implement proper error handling for API failures
+- [ ] Add retry logic with exponential backoff
+- [ ] Create offline mode fallback for testing
 
-#### Version Display Inconsistency
-- [ ] Current display: `merit.html/04152025.03:55pm.v.1.16`
-- [ ] Format issues:
-  - Year shows as 2025 instead of 2024
-  - Version format differs from admin (v1.0.0 vs v.1.16)
-  - Build timestamp needs standardization
+##### UI/UX Improvements
+- [ ] Increase icon sizes throughout interface
+- [ ] Improve button state indicators
+- [ ] Refine form dropdown selections
+- [ ] Add loading states for API calls
+- [ ] Implement proper error messages for users
 
-#### Validation States
-Current console output shows temporary validation bypasses:
-```javascript
-[Merit Flow] All validations passed for MVP testing
-[Merit Flow] Note: Proper validation will be implemented in v1.0.16
-[Merit Flow] Form validation hardcoded to pass for testing
-[Merit Flow] Navigation validation hardcoded to pass for testing
-```
-Required fixes:
-- [ ] Implement proper form validation
-- [ ] Add navigation state validation
-- [ ] Remove hardcoded validation passes
-- [ ] Add validation error handling
+##### State Management
+- [ ] Fix form validation with proper UX feedback
+- [ ] Implement proper state persistence
+- [ ] Add loading indicators for state transitions
+- [ ] Create proper error boundaries
 
-#### OpenAI Integration
-Current initialization shows:
-```javascript
-[Merit Flow] OpenAI client initialized
-[Merit Flow] Using API endpoint: https://tixnmh1pe8.execute-api.us-east-2.amazonaws.com/prod/IntegralEd-Main
-[Merit Flow] Project ID: proj_V4lrL1OSfydWCFW0zjgwrFRT
-```
-Required fixes:
-- [ ] Move API endpoint to configuration
-- [ ] Add error handling for API failures
-- [ ] Implement retry logic
-- [ ] Add offline mode fallback
-
-#### State Management
-Current state tracking shows:
-```javascript
-[Merit Flow] Action state updated: {
-  nextButton: true, 
-  sendButton: true, 
-  chatInput: true, 
-  chatReady: false, 
-  formValid: false
-}
-[Merit Flow] Navigated to welcome {
-  section: 'welcome',
-  formValid: false,
-  gradeLevel: null,
-  curriculum: 'ela',
-  chatReady: false
-}
-```
-Required fixes:
-- [ ] Add proper state persistence
-- [ ] Implement form validation
-- [ ] Add loading states for chat readiness
-- [ ] Fix initial state management
+##### Console Logging
+- [ ] Add structured logging format
+- [ ] Include assistant information in logs
+- [ ] Add configuration logging on page load
+- [ ] Implement proper error tracking
 
 #### Implementation Priority
-1. Security Module Creation
-   - Create elpl-security.js
-   - Implement CORS protection
-   - Add embed validation
+1. API Configuration
+   - Verify DNS resolution for development endpoint
+   - Implement proper error handling
+   - Add retry logic
+   - Create offline fallback
 
-2. Form Validation
-   - Remove hardcoded passes
-   - Implement proper validation
-   - Add error states
+2. UI/UX Refinement
+   - Fix remaining button states
+   - Increase icon sizes
+   - Improve visual feedback
    - Add loading indicators
 
 3. State Management
-   - Fix initial states
-   - Add persistence
-   - Implement proper transitions
-
-4. Version Display
-   - Fix year display
-   - Standardize format
-   - Add build tracking
-
-5. OpenAI Integration
-   - Add configuration
-   - Implement error handling
-   - Add retry logic
-   - Create offline mode
-
-#### Required Files
-```plaintext
-/clients/elpl/assets/
-  ├── elpl-security.js (new)
-  ├── js/
-  │   ├── client-merit-validation.js (new)
-  │   ├── client-merit-state.js (new)
-  │   └── client-merit-config.js (new)
-  └── css/
-      └── client-merit-states.css (new)
-```
+   - Implement proper validation
+   - Add state persistence
+   - Fix transition states
+   - Add error boundaries
 
 #### Next Steps
-1. Create security module with proper CORS
-2. Implement form validation system
-3. Add proper state management
-4. Fix version display format
-5. Enhance OpenAI integration
-6. Add error boundaries and loading states
+1. Test development API endpoint functionality
+2. Complete remaining UI/UX improvements
+3. Implement proper state management
+4. Enhance error handling and user feedback
+5. Add comprehensive logging
