@@ -1,5 +1,5 @@
 // Chat Core Configuration
-const LAMBDA_ENDPOINT = 'https://api.recursivelearning.app/dev';
+const LAMBDA_ENDPOINT = process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app';
 
 // State Management
 let messageCount = 0;

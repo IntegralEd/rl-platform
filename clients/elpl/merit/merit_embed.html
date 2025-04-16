@@ -414,7 +414,8 @@
             chatWindow.appendChild(transmissionIndicator);
 
             // Send to Lambda
-            fetch('https://api.recursivelearning.app/dev', {
+            const API_ENDPOINT = process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app';
+            fetch(API_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
