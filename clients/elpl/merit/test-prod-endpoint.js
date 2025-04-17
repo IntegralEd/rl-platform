@@ -1,79 +1,98 @@
 /**
- * Merit Production Endpoint Health Check
  * Tests the Lambda API endpoint
+ * Uses API key from merit-api-key file
  */
 
-const ENDPOINTS = {
-    lambda: 'https://api.recursivelearning.app/v1/lambda'
-};
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
 
-const CONFIG = {
-    org_id: 'recdg5Hlm3VVaBA2u',
-    assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
-    schema_version: '04102025.B01'
-};
+// Read API key from file
+const API_KEY_PATH = path.join(__dirname, 'merit-api-key');
+let MERIT_API_KEY;
+
+try {
+    MERIT_API_KEY = fs.readFileSync(API_KEY_PATH, 'utf8')
+        .split('\n')
+        .find(line => !line.startsWith('#'))
+        .trim();
+    
+    if (!MERIT_API_KEY) {
+        throw new Error('API key not found in file');
+    }
+} catch (error) {
+    console.error('❌ Error reading merit-api-key file:', error.message);
+    process.exit(1);
+}
+
+// Test configuration
+const endpoint = 'https://api.recursivelearning.app/v1/lambda';
+const data = JSON.stringify({
+    action: 'create_thread',
+    project_id: 'merit',
+    thread_id: `test-${Date.now()}`
+});
 
 async function runTest() {
-    if (!process.env.MERIT_API_KEY) {
-        console.error('❌ Error: MERIT_API_KEY environment variable is not set');
-        process.exit(1);
-    }
-
-    console.log('🚀 Starting endpoint health check...');
     console.log('Testing Lambda endpoint with authentication\n');
-
-    const endpoint = ENDPOINTS.lambda;
     
-    console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
-    
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.MERIT_API_KEY}`,
-                'X-Project-ID': CONFIG.org_id
-            },
-            body: JSON.stringify({
-                action: 'create_thread',
-                org_id: CONFIG.org_id,
-                assistant_id: CONFIG.assistant_id,
-                schema_version: CONFIG.schema_version
-            })
-        });
-
-        const data = await response.json();
-        
-        console.log(`\n✅ Response Status: ${response.status}`);
-        console.log('Response Data:', JSON.stringify(data, null, 2));
-        
-        if (response.status === 403) {
-            if (data.message === 'Missing Authentication Token') {
-                console.log('\n🔴 Test failed - API key not recognized');
-                console.log('Headers sent:', {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer [REDACTED]',
-                    'X-Project-ID': CONFIG.org_id
-                });
-            } else {
-                console.log('\n🟡 Test complete - authentication required but token format correct');
-            }
-        } else if (response.status === 401) {
-            console.log('\n🔴 Test failed - invalid API key');
-        } else if (response.status === 200) {
-            console.log('\n🟢 Test complete - successfully authenticated');
-            if (data.thread_id) {
-                console.log(`Thread ID: ${data.thread_id}`);
-            }
-        } else if (response.status === 429) {
-            console.log('\n🟡 Test complete - rate limit exceeded');
-        } else {
-            console.log('\n🔴 Test complete - unexpected response status');
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${MERIT_API_KEY}`,
+            'Content-Length': data.length
         }
-    } catch (error) {
-        console.error(`\n❌ Error testing ${endpoint}:`, error.message);
-        process.exit(1);
-    }
+    };
+
+    console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
+    console.log('Request headers:', {
+        ...options.headers,
+        'Authorization': 'Bearer [REDACTED]'
+    });
+
+    return new Promise((resolve, reject) => {
+        const req = https.request(endpoint, options, (res) => {
+            let responseData = '';
+            
+            res.on('data', (chunk) => {
+                responseData += chunk;
+            });
+            
+            res.on('end', () => {
+                switch (res.statusCode) {
+                    case 200:
+                        console.log('\n🟢 Test complete - successfully authenticated');
+                        break;
+                    case 401:
+                        console.log('\n🔴 Test failed - API key not recognized');
+                        break;
+                    case 403:
+                        if (responseData.includes('token')) {
+                            console.log('\n🟡 Test complete - authentication required but token format correct');
+                        } else {
+                            console.log('\n🔴 Test failed - invalid API key');
+                        }
+                        break;
+                    case 429:
+                        console.log('\n🟡 Test complete - rate limit exceeded');
+                        break;
+                    default:
+                        console.log('\n🔴 Test complete - unexpected response status');
+                }
+                console.log('Response:', responseData);
+                resolve();
+            });
+        });
+        
+        req.on('error', (error) => {
+            console.error(`\n❌ Error testing ${endpoint}:`, error.message);
+            reject(error);
+        });
+        
+        req.write(data);
+        req.end();
+    });
 }
 
 // Run the tests
