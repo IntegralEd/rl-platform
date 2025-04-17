@@ -5,33 +5,27 @@
  */
 class MeritOpenAIClient {
     constructor() {
-        // OpenAI Configuration
-        const OPENAI_CONFIG = {
-            assistant: {
-                id: 'asst_QoAA395ibbyMImFJERbG2hKT',
-                project: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-                model: 'gpt-4o'
-            }
-        };
+        // Core configuration
+        this.threadId = null;
+        this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
+        this.userId = null;
 
-        // API Configuration - Single source of truth for endpoint
+        // API Configuration
         const ENDPOINTS = {
             prod: 'https://api.recursivelearning.app/prod',
-            contextPrefix: 'merit:ela:context',
-            threadPrefix: 'merit:ela:thread'
+            contextPrefix: 'context',
+            threadPrefix: 'thread'
         };
         
         // Core state
-        this.threadId = null;
-        this.userId = null;
         this.baseUrl = ENDPOINTS.prod;
         
         // Project configuration
         this.config = {
             org_id: 'recdg5Hlm3VVaBA2u',
-            assistant_id: OPENAI_CONFIG.assistant.id,
-            project_id: OPENAI_CONFIG.assistant.project,
-            model: OPENAI_CONFIG.assistant.model,
+            assistant_id: this.assistantId,
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            model: 'gpt-4o',
             schema_version: '04102025.B01',
             ttl: {
                 session: 3600, // 1 hour for MVP phase
@@ -44,8 +38,27 @@ class MeritOpenAIClient {
         this.headers = {
             'Content-Type': 'application/json',
             'x-api-key': process.env.MERIT_API_KEY || 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
-            'X-Project-ID': OPENAI_CONFIG.assistant.project,
-            'X-Assistant-ID': OPENAI_CONFIG.assistant.id
+            'X-Project-ID': this.config.project_id
+        };
+
+        // Context fields structure
+        this.contextFields = {
+            intake: {
+                grade_level: null,
+                curriculum: 'ela',
+                user_context: null
+            },
+            system: {
+                schema_version: this.config.schema_version,
+                thread_id: null
+            }
+        };
+
+        // Error tracking
+        this.errors = {
+            validation: [],
+            cache: [],
+            schema: []
         };
 
         // State management
@@ -61,8 +74,8 @@ class MeritOpenAIClient {
         };
 
         console.log('[Merit Flow] OpenAI client initialized', {
-            assistant: OPENAI_CONFIG.assistant.id,
-            project: OPENAI_CONFIG.assistant.project,
+            assistant: this.assistantId,
+            project: this.config.project_id,
             endpoint: this.baseUrl
         });
     }
@@ -83,7 +96,8 @@ class MeritOpenAIClient {
                     action: 'create_thread',
                     org_id: this.config.org_id,
                     assistant_id: this.config.assistant_id,
-                    schema_version: this.config.schema_version
+                    schema_version: this.config.schema_version,
+                    project_id: this.config.project_id
                 })
             });
 
@@ -96,7 +110,8 @@ class MeritOpenAIClient {
             }
 
             const data = await response.json();
-            this.threadId = data.thread_id;
+            this.threadId = `${this.config.org_id}:${data.thread_id}`;
+            this.contextFields.system.thread_id = this.threadId;
             this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
             return this.threadId;
@@ -110,6 +125,38 @@ class MeritOpenAIClient {
             });
             this.state.hasError = true;
             this.state.errorMessage = error.message;
+            this.errors.validation.push({
+                timestamp: new Date().toISOString(),
+                error: error.message
+            });
+            throw error;
+        }
+    }
+
+    /**
+     * Preloads context for the conversation
+     * @param {Object} context - The context object containing grade level and curriculum
+     */
+    async preloadContext(context) {
+        try {
+            console.log('[Merit Flow] Preloading context');
+            const preloadMessage = `Hi, I'm your guide. I'll be helping with ${context.curriculum.toUpperCase()} for ${context.grade_level}.`;
+            await this.sendMessage(preloadMessage, { visible: false });
+            this.state.isPreloaded = true;
+            this.state.context = context;
+            this.contextFields.intake = {
+                ...this.contextFields.intake,
+                ...context
+            };
+            console.log('[Merit Flow] Context preloaded:', context);
+        } catch (error) {
+            console.error('[Merit Flow] Context preload error:', error);
+            this.state.hasError = true;
+            this.state.errorMessage = error.message;
+            this.errors.cache.push({
+                timestamp: new Date().toISOString(),
+                error: error.message
+            });
             throw error;
         }
     }
@@ -117,10 +164,10 @@ class MeritOpenAIClient {
     /**
      * Sends a message to the assistant
      * @param {string} message User message
+     * @param {Object} options Additional options
      * @returns {Promise<Object>} Assistant response
      */
-    async sendMessage(message) {
-        // Check project pairing before proceeding
+    async sendMessage(message, options = {}) {
         if (!this.state.projectPaired || !this.threadId) {
             await this.createThread();
         }
@@ -135,7 +182,10 @@ class MeritOpenAIClient {
                     thread_id: this.threadId,
                     org_id: this.config.org_id,
                     assistant_id: this.config.assistant_id,
-                    schema_version: this.config.schema_version
+                    schema_version: this.config.schema_version,
+                    project_id: this.config.project_id,
+                    context: this.contextFields,
+                    ...options
                 })
             });
 
@@ -149,14 +199,56 @@ class MeritOpenAIClient {
             }
 
             const data = await response.json();
+            this.state.lastRequest = message;
+            this.state.lastResponse = data;
             console.log('[Merit Flow] Message sent successfully');
             return data;
         } catch (error) {
             console.error('[Merit Flow] Message sending error:', error);
             this.state.hasError = true;
             this.state.errorMessage = error.message;
+            this.errors.validation.push({
+                timestamp: new Date().toISOString(),
+                error: error.message
+            });
             throw error;
         }
+    }
+
+    /**
+     * Gets the current state of the client
+     * @returns {Object} Current state
+     */
+    getState() {
+        return {
+            ...this.state,
+            context: this.contextFields,
+            errors: this.errors
+        };
+    }
+
+    /**
+     * Destroys the client instance
+     */
+    destroy() {
+        this.threadId = null;
+        this.contextFields.system.thread_id = null;
+        this.state = {
+            isLoading: false,
+            hasError: false,
+            errorMessage: null,
+            lastRequest: null,
+            lastResponse: null,
+            isPreloaded: false,
+            context: null,
+            projectPaired: false
+        };
+        this.errors = {
+            validation: [],
+            cache: [],
+            schema: []
+        };
+        console.log('[Merit Flow] Client destroyed');
     }
 }
 

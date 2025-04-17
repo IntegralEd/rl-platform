@@ -22,9 +22,9 @@ async function runTest() {
     console.log('🚀 Starting endpoint health check...');
     console.log('Testing production endpoint with authentication\n');
 
-    const endpoint = ENDPOINTS.prod;
+    const endpoint = `${ENDPOINTS.prod}?apikey=${process.env.MERIT_API_KEY}`;
     
-    console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
+    console.log(`🔍 Testing endpoint: ${ENDPOINTS.prod} (create_thread)`);
     
     try {
         const response = await fetch(endpoint, {
@@ -49,6 +49,11 @@ async function runTest() {
         if (response.status === 403) {
             if (data.message === 'Missing Authentication Token') {
                 console.log('\n🔴 Test failed - API key not recognized');
+                console.log('Headers sent:', {
+                    'Content-Type': 'application/json',
+                    'x-api-key': '[REDACTED]'
+                });
+                console.log('API Key also sent as query parameter');
             } else {
                 console.log('\n🟡 Test complete - authentication required but token format correct');
             }
