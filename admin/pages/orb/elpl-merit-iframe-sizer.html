@@ -1,290 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Merit Iframe Sizer | Admin</title>
-  
-  <!-- Platform CSS -->
-  <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
-  <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
-  
-  <!-- Admin Styles -->
-  <link rel="stylesheet" href="/admin/assets/css/admin-variables.css">
-  <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
-  
-  <!-- Required Admin Scripts -->
-  <script type="module" src="/admin/assets/js/admin-component-loader.js"></script>
-  <script type="module" src="/admin/assets/js/admin-auth.js"></script>
-  <script type="module" src="/admin/assets/js/admin-router.js"></script>
-  
-  <style>
-    .iframe-sizer-content {
-      display: grid;
-      grid-template-columns: var(--nav-width) 1fr;
-      gap: 2rem;
-      height: calc(100vh - var(--header-height) - 4rem);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELPL Merit Iframe Sizer</title>
+    <style>
+        :root {
+            --tree-indent: 20px;
+            --tree-line-color: #e1e4e8;
+            --tree-font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+            --tree-font-size: 14px;
+            --tree-line-height: 1.5;
+            --primary-color: #c6123f;
+            --highlight-color: #f1f8ff;
+            --border-color: #e1e4e8;
+        }
 
-    .control-panel {
-      background: var(--surface-1);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.5rem;
-      height: fit-content;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
 
-    .control-panel h3 {
-      margin: 0 0 1.5rem;
-      color: var(--text-1);
-      font-size: 1.25rem;
-    }
+        .sidebar {
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow: auto;
+            background: #f6f8fa;
+        }
 
-    .control-panel label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--text-2);
-      font-size: 0.875rem;
-    }
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-    .control-panel input[type="number"] {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      margin-bottom: 1rem;
-      background: var(--surface-2);
-      color: var(--text-1);
-    }
+        .gh-tree {
+            font-family: var(--tree-font);
+            font-size: var(--tree-font-size);
+            line-height: var(--tree-line-height);
+        }
 
-    .preview-panel {
-      background: var(--surface-1);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+        .gh-tree ul {
+            list-style: none;
+            padding-left: var(--tree-indent);
+            margin: 0;
+        }
 
-    .preview-header {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      background: var(--surface-2);
-    }
+        .gh-tree > ul {
+            padding-left: 0;
+        }
 
-    .preview-header h3 {
-      margin: 0;
-      color: var(--text-1);
-      font-size: 1.25rem;
-    }
+        .file {
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #24292e;
+            text-decoration: none;
+            display: block;
+        }
 
-    .preview-container {
-      flex: 1;
-      padding: 1rem;
-      overflow: auto;
-    }
+        .file:hover {
+            background: var(--highlight-color);
+        }
 
-    .code-panel {
-      margin-top: 1rem;
-      background: var(--surface-2);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1rem;
-    }
+        .file.live {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
 
-    .code-panel textarea {
-      width: 100%;
-      min-height: 120px;
-      font-family: monospace;
-      padding: 0.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: var(--surface-1);
-      color: var(--text-1);
-      resize: vertical;
-    }
+        .folder {
+            padding: 4px 0;
+            cursor: pointer;
+            color: #24292e;
+            font-weight: 600;
+        }
 
-    .button-group {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 1rem;
-    }
+        .controls {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
 
-    .preset-button {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.25rem 0;
-      text-align: left;
-      background: var(--surface-2);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      color: var(--text-1);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+        .controls input {
+            width: 100%;
+            padding: 8px;
+            margin: 4px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
 
-    .preset-button:hover {
-      background: var(--surface-3);
-      border-color: var(--primary-color);
-    }
+        .controls label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
 
-    .action-button {
-      padding: 0.5rem 1rem;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+        .preset-sizes {
+            margin-top: 20px;
+        }
 
-    .action-button:hover {
-      background: var(--primary-hover);
-    }
+        .preset-sizes button {
+            margin-right: 8px;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
 
-    .action-button.secondary {
-      background: var(--surface-2);
-      color: var(--text-1);
-      border: 1px solid var(--border-color);
-    }
+        .preset-sizes button:hover {
+            background: var(--highlight-color);
+        }
 
-    .action-button.secondary:hover {
-      background: var(--surface-3);
-    }
-  </style>
+        .preview {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .copy-code {
+            background: #f6f8fa;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: var(--tree-font);
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background: var(--highlight-color);
+        }
+    </style>
 </head>
 <body>
-  <div class="admin-layout">
-    <header class="admin-header">
-      <div class="header-left">
-        <a href="/admin/dashboard.html" class="header-logo">
-          <img src="/shared/platform/images/platform-logo-admin-white.svg" alt="Recursive Learning" width="160" height="40" />
-        </a>
-        <span class="version-display">v1.0.0 (04.17.2024)</span>
-      </div>
-      <nav class="header-nav">
-        <a href="/admin/dashboard.html" class="nav-item">Admin</a>
-        <div class="nav-item active">
-          <a href="/admin/pages/orb/index.html" class="icon-button tooltip" data-tooltip="Developer Hub">
-            <img src="/shared/platform/images/platform-dev-icon-white.svg" alt="Developer Hub" class="nav-icon" width="24" height="24">
-          </a>
+    <div class="sidebar">
+        <div class="gh-tree" id="file-tree">
+            <!-- Tree will be populated by JavaScript -->
         </div>
-      </nav>
-    </header>
+    </div>
 
-    <main class="admin-content">
-      <h1>Merit Iframe Sizer</h1>
-      <p class="subtitle">Configure and preview Merit iframe embeds for Storyline integration</p>
-
-      <div class="iframe-sizer-content">
-        <div class="control-panel">
-          <h3>Size Controls</h3>
-          
-          <label for="iframe-width">Width (%)</label>
-          <input type="number" id="iframe-width" value="100" min="10" max="200">
-          
-          <label for="iframe-height">Height (px)</label>
-          <input type="number" id="iframe-height" value="600" min="100" max="2000">
-
-          <h3>Preset Sizes</h3>
-          <button class="preset-button" onclick="IframeSizer.setSize(100, 600)">
-            Default (100% × 600px)
-          </button>
-          <button class="preset-button" onclick="IframeSizer.setSize(100, 800)">
-            Tall (100% × 800px)
-          </button>
-          <button class="preset-button" onclick="IframeSizer.setSize(100, 400)">
-            Compact (100% × 400px)
-          </button>
-
-          <div class="code-panel">
-            <h3>Embed Code</h3>
-            <textarea id="iframe-code" readonly aria-label="Iframe embed code"></textarea>
-            <div class="button-group">
-              <button class="action-button" onclick="IframeSizer.copyCode()">Copy Code</button>
-              <button class="action-button secondary" onclick="IframeSizer.resetSize()">Reset Size</button>
+    <div class="main-content">
+        <div class="controls">
+            <label>Width (%)</label>
+            <input type="number" id="width-input" value="100" min="10" max="100">
+            
+            <label>Height (px)</label>
+            <input type="number" id="height-input" value="600" min="100">
+            
+            <div class="preset-sizes">
+                <button onclick="setSize('100%', '600px')">Default (100% × 600px)</button>
+                <button onclick="setSize('100%', '800px')">Tall (100% × 800px)</button>
+                <button onclick="setSize('100%', '400px')">Compact (100% × 400px)</button>
             </div>
-          </div>
         </div>
 
-        <div class="preview-panel">
-          <div class="preview-header">
-            <h3>Live Preview</h3>
-          </div>
-          <div class="preview-container">
-            <iframe
-              id="merit-iframe"
-              src="https://recursivelearning.app/clients/elpl/merit/merit_live.html"
-              width="100%"
-              height="600px"
-              frameborder="0"
-              title="ELPL Merit System">
-            </iframe>
-          </div>
+        <div class="preview">
+            <iframe id="preview-frame" src="about:blank" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
         </div>
-      </div>
-    </main>
-  </div>
 
-  <script>
-    const IframeSizer = {
-      init() {
-        this.iframe = document.getElementById('merit-iframe');
-        this.codeBlock = document.getElementById('iframe-code');
-        this.widthInput = document.getElementById('iframe-width');
-        this.heightInput = document.getElementById('iframe-height');
+        <div class="copy-code">
+            <pre id="embed-code"></pre>
+            <button class="copy-button" onclick="copyEmbedCode()">Copy Code</button>
+        </div>
+    </div>
 
-        this.widthInput.addEventListener('input', () => this.updateSize());
-        this.heightInput.addEventListener('input', () => this.updateSize());
-        
-        this.updateCode();
-      },
+    <script>
+        // Tree structure will be populated from the actual filesystem
+        const treeData = {
+            'clients': {
+                'elpl': {
+                    'merit': {
+                        'merit_live.html': true,
+                        'merit_temp.html': false,
+                        'merit.html': false
+                    }
+                }
+            }
+        };
 
-      setSize(width, height) {
-        this.widthInput.value = width;
-        this.heightInput.value = height;
-        this.updateSize();
-      },
+        function buildTree(data, parent = document.getElementById('file-tree')) {
+            const ul = document.createElement('ul');
+            
+            for (const [key, value] of Object.entries(data)) {
+                const li = document.createElement('li');
+                
+                if (typeof value === 'object') {
+                    // Folder
+                    const folder = document.createElement('div');
+                    folder.className = 'folder';
+                    folder.textContent = key + '/';
+                    li.appendChild(folder);
+                    buildTree(value, li);
+                } else {
+                    // File
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'file' + (key.endsWith('_live.html') ? ' live' : '');
+                    a.textContent = key;
+                    if (value) { // For live files
+                        a.onclick = (e) => {
+                            e.preventDefault();
+                            loadPreview(`/clients/elpl/merit/${key}`);
+                        };
+                    }
+                    li.appendChild(a);
+                }
+                
+                ul.appendChild(li);
+            }
+            
+            parent.appendChild(ul);
+        }
 
-      updateSize() {
-        const width = this.widthInput.value;
-        const height = this.heightInput.value;
-        
-        this.iframe.style.width = width + '%';
-        this.iframe.style.height = height + 'px';
-        
-        this.updateCode();
-      },
+        function loadPreview(url) {
+            const frame = document.getElementById('preview-frame');
+            frame.src = url;
+            updateEmbedCode();
+        }
 
-      resetSize() {
-        this.setSize(100, 600);
-      },
+        function setSize(width, height) {
+            document.getElementById('width-input').value = parseInt(width);
+            document.getElementById('height-input').value = parseInt(height);
+            updateEmbedCode();
+        }
 
-      updateCode() {
-        const width = this.widthInput.value;
-        const height = this.heightInput.value;
-        
-        const code = `<iframe
-  src="https://recursivelearning.app/clients/elpl/merit/merit_live.html"
-  width="${width}%"
-  height="${height}px"
-  frameborder="0"
-  title="ELPL Merit System">
+        function updateEmbedCode() {
+            const width = document.getElementById('width-input').value + '%';
+            const height = document.getElementById('height-input').value + 'px';
+            const url = document.getElementById('preview-frame').src;
+            
+            const code = `<iframe
+    src="${url}"
+    width="${width}"
+    height="${height}"
+    frameborder="0"
+    title="ELPL Merit System">
 </iframe>`;
-        
-        this.codeBlock.value = code;
-      },
+            
+            document.getElementById('embed-code').textContent = code;
+        }
 
-      copyCode() {
-        this.codeBlock.select();
-        document.execCommand('copy');
-        alert('Iframe code copied to clipboard!');
-      }
-    };
+        function copyEmbedCode() {
+            const code = document.getElementById('embed-code').textContent;
+            navigator.clipboard.writeText(code);
+            const button = document.querySelector('.copy-button');
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = 'Copy Code';
+            }, 2000);
+        }
 
-    document.addEventListener('DOMContentLoaded', () => IframeSizer.init());
-  </script>
+        // Initialize
+        buildTree(treeData);
+        document.getElementById('width-input').addEventListener('input', updateEmbedCode);
+        document.getElementById('height-input').addEventListener('input', updateEmbedCode);
+        updateEmbedCode();
+    </script>
 </body>
 </html> 
