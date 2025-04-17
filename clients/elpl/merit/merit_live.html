@@ -9,326 +9,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Merit System Version Switcher">
-    <title>Merit System | EL Education</title>
+    <title>ELPL Merit Chat</title>
     <style>
-        :root {
-            --primary-color: #c6123f;
-            --secondary-color: #211651;
-            --loading-bg: rgba(255, 255, 255, 0.98);
-            --error-color: #dc3545;
-            --success-color: #28a745;
-        }
-
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            width: 100%;
+            height: 100vh;
+            width: 100vw;
             overflow: hidden;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-        #loading-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--loading-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.3s ease;
+        #chatbase-container {
+            width: 100%;
+            height: 100%;
         }
 
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            margin-top: 20px;
-            color: var(--secondary-color);
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .error-container {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            margin: 20px;
-            border-radius: 8px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .error-container.visible {
-            display: block;
-        }
-
-        .error-title {
-            color: var(--error-color);
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .error-message {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
-
-        .error-action {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s ease;
-        }
-
-        .error-action:hover {
-            background: #a30f35;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        #content-frame {
-            display: block;
+        #chatbase-frame {
             width: 100%;
             height: 100%;
             border: none;
-        }
-
-        .version-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            color: white;
-            background: var(--secondary-color);
-            z-index: 1001;
-            opacity: 0.8;
-        }
-
-        #chatbot-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #chatbot-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            flex: 1;
         }
     </style>
 </head>
 <body>
-    <div id="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Contacting ELPL Merit for chat...</div>
-        <div class="error-container" id="error-container">
-            <div class="error-title">Loading Error</div>
-            <div class="error-message" id="error-message"></div>
-            <button class="error-action" onclick="window.location.reload()">Retry</button>
-        </div>
-    </div>
-    
-    <div id="version-indicator" class="version-indicator"></div>
-    <div id="chatbot-container">
-        <!-- When ready for production, change src to merit.html instead of chatbase URL -->
+    <!-- When ready for production, change src to merit.html instead of chatbase URL -->
+    <div id="chatbase-container">
         <iframe 
-            id="chatbot-frame"
+            id="chatbase-frame"
             src="https://www.chatbase.co/chatbot-iframe/5qqQasv1fDxQQONBMuxJZ"
-            title="Merit Chatbot"
-            sandbox="allow-scripts allow-forms"
+            title="ELPL Merit Chat"
+            sandbox="allow-scripts allow-forms allow-same-origin"
             loading="lazy">
         </iframe>
     </div>
-
-    <script>
-        (function() {
-            // Configuration
-            const CONFIG = {
-                production: {
-                    file: '/clients/elpl/merit/merit.html',
-                    version: 'production'
-                },
-                development: {
-                    file: '/clients/elpl/merit/merit_temp.html',
-                    version: 'development'
-                },
-                timeout: 5000,
-                storageKey: 'merit_version'
-            };
-
-            // Elements
-            const frame = document.getElementById('content-frame');
-            const loading = document.getElementById('loading-overlay');
-            const errorContainer = document.getElementById('error-container');
-            const errorMessage = document.getElementById('error-message');
-            const versionIndicator = document.getElementById('version-indicator');
-
-            // Logging utility
-            const log = (type, message, data = {}) => {
-                const timestamp = new Date().toISOString();
-                console.log(`[Merit Switcher] ${timestamp} - ${type}:`, message, data);
-            };
-
-            // Error handling
-            const handleError = (message) => {
-                log('ERROR', message);
-                errorMessage.textContent = message;
-                errorContainer.classList.add('visible');
-                loading.style.backgroundColor = 'rgba(255,255,255,0.98)';
-            };
-
-            // Version management
-            const getVersion = () => {
-                try {
-                    // Check for forced version from URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.has('version')) {
-                        const version = urlParams.get('version');
-                        if (version === 'dev') return 'development';
-                        if (version === 'prod') return 'production';
-                    }
-                    
-                    // Check localStorage
-                    const stored = localStorage.getItem(CONFIG.storageKey);
-                    if (stored === 'dev') return 'development';
-                    if (stored === 'prod') return 'production';
-                    
-                    // Default to development for testing
-                    return 'development';
-                } catch (error) {
-                    log('ERROR', 'Version check failed', error);
-                    return 'development'; // Default to development on error
-                }
-            };
-
-            // Initialize system
-            const init = () => {
-                try {
-                    const version = getVersion();
-                    const config = CONFIG[version];
-                    
-                    log('INIT', `Loading ${version} version`, { file: config.file });
-                    
-                    // Set version indicator
-                    versionIndicator.textContent = config.version.toUpperCase();
-                    versionIndicator.style.backgroundColor = version === 'production' ? 
-                        'var(--success-color)' : 'var(--error-color)';
-
-                    // Load timeout handler
-                    const timeoutId = setTimeout(() => {
-                        handleError('Loading timed out. Please check your connection and try again.');
-                    }, CONFIG.timeout);
-
-                    // Frame event handlers
-                    frame.onload = () => {
-                        clearTimeout(timeoutId);
-                        loading.style.opacity = '0';
-                        setTimeout(() => {
-                            loading.style.display = 'none';
-                        }, 300);
-                        log('SUCCESS', 'System loaded successfully');
-                    };
-
-                    frame.onerror = () => {
-                        clearTimeout(timeoutId);
-                        handleError('Failed to load Merit system. Please try again.');
-                    };
-
-                    // Set frame source with proper sandbox attributes
-                    frame.setAttribute('sandbox', 'allow-scripts allow-forms');
-                    frame.src = window.location.origin + config.file;
-
-                } catch (error) {
-                    handleError('System initialization failed. Please refresh the page.');
-                    log('ERROR', 'Initialization failed', error);
-                }
-            };
-
-            // Handle window resize
-            const handleResize = () => {
-                frame.style.height = `${window.innerHeight}px`;
-            };
-
-            // Event listeners
-            window.addEventListener('resize', handleResize);
-            window.addEventListener('error', (event) => {
-                log('ERROR', 'Global error caught', event);
-            });
-
-            // Initialize
-            init();
-            handleResize();
-        })();
-
-        function loadVersion(version) {
-            // Convert legacy version names
-            const versionMap = {
-                'prod': 'production',
-                'dev': 'development'
-            };
-            const normalizedVersion = versionMap[version] || version;
-            
-            const config = CONFIG[normalizedVersion];
-            if (!config) {
-                handleError('Invalid version specified');
-                return;
-            }
-
-            const iframe = document.createElement('iframe');
-            iframe.src = window.location.origin + config.file;
-            iframe.id = 'merit-frame';
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            iframe.style.border = 'none';
-            iframe.setAttribute('sandbox', 'allow-scripts allow-forms');
-            iframe.setAttribute('title', 'Merit System');
-            
-            const container = document.getElementById('merit-container');
-            container.innerHTML = '';
-            container.appendChild(iframe);
-            
-            // Update version indicator
-            versionIndicator = document.getElementById('version-indicator');
-            versionIndicator.textContent = config.version.toUpperCase();
-            versionIndicator.style.backgroundColor = normalizedVersion === 'production' ? 
-                'var(--success-color)' : 'var(--error-color)';
-            
-            // Store selected version
-            localStorage.setItem(CONFIG.storageKey, version);
-            
-            log('VERSION', `Switched to ${normalizedVersion} version`, { file: config.file });
-        }
-
-        // Handle window resize to ensure iframe is always full size
-        function handleResize() {
-            const container = document.getElementById('chatbot-container');
-            container.style.height = window.innerHeight + 'px';
-        }
-
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('load', handleResize);
-    </script>
 </body>
 </html> 

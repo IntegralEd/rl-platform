@@ -251,3 +251,24 @@ thread:{thread_id}:messages            # Message history
 - Redis TTL set to 1 hour
 - DNS fallback to DEV endpoint if needed
 - Contact David for questions 
+
+## Follow-up Updates (Apr 17)
+
+### Slack Update: Merit Live Page Simplification
+```
+:wrench: Quick update on Merit integration:
+- Simplified merit_live.html to directly iframe the chatbase placeholder
+- Removed version switching for now (will add back with admin panel)
+- Focus: getting iframe sizing/integration right with Storyline
+- Current URL: recursivelearning.app/clients/elpl/merit/merit_live.html
+
+This lets us focus on getting the core Merit experience right before adding version management. Will circle back to add proper routing once we have the admin panel ready.
+```
+
+### Next Steps
+- [x] Simplify merit_live.html to basic iframe
+- [x] Update loading text for clarity
+- [x] Add production switch note in code
+- [ ] Verify no 404s on recursivelearning.app
+- [ ] Test iframe sizing in Storyline
+- [ ] Plan admin panel integration for version management 
