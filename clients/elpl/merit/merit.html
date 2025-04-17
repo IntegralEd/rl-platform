@@ -11,8 +11,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
     
-    <!-- Required security - client level CORS and embed protection -->
-    <script type="module" src="/clients/elpl/assets/client-security.js"></script>
+    <!-- Public access - no auth required -->
     
     <!-- Platform level styles -->
     <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
@@ -30,18 +29,8 @@
     <!-- Merit specific logic - instructional flow controller -->
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
     
-    <!-- Preheader data span -->
-    <span id="header-span" style="display:none" 
-        data-user-email=""
-        data-user-name=""
-        data-user-id=""
-        data-access-level=""
-        data-last-login=""
-        data-test-id="header-data">
-    </span>
-
     <script>
-/Users/Shared/Repositories/rl-platform/clients/elpl/merit/merit.html        // Monitor for deprecated script loading
+        // Monitor for deprecated script loading
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList') {
@@ -1142,32 +1131,24 @@
                     timestamp: Date.now()
                 });
 
-                // Generate temp user ID
-                const tempUserId = `elpl-merit-${Date.now()}`;
-                window.REDIS_FLOW.logStep('TEMP_USER_CREATED', {
-                    tempUserId,
+                // Generate anonymous session ID
+                const sessionId = `merit-${Date.now()}`;
+                window.REDIS_FLOW.logStep('SESSION_CREATED', {
+                    sessionId,
                     timestamp: Date.now()
                 });
 
                 try {
                     // Create Redis record
                     window.REDIS_FLOW.logStep('REDIS_WRITE_START', {
-                        tempUserId,
+                        sessionId,
                         timestamp: Date.now()
                     });
 
                     // After Redis write
                     window.REDIS_FLOW.logStep('REDIS_WRITE_COMPLETE', {
-                        tempUserId,
+                        sessionId,
                         ttl: 3600,
-                        syncQueued: true,
-                        timestamp: Date.now()
-                    });
-
-                    // Queue Airtable sync
-                    window.REDIS_FLOW.logStep('AIRTABLE_SYNC_QUEUED', {
-                        tempUserId,
-                        scheduledSync: new Date(Date.now() + 3600000).toISOString(),
                         timestamp: Date.now()
                     });
 
