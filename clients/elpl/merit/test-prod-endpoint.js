@@ -28,7 +28,7 @@ async function runTest() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'x-api-key': CONFIG.x_api_key,
+            'x-api-key': CONFIG['x-api-key'],
             'Content-Length': data.length
         }
     };
