@@ -43,7 +43,7 @@ async function runTest() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${MERIT_API_KEY}`,
+            'Authorization': MERIT_API_KEY,
             'Content-Length': data.length
         }
     };
@@ -51,7 +51,7 @@ async function runTest() {
     console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
     console.log('Request headers:', {
         ...options.headers,
-        'Authorization': 'Bearer [REDACTED]'
+        'Authorization': 'apikey=[REDACTED]'
     });
 
     return new Promise((resolve, reject) => {
