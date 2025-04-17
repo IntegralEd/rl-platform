@@ -12,14 +12,17 @@ const API_KEY_PATH = path.join(__dirname, 'merit-api-key');
 let MERIT_API_KEY;
 
 try {
-    MERIT_API_KEY = fs.readFileSync(API_KEY_PATH, 'utf8')
+    const fileContent = fs.readFileSync(API_KEY_PATH, 'utf8');
+    MERIT_API_KEY = fileContent
         .split('\n')
-        .find(line => !line.startsWith('#'))
-        .trim();
+        .map(line => line.trim())
+        .filter(line => line && !line.startsWith('#'))
+        [0];
     
     if (!MERIT_API_KEY) {
         throw new Error('API key not found in file');
     }
+    console.log('✅ API key loaded successfully');
 } catch (error) {
     console.error('❌ Error reading merit-api-key file:', error.message);
     process.exit(1);
