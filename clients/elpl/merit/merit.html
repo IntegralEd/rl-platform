@@ -41,6 +41,39 @@
     </span>
 
     <script>
+        // Monitor for deprecated script loading
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.tagName === 'SCRIPT') {
+                            const src = node.src || '';
+                            if (src.includes('client-merit-admin-logic.js')) {
+                                console.error('[MERIT ERROR] Attempting to load deprecated admin logic script. This file has been removed. Use client-merit-instructional-flow.js instead.');
+                                throw new Error('Deprecated script detected: client-merit-admin-logic.js');
+                            }
+                            if (src.includes('D_client-merit')) {
+                                console.error('[MERIT ERROR] Attempting to load deprecated script:', src);
+                                throw new Error('Deprecated script detected: ' + src);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+
+        // Log any attempts to use old admin functions
+        window.addEventListener('error', (event) => {
+            if (event.message.includes('MeritInstructionalFlow')) {
+                console.error('[MERIT ERROR] Attempting to use deprecated MeritInstructionalFlow. Use the new unified controller instead.');
+            }
+        });
+
         // Initialize version display with build counter
         document.addEventListener('DOMContentLoaded', () => {
             const versionDisplay = document.querySelector('.version-display');
