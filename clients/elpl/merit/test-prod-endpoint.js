@@ -1,10 +1,10 @@
 /**
  * Merit Production Endpoint Health Check
- * Tests the new production API endpoint
+ * Tests the Lambda API endpoint
  */
 
 const ENDPOINTS = {
-    prod: 'https://api.recursivelearning.app/prod'
+    lambda: 'https://api.recursivelearning.app/v1/lambda'
 };
 
 const CONFIG = {
@@ -20,18 +20,19 @@ async function runTest() {
     }
 
     console.log('🚀 Starting endpoint health check...');
-    console.log('Testing production endpoint with authentication\n');
+    console.log('Testing Lambda endpoint with authentication\n');
 
-    const endpoint = `${ENDPOINTS.prod}?apikey=${process.env.MERIT_API_KEY}`;
+    const endpoint = ENDPOINTS.lambda;
     
-    console.log(`🔍 Testing endpoint: ${ENDPOINTS.prod} (create_thread)`);
+    console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
     
     try {
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.MERIT_API_KEY
+                'Authorization': `Bearer ${process.env.MERIT_API_KEY}`,
+                'X-Project-ID': CONFIG.org_id
             },
             body: JSON.stringify({
                 action: 'create_thread',
@@ -51,9 +52,9 @@ async function runTest() {
                 console.log('\n🔴 Test failed - API key not recognized');
                 console.log('Headers sent:', {
                     'Content-Type': 'application/json',
-                    'x-api-key': '[REDACTED]'
+                    'Authorization': 'Bearer [REDACTED]',
+                    'X-Project-ID': CONFIG.org_id
                 });
-                console.log('API Key also sent as query parameter');
             } else {
                 console.log('\n🟡 Test complete - authentication required but token format correct');
             }
