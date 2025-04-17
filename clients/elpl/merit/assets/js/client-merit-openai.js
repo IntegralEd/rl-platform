@@ -16,15 +16,15 @@ class MeritOpenAIClient {
 
         // API Configuration - Single source of truth for endpoint
         const ENDPOINTS = {
-            lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
+            prod: 'https://api.recursivelearning.app/prod',
             contextPrefix: 'merit:ela:context',
             threadPrefix: 'merit:ela:thread'
         };
         
         // Core state
         this.threadId = null;
-        this.userId = 'default_user';
-        this.baseUrl = ENDPOINTS.lambda;
+        this.userId = null;
+        this.baseUrl = ENDPOINTS.prod;
         
         // Project configuration
         this.config = {
@@ -43,6 +43,7 @@ class MeritOpenAIClient {
         // Request headers
         this.headers = {
             'Content-Type': 'application/json',
+            'x-api-key': process.env.MERIT_API_KEY || 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
             'X-Project-ID': OPENAI_CONFIG.assistant.project,
             'X-Assistant-ID': OPENAI_CONFIG.assistant.id
         };
@@ -73,28 +74,29 @@ class MeritOpenAIClient {
     async createThread() {
         try {
             console.log('[Merit Flow] Creating new thread');
-            console.log('[Merit Flow] Using lambda endpoint:', this.baseUrl);
+            console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
             
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify({
                     action: 'create_thread',
-                    project_id: this.config.project_id,
-                    ...this.config
+                    org_id: this.config.org_id,
+                    assistant_id: this.config.assistant_id,
+                    schema_version: this.config.schema_version
                 })
             });
 
             if (!response.ok) {
                 const error = await response.json();
                 if (error.statusCode === 403) {
-                    throw new Error('OpenAI project pairing required');
+                    throw new Error('API authentication failed');
                 }
                 throw new Error(error.error || 'Thread creation failed');
             }
 
             const data = await response.json();
-            this.threadId = `${ENDPOINTS.threadPrefix}:${this.config.org_id}:${this.userId}:${data.thread_id}`;
+            this.threadId = data.thread_id;
             this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
             return this.threadId;
@@ -103,7 +105,7 @@ class MeritOpenAIClient {
             console.error('[Merit Flow] Thread creation error:', error);
             console.error('[Merit Flow] Error details:', {
                 endpoint: this.baseUrl,
-                headers: this.headers,
+                headers: { ...this.headers, 'x-api-key': '[REDACTED]' },
                 error: error.message
             });
             this.state.hasError = true;
@@ -119,7 +121,7 @@ class MeritOpenAIClient {
      */
     async sendMessage(message) {
         // Check project pairing before proceeding
-        if (!this.state.projectPaired) {
+        if (!this.state.projectPaired || !this.threadId) {
             await this.createThread();
         }
 
@@ -128,9 +130,12 @@ class MeritOpenAIClient {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify({
+                    action: 'send_message',
                     message,
                     thread_id: this.threadId,
-                    ...this.config
+                    org_id: this.config.org_id,
+                    assistant_id: this.config.assistant_id,
+                    schema_version: this.config.schema_version
                 })
             });
 
@@ -138,7 +143,7 @@ class MeritOpenAIClient {
                 const error = await response.json();
                 if (error.statusCode === 403) {
                     this.state.projectPaired = false;
-                    throw new Error('OpenAI project pairing lost');
+                    throw new Error('API authentication failed');
                 }
                 throw new Error(error.error || 'Message send failed');
             }
