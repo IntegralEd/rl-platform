@@ -183,18 +183,20 @@
                     const urlParams = new URLSearchParams(window.location.search);
                     if (urlParams.has('version')) {
                         const version = urlParams.get('version');
-                        if (['prod', 'dev'].includes(version)) {
-                            localStorage.setItem(CONFIG.storageKey, version);
-                            return version;
-                        }
+                        if (version === 'dev') return 'development';
+                        if (version === 'prod') return 'production';
                     }
                     
                     // Check localStorage
                     const stored = localStorage.getItem(CONFIG.storageKey);
-                    return ['prod', 'dev'].includes(stored) ? stored : 'prod';
+                    if (stored === 'dev') return 'development';
+                    if (stored === 'prod') return 'production';
+                    
+                    // Default to development for testing
+                    return 'development';
                 } catch (error) {
                     log('ERROR', 'Version check failed', error);
-                    return 'prod'; // Default to production on error
+                    return 'development'; // Default to development on error
                 }
             };
 
@@ -208,7 +210,7 @@
                     
                     // Set version indicator
                     versionIndicator.textContent = config.version.toUpperCase();
-                    versionIndicator.style.backgroundColor = version === 'prod' ? 
+                    versionIndicator.style.backgroundColor = version === 'production' ? 
                         'var(--success-color)' : 'var(--error-color)';
 
                     // Load timeout handler
@@ -231,8 +233,9 @@
                         handleError('Failed to load Merit system. Please try again.');
                     };
 
-                    // Set frame source
-                    frame.src = config.file;
+                    // Set frame source with proper sandbox attributes
+                    frame.setAttribute('sandbox', 'allow-scripts allow-forms');
+                    frame.src = window.location.origin + config.file;
 
                 } catch (error) {
                     handleError('System initialization failed. Please refresh the page.');
@@ -257,9 +260,16 @@
         })();
 
         function loadVersion(version) {
-            const config = CONFIG[version];
+            // Convert legacy version names
+            const versionMap = {
+                'prod': 'production',
+                'dev': 'development'
+            };
+            const normalizedVersion = versionMap[version] || version;
+            
+            const config = CONFIG[normalizedVersion];
             if (!config) {
-                showError('Invalid version specified');
+                handleError('Invalid version specified');
                 return;
             }
 
@@ -269,16 +279,23 @@
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
+            iframe.setAttribute('sandbox', 'allow-scripts allow-forms');
+            iframe.setAttribute('title', 'Merit System');
             
             const container = document.getElementById('merit-container');
             container.innerHTML = '';
             container.appendChild(iframe);
             
             // Update version indicator
-            document.getElementById('version-indicator').textContent = config.version.toUpperCase();
+            versionIndicator = document.getElementById('version-indicator');
+            versionIndicator.textContent = config.version.toUpperCase();
+            versionIndicator.style.backgroundColor = normalizedVersion === 'production' ? 
+                'var(--success-color)' : 'var(--error-color)';
             
             // Store selected version
             localStorage.setItem(CONFIG.storageKey, version);
+            
+            log('VERSION', `Switched to ${normalizedVersion} version`, { file: config.file });
         }
     </script>
 </body>
