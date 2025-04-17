@@ -4,15 +4,13 @@
  */
 
 const ENDPOINTS = {
-    lambda: 'https://api.recursivelearning.app/v1/lambda'
-};
-
-const ROUTES = {
-    create_thread: '/create_thread'
+    prod: 'https://api.recursivelearning.app/prod'
 };
 
 const CONFIG = {
-    project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT'
+    org_id: 'recdg5Hlm3VVaBA2u',
+    assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
+    schema_version: '04102025.B01'
 };
 
 async function runTest() {
@@ -22,21 +20,25 @@ async function runTest() {
     }
 
     console.log('🚀 Starting endpoint health check...');
-    console.log('Testing lambda endpoint with authentication\n');
+    console.log('Testing production endpoint with authentication\n');
 
-    const endpoint = ENDPOINTS.lambda;
-    const route = ROUTES.create_thread;
+    const endpoint = ENDPOINTS.prod;
     
     console.log(`🔍 Testing endpoint: ${endpoint} (create_thread)`);
     
     try {
-        const response = await fetch(`${endpoint}${route}`, {
+        const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Api-Key': process.env.MERIT_API_KEY,
-                'X-Project-ID': CONFIG.project_id
-            }
+                'x-api-key': process.env.MERIT_API_KEY
+            },
+            body: JSON.stringify({
+                action: 'create_thread',
+                org_id: CONFIG.org_id,
+                assistant_id: CONFIG.assistant_id,
+                schema_version: CONFIG.schema_version
+            })
         });
 
         const data = await response.json();
@@ -54,6 +56,11 @@ async function runTest() {
             console.log('\n🔴 Test failed - invalid API key');
         } else if (response.status === 200) {
             console.log('\n🟢 Test complete - successfully authenticated');
+            if (data.thread_id) {
+                console.log(`Thread ID: ${data.thread_id}`);
+            }
+        } else if (response.status === 429) {
+            console.log('\n🟡 Test complete - rate limit exceeded');
         } else {
             console.log('\n🔴 Test complete - unexpected response status');
         }
@@ -64,4 +71,4 @@ async function runTest() {
 }
 
 // Run the tests
-runTest(); 
+runTest();
