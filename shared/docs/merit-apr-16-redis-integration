@@ -132,8 +132,9 @@
 
 ### 🎯 Today's Focus
 1. Get backend review on authentication flow
-2. Confirm thread ID format
-3. Standardize error handling
+2. Test iframe sizing in Storyline
+3. Confirm thread ID format
+4. Standardize error handling
 
 ### 🔜 Next Steps
 1. Implement backend feedback
@@ -154,3 +155,38 @@
 - Maintain consistent error handling
 - Keep Redis TTL at 3600s for MVP
 - Use standard lambda endpoint
+
+### 🔄 Updates (Apr 17 - Iframe Integration)
+1. **Simplified Merit Live Page**
+   ```html
+   <!-- Bare minimum iframe implementation -->
+   <div id="chatbase-container">
+       <iframe 
+           id="chatbase-frame"
+           src="https://www.chatbase.co/chatbot-iframe/5qqQasv1fDxQQONBMuxJZ"
+           sandbox="allow-scripts allow-forms allow-same-origin"
+           loading="lazy">
+       </iframe>
+   </div>
+   ```
+   - Removed version switching (will add back with admin panel)
+   - Fixed sandbox attributes for React compatibility
+   - Using viewport units for full-screen sizing
+   - Ready for Storyline integration testing
+
+### 📢 Slack Update: Merit Iframe Integration
+```
+:rocket: Quick update on Merit iframe integration:
+
+1. Simplified merit_live.html to bare minimum iframe implementation
+   - Direct Chatbase integration for testing
+   - Fixed React/sandbox issues
+   - Ready for Storyline sizing tests
+
+2. Next Steps:
+   - Test iframe sizing in Storyline
+   - Plan admin panel for version management
+   - Document production switch process
+
+Current test URL: recursivelearning.app/clients/elpl/merit/merit_live.html
+```
