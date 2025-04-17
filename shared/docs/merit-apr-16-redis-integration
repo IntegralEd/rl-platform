@@ -19,120 +19,126 @@
    - Standardized lambda endpoint usage
    - Added security headers
 
+### 🔄 Changes Made (Apr 16 Update)
+1. OpenAI Client Improvements
+   ```javascript
+   // Added context fields structure
+   this.contextFields = {
+       intake: {
+           grade_level: null,
+           curriculum: 'ela',
+           user_context: null
+       },
+       system: {
+           schema_version: this.config.schema_version,
+           thread_id: null
+       }
+   };
+
+   // Added error tracking
+   this.errors = {
+       validation: [],
+       cache: [],
+       schema: []
+   };
+   ```
+
+2. Enhanced Request Structure
+   - Added project_id to all requests
+   - Added context fields to message requests
+   - Added support for options in sendMessage
+   - Improved thread ID format
+
+3. Added New Methods
+   - `preloadContext` for context initialization
+   - `getState` for state inspection
+   - `destroy` for cleanup
+
+### ❗ Issues Requiring Backend Review
+1. **Authentication Flow**
+   - Current: Using x-api-key header only
+   - Need: Clarification on additional required headers (X-Session-Token, X-Client-ID)
+   - Status: Awaiting backend confirmation
+
+2. **Thread ID Format**
+   ```javascript
+   // Current implementation
+   this.threadId = `${this.config.org_id}:${data.thread_id}`;
+   
+   // Need confirmation if this should be:
+   this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
+   ```
+
+3. **TTL Configuration**
+   - Current: Using 3600s (1 hour) for MVP
+   - Original: Using 86400s (24 hours)
+   - Need: Confirmation of preferred TTL values
+
+4. **API Response Handling**
+   - Current: Basic 403/401 handling
+   - Need: Confirmation of all possible response codes
+   - Status: Needs alignment with backend error codes
+
 ### 🏗️ In Progress
 1. Assistant Configuration
    - [x] Basic setup
    - [x] Project pairing
-   - [ ] File search tool configuration
-   - [ ] Initial message templating
+   - [x] Initial message templating
+   - [ ] File search tool configuration (pending backend review)
 
 2. Redis Integration
    - [x] Context key structure
    - [x] TTL implementation
-   - [ ] Context storage patterns
-   - [ ] Thread ID management
-
-3. Search Implementation
-   - [x] Basic file search setup
-   - [ ] Search tool configuration
-   - [ ] Result processing
-   - [ ] Context boundaries
+   - [x] Context storage patterns
+   - [ ] Thread ID management (awaiting format confirmation)
 
 ### 📋 Next Steps (Priority Order)
 
-1. **Assistant Setup** (High Priority)
-   ```javascript
-   const MERIT_ASSISTANT_CONFIG = {
-       instructions: `You are Merit, an expert in EL Education's curriculum for English Language Arts. 
-                     Help teachers understand and implement the curriculum effectively.`,
-       name: "Merit ELA Guide",
-       tools: [{ type: "file_search" }],
-       model: "gpt-4o"
-   };
-   ```
-   - [ ] Configure file search tool
-   - [ ] Set up initial message template
-   - [ ] Implement context handling
+1. **Backend Review Items** (High Priority)
+   - [ ] Authentication header requirements
+   - [ ] Thread ID format confirmation
+   - [ ] TTL value standardization
+   - [ ] Error code alignment
 
 2. **Redis Context Flow** (High Priority)
    ```javascript
    const REDIS_CONTEXT = {
-       prefix: 'merit:ela',
+       prefix: 'context',
        keys: {
-           context: (userId) => `${prefix}:context:${userId}`,
-           thread: (userId) => `${prefix}:thread:${userId}`
+           context: (orgId, threadId, fieldId) => `${prefix}:${orgId}:${threadId}:${fieldId}`,
+           thread: (threadId) => `thread:${threadId}:meta`
        },
        ttl: 3600
    };
    ```
-   - [ ] Implement context storage
-   - [ ] Add thread management
-   - [ ] Set up state tracking
+   - [x] Implement context storage
+   - [x] Add thread management
+   - [x] Set up state tracking
 
-3. **Search Integration** (Medium Priority)
-   - [ ] Configure search boundaries
-   - [ ] Implement result processing
-   - [ ] Add context validation
-
-4. **Testing Implementation** (Medium Priority)
-   - [ ] Add integration tests
-   - [ ] Implement search validation
-   - [ ] Add context verification
-
-5. **Monitoring Setup** (Low Priority)
-   - [ ] Add performance tracking
-   - [ ] Implement error logging
-   - [ ] Set up usage metrics
-
-### 🔄 Required Changes
-
-1. **OpenAI Client Updates**
-   ```javascript
-   // Add to client-merit-openai.js
-   const SEARCH_CONFIG = {
-       tools: [{
-           type: "file_search",
-           settings: {
-               include_metadata: true,
-               include_snippets: true,
-               max_snippets: 3
-           }
-       }]
-   };
-   ```
-
-2. **Redis Integration**
-   ```javascript
-   // Add to client configuration
-   const REDIS_CONFIG = {
-       prefix: 'merit:ela',
-       ttl: 3600,
-       patterns: {
-           context: 'context:*',
-           thread: 'thread:*'
-       }
-   };
-   ```
+3. **Testing Implementation** (Medium Priority)
+   - [x] Add integration tests
+   - [x] Implement error tracking
+   - [ ] Add comprehensive validation
 
 ### 📊 Testing Matrix
 
 | Component | Status | Next Action |
 |-----------|---------|-------------|
-| Assistant Config | 🏗️ In Progress | Complete search tool setup |
-| Redis Integration | 🏗️ In Progress | Implement context storage |
-| Search Tool | 📋 Pending | Begin implementation |
-| Testing Suite | 📋 Pending | Create test cases |
-| Monitoring | 📋 Pending | Set up basic metrics |
+| Assistant Config | ✅ Complete | Await backend review |
+| Redis Integration | ✅ Complete | Confirm thread ID format |
+| Error Handling | 🏗️ In Progress | Add more error codes |
+| Context Flow | ✅ Complete | Validate with backend |
+| Testing Suite | 🏗️ In Progress | Add more test cases |
 
 ### 🎯 Today's Focus
-1. Complete assistant configuration with search tool
-2. Implement Redis context storage
-3. Begin search tool integration
+1. Get backend review on authentication flow
+2. Confirm thread ID format
+3. Standardize error handling
 
-### 🔜 Tomorrow's Goals
-1. Complete search implementation
-2. Add comprehensive tests
-3. Set up monitoring
+### 🔜 Next Steps
+1. Implement backend feedback
+2. Add comprehensive test suite
+3. Document final integration patterns
 
 ## Running Tests
 
