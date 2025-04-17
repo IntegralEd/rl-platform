@@ -1,8 +1,9 @@
 /**
  * Merit Instructional Flow Handler
  * Controls the flow of instruction, navigation, and state management for Merit pages.
+ * Integrates admin and client functionality in a unified controller.
  * 
- * @version 1.0.15
+ * @version 1.0.20
  * @module client-merit-instructional-flow
  */
 
@@ -11,9 +12,10 @@ import MeritOpenAIClient from './client-merit-openai.js';
 export class MeritInstructionalFlow {
     #config = {
         id: "merit-ela-flow",
-        version: "1.0.15",
+        version: "1.0.20",
         sections: ["welcome", "chat"],
-        defaultSection: "welcome"
+        defaultSection: "welcome",
+        schema_version: "04102025.B01"
     };
 
     #state = {
@@ -23,7 +25,11 @@ export class MeritInstructionalFlow {
         curriculum: "ela",
         initialized: false,
         chatReady: false,
-        contextLoaded: false
+        contextLoaded: false,
+        isAdmin: false,
+        redisConnected: false,
+        hasError: false,
+        errorMessage: null
     };
 
     #elements = {
@@ -36,15 +42,16 @@ export class MeritInstructionalFlow {
         nextButton: null,
         sendButton: null,
         chatInput: null,
-        chatWindow: null
+        chatWindow: null,
+        adminControls: null
     };
 
     #openAIClient = null;
 
-    constructor() {
-        console.log('[Merit Flow] Initializing instructional flow controller');
+    constructor(isAdmin = false) {
+        console.log('[Merit Flow] Initializing unified flow controller');
+        this.#state.isAdmin = isAdmin;
         
-        // Ensure DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.#initialize());
             return;
@@ -59,30 +66,92 @@ export class MeritInstructionalFlow {
             return;
         }
 
-        this.#openAIClient = new MeritOpenAIClient();
-        
-        // Ensure welcome section and form are visible
-        const welcomeSection = document.querySelector('[data-section="welcome"]');
-        if (welcomeSection) {
-            welcomeSection.classList.add('active');
-            welcomeSection.removeAttribute('hidden');
-            console.log('[Merit Flow] Welcome section activated');
-        }
+        try {
+            this.#openAIClient = new MeritOpenAIClient();
+            this.#state.redisConnected = true;
+            
+            // Initialize based on role
+            if (this.#state.isAdmin) {
+                await this.#initializeAdminFeatures();
+            }
+            
+            const welcomeSection = document.querySelector('[data-section="welcome"]');
+            if (welcomeSection) {
+                welcomeSection.classList.add('active');
+                welcomeSection.removeAttribute('hidden');
+            }
 
-        const welcomeForm = document.getElementById('welcome-form');
-        if (welcomeForm) {
-            welcomeForm.style.display = 'block';
-            console.log('[Merit Flow] Welcome form displayed');
-        }
+            const welcomeForm = document.getElementById('welcome-form');
+            if (welcomeForm) {
+                welcomeForm.style.display = 'block';
+            }
 
-        this.#setupEventListeners();
-        
-        // Chat is ready immediately - thread will be created with first message
-        this.#state.chatReady = true;
-        console.log('[Merit Flow] Chat system initialized for new user session');
-        
-        this.#logState('Initialization complete');
+            this.#setupEventListeners();
+            this.#state.chatReady = true;
+            this.#logState('Initialization complete');
+            
+        } catch (error) {
+            this.#handleError(error);
+        }
     };
+
+    async #initializeAdminFeatures() {
+        // Admin-specific initialization
+        const adminControls = document.querySelector('.admin-controls');
+        if (adminControls) {
+            this.#elements.adminControls = adminControls;
+            adminControls.removeAttribute('hidden');
+        }
+        
+        // Add admin event listeners
+        this.#setupAdminEventListeners();
+    }
+
+    #setupAdminEventListeners() {
+        if (!this.#state.isAdmin) return;
+        
+        const adminControls = this.#elements.adminControls;
+        if (!adminControls) return;
+
+        // Admin-specific event listeners
+        adminControls.querySelectorAll('[data-admin-action]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const action = e.target.dataset.adminAction;
+                this.#handleAdminAction(action);
+            });
+        });
+    }
+
+    async #handleAdminAction(action) {
+        try {
+            switch (action) {
+                case 'reset-context':
+                    await this.#openAIClient.resetContext();
+                    this.#logState('Admin: Context reset');
+                    break;
+                case 'view-logs':
+                    this.#displayAdminLogs();
+                    break;
+                default:
+                    console.warn('[Merit Flow] Unknown admin action:', action);
+            }
+        } catch (error) {
+            this.#handleError(error);
+        }
+    }
+
+    #displayAdminLogs() {
+        if (!this.#state.isAdmin) return;
+        
+        const logs = {
+            state: this.#state,
+            redis: this.#state.redisConnected,
+            thread: this.#openAIClient?.threadId,
+            errors: this.#state.errorMessage
+        };
+        
+        console.table(logs);
+    }
 
     #initializeElements() {
         const elements = {
@@ -319,13 +388,21 @@ export class MeritInstructionalFlow {
     }
 
     #logState(action) {
-        console.log('[Merit Flow]', action, {
+        const state = {
             section: this.#state.currentSection,
             formValid: this.#state.formValid,
             gradeLevel: this.#state.gradeLevel,
             curriculum: this.#state.curriculum,
-            chatReady: this.#state.chatReady
-        });
+            chatReady: this.#state.chatReady,
+            isAdmin: this.#state.isAdmin,
+            redisConnected: this.#state.redisConnected
+        };
+        
+        console.log('[Merit Flow]', action, state);
+        
+        if (this.#state.isAdmin) {
+            this.#displayAdminLogs();
+        }
     }
 
     getState() {
@@ -340,19 +417,42 @@ export class MeritInstructionalFlow {
             curriculum: "ela",
             initialized: false,
             chatReady: false,
-            contextLoaded: false
+            contextLoaded: false,
+            isAdmin: this.#state.isAdmin,
+            redisConnected: false,
+            hasError: false,
+            errorMessage: null
         };
         
         this.#openAIClient?.destroy();
         this.#openAIClient = new MeritOpenAIClient();
         this.#initialize();
     }
+
+    #handleError(error) {
+        this.#state.hasError = true;
+        this.#state.errorMessage = error.message;
+        console.error('[Merit Flow] Error:', error);
+        
+        const errorMessage = this.#state.isAdmin 
+            ? `Error: ${error.message}\nCheck console for details.`
+            : 'An error occurred. Please try again.';
+            
+        this.#elements.chatWindow.innerHTML = `
+            <div class="error-message" role="alert">
+                <p>${errorMessage}</p>
+                <button onclick="window.location.reload()">Refresh Page</button>
+            </div>
+        `;
+    }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        window.meritFlow = new MeritInstructionalFlow();
+        // Check for admin role
+        const isAdmin = document.body.hasAttribute('data-admin-view');
+        window.meritFlow = new MeritInstructionalFlow(isAdmin);
     } catch (error) {
         console.error('[Merit Flow] Error initializing:', error);
     }
