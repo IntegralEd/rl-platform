@@ -1,4 +1,20 @@
 /**
+ * @deprecated Since version 1.0.20
+ * This file is deprecated and will be removed in future versions.
+ * All functionality has been merged into client-merit-instructional-flow.js
+ * 
+ * Migration Guide:
+ * 1. Use data-admin-view attribute on body for admin features
+ * 2. Admin controls now use data-admin-action attribute
+ * 3. Redis connection state is tracked in unified controller
+ * 4. Error handling is improved with detailed logging
+ * 
+ * @see client-merit-instructional-flow.js for the new implementation
+ */
+
+console.warn('[Merit Admin] This module is deprecated. Use client-merit-instructional-flow.js instead.');
+
+/**
  * Merit Instructional Flow Controller
  * Handles state transitions, Redis integration, and UI management
  * @version 1.0.15
