@@ -143,16 +143,16 @@
         (function() {
             // Configuration
             const CONFIG = {
-                prod: {
-                    file: 'merit.html',
-                    label: 'PRODUCTION'
+                production: {
+                    file: '/clients/elpl/merit/merit.html',
+                    version: 'production'
                 },
-                dev: {
-                    file: 'merit_temp.html',
-                    label: 'DEVELOPMENT'
+                development: {
+                    file: '/clients/elpl/merit/merit_temp.html',
+                    version: 'development'
                 },
-                timeout: 10000, // 10 seconds
-                storageKey: 'merit_system_status'
+                timeout: 5000,
+                storageKey: 'merit_version'
             };
 
             // Elements
@@ -207,7 +207,7 @@
                     log('INIT', `Loading ${version} version`, { file: config.file });
                     
                     // Set version indicator
-                    versionIndicator.textContent = config.label;
+                    versionIndicator.textContent = config.version.toUpperCase();
                     versionIndicator.style.backgroundColor = version === 'prod' ? 
                         'var(--success-color)' : 'var(--error-color)';
 
@@ -255,6 +255,31 @@
             init();
             handleResize();
         })();
+
+        function loadVersion(version) {
+            const config = CONFIG[version];
+            if (!config) {
+                showError('Invalid version specified');
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.src = window.location.origin + config.file;
+            iframe.id = 'merit-frame';
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            
+            const container = document.getElementById('merit-container');
+            container.innerHTML = '';
+            container.appendChild(iframe);
+            
+            // Update version indicator
+            document.getElementById('version-indicator').textContent = config.version.toUpperCase();
+            
+            // Store selected version
+            localStorage.setItem(CONFIG.storageKey, version);
+        }
     </script>
 </body>
 </html> 
