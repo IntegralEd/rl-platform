@@ -8,6 +8,7 @@
 export const AUTH_CONFIG = {
     clientId: 'elpl',
     authEndpoint: '/api/auth',
+    loginEndpoint: '/login.html',
     redirectUri: window.location.origin + '/clients/elpl/',
     tokenStorageKey: 'elpl_auth_token',
     tokenRefreshThreshold: 300 // 5 minutes in seconds
@@ -93,6 +94,8 @@ export async function refreshTokenIfNeeded() {
 document.addEventListener('DOMContentLoaded', () => {
     const session = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
     if (!session || !isTokenValid(session)) {
-        window.location.href = `${AUTH_CONFIG.authEndpoint}/login?client_id=${AUTH_CONFIG.clientId}&redirect_uri=${AUTH_CONFIG.redirectUri}`;
+        // Redirect to login page with return URL
+        const returnUrl = encodeURIComponent(window.location.href);
+        window.location.href = `${AUTH_CONFIG.loginEndpoint}?return_url=${returnUrl}`;
     }
 }); 
