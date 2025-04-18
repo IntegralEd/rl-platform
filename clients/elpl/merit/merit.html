@@ -1337,5 +1337,27 @@
             );
         }
     </script>
+
+    <!-- Debugging script added for console logging -->
+    <script>
+      console.log('[Merit HTML] Loaded.');
+      const nextButton = document.getElementById('next-button');
+      if (nextButton) {
+        console.log('[Merit HTML] Next button initial state:', nextButton.disabled);
+      } else {
+        console.log('[Merit HTML] Next button not found.');
+      }
+      const gradeSelect = document.getElementById('grade-level');
+      if (gradeSelect) {
+        gradeSelect.addEventListener('change', function() {
+          console.log('[Merit HTML] Grade level changed to:', this.value);
+          console.log('[Merit HTML] Next button state after grade change:', nextButton ? nextButton.disabled : 'not found');
+        });
+      } else {
+        console.log('[Merit HTML] Grade level select not found.');
+      }
+    </script>
+
+    <!-- End Debugging Script -->
 </body>
 </html> 
