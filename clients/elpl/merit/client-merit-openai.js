@@ -1,7 +1,7 @@
 /*
  * @component MeritOpenAIClient
  * @description Handles OpenAI Assistant interactions for Merit chat with Redis caching
- * @version 1.0.19
+ * @version 1.0.21
  */
 
 class MeritOpenAIClient {
@@ -9,27 +9,44 @@ class MeritOpenAIClient {
     // Core configuration
     this.threadId = null;
     this.assistantId = process.env.MERIT_ASSISTANT_ID;
-    this.userId = 'default_user';
+    this.userId = this.generateSessionId(); // Generate temp session ID on init
 
-    // API Configuration
+    // Session Types
+    this.SESSION_TYPES = {
+      ANONYMOUS: 'anonymous',    // Browser session only
+      PERSISTENT: 'persistent',  // User opted to save
+      EMBEDDED: 'embedded'       // Auth from wrapper
+    };
+
+    // API Configuration with validated endpoints
     const ENDPOINTS = {
-      lambda: process.env.LAMBDA_ENDPOINT,
-      REDIS: process.env.REDIS_URL,
+      lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
+      REDIS: process.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
       cachePrefix: 'merit:ela:cache'
     };
 
-    // Redis Configuration
+    // Redis Configuration with validated auth
     this.redisConfig = {
       endpoint: ENDPOINTS.REDIS,
+      auth: {
+        username: 'recursive-frontend',
+        password: process.env.REDIS_PASSWORD
+      },
       defaultTTL: 3600, // 1 hour for MVP
       keys: {
-        context: (userId) => `${ENDPOINTS.contextPrefix}:${userId}`,
-        thread: (userId) => `${ENDPOINTS.threadPrefix}:${userId}`,
+        context: (sessionId) => `${ENDPOINTS.contextPrefix}:${sessionId}`,
+        thread: (sessionId) => `${ENDPOINTS.threadPrefix}:${sessionId}`,
         cache: (key) => `${ENDPOINTS.cachePrefix}:${key}`,
-        user: (email) => `merit:user:${email}`,
-        userThread: (email) => `merit:user:thread:${email}`
+        session: (sessionId) => `merit:session:${sessionId}`,
+        messageCount: (sessionId) => `merit:messages:${sessionId}`
+      },
+      retryOptions: {
+        retries: 3,
+        factor: 2,
+        minTimeout: 1000,
+        maxTimeout: 5000
       }
     };
 
@@ -43,14 +60,16 @@ class MeritOpenAIClient {
       ttl: {
         session: 3600,    // 1 hour for MVP
         cache: 3600,      // 1 hour for MVP
-        temp: 3600        // 1 hour for MVP
+        temp: 900         // 15 minutes for temp data
       }
     };
 
+    // Validated API headers
     this.headers = {
       'Content-Type': 'application/json',
       'x-api-key': process.env.MERIT_API_KEY,
-      'X-Project-ID': this.config.project_id
+      'X-Project-ID': this.config.project_id,
+      'Origin': 'https://recursivelearning.app'
     };
 
     this.state = {
@@ -62,6 +81,8 @@ class MeritOpenAIClient {
       isPreloaded: false,
       context: null,
       projectPaired: false,
+      sessionType: this.SESSION_TYPES.ANONYMOUS,
+      messageCount: 0,
       cacheStatus: {
         hits: 0,
         misses: 0,
@@ -96,9 +117,85 @@ class MeritOpenAIClient {
       schema: []
     };
 
-    console.log('[Merit Flow] OpenAI client initialized with Redis support');
+    console.log('[Merit Flow] OpenAI client initialized with session:', this.userId);
     console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
     console.log('[Merit Flow] Using Redis endpoint:', this.redisConfig.endpoint);
+  }
+
+  generateSessionId() {
+    return 'merit-' + 
+           Date.now() + 
+           '-' + 
+           Math.random().toString(36).substring(2);
+  }
+
+  async initializeSession(context = {}) {
+    try {
+      const sessionData = {
+        sessionId: this.userId,
+        context: {
+          gradeLevel: context.gradeLevel || null,
+          curriculum: "ela",
+          threadId: null,       // Set after first message
+          messageCount: 0,      // Track engagement
+          created_at: Date.now()
+        },
+        type: this.SESSION_TYPES.ANONYMOUS,
+        ttl: this.config.ttl.session
+      };
+
+      // Store session in Redis
+      await this.redisSet(
+        this.redisConfig.keys.session(this.userId),
+        JSON.stringify(sessionData),
+        this.config.ttl.session
+      );
+
+      // Store context separately for quick access
+      await this.redisSet(
+        this.redisConfig.keys.context(this.userId),
+        JSON.stringify(context),
+        this.config.ttl.session
+      );
+
+      console.log('[Merit Flow] Session initialized:', sessionData);
+      return sessionData;
+    } catch (error) {
+      console.error('[Merit Flow] Session initialization error:', error);
+      throw error;
+    }
+  }
+
+  async incrementMessageCount() {
+    try {
+      const key = this.redisConfig.keys.messageCount(this.userId);
+      const count = await this.redisGet(key) || 0;
+      const newCount = parseInt(count) + 1;
+      await this.redisSet(key, newCount, this.config.ttl.session);
+      this.state.messageCount = newCount;
+
+      // Check if we should prompt for persistence
+      if (newCount === 3) {
+        this.triggerPersistencePrompt();
+      }
+
+      return newCount;
+    } catch (error) {
+      console.error('[Merit Flow] Message count increment error:', error);
+      return this.state.messageCount;
+    }
+  }
+
+  triggerPersistencePrompt() {
+    // Emit event for UI to handle
+    const event = new CustomEvent('merit-persistence-prompt', {
+      detail: {
+        sessionId: this.userId,
+        messageCount: this.state.messageCount,
+        context: this.state.context
+      }
+    });
+    window.dispatchEvent(event);
   }
 
   async checkCache(key) {
@@ -170,7 +267,7 @@ class MeritOpenAIClient {
       this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
       this.state.projectPaired = true;
 
-      // Cache the new thread
+      // Cache the new thread with session TTL
       await this.setCache(`thread:${this.userId}`, {
         threadId: this.threadId,
         created: Date.now(),
@@ -222,6 +319,9 @@ class MeritOpenAIClient {
   }
 
   async sendMessage(message, options = {}) {
+    // Increment message count before sending
+    await this.incrementMessageCount();
+    
     console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
     
     if (!this.state.projectPaired || !this.threadId) {
@@ -299,16 +399,60 @@ class MeritOpenAIClient {
   }
 
   async redisGet(key) {
-    // Redis GET implementation
-    // TODO: Implement actual Redis GET
-    return localStorage.getItem(key);
+    try {
+      const client = await this.getRedisClient();
+      const value = await client.get(key);
+      return value;
+    } catch (error) {
+      console.error('[Merit Flow] Redis get error:', error);
+      this.errors.cache.push(error);
+      return null;
+    }
   }
 
   async redisSet(key, value, ttl) {
-    // Redis SET implementation
-    // TODO: Implement actual Redis SET
-    localStorage.setItem(key, value);
-    return true;
+    try {
+      const client = await this.getRedisClient();
+      await client.set(key, value, 'EX', ttl);
+      return true;
+    } catch (error) {
+      console.error('[Merit Flow] Redis set error:', error);
+      this.errors.cache.push(error);
+      return false;
+    }
+  }
+
+  async getRedisClient() {
+    if (!this._redisClient) {
+      const Redis = await import('ioredis');
+      this._redisClient = new Redis.default({
+        host: new URL(this.redisConfig.endpoint).hostname,
+        port: 6379,
+        username: this.redisConfig.auth.username,
+        password: this.redisConfig.auth.password,
+        retryStrategy: (times) => {
+          const opts = this.redisConfig.retryOptions;
+          const delay = Math.min(
+            opts.minTimeout * Math.pow(opts.factor, times),
+            opts.maxTimeout
+          );
+          return times <= opts.retries ? delay : null;
+        },
+        tls: {
+          rejectUnauthorized: false // For self-signed certs in dev
+        }
+      });
+
+      this._redisClient.on('error', (error) => {
+        console.error('[Merit Flow] Redis client error:', error);
+        this.errors.cache.push(error);
+      });
+
+      this._redisClient.on('connect', () => {
+        console.log('[Merit Flow] Redis client connected');
+      });
+    }
+    return this._redisClient;
   }
 
   getState() {
@@ -333,6 +477,8 @@ class MeritOpenAIClient {
       isPreloaded: false,
       context: null,
       projectPaired: false,
+      sessionType: this.SESSION_TYPES.ANONYMOUS,
+      messageCount: 0,
       cacheStatus: {
         hits: 0,
         misses: 0,
