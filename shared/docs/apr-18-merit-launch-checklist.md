@@ -3,7 +3,7 @@ Version: 1.0.3
 
 ## IMMEDIATE BLOCKERS [CRITICAL - MUST RESOLVE TODAY]
 
-### 1. Environment & API Configuration
+### 1. Environment & API Configuration From Lambda Team
 - [ ] Create `clients/elpl/merit/.env` file with correct configuration:
   ```env
   # Merit API Configuration
@@ -48,6 +48,70 @@ Version: 1.0.3
 - [ ] Update error handling to properly report endpoint issues
 - [ ] Verify environment variables are correctly loaded
 - [ ] Update tests to use proper endpoint mocking
+### Port Configuration & Traffic Routing
+
+```javascript
+// Infrastructure Configuration
+const ENDPOINTS = {
+    // Main entrance - Web Traffic (Port 443)
+    api: {
+        url: 'https://api.recursivelearning.app/prod',
+        port: 443,
+        protocol: 'https',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.MERIT_API_KEY,
+            'X-Project-ID': process.env.OPENAI_PROJECT_ID
+        }
+    },
+    // Service entrance - Redis Traffic (Port 6379)
+    redis: {
+        url: 'redis://redis.recursivelearning.app',
+        port: 6379,
+        protocol: 'redis',
+        auth: process.env.REDIS_AUTH_TOKEN
+    }
+};
+
+// DNS Configuration in Hover
+const DNS_RECORDS = {
+    api: {
+        type: 'CNAME',
+        host: 'api',
+        value: '29wtfiieig.execute-api.us-east-2.amazonaws.com',
+        ttl: '15 Minutes'
+    },
+    redis: {
+        type: 'CNAME',
+        host: 'redis',
+        value: '29wtfiieig.execute-api.us-east-2.amazonaws.com', // Same API Gateway
+        ttl: '15 Minutes'
+    }
+};
+
+// API Gateway Configuration
+const GATEWAY_RULES = {
+    'api.recursivelearning.app:443': {
+        target: 'lambda',
+        service: 'rl-restapi-lambda'
+    },
+    'redis.recursivelearning.app:6379': {
+        target: 'redis',
+        service: 'rl-redis-cache'
+    }
+};
+```
+
+This setup allows:
+1. Chat traffic through `api.recursivelearning.app` (port 443)
+2. Redis traffic through `redis.recursivelearning.app` (port 6379)
+3. Both using the same API Gateway but different routing rules
+4. Proper security isolation between services
+
+The API Gateway intelligently routes:
+- HTTPS requests to Lambda functions
+- Redis protocol requests to Redis service
+- All while maintaining proper security and authentication
 
 ### 2. DNS Resolution Issue
 - [ ] Fix DNS resolution failure:
