@@ -1358,6 +1358,16 @@
       }
     </script>
 
+    <!-- Set default tab to #welcome if no hash is present -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (!window.location.hash) {
+          window.location.hash = '#welcome';
+          console.log('[Merit HTML] No hash present - defaulting to #welcome');
+        }
+      });
+    </script>
+
     <!-- End Debugging Script -->
 </body>
 </html> 
