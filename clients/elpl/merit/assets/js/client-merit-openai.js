@@ -37,7 +37,7 @@ class MeritOpenAIClient {
         // Request headers
         this.headers = {
             'Content-Type': 'application/json',
-            'x-api-key': process.env.MERIT_API_KEY || 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
+            'x-api-key': window.env.MERIT_API_KEY || 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
             'X-Project-ID': this.config.project_id
         };
 
