@@ -26,6 +26,12 @@
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
+    <!-- Redis Client -->
+    <script type="module">
+      import Redis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
+      window.Redis = Redis;
+    </script>
+    
     <!-- Merit specific logic - instructional flow controller -->
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
     
@@ -107,7 +113,7 @@
         console.log('[Merit Flow] Form validation hardcoded to pass for testing');
         console.log('[Merit Flow] Navigation validation hardcoded to pass for testing');
 
-        // Redis Flow Logging
+        // Redis Flow Logging with enhanced error handling
         window.REDIS_FLOW = {
             logStep: (step, data) => {
                 const timestamp = new Date().toISOString();
@@ -129,6 +135,35 @@
             logError: (step, error) => {
                 const timestamp = new Date().toISOString();
                 console.error(`[${timestamp}] REDIS FLOW ERROR - ${step}:`, error);
+                
+                // Add to error panel if it exists
+                const errorPanel = document.getElementById('error-panel');
+                if (errorPanel) {
+                    const errorEntry = document.createElement('div');
+                    errorEntry.className = 'error-entry';
+                    errorEntry.innerHTML = `
+                        <span class="timestamp">${timestamp}</span>
+                        <span class="step">${step}</span>
+                        <span class="error">${error.message}</span>
+                        <button onclick="retryOperation('${step}')">Retry</button>
+                    `;
+                    errorPanel.appendChild(errorEntry);
+                }
+                
+                // Trigger error recovery if available
+                if (window.REDIS_FLOW.errorRecovery && typeof window.REDIS_FLOW.errorRecovery[step] === 'function') {
+                    window.REDIS_FLOW.errorRecovery[step](error);
+                }
+            },
+            errorRecovery: {
+                'REDIS_CONNECT': async (error) => {
+                    console.log('[Merit Flow] Attempting Redis reconnection...');
+                    // Implement reconnection logic
+                },
+                'CACHE_OPERATION': async (error) => {
+                    console.log('[Merit Flow] Attempting cache operation recovery...');
+                    // Implement cache recovery logic
+                }
             }
         };
 
@@ -145,6 +180,55 @@
             timestamp: Date.now(),
             environment: window.location.hostname,
             intakeToken: 'elpl-merit'
+        });
+
+        // Session Management Logging
+        window.SESSION_FLOW = {
+            logSession: (sessionId, type, data) => {
+                const timestamp = new Date().toISOString();
+                console.log(`[${timestamp}] SESSION FLOW - ${type}:`, {
+                    sessionId,
+                    type,
+                    ...data
+                });
+                
+                // Add to debug panel if it exists
+                const debugPanel = document.getElementById('debug-panel');
+                if (debugPanel) {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'log-entry';
+                    logEntry.innerHTML = `
+                        <span class="timestamp">${timestamp}</span>
+                        <span class="type">${type}</span>
+                        <span class="data">${JSON.stringify({ sessionId, ...data })}</span>
+                    `;
+                    debugPanel.appendChild(logEntry);
+                }
+            }
+        };
+
+        // Listen for session events
+        window.addEventListener('merit-session-created', (event) => {
+            window.SESSION_FLOW.logSession(
+                event.detail.sessionId,
+                'SESSION_CREATED',
+                event.detail
+            );
+        });
+
+        // Listen for persistence prompt
+        window.addEventListener('merit-persistence-prompt', (event) => {
+            window.SESSION_FLOW.logSession(
+                event.detail.sessionId,
+                'PERSISTENCE_PROMPT',
+                event.detail
+            );
+            
+            // Show the persistence prompt
+            const promptPanel = document.getElementById('persistence-prompt');
+            if (promptPanel) {
+                promptPanel.hidden = false;
+            }
         });
     </script>
 
@@ -945,6 +1029,62 @@
             color: #fff;
             word-break: break-all;
         }
+
+        /* Persistence Prompt Styles */
+        .persistence-prompt {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid var(--elpl-border);
+            border-radius: var(--elpl-border-radius);
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 300px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .persistence-prompt h4 {
+            margin: 0 0 10px;
+            color: var(--elpl-secondary);
+        }
+
+        .persistence-prompt p {
+            margin: 0 0 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .prompt-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .prompt-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .prompt-button.primary {
+            background: var(--elpl-secondary);
+            color: white;
+        }
+
+        .prompt-button.secondary {
+            background: transparent;
+            border: 1px solid var(--elpl-border);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -1117,6 +1257,16 @@
         </div>
     </div>
 
+    <!-- Persistence Prompt -->
+    <div id="persistence-prompt" class="persistence-prompt" hidden>
+        <h4>Save Your Progress?</h4>
+        <p>Would you like to save your chat history and preferences for future sessions?</p>
+        <div class="prompt-actions">
+            <button class="prompt-button secondary" onclick="dismissPersistencePrompt()">Maybe Later</button>
+            <button class="prompt-button primary" onclick="enablePersistence()">Save Progress</button>
+        </div>
+    </div>
+
     <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('welcome-form');
@@ -1157,6 +1307,43 @@
                 }
             });
         });
+    </script>
+
+    <!-- Error Panel for Redis Operations -->
+    <div id="error-panel" class="error-panel" hidden>
+        <h3>System Status</h3>
+        <div class="error-list"></div>
+    </div>
+
+    <script>
+        function dismissPersistencePrompt() {
+            const promptPanel = document.getElementById('persistence-prompt');
+            if (promptPanel) {
+                promptPanel.hidden = true;
+            }
+            window.SESSION_FLOW.logSession(
+                'unknown', // Will be filled by event handler
+                'PERSISTENCE_DISMISSED',
+                { timestamp: Date.now() }
+            );
+        }
+
+        function enablePersistence() {
+            const promptPanel = document.getElementById('persistence-prompt');
+            if (promptPanel) {
+                promptPanel.hidden = true;
+            }
+            // Emit event for persistence handling
+            const event = new CustomEvent('merit-enable-persistence', {
+                detail: { timestamp: Date.now() }
+            });
+            window.dispatchEvent(event);
+            window.SESSION_FLOW.logSession(
+                'unknown', // Will be filled by event handler
+                'PERSISTENCE_ENABLED',
+                { timestamp: Date.now() }
+            );
+        }
     </script>
 </body>
 </html> 

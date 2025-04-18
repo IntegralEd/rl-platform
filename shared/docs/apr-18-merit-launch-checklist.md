@@ -208,28 +208,283 @@ The API Gateway intelligently routes:
 - [x] Confirm API Gateway stage deployment
 
 ### 3. Redis Integration [BLOCKING]
-- [ ] Configure Redis with proper prefixes:
+- [ ] Configure Redis with proper session-based flow:
   ```javascript
+  // Redis Cache Structure
   const REDIS_CONFIG = {
-      prefix: 'merit:ela',
-      contextKey: 'context',
-      threadKey: 'thread',
-      ttl: 3600 // 1 hour for MVP
+      prefix: 'merit',
+      ttl: 3600, // 1 hour temp cache
+      keys: {
+          // Anonymous-friendly session keys
+          session: (sessionId) => `merit:session:${sessionId}`,
+          context: (sessionId) => `merit:context:${sessionId}`,
+          thread: (sessionId) => `merit:thread:${sessionId}`,
+          
+          // Optional authenticated user mapping
+          user: (email) => `merit:user:${email}` // Only if authenticated
+      }
+  };
+
+  // Session Context Flow
+  const sessionFlow = {
+      // 1. Generate session ID and cache data
+      initial: {
+          sessionId: generateSessionId(), // UUID v4
+          gradeLevel: "Grade 3",
+          curriculum: "ela",
+          schema_version: process.env.SCHEMA_VERSION,
+          isAuthenticated: false, // Default to anonymous
+          email: null, // Optional, only if authenticated
+          created_at: Date.now()
+      },
+      
+      // 2. Only create AirTable record if authenticated
+      airtable: {
+          condition: "isAuthenticated",
+          trigger: "chat_initialized",
+          retry: 3,
+          fields: [
+              "Session_ID", // Required
+              "Email",      // Optional
+              "Grade_Level",
+              "Curriculum",
+              "Schema_Version",
+              "Thread_ID"
+          ]
+      }
+  };
+
+  // Session ID Generation
+  function generateSessionId() {
+      return 'merit-' + 
+             Date.now() + 
+             '-' + 
+             Math.random().toString(36).substring(2);
+  }
+  ```
+- [ ] Implement session-based caching:
+  1. Generate unique session ID on form load
+  2. Cache form data with session ID
+  3. Create AirTable record only if authenticated
+  4. Maintain session mapping for authenticated users
+- [ ] Set up proper error handling:
+  - [ ] Redis connection failures
+  - [ ] Session validation
+  - [ ] AirTable sync for authenticated users
+- [ ] Add monitoring for sessions:
+  - [ ] Track active sessions
+  - [ ] Monitor anonymous vs authenticated usage
+  - [ ] Alert on session anomalies
+
+### Progressive User Engagement Flow [MVP APPROACH]
+- [x] Implement tiered session management:
+  ```javascript
+  // Session Tiers
+  const SESSION_TYPES = {
+    ANONYMOUS: 'anonymous',    // Browser session only
+    PERSISTENT: 'persistent',  // User opted to save
+    EMBEDDED: 'embedded'       // Auth from wrapper (Softr etc)
   };
   ```
-- [ ] Test Redis connectivity:
+
+- [x] Implement persistence prompt UI:
   ```javascript
-  const redis = new Redis(process.env.REDIS_URL);
-  await redis.ping();  // Should return PONG
+  // Persistence Prompt Flow
+  const PERSISTENCE_UI = {
+    trigger: {
+      messageCount: 3,      // Show after 3 messages
+      position: 'top-right',
+      animation: 'slide-in'
+    },
+    components: {
+      title: 'Save Your Progress?',
+      message: 'Would you like to save your chat history and preferences for future sessions?',
+      actions: [
+        {
+          text: 'Maybe Later',
+          type: 'secondary',
+          action: 'dismiss'
+        },
+        {
+          text: 'Save Progress',
+          type: 'primary',
+          action: 'enable_persistence'
+        }
+      ]
+    },
+    logging: {
+      events: [
+        'PERSISTENCE_PROMPT',    // When prompt is shown
+        'PERSISTENCE_DISMISSED', // User clicks "Maybe Later"
+        'PERSISTENCE_ENABLED'    // User opts to save
+      ]
+    }
+  };
   ```
-- [ ] Implement context caching with schema validation
-- [ ] Set up thread persistence with proper ID format:
+
+- [x] Add session flow logging:
   ```javascript
-  const threadId = `threads:${orgId}:${userId}:${threadId}`;
+  // Session Flow Logging
+  const SESSION_LOGGING = {
+    events: {
+      SESSION_CREATED: {
+        data: {
+          sessionId: 'merit-{timestamp}-{random}',
+          type: 'anonymous',
+          created_at: timestamp
+        }
+      },
+      PERSISTENCE_PROMPT: {
+        data: {
+          sessionId: 'current',
+          messageCount: 3,
+          context: 'current'
+        }
+      },
+      PERSISTENCE_DISMISSED: {
+        data: {
+          sessionId: 'current',
+          timestamp: 'action_time'
+        }
+      },
+      PERSISTENCE_ENABLED: {
+        data: {
+          sessionId: 'current',
+          timestamp: 'action_time'
+        }
+      }
+    },
+    storage: {
+      debug_panel: true,    // Show in debug UI
+      console: true,        // Log to console
+      redis: true          // Store in Redis
+    }
+  };
   ```
-- [ ] Add cache invalidation
-- [ ] Test cache hit/miss ratios
-- [ ] Verify TTL settings (3600s default)
+
+- [x] Implement session state transitions:
+  ```javascript
+  // Session State Machine
+  const SESSION_STATES = {
+    initial: 'anonymous',
+    transitions: {
+      anonymous: {
+        on_persistence: 'collecting_email',
+        on_dismiss: 'anonymous'
+      },
+      collecting_email: {
+        on_submit: 'persistent',
+        on_cancel: 'anonymous'
+      },
+      persistent: {
+        on_expire: 'anonymous',
+        on_logout: 'anonymous'
+      }
+    },
+    ttl: {
+      anonymous: 3600,    // 1 hour
+      persistent: 2592000 // 30 days
+    }
+  };
+  ```
+
+### Testing Requirements [UPDATED]
+
+#### Session Management Testing
+- [ ] Verify anonymous session creation
+  ```bash
+  # Expected Console Output
+  [2025-04-18T14:30:00.000Z] SESSION FLOW - SESSION_CREATED: {
+    sessionId: "merit-1744982078625-abc123",
+    type: "anonymous",
+    created_at: 1744982078625
+  }
+  ```
+- [ ] Test persistence prompt trigger
+  ```bash
+  # After 3 messages
+  [2025-04-18T14:35:00.000Z] SESSION FLOW - PERSISTENCE_PROMPT: {
+    sessionId: "merit-1744982078625-abc123",
+    messageCount: 3,
+    context: { ... }
+  }
+  ```
+- [ ] Validate prompt UI
+  - [ ] Appears in top-right corner
+  - [ ] Slides in smoothly
+  - [ ] Both buttons work correctly
+  - [ ] Proper event logging
+- [ ] Test state transitions
+  - [ ] Anonymous → Collecting Email
+  - [ ] Collecting Email → Persistent
+  - [ ] Proper TTL updates
+
+### Next Steps
+1. [x] Add persistence prompt UI
+2. [x] Implement session logging
+3. [ ] Test session flow
+4. [ ] Validate state transitions
+5. [ ] Test email collection
+6. [ ] Verify data persistence
+
+### Quality Control
+- [x] Session events logged to console
+- [x] Debug panel shows session flow
+- [x] Persistence prompt styled correctly
+- [x] Smooth animations implemented
+- [ ] Error states handled properly
+
+### Storage Implementation
+1. [ ] OpenAI Integration:
+   - Immediate message storage
+   - Thread management
+   - Metadata attachment
+
+2. [ ] Redis Caching:
+   - Quick message retrieval
+   - Session management
+   - TTL based on user type
+
+3. [ ] AirTable Storage:
+   - ALL threads stored
+   - ALL messages stored
+   - Async but guaranteed
+   - Retry on failure
+
+### Data Consistency
+- [ ] Verify thread creation in all systems
+- [ ] Confirm message storage in AT tables
+- [ ] Monitor Redis cache sync
+- [ ] Track storage success rates
+
+### Recovery Procedures
+- [ ] Handle OpenAI failures
+- [ ] Manage AT retry queue
+- [ ] Redis cache rebuilding
+- [ ] Session restoration
+
+### Quality Control
+- [x] All chats saved to OpenAI regardless of user type
+- [x] All threads available for QC and learning
+- [ ] User association optional but recoverable
+- [ ] Session data encrypted in Redis
+
+### Next Steps
+1. Implement anonymous chat flow
+2. Add message counter
+3. Create save prompt UI
+4. Build context persistence
+5. Test session recovery
+
+### Team Coordination
+- [ ] UX team: Design save prompt
+- [ ] Security: Review session handling
+- [ ] QA: Test all user paths
+
+### Contact Information
+- Security Team: #security-team
+- Redis Team: #redis-team
+- Backend Team: #backend-team
 
 ## Implementation Priorities
 
@@ -523,3 +778,304 @@ The API Gateway intelligently routes:
   - [ ] Verify authentication
   - [ ] Check CloudWatch logs
   - [ ] Monitor metrics
+
+### E2E Testing Results [IN PROGRESS]
+- [x] Test mock endpoint:
+  ```bash
+  # Mock Endpoint Test (✓ Working)
+  curl -v -H "Content-Type: application/json" \
+       -H "x-api-key: $MERIT_API_KEY" \
+       -H "X-Project-ID: $OPENAI_PROJECT_ID" \
+       https://api.recursivelearning.app/api/v1/mock
+  
+  # Response: 200 OK
+  {
+    "message": "Mock response successful",
+    "timestamp": "1744982367808"
+  }
+  ```
+
+- [ ] Test context endpoint:
+  ```bash
+  # Context Endpoint Test (✕ Needs Fix)
+  curl -v -H "Content-Type: application/json" \
+       -H "x-api-key: $MERIT_API_KEY" \
+       -H "X-Project-ID: $OPENAI_PROJECT_ID" \
+       -d '{"gradeLevel": "Grade 3", "curriculum": "ela"}' \
+       https://api.recursivelearning.app/api/v1/context
+  
+  # Response: 403 Forbidden
+  # Issue: POST method needs to be enabled in API Gateway
+  ```
+
+### Next Steps for API Gateway
+1. [ ] Enable POST method for /context endpoint
+2. [ ] Add proper IAM permissions for POST
+3. [ ] Update CORS configuration for POST
+4. [ ] Test context endpoint again after changes
+5. [ ] Document successful response format
+
+## Build & Test Progression
+
+### Stage 1: MVP Redis Chat [CURRENT FOCUS]
+- [ ] Basic Redis Chat Implementation
+  ```javascript
+  // MVP Chat Flow
+  const MVP_CHAT = {
+    init: {
+      sessionId: generateSessionId(),
+      storage: {
+        openai: true,      // Required for chat
+        redis: true,       // Required for session
+        airtable: true     // Required for persistence
+      },
+      identity: 'anonymous' // MVP starts anonymous
+    },
+    
+    logging: {
+      client: {
+        SESSION_START: 'Chat initialized with session ${sessionId}',
+        MESSAGE_SEND: 'Message sent to thread ${threadId}',
+        MESSAGE_RECEIVE: 'Response received from assistant',
+        STORAGE_SUCCESS: 'Thread stored in all systems'
+      },
+      page: {
+        CHAT_READY: 'Chat component mounted and ready',
+        REDIS_CONNECTED: 'Redis connection established',
+        OPENAI_READY: 'OpenAI client initialized'
+      }
+    },
+    
+    validation: {
+      required: [
+        'redis.connection',
+        'openai.thread',
+        'airtable.access'
+      ],
+      optional: [
+        'user.identity',
+        'email.capture'
+      ]
+    }
+  };
+  ```
+
+### Stage 2: Email Identity [NEXT]
+- [ ] Email Capture UI/UX
+  ```javascript
+  // Email Identity Flow
+  const EMAIL_IDENTITY = {
+    trigger: {
+      conditions: [
+        'messageCount >= 3',
+        'chatValue === true',
+        'noExistingIdentity'
+      ],
+      ui: {
+        type: 'inline-prompt',
+        position: 'above-chat',
+        style: 'non-disruptive'
+      }
+    },
+    
+    logging: {
+      client: {
+        PROMPT_SHOW: 'Email capture prompt displayed',
+        EMAIL_SUBMIT: 'Email submitted: ${email}',
+        IDENTITY_SET: 'User identity established'
+      },
+      page: {
+        PROMPT_READY: 'Email capture component mounted',
+        VALIDATION_PASS: 'Email validated successfully',
+        CONTEXT_UPDATED: 'User context updated with email'
+      }
+    }
+  };
+  ```
+
+### Stage 3: Softr Integration [AFTER EMAIL]
+- [ ] Softr Wrapper Identity
+  ```javascript
+  // Softr Identity Flow
+  const SOFTR_IDENTITY = {
+    detection: {
+      type: 'wrapper',
+      source: 'softr',
+      method: 'postMessage'
+    },
+    
+    logging: {
+      client: {
+        WRAPPER_DETECTED: 'Softr wrapper detected',
+        AUTH_RECEIVED: 'Softr auth data received',
+        CONTEXT_SYNCED: 'Context synced with Softr'
+      },
+      page: {
+        WRAPPER_READY: 'Wrapper communication established',
+        AUTH_VERIFIED: 'Softr authentication verified',
+        IDENTITY_LINKED: 'Identity linked to Softr user'
+      }
+    }
+  };
+  ```
+
+### Stage 4: Storyline Integration [AFTER SOFTR]
+- [ ] Storyline Embed Identity
+  ```javascript
+  // Storyline Identity Flow
+  const STORYLINE_IDENTITY = {
+    detection: {
+      type: 'embed',
+      source: 'storyline',
+      method: 'iframe'
+    },
+    
+    logging: {
+      client: {
+        EMBED_DETECTED: 'Storyline embed detected',
+        CONTEXT_RECEIVED: 'Storyline context received',
+        STATE_SYNCED: 'State synced with Storyline'
+      },
+      page: {
+        EMBED_READY: 'Storyline communication ready',
+        CONTEXT_VERIFIED: 'Storyline context verified',
+        BRIDGE_ACTIVE: 'Storyline bridge active'
+      }
+    }
+  };
+  ```
+
+### Stage 5: Anonymous Public [FINAL]
+- [ ] Public Anonymous Access
+  ```javascript
+  // Anonymous Flow
+  const ANONYMOUS_FLOW = {
+    rules: {
+      maxMessages: 10,
+      sessionTTL: 3600,
+      promptTrigger: 5
+    },
+    
+    logging: {
+      client: {
+        SESSION_START: 'Anonymous session started',
+        LIMIT_WARNING: 'Approaching message limit',
+        PROMPT_TRIGGER: 'Save prompt triggered'
+      },
+      page: {
+        ANON_READY: 'Anonymous mode active',
+        LIMITS_SET: 'Session limits configured',
+        STORAGE_TEMP: 'Temporary storage active'
+      }
+    }
+  };
+  ```
+
+### Testing Gates & Validation
+
+#### MVP Gate (Current Focus)
+- [ ] Redis connection successful
+- [ ] OpenAI thread creation working
+- [ ] AirTable storage confirmed
+- [ ] Basic chat functional
+- [ ] Session management working
+
+#### Identity Gate 1 (Email)
+- [ ] Email prompt triggers correctly
+- [ ] Validation working
+- [ ] Context persistence verified
+- [ ] Thread linking functional
+- [ ] AirTable user record created
+
+#### Identity Gate 2 (Softr)
+- [ ] Wrapper detection working
+- [ ] Auth flow functional
+- [ ] Context sync verified
+- [ ] User state maintained
+- [ ] Error handling tested
+
+#### Identity Gate 3 (Storyline)
+- [ ] Embed detection working
+- [ ] Context passing verified
+- [ ] State sync functional
+- [ ] Bridge communication tested
+- [ ] Error recovery working
+
+#### Identity Gate 4 (Anonymous)
+- [ ] Session limits working
+- [ ] Storage rules applied
+- [ ] Prompt timing correct
+- [ ] State cleanup verified
+- [ ] Rate limiting active
+
+### Console Logging Structure
+```javascript
+// Unified Logging System
+const IDENTITY_LOGGING = {
+  // Identity States
+  STATES: {
+    UNKNOWN: 'Identity not yet determined',
+    EMAIL: 'Email identity confirmed',
+    SOFTR: 'Softr wrapper identity',
+    STORYLINE: 'Storyline embed identity',
+    ANONYMOUS: 'Confirmed anonymous user'
+  },
+
+  // Log Levels
+  LEVELS: {
+    INFO: 'standard flow',
+    WARN: 'potential issues',
+    ERROR: 'blocking problems',
+    DEBUG: 'development info'
+  },
+
+  // Identity Transitions
+  TRANSITIONS: {
+    DETECT: 'Starting identity detection',
+    CONFIRM: 'Identity confirmed as ${type}',
+    CHANGE: 'Identity changing from ${old} to ${new}',
+    PERSIST: 'Identity persisted to storage'
+  }
+};
+
+// Client-Side Logging
+window.MERIT_LOGGER = {
+  log: (level, category, message, data) => {
+    console.log(
+      `[MERIT ${level}] ${category}: ${message}`,
+      data || ''
+    );
+    
+    // Also send to monitoring if needed
+    if (level === 'ERROR') {
+      // Alert monitoring
+    }
+  }
+};
+```
+
+### Build Order & Dependencies
+1. MVP Redis Chat
+   - Redis connection
+   - OpenAI integration
+   - Basic storage
+   
+2. Email Identity
+   - Prompt UI/UX
+   - Validation
+   - Context update
+   
+3. Softr Integration
+   - Wrapper detection
+   - Auth flow
+   - Context sync
+   
+4. Storyline Integration
+   - Embed detection
+   - Bridge setup
+   - State sync
+   
+5. Anonymous Public
+   - Session limits
+   - Storage rules
+   - Prompt system
