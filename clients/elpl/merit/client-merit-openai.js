@@ -8,7 +8,7 @@ class MeritOpenAIClient {
   constructor() {
     // Core configuration
     this.threadId = null;
-    this.assistantId = process.env.MERIT_ASSISTANT_ID;
+    this.assistantId = window.env.MERIT_ASSISTANT_ID;
     this.userId = this.generateSessionId(); // Generate temp session ID on init
 
     // Session Types
@@ -20,8 +20,8 @@ class MeritOpenAIClient {
 
     // API Configuration with validated endpoints
     const ENDPOINTS = {
-      lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
-      REDIS: process.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
+      lambda: window.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
+      REDIS: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
       cachePrefix: 'merit:ela:cache'
@@ -32,7 +32,7 @@ class MeritOpenAIClient {
       endpoint: ENDPOINTS.REDIS,
       auth: {
         username: 'recursive-frontend',
-        password: process.env.REDIS_PASSWORD
+        password: window.env.REDIS_PASSWORD
       },
       defaultTTL: 3600, // 1 hour for MVP
       keys: {
@@ -52,11 +52,11 @@ class MeritOpenAIClient {
 
     this.baseUrl = ENDPOINTS.lambda;
     this.config = {
-      org_id: process.env.ORG_ID,
+      org_id: window.env.MERIT_ORG_ID,
       assistant_id: this.assistantId,
       model: 'gpt-4o',
-      schema_version: process.env.SCHEMA_VERSION,
-      project_id: process.env.OPENAI_PROJECT_ID,
+      schema_version: window.env.SCHEMA_VERSION,
+      project_id: window.env.OPENAI_PROJECT_ID,
       ttl: {
         session: 3600,    // 1 hour for MVP
         cache: 3600,      // 1 hour for MVP
@@ -67,7 +67,7 @@ class MeritOpenAIClient {
     // Validated API headers
     this.headers = {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.MERIT_API_KEY,
+      'x-api-key': window.env.MERIT_API_KEY,
       'X-Project-ID': this.config.project_id,
       'Origin': 'https://recursivelearning.app'
     };

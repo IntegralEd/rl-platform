@@ -26,9 +26,22 @@
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
+    <!-- Environment Configuration -->
+    <script>
+        window.env = {
+            SCHEMA_VERSION: '1.0.16',
+            MERIT_API_KEY: process.env.MERIT_API_KEY,
+            OPENAI_PROJECT_ID: process.env.OPENAI_PROJECT_ID,
+            MERIT_ASSISTANT_ID: process.env.MERIT_ASSISTANT_ID,
+            MERIT_ORG_ID: process.env.MERIT_ORG_ID,
+            LAMBDA_ENDPOINT: 'https://api.recursivelearning.app/prod',
+            REDIS_URL: 'redis://redis.recursivelearning.app:6379'
+        };
+    </script>
+    
     <!-- Redis Client -->
     <script type="module">
-      import Redis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
+      import { Redis } from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
       window.Redis = Redis;
     </script>
     
@@ -71,40 +84,36 @@
 
         // Initialize version display with build counter
         document.addEventListener('DOMContentLoaded', () => {
-            const versionDisplay = document.querySelector('.version-display');
-            if (versionDisplay) {
-                const now = new Date();
-                // Convert to Central Time
-                const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-                
-                // Format date as MMDDYYYY
-                const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-                const day = String(centralTime.getDate()).padStart(2, '0');
-                const year = centralTime.getFullYear();
-                const buildDate = `${month}${day}${year}`;
-                
-                // Format time as HH:MMam/pm
-                const hours = centralTime.getHours();
-                const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-                const ampm = hours >= 12 ? 'pm' : 'am';
-                const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-                const buildTime = `${formattedHours}:${minutes}${ampm}`;
-                
-                // Version 1.0.15 simplified to 1.16
-                const version = '1.16';
-                
-                // Format: merit.html/04132024.09:09am.v.1.15
-                const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-                versionDisplay.textContent = displayVersion;
-                
-                // Store for debugging and build tracking
-                localStorage.setItem('meritVersion', version);
-                localStorage.setItem('meritBuildDate', buildDate);
-                localStorage.setItem('meritBuildTime', buildTime);
-                localStorage.setItem('meritFullVersion', displayVersion);
-                
-                console.log('[Merit Flow] Build version:', displayVersion);
-            }
+            const now = new Date();
+            // Convert to Central Time
+            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+            
+            // Format date as MMDDYYYY
+            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+            const day = String(centralTime.getDate()).padStart(2, '0');
+            const year = centralTime.getFullYear();
+            const buildDate = `${month}${day}${year}`;
+            
+            // Format time as HH:MMam/pm
+            const hours = centralTime.getHours();
+            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+            const buildTime = `${formattedHours}:${minutes}${ampm}`;
+            
+            // Version 1.0.15 simplified to 1.16
+            const version = '1.16';
+            
+            // Format: merit.html/04132024.09:09am.v.1.15
+            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+            
+            // Store for debugging and build tracking
+            localStorage.setItem('meritVersion', version);
+            localStorage.setItem('meritBuildDate', buildDate);
+            localStorage.setItem('meritBuildTime', buildTime);
+            localStorage.setItem('meritFullVersion', displayVersion);
+            
+            console.log('[Merit Flow] Build version:', displayVersion);
         });
 
         // MVP validation logging
@@ -460,18 +469,6 @@
         .header-logo-container {
             height: calc(var(--header-height) - 20px);
             padding: 10px 0;
-        }
-
-        .header-version-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-        
-        .version-display {
-            font-size: 0.9em;
-            text-align: right;
-            white-space: nowrap;
         }
 
         .header-logo {
@@ -1092,18 +1089,13 @@
         <header class="client-header" role="banner" data-test-id="header-bar">
             <div class="header-content">
                 <div class="header-logo-container" data-test-id="logo-container"> 
-                     <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" 
-                          alt="EL Education Logo" 
-                          class="header-logo"
-                          loading="lazy"
-                          aria-live="polite">
+                    <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" 
+                         alt="EL Education Logo" 
+                         class="header-logo"
+                         loading="lazy"
+                         aria-live="polite">
                 </div>
-                <div class="header-version-container"> 
-                    <div class="version-display" 
-                         aria-label="Version and time"
-                         data-test-id="version-display"></div>
-                </div>
-    </div>
+            </div>
         </header>
 
         <main class="client-content" role="main" data-test-id="main-content">
@@ -1221,7 +1213,7 @@
                                 data-active="true"
                                 disabled
                                 data-test-id="next-button">
-                            <img src="/clients/elpl/assets/images/client-elpl-next-icon-white.svg" 
+                            <img src="/clients/elpl/assets/images/client-elpl-next-button.png" 
                                  alt="Next" 
                                  class="button-icon"
                                  loading="lazy">
@@ -1241,7 +1233,7 @@
                                 class="action-button"
                                 aria-label="Send message"
                                 data-test-id="send-button">
-                            <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" 
+                            <img src="/clients/elpl/assets/images/client-elpl-send-button-crimson.png" 
                                  alt="Send" 
                                  class="button-icon"
                                  loading="lazy">

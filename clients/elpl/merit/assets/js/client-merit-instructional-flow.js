@@ -15,7 +15,7 @@ export class MeritInstructionalFlow {
         version: "1.0.20",
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
-        schema_version: process.env.SCHEMA_VERSION
+        schema_version: window.env.SCHEMA_VERSION
     };
 
     #state = {
