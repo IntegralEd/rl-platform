@@ -685,6 +685,47 @@ The API Gateway intelligently routes:
 - [x] Update error handling to properly report endpoint issues
 - [x] Verify environment variables are correctly loaded
 - [x] Update tests to use proper endpoint mocking
+- [x] Remove hardcoded API keys and project IDs from merit.html
+- [x] Move version display from UI to console logging
+- [x] Update header structure to match client layout rules
+
+## Environment Testing
+- [x] Create test script at `clients/elpl/merit/test-env.sh`
+- [ ] Run environment verification:
+  - [ ] Make script executable: `chmod +x test-env.sh`
+  - [ ] Run script: `./test-env.sh`
+- [ ] Verify all environment variables are loaded
+  - [ ] MERIT_API_KEY
+  - [ ] OPENAI_PROJECT_ID
+  - [ ] SCHEMA_VERSION
+  - [ ] LAMBDA_ENDPOINT
+  - [ ] REDIS_URL
+- [ ] Confirm API connectivity
+- [ ] Test Redis connection
+- [ ] Check schema version compatibility
+
+## Redis Connection Resolution (BLOCKING)
+- [x] Create Redis test script
+- [ ] Verify Redis credentials
+- [ ] Run connection tests
+- [ ] Document any connection errors
+- [ ] Update DNS records if needed
+
+## Next Steps
+1. Run Redis test script to verify connection
+2. Test API key independently
+3. Update checklist with findings
+4. Coordinate with team on any blocking issues
+
+## Team Coordination
+- DevOps Lead: @devops-lead
+- Backend Support: @backend-team
+- Frontend Lead: @frontend-lead
+
+## Support Contacts
+- Redis Issues: devops@recursivelearning.app
+- API Gateway: api-support@recursivelearning.app
+- Frontend: frontend@recursivelearning.app
 
 ## Redis Connection Resolution
 - [x] Create Redis test script at `clients/elpl/merit/test-redis.js`
