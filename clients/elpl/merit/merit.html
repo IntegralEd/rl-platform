@@ -41,8 +41,8 @@
     
     <!-- Redis Client -->
     <script type="module">
-      import Redis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
-      window.Redis = Redis;
+      import * as IORedis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
+      window.Redis = IORedis;
     </script>
     
     <!-- Merit specific logic - instructional flow controller -->

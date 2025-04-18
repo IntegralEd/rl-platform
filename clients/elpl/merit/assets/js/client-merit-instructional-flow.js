@@ -222,6 +222,7 @@ export class MeritInstructionalFlow {
 
     #validateForm() {
         const gradeLevel = this.#elements.form?.querySelector('#grade-level')?.value;
+        console.log('[Merit Flow] validateForm: gradeLevel value:', gradeLevel);
         this.#state.formValid = !!gradeLevel;
         this.#state.gradeLevel = gradeLevel;
         
@@ -241,7 +242,7 @@ export class MeritInstructionalFlow {
                 const context = {
                     gradeLevel: this.#state.gradeLevel,
                     curriculum: this.#state.curriculum,
-                    schema_version: process.env.SCHEMA_VERSION
+                    schema_version: window.env.SCHEMA_VERSION
                 };
                 
                 // Create Redis user session
