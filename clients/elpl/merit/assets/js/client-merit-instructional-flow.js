@@ -190,6 +190,14 @@ export class MeritInstructionalFlow {
             this.#validateForm();
         });
 
+        const gradeSelect = this.#elements.form?.querySelector('#grade-level');
+        if (gradeSelect) {
+            gradeSelect.addEventListener('input', () => {
+                console.log('[Merit Flow] gradeSelect input event fired');
+                this.#validateForm();
+            });
+        }
+
         // Next button
         this.#elements.nextButton?.addEventListener('click', () => {
             if (this.#state.formValid) {
