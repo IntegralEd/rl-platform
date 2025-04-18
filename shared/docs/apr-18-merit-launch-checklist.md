@@ -336,3 +336,61 @@ The API Gateway intelligently routes:
 - Follow the established deployment checklist
 - Keep stakeholders updated on progress
 - Monitor error rates closely during launch 
+
+## Critical Blockers
+- [x] Environment variables configured
+- [ ] Redis connection issues resolved
+- [ ] API authorization issues (403) resolved
+
+## Environment & API Configuration
+- [x] Create `.env` file with correct configuration
+- [x] Update `client-merit-openai.js` configuration
+- [x] Remove all instances of `/dev` from endpoint URLs
+- [x] Update error handling to properly report endpoint issues
+- [x] Verify environment variables are correctly loaded
+- [x] Update tests to use proper endpoint mocking
+
+## Redis Connection Resolution
+- [x] Create Redis test script at `clients/elpl/merit/test-redis.js`
+  - Implements platform standard access patterns
+  - Tests read-only frontend access
+  - Verifies context and schema access
+  - Validates permission boundaries
+- [ ] Verify Redis credentials
+  - [ ] Check REDIS_PASSWORD environment variable
+  - [ ] Confirm recursive-frontend user access
+  - [ ] Test with direct redis-cli connection
+- [ ] Run connection tests
+  - [ ] Execute `node test-redis.js`
+  - [ ] Verify DNS resolution for redis.recursivelearning.app
+  - [ ] Check network connectivity to port 6379
+  - [ ] Confirm SSL/TLS configuration if required
+- [ ] Document any connection errors in detail
+  - Error type (auth, permission, network)
+  - Timestamp and frequency
+  - Related environment variables
+
+## Next Steps
+1. Run Redis test script and document results
+2. If DNS issues persist:
+   ```bash
+   dig redis.recursivelearning.app
+   ping redis.recursivelearning.app
+   telnet redis.recursivelearning.app 6379
+   ```
+3. Test API key independently:
+   ```bash
+   curl -v -H "Authorization: Bearer $API_KEY" $LAMBDA_ENDPOINT
+   ```
+4. Update this checklist with findings
+
+## Team Coordination
+- [ ] Share Redis test results with infrastructure team
+- [ ] Coordinate with security for access review
+- [ ] Schedule deployment window
+- [ ] Prepare rollback plan
+
+## Contact Information
+- Infrastructure Support: #infra-support
+- Security Team: #security-team
+- Project Lead: @project-lead
