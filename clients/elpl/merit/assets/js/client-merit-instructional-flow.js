@@ -15,7 +15,7 @@ export class MeritInstructionalFlow {
         version: "1.0.20",
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
-        schema_version: "04102025.B01"
+        schema_version: process.env.SCHEMA_VERSION
     };
 
     #state = {
@@ -240,7 +240,8 @@ export class MeritInstructionalFlow {
                 const email = document.querySelector('#header-span')?.dataset?.userEmail || 'default@integral-ed.com';
                 const context = {
                     gradeLevel: this.#state.gradeLevel,
-                    curriculum: this.#state.curriculum
+                    curriculum: this.#state.curriculum,
+                    schema_version: process.env.SCHEMA_VERSION
                 };
                 
                 // Create Redis user session

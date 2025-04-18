@@ -1,55 +1,17 @@
 # Merit Launch Checklist - April 18, 2025
-Version: 1.0.3
+Version: 1.0.6
 
-## IMMEDIATE BLOCKERS [CRITICAL - MUST RESOLVE TODAY]
+## **ATTN: Backend Team / DNS Config for Redis needed today**
+**CRITICAL: Missing DNS Record Blocking Redis Connection**
+- Current Status: ❌ No DNS record for `redis.recursivelearning.app`
+- Required Action: Add CNAME record in Hover control panel
+- Value: `29wtfiieig.execute-api.us-east-2.amazonaws.com` (Same as API Gateway)
+- Priority: IMMEDIATE (blocking Merit launch)
+- TTL: 15 Minutes (match existing records)
+- Contact: Backend Team Lead for endpoint verification
+- Validation: Will require DNS propagation check after addition
 
-### 1. Environment & API Configuration From Lambda Team
-- [ ] Create `clients/elpl/merit/.env` file with correct configuration:
-  ```env
-  # Merit API Configuration
-  MERIT_API_KEY=qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J
-  LAMBDA_ENDPOINT=https://api.recursivelearning.app/prod
-  OPENAI_PROJECT_ID=proj_V4lrL1OSfydWCFW0zjgwrFRT
-  MERIT_ASSISTANT_ID=asst_QoAA395ibbyMImFJERbG2hKT
-  REDIS_URL=redis://redis.recursivelearning.app:6379
-  
-  # Organization Configuration
-  ORG_ID=recdg5Hlm3VVaBA2u
-  SCHEMA_VERSION=04102025.B01
-  ```
-
-- [ ] Test API endpoint with proper headers:
-  ```bash
-  curl -v -H "Content-Type: application/json" \
-       -H "x-api-key: qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J" \
-       -H "X-Project-ID: proj_V4lrL1OSfydWCFW0zjgwrFRT" \
-       https://api.recursivelearning.app/prod/chat
-  ```
-
-- [ ] Update `client-merit-openai.js` configuration:
-  ```javascript
-  // Core configuration
-  this.config = {
-      org_id: process.env.ORG_ID,
-      assistant_id: process.env.MERIT_ASSISTANT_ID,
-      project_id: process.env.OPENAI_PROJECT_ID,
-      schema_version: process.env.SCHEMA_VERSION
-  };
-  
-  // Request headers
-  this.headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.MERIT_API_KEY,
-      'X-Project-ID': this.config.project_id
-  };
-  ```
-
-- [ ] Remove all instances of `/dev` from endpoint URLs
-- [ ] Update error handling to properly report endpoint issues
-- [ ] Verify environment variables are correctly loaded
-- [ ] Update tests to use proper endpoint mocking
-### Port Configuration & Traffic Routing
-
+### Infrastructure Configuration [FROM LAMBDA TEAM]
 ```javascript
 // Infrastructure Configuration
 const ENDPOINTS = {
@@ -102,7 +64,7 @@ const GATEWAY_RULES = {
 };
 ```
 
-This setup allows:
+This setup enables:
 1. Chat traffic through `api.recursivelearning.app` (port 443)
 2. Redis traffic through `redis.recursivelearning.app` (port 6379)
 3. Both using the same API Gateway but different routing rules
@@ -113,24 +75,58 @@ The API Gateway intelligently routes:
 - Redis protocol requests to Redis service
 - All while maintaining proper security and authentication
 
-### 2. DNS Resolution Issue
-- [ ] Fix DNS resolution failure:
-  ```bash
-  # Test primary endpoint (should work)
-  curl -v https://api.recursivelearning.app/chat
-  
-  # Verify headers
-  curl -v -H "Content-Type: application/json" \
-       -H "X-Project-ID: proj_V4lrL1OSfydWCFW0zjgwrFRT" \
-       https://api.recursivelearning.app/chat
-  ```
-- [ ] Verify API gateway configuration
-- [ ] Contact DevOps team for endpoint verification
-- [ ] Remove any temporary `/dev` fixes
-- [ ] Update DNS records if needed
-- [ ] Implement proper error handling for DNS failures
+## IMMEDIATE BLOCKERS [CRITICAL - MUST RESOLVE TODAY]
 
-### 3. Redis Integration [IN PROGRESS]
+### 1. DNS Configuration [IN PROGRESS]
+- [x] Main domain A records (@) pointing to GitHub Pages
+  ```
+  @ -> 185.199.108.153
+  @ -> 185.199.109.153
+  @ -> 185.199.110.153
+  @ -> 185.199.111.153
+  ```
+- [x] API subdomain configuration
+  ```
+  api.recursivelearning.app -> 29wtfiieig.execute-api.us-east-2.amazonaws.com
+  ```
+- [x] ACM validation record
+  ```
+  _0c82b441670e25ae696abd2fe605696d.api -> d-ueohg7hhi6.execute-api.us-east-2.amazonaws.com
+  ```
+- [ ] Add Redis CNAME record
+  ```
+  redis.recursivelearning.app -> 29wtfiieig.execute-api.us-east-2.amazonaws.com
+  ```
+- [ ] Verify DNS propagation (can take up to 15 minutes)
+- [ ] Test endpoint resolution:
+  ```bash
+  # Test API endpoint
+  dig api.recursivelearning.app
+  curl -v https://api.recursivelearning.app/health
+  
+  # Test Redis endpoint
+  dig redis.recursivelearning.app
+  nc -zv redis.recursivelearning.app 6379
+  ```
+
+### 2. API Authorization (403) [BLOCKING - NOT DNS RELATED]
+- [ ] Verify API key is active and valid
+  ```
+  Current key: qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J
+  Project ID: proj_V4lrL1OSfydWCFW0zjgwrFRT
+  ```
+- [ ] Test API key with curl:
+  ```bash
+  curl -v -H "Content-Type: application/json" \
+       -H "x-api-key: qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J" \
+       -H "X-Project-ID: proj_V4lrL1OSfydWCFW0zjgwrFRT" \
+       https://api.recursivelearning.app/prod/auth/verify
+  ```
+- [ ] Check for any IP restrictions
+- [x] Verify ACM certificate is valid and active
+- [ ] Confirm API Gateway stage deployment
+
+### 3. Redis Integration [BLOCKING]
 - [ ] Configure Redis with proper prefixes:
   ```javascript
   const REDIS_CONFIG = {

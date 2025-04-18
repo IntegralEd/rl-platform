@@ -8,13 +8,13 @@ class MeritOpenAIClient {
   constructor() {
     // Core configuration
     this.threadId = null;
-    this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
+    this.assistantId = process.env.MERIT_ASSISTANT_ID;
     this.userId = 'default_user';
 
     // API Configuration
     const ENDPOINTS = {
-      lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
-      REDIS: 'redis://redis.recursivelearning.app:6379',
+      lambda: process.env.LAMBDA_ENDPOINT,
+      REDIS: process.env.REDIS_URL,
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
       cachePrefix: 'merit:ela:cache'
@@ -35,11 +35,11 @@ class MeritOpenAIClient {
 
     this.baseUrl = ENDPOINTS.lambda;
     this.config = {
-      org_id: 'recdg5Hlm3VVaBA2u',
+      org_id: process.env.ORG_ID,
       assistant_id: this.assistantId,
       model: 'gpt-4o',
-      schema_version: '04102025.B01',
-      project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+      schema_version: process.env.SCHEMA_VERSION,
+      project_id: process.env.OPENAI_PROJECT_ID,
       ttl: {
         session: 3600,    // 1 hour for MVP
         cache: 3600,      // 1 hour for MVP
@@ -49,6 +49,7 @@ class MeritOpenAIClient {
 
     this.headers = {
       'Content-Type': 'application/json',
+      'x-api-key': process.env.MERIT_API_KEY,
       'X-Project-ID': this.config.project_id
     };
 
