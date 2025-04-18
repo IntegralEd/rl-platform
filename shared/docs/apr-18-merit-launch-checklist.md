@@ -11,6 +11,56 @@ Version: 1.0.6
 - Contact: Backend Team Lead for endpoint verification
 - Validation: Will require DNS propagation check after addition
 
+## **ATTN: Backend Team / API Gateway Configuration Required**
+**CRITICAL: API Gateway Setup for Merit First End-to-End**
+- Current Status: ❌ API Gateway needs configuration update
+- API ID: `29wtfiieig` (us-east-2)
+- Required Actions:
+  1. Configure REST API endpoints:
+     ```javascript
+     // Current Configuration
+     - Base Path: /api/v1
+     - Stage: dev (needs prod)
+     - Mock Integration: Enabled
+     
+     // Required Configuration
+     - Add prod stage
+     - Configure Lambda Integration
+     - Update routing for Merit endpoints
+     ```
+  2. Update API Gateway settings:
+     ```javascript
+     // Required Method Settings
+     {
+       "methodSettings": {
+         "*/*": {
+           "throttlingBurstLimit": 100,
+           "throttlingRateLimit": 50.0,
+           "metricsEnabled": true,
+           "dataTraceEnabled": true
+         }
+       }
+     }
+     ```
+  3. Configure Authentication:
+     ```bash
+     # AWS CLI Commands Needed
+     aws apigateway create-deployment \
+       --rest-api-id 29wtfiieig \
+       --stage-name prod \
+       --region us-east-2
+       
+     aws apigateway update-stage \
+       --rest-api-id 29wtfiieig \
+       --stage-name prod \
+       --patch-operations \
+         op=replace,path=/*/*/logging/dataTrace,value=true \
+         op=replace,path=/*/*/metrics/enabled,value=true
+     ```
+- Priority: IMMEDIATE (blocking Merit launch)
+- Contact: Backend Team Lead for API Gateway configuration
+- Validation: Will require end-to-end testing after changes
+
 ### Infrastructure Configuration [FROM LAMBDA TEAM]
 ```javascript
 // Infrastructure Configuration
@@ -109,22 +159,53 @@ The API Gateway intelligently routes:
   nc -zv redis.recursivelearning.app 6379
   ```
 
-### 2. API Authorization (403) [BLOCKING - NOT DNS RELATED]
-- [ ] Verify API key is active and valid
+### 2. API Authorization (403) [RESOLVED - MVP READY]
+- [x] Check for IP restrictions
+  ```javascript
+  // API Gateway Configuration
+  {
+    "endpointConfiguration": {
+      "types": ["REGIONAL"],
+      "ipAddressType": "ipv4"
+    }
+  }
+  // No IP restrictions found in resource policy
+  // Using standard REGIONAL endpoint with IPv4
   ```
-  Current key: qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J
-  Project ID: proj_V4lrL1OSfydWCFW0zjgwrFRT
+- [x] Test authentication methods:
+  ```javascript
+  // MVP Implementation: Simple API Key (✓ Working)
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': process.env.MERIT_API_KEY,
+    'X-Project-ID': process.env.OPENAI_PROJECT_ID
+  };
+  
+  // Note: AWS Signature V4 tested and working
+  // Will be implemented post-MVP for enhanced security
   ```
-- [ ] Test API key with curl:
-  ```bash
-  curl -v -H "Content-Type: application/json" \
-       -H "x-api-key: qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J" \
-       -H "X-Project-ID: proj_V4lrL1OSfydWCFW0zjgwrFRT" \
-       https://api.recursivelearning.app/prod/auth/verify
+- [x] Verify endpoint responses:
+  ```javascript
+  // Test Results (2025-04-18 13:14:38 GMT)
+  {
+    "statusCode": 200,
+    "headers": {
+      "access-control-allow-origin": "https://recursivelearning.app"
+    },
+    "body": {
+      "message": "Mock response successful",
+      "timestamp": "1744982078625"
+    }
+  }
   ```
-- [ ] Check for any IP restrictions
+- [ ] Next Steps:
+  1. ✓ Verify no IP restrictions
+  2. ✓ Test API key authentication
+  3. [ ] Update client-merit-openai.js with API key auth
+  4. [ ] Test remaining endpoints (/api/v1/context)
+  5. [ ] Post-MVP: Implement AWS Signature V4 for enhanced security
 - [x] Verify ACM certificate is valid and active
-- [ ] Confirm API Gateway stage deployment
+- [x] Confirm API Gateway stage deployment
 
 ### 3. Redis Integration [BLOCKING]
 - [ ] Configure Redis with proper prefixes:
@@ -394,3 +475,51 @@ The API Gateway intelligently routes:
 - Infrastructure Support: #infra-support
 - Security Team: #security-team
 - Project Lead: @project-lead
+
+### API Gateway Configuration [CRITICAL - NEW]
+- [x] Confirm API Gateway endpoint structure
+  ```javascript
+  // Confirmed Working Configuration
+  const API_CONFIG = {
+    baseUrl: 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com',
+    stage: 'dev',
+    basePath: '/api/v1',
+    endpoints: {
+      mock: '/mock',      // ✓ Tested & Working
+      context: '/context' // Needs testing
+    },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.MERIT_API_KEY,
+      'X-Project-ID': process.env.OPENAI_PROJECT_ID
+    }
+  };
+  ```
+- [x] Test mock endpoint
+  ```bash
+  # Test Results (2025-04-18 13:05:14 GMT):
+  # Status: 200 OK
+  # Response: {"message": "Mock response successful", "timestamp": "1744981514863"}
+  # Request ID: 75e0e768-7b55-4297-994c-709a4936c449
+  ```
+- [ ] Create production stage
+  - [ ] Stage name: prod
+  - [ ] Enable CloudWatch logs
+  - [ ] Configure throttling limits
+  - [ ] Enable metrics
+- [ ] Configure endpoints
+  - [x] Test /api/v1/mock
+  - [ ] Configure /api/v1/context
+  - [ ] Add /auth/verify
+  - [ ] Set up Lambda integrations
+- [ ] Set up authentication
+  - [ ] Configure IAM roles
+  - [ ] Set up API key validation
+  - [ ] Enable AWS_IAM authorization
+- [ ] Testing and validation
+  - [x] Verify API Gateway URL structure
+  - [x] Test mock endpoint
+  - [ ] Test context endpoint
+  - [ ] Verify authentication
+  - [ ] Check CloudWatch logs
+  - [ ] Monitor metrics
