@@ -1,172 +1,251 @@
 # Merit End-to-End Integration Checklist
-**Document Version:** 1.0.2
-**Last Updated:** April 19, 2025 17:00 UTC
-**Status:** Ready for Implementation
+**Document Version:** 1.0.6
+**Last Updated:** April 25, 2025 12:30 UTC
+**Status:** Navigation Fixed, Environment Updated
 
 ## Overview
 This checklist outlines the required changes to integrate the Merit client with the updated API Gateway and Redis caching system. Items are tagged as:
 - 🔧 **[BACKEND]** - Backend team implementation required
 - 👀 **[VERIFY]** - Frontend visual verification in console/network tab
 - 🔄 **[FRONTEND]** - Frontend team implementation
+- 🔐 **[ENV]** - Environment configuration required
+- ✅ **[FIXED]** - Issue has been resolved
 
-## Pre-Implementation Verification
-
-### 1. Redis Access Verification
-🔧 **[BACKEND]** Configure Redis ACL:
+## Environment Setup
+🔐 **[ENV]** Merit-specific configuration:
 ```bash
-# Backend team to implement:
-redis-cli -h redis.recursivelearning.app -a ADMIN_PASSWORD ACL SETUSER recursive-frontend on >context:* allkeys +get +ping +info
+# Merit-specific .env (clients/elpl/merit/.env)
+# OpenAI Configuration
+OPENAI_API_KEY=sk-...  # Your OpenAI API key
+OPENAI_PROJECT_ID=proj_V4lrL1OSfydWCFW0zjgwrFRT
+MERIT_ASSISTANT_ID=asst_QoAA395ibbyMImFJERbG2hKT
+MERIT_ORG_ID=recdg5Hlm3VVaBA2u
+
+# API Gateway Configuration
+LAMBDA_ENDPOINT=https://api.recursivelearning.app/prod/api/v1
+API_GATEWAY_ENDPOINT=https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
+API_GATEWAY_KEY=68gmsx2jsk
+MERIT_API_KEY=qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J
+
+# Schema Version
+SCHEMA_VERSION=04102025.B01
 ```
 
-👀 **[VERIFY]** Frontend team to confirm:
+## Browser Testing Steps
+
+### 1. Network Tab Verification
+👀 **[VERIFY]** Check request headers:
 ```javascript
-// Open browser console, look for:
-[Merit Redis] Connection successful: recursive-frontend
-[Merit Redis] Read access confirmed for context:*
-[Merit Redis] Write access blocked as expected
+// Every API request should include:
+{
+  'x-api-key': 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
+  'X-Project-ID': 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+  'X-Assistant-ID': 'asst_QoAA395ibbyMImFJERbG2hKT',
+  'Content-Type': 'application/json'
+}
 ```
 
-### 2. Schema Version Validation
-🔧 **[BACKEND]** Set schema version:
-```bash
-# Backend team to implement:
-redis-cli -h redis.recursivelearning.app -a ADMIN_PASSWORD SET "schema:exposed_fields:rollout_version" "04102025.B01"
-```
+Expected Network Flow:
+1. Initial schema fetch (`GET /schema/fields`)
+2. Context initialization (`POST /context/init`)
+3. Assistant connection (`GET /assistant/connect`)
 
-👀 **[VERIFY]** Frontend team to confirm:
+### 2. Console Verification
+👀 **[VERIFY]** Expected console messages:
 ```javascript
-// Console should show:
-[Merit Schema] Version check passed: 04102025.B01
-[Merit Schema] Field registry accessible
+// Successful initialization:
+[Merit] Environment loaded ✓
+[Merit] API connection established ✓
+[Merit] Assistant connected: asst_QoAA395ibbyMImFJERbG2hKT ✓
+
+// Successful API calls:
+[Merit API] Schema fields loaded
+[Merit API] Context initialized
+[Merit API] Assistant ready
+
+// Error states (if any):
+[Merit Error] API connection failed: Check API key
+[Merit Error] Schema validation failed: Version mismatch
+[Merit Error] Assistant unavailable: Check assistant ID
 ```
 
-## Frontend Implementation Steps
+### 3. Visual Verification Points
+👀 **[VERIFY]** Check for:
+1. Assistant status indicator (top right):
+   - 🟢 Green: Connected
+   - 🟡 Yellow: Connecting
+   - 🔴 Red: Error
+2. Schema version display (footer):
+   - Should show: `v04102025.B01`
+3. Context panel (right sidebar):
+   - Should list available fields
+   - Should show field types
+   - Should indicate cache status
 
-### 1. API Authentication
-🔄 **[FRONTEND]** Update headers:
-```javascript
-this.headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': window.env.MERIT_API_KEY,
-    'X-Project-ID': this.config.project_id
-};
-```
+### 4. Error Handling Verification
+👀 **[VERIFY]** Test error scenarios:
+1. Temporarily modify API key - should see:
+   ```javascript
+   [Merit Error] API connection failed (403)
+   Error: Invalid API key provided
+   ```
 
-👀 **[VERIFY]** Check Network tab:
-- Request headers show `x-api-key`
-- No `Authorization: Bearer` present
-- Response: 200 OK
+2. Modify Project ID - should see:
+   ```javascript
+   [Merit Error] Project validation failed
+   Error: Project ID not found or unauthorized
+   ```
 
-### 2. Redis Key Pattern Verification
-🔧 **[BACKEND]** Configure key patterns:
-```bash
-# Backend team to implement:
-redis-cli -h redis.recursivelearning.app -a ADMIN_PASSWORD SET "schema:key_patterns:context" "context:{org_id}:{thread_id}:{field_id}"
-```
+3. Network disconnect - should see:
+   ```javascript
+   [Merit] Connection lost - retrying...
+   [Merit] Reconnection attempt 1/3...
+   ```
 
-👀 **[VERIFY]** Frontend team to confirm:
-```javascript
-// Console should show:
-[Merit Redis] Key pattern validated: context:test_org:test_thread:test_field
-[Merit Redis] TTL confirmed: 3600
-```
+## Screenshot Verification Points
 
-### 3. Field Validation
-🔧 **[BACKEND]** Configure field registry:
-```bash
-# Backend team to implement:
-redis-cli -h redis.recursivelearning.app -a ADMIN_PASSWORD HSET "schema:fields:allowed" "Field_AT_ID" "1" "Field_ID" "1"
-```
+### 1. Network Panel
+�� Capture showing:
+- Request headers
+- Response status codes
+- Timing waterfall
+- SSL/TLS verification
 
-👀 **[VERIFY]** Frontend team to confirm:
-```javascript
-// Console should show:
-[Merit Schema] Required fields present
-[Merit Schema] Field types valid
-[Merit Schema] Cache flags enabled
-```
+### 2. Console Output
+📸 Capture showing:
+- Initialization messages
+- API connection status
+- Schema validation
+- Any warnings/errors
 
-## Common Failure Scenarios
+### 3. UI Elements
+📸 Capture showing:
+- Assistant status indicator
+- Schema version display
+- Context panel state
+- Any error messages
 
-### 1. Redis ACL Blocks
-🔧 **[BACKEND]** Symptoms to fix:
-- ACL logs show denied commands
-- Frontend user lacks read permissions
+## Common Issues and Solutions
 
-👀 **[VERIFY]** Frontend team to check:
-```javascript
-// Console should show:
-[Merit Redis] Permission check: READ ✓
-[Merit Redis] Permission check: WRITE ✗ (expected)
-[Merit Redis] Key pattern access: ✓
-```
+### 1. API Connection Issues
+- Verify all required headers are present
+- Check API key format
+- Confirm endpoint URL is correct
+- Verify SSL certificate is valid
 
-### 2. Schema Version Mismatch
-🔧 **[BACKEND]** Actions:
-- Update schema version in Redis
-- Sync field registry
+### 2. Schema Validation Failures
+- Confirm schema version matches backend
+- Check field registry is accessible
+- Verify field types are correct
 
-👀 **[VERIFY]** Frontend team to check:
-```javascript
-// Console should show:
-[Merit Schema] Version: 04102025.B01 ✓
-[Merit Schema] Registry: Connected ✓
-[Merit Schema] Fields: Synced ✓
-```
-
-## Monitoring Setup
-
-### 1. Redis Monitoring
-🔧 **[BACKEND]** Configure:
-- CloudWatch metrics for Redis
-- ACL violation alerts
-- Connection rate monitoring
-
-👀 **[VERIFY]** Frontend team to check:
-```javascript
-// Console should show:
-[Merit Monitor] Redis connection: Active
-[Merit Monitor] Read latency: <100ms
-[Merit Monitor] Cache hit rate: >80%
-```
-
-### 2. API Gateway Monitoring
-🔧 **[BACKEND]** Configure:
-- 403 error rate alerts
-- CORS validation logging
-- Latency thresholds
-
-👀 **[VERIFY]** Frontend team to check:
-```javascript
-// Console should show:
-[Merit API] Gateway status: Connected
-[Merit API] Auth format: Valid
-[Merit API] CORS: Enabled
-```
-
-## Implementation Timeline
-
-1. 🔧 **[BACKEND]** Setup (2 hours):
-   - Configure Redis ACL
-   - Set schema version
-   - Enable monitoring
-
-2. 👀 **[VERIFY]** Initial Checks (1 hour):
-   - Confirm Redis access
-   - Validate schema version
-   - Test key patterns
-
-3. 🔄 **[FRONTEND]** Implementation (3 hours):
-   - Update authentication
-   - Implement Redis client
-   - Add error handling
-
-4. 👀 **[VERIFY]** Final Validation (1 hour):
-   - End-to-end testing
-   - Error scenario validation
-   - Performance checks
+### 3. Assistant Connection Issues
+- Verify Assistant ID is correct
+- Check OpenAI API key
+- Confirm project permissions
 
 ## Support Contacts
-- Redis ACL Issues: @devops-team
+- API Issues: @api-team
 - Schema Updates: @backend-team
-- Frontend Integration: @frontend-team 
+- Frontend Integration: @frontend-team
+
+## Initial Navigation Flow Verification
+👀 **[VERIFY]** Welcome to Chat transition:
+
+### 1. Welcome Screen Console Messages
+```javascript
+// Expected initialization sequence:
+[Merit Flow] Build version: merit.html/04192025.12:04pm.v.1.16
+[Merit HTML] No hash present - defaulting to #welcome
+[Merit Flow] Initializing unified flow controller
+[Merit Flow] Elements initialized: [...] // Should include 'chatWindow'
+[Merit Flow] OpenAI client initialized {
+  assistant: 'asst_QoAA395ibbyMImFJERbG2hKT',
+  project: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+  endpoint: 'https://api.recursivelearning.app/prod'
+}
+```
+
+### 2. Form Validation States
+```javascript
+// After grade selection:
+[Merit Flow] validateForm: gradeLevel value: Grade 1
+[Merit Flow] Next button updated: {disabled: false, active: true, formValid: true}
+[Merit HTML] Grade level changed to: Grade 1
+```
+
+### 3. Known Issues to Fix
+🔧 **[FRONTEND]** Current blockers:
+1. ✅ **[FIXED]** Navigation Handler Error:
+   ```javascript
+   // Previous error (FIXED):
+   Uncaught (in promise) TypeError: event.preventDefault is not a function
+   at #handleNavigation (client-merit-instructional-flow.js:254:15)
+   ```
+   Fix implemented: Updated event handler to properly handle both string sections and event objects.
+
+2. Node.js Module Error:
+   ```javascript
+   // Current error:
+   Uncaught Error: Failed to bundle using Rollup v2.79.2: 
+   the file imports a not supported node.js built-in module "net"
+   ```
+   Fix: Remove Node.js dependencies from browser bundle
+
+### 4. Expected Navigation Flow
+1. Welcome Screen Load:
+   - Hash defaults to #welcome
+   - Form elements initialize
+   - Grade selector enabled
+
+2. Grade Selection:
+   - Form validates
+   - Next button enables
+   - Navigation state updates
+
+3. Chat Transition:
+   - Next button click handled
+   - Hash updates to #chat
+   - Chat interface loads
+
+### 5. Verification Checklist
+👀 **[VERIFY]** Check in sequence:
+1. Initial Load:
+   - [ ] Build version displays correctly
+   - [ ] Welcome screen shows
+   - [ ] Grade selector enabled
+
+2. Grade Selection:
+   - [ ] Form validates on change
+   - [ ] Next button enables
+   - [ ] No console errors
+
+3. Navigation:
+   - [ ] Next button clickable
+   - [ ] URL hash updates
+   - [ ] Chat interface loads
+
+### 6. Required Fixes
+🔄 **[FRONTEND]** Implementation updates needed:
+```javascript
+// 1. ✅ FIXED: Update navigation handler
+async #handleNavigation(sectionOrEvent) {
+  let targetSection;
+  
+  // Handle both event objects and direct section strings
+  if (typeof sectionOrEvent === 'string') {
+    targetSection = sectionOrEvent;
+  } else if (sectionOrEvent?.preventDefault) {
+    sectionOrEvent.preventDefault();
+    targetSection = sectionOrEvent.target.getAttribute('href').substring(1);
+  } else {
+    console.error('[Merit Flow] Invalid navigation parameter');
+    return;
+  }
+  
+  // ... rest of navigation logic
+}
+
+// 2. Remove Node.js dependencies
+// Replace 'net' module usage with browser-compatible alternative
+// or move server-side functionality to API
+```

@@ -212,8 +212,9 @@ export class MeritInstructionalFlow {
         }
 
         // Next button
-        this.#elements.nextButton?.addEventListener('click', () => {
+        this.#elements.nextButton?.addEventListener('click', (e) => {
             if (this.#state.formValid) {
+                e.preventDefault();
                 this.#handleNavigation('chat');
             }
         });
