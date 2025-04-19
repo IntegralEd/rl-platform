@@ -257,11 +257,11 @@ export class MeritInstructionalFlow {
         // Handle both event objects and direct section strings
         if (typeof sectionOrEvent === 'string') {
             targetSection = sectionOrEvent;
-        } else if (sectionOrEvent?.preventDefault) {
+        } else if (sectionOrEvent && typeof sectionOrEvent === 'object' && typeof sectionOrEvent.preventDefault === 'function') {
             sectionOrEvent.preventDefault();
             targetSection = sectionOrEvent.target.getAttribute('href').substring(1);
         } else {
-            console.error('[Merit Flow] Invalid navigation parameter');
+            console.error('[Merit Flow] Invalid navigation parameter:', sectionOrEvent);
             return;
         }
         

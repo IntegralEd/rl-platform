@@ -41,11 +41,9 @@
         };
     </script>
     
-    <!-- Redis Client -->
-    <script type="module">
-      import * as IORedis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
-      window.Redis = IORedis;
-    </script>
+    <!-- Redis Client (API-based)
+    All Redis operations now go through API Gateway endpoints instead of direct Redis connections,
+    eliminating browser compatibility issues with Node.js modules -->
     
     <!-- Merit specific logic - instructional flow controller -->
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
