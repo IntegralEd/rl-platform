@@ -1,7 +1,7 @@
 # Merit End-to-End Integration Checklist
-**Document Version:** 1.0.6
-**Last Updated:** April 25, 2025 12:30 UTC
-**Status:** Navigation Fixed, Environment Updated
+**Document Version:** 1.0.7
+**Last Updated:** April 26, 2025 10:15 UTC
+**Status:** Navigation Fixed, Environment Updated, TTL Standardized
 
 ## Overview
 This checklist outlines the required changes to integrate the Merit client with the updated API Gateway and Redis caching system. Items are tagged as:
@@ -105,7 +105,7 @@ Expected Network Flow:
 ## Screenshot Verification Points
 
 ### 1. Network Panel
-�� Capture showing:
+📸 Capture showing:
 - Request headers
 - Response status codes
 - Timing waterfall
@@ -119,7 +119,7 @@ Expected Network Flow:
 - Any warnings/errors
 
 ### 3. UI Elements
-📸 Capture showing:
+�� Capture showing:
 - Assistant status indicator
 - Schema version display
 - Context panel state
@@ -142,6 +142,37 @@ Expected Network Flow:
 - Verify Assistant ID is correct
 - Check OpenAI API key
 - Confirm project permissions
+
+### 4. TTL Configuration ✅ **[FIXED]**
+- Redis TTL value standardized to 3600 seconds (1 hour) for temporary data
+- Sync interval configuration standardized with explicit time units
+- Centralized TTL configuration object implemented in all sync clients
+
+## Redis TTL Standardization
+✅ **[FIXED]** Implementation details:
+```javascript
+// Client-side TTL configuration (standardized)
+this.config = {
+  // Operation timing configuration
+  syncIntervalMs: 5000, // 5 seconds
+  
+  // Redis key configuration
+  redisKeys: { /* ... */ },
+  
+  // Centralized TTL configuration with clear time units
+  ttl: {
+    queue: 3600,     // 1 hour
+    processing: 3600, // 1 hour
+    failed: 86400     // 24 hours
+  }
+};
+```
+
+Verification points:
+1. TTL value matches backend expectation (3600s)
+2. Clear naming convention with time unit indication
+3. Centralized TTL configuration for easier adjustments
+4. Comments documenting time periods in human-readable format
 
 ## Support Contacts
 - API Issues: @api-team

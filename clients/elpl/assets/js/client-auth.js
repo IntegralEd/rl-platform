@@ -7,7 +7,7 @@
 // Authentication Configuration
 export const AUTH_CONFIG = {
     clientId: 'elpl',
-    authEndpoint: process.env.LAMBDA_ENDPOINT + '/auth',
+    authEndpoint: window.env.LAMBDA_ENDPOINT + '/auth',
     loginEndpoint: '/login.html',
     redirectUri: window.location.origin + '/clients/elpl/',
     tokenStorageKey: 'elpl_auth_token',

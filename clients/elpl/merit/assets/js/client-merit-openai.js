@@ -7,9 +7,9 @@ class MeritOpenAIClient {
     constructor() {
         // OpenAI Configuration - Merit Assistant
         this.OPENAI_CONFIG = {
-            assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
-            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-            org_id: 'recdg5Hlm3VVaBA2u'
+            assistant_id: window.env.MERIT_ASSISTANT_ID || 'asst_QoAA395ibbyMImFJERbG2hKT',
+            project_id: window.env.OPENAI_PROJECT_ID || 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            org_id: window.env.MERIT_ORG_ID || 'recdg5Hlm3VVaBA2u'
         };
 
         // Core configuration
@@ -19,7 +19,7 @@ class MeritOpenAIClient {
 
         // API Configuration
         const ENDPOINTS = {
-            prod: window.env.LAMBDA_ENDPOINT,
+            prod: window.env.API_GATEWAY_ENDPOINT || window.env.LAMBDA_ENDPOINT,
             contextPrefix: 'context',
             threadPrefix: 'thread'
         };
@@ -40,10 +40,10 @@ class MeritOpenAIClient {
             }
         };
         
-        // Request headers with bearer token format
+        // Request headers with API Gateway key format
         this.headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${window.env.MERIT_API_KEY}`,
+            'x-api-key': window.env.API_GATEWAY_KEY || window.env.MERIT_API_KEY,
             'X-Project-ID': this.config.project_id,
             'Origin': 'https://recursivelearning.app'
         };
