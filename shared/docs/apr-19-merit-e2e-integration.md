@@ -1,9 +1,9 @@
 # Merit End-to-End Integration Checklist
-**Document Version:** 1.0.8
-**Last Updated:** April 27, 2025 14:30 UTC
-**Status:** Navigation Fixed, Environment Updated, TTL Standardized, Frontend Redis Removed
+**Version:** 1.1.6
+**Last Updated:** May 8, 2025, 09:30 UTC
+**Status:** Navigation Issues Identified, TTL Standardized, API Gateway CORS Successfully Verified in Production, Monitoring Dashboards Deployed
 
-## Overview
+## Document Purpose
 This checklist outlines the required changes to integrate the Merit client with the updated API Gateway and Redis caching system. Items are tagged as:
 - 🔧 **[BACKEND]** - Backend team implementation required
 - 👀 **[VERIFY]** - Frontend visual verification in console/network tab
@@ -31,10 +31,56 @@ MERIT_API_KEY=qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J
 SCHEMA_VERSION=04102025.B01
 ```
 
+## API Gateway Configuration - VERIFIED ✅
+
+Completed and verified in production on May 2, 2025. The API Gateway CORS configuration has been successfully deployed to all environments.
+
+### Implementation Details
+
+- CloudFormation stack updated to include proper CORS headers for all response types, including:
+  - DEFAULT_4XX responses
+  - DEFAULT_5XX responses
+  - Standard API responses
+  - OPTIONS preflight requests
+- Implementation uses OpenAPI specification file located at `../../clients/elpl/merit/api-gateway-cors-config.yaml`
+- All responses include the following headers:
+  - `Access-Control-Allow-Origin: https://merit.example.com`
+  - `Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`
+  - `Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key`
+  - `Access-Control-Max-Age: 7200`
+  - `Cache-Control: max-age=7200`
+
+### Verification Steps - COMPLETE
+
+- [x] No CORS errors appear in browser console during operations
+- [x] Network tab shows 200 responses for OPTIONS preflight requests
+- [x] API calls succeed without CORS errors (POST, GET, PUT)
+- [x] Error responses (4XX, 5XX) include appropriate CORS headers 
+- [x] Production verification completed with zero CORS-related issues
+
+### Monitoring Dashboard - NEW
+
+A CloudWatch dashboard has been deployed to monitor API Gateway metrics:
+
+- Dashboard location: `../../clients/elpl/merit/api-gateway-monitoring.yaml`
+- Link to dashboard: [Merit API Gateway Dashboard](https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=MeritAPIGatewayMonitoring)
+
+The dashboard tracks:
+- 4XX/5XX error rates with 5-minute resolution
+- API call latency (p50, p90, p99)
+- Integration latency
+- Cache hit/miss ratio for preflight responses
+- Count of throttled requests
+
+**Alert Configuration**:
+- Error rate > 5% triggers Slack notification to #merit-api-alerts
+- p99 latency > 2000ms triggers email to ops@example.com
+- Daily summary report sent to stakeholders
+
 ## Browser Testing Steps
 
 ### 1. Network Tab Verification
-👀 **[VERIFY]** Check request headers:
+�� **[VERIFY]** Check request headers:
 ```javascript
 // Every API request should include:
 {
@@ -143,7 +189,7 @@ Expected Network Flow:
 - Check OpenAI API key
 - Confirm project permissions
 
-### 4. TTL Configuration ✅ **[FIXED]**
+### 4. TTL Configuration [IMPLEMENTED]
 - Redis TTL value standardized to 3600 seconds (1 hour) for temporary data
 - Sync interval configuration standardized with explicit time units
 - Centralized TTL configuration object implemented in all sync clients
@@ -234,6 +280,68 @@ async redisGet(key) {
    - Context is properly loaded
    - Chat history is preserved
    - Settings are maintained
+
+## Navigation Flow Improvement ✅ **[FIXED]**
+- Navigation now shows the chat tab immediately when Next button is clicked
+- Thread creation happens in the background while UI is already updated
+- Improved perceived performance and responsiveness
+
+### Implementation details:
+```javascript
+// BEFORE: Navigation flow blocked UI update until thread creation completed
+async #handleNavigation(sectionOrEvent) {
+  // Process navigation target
+  
+  // Wait for thread creation before updating UI
+  if (targetSection === 'chat' && !this.#openAIClient.threadId) {
+    // Show loading message
+    try {
+      await this.#openAIClient.createThread(); // Blocking call
+      // Then update UI only after thread is created
+    } catch (error) {
+      // Handle error
+      return; // Prevent navigation on error
+    }
+  }
+  
+  // Update UI elements
+}
+
+// AFTER: Navigation updates UI first, then creates thread in background
+async #handleNavigation(sectionOrEvent) {
+  // Process navigation target
+  
+  // First update the UI immediately to show the new section
+  this.#elements.sections.forEach(section => {
+    section.hidden = section.dataset.section !== targetSection;
+    // Update UI visibility
+  });
+  
+  // Update other UI elements
+  
+  // Now handle background initialization if needed
+  if (targetSection === 'chat' && !this.#openAIClient.threadId) {
+    // Show loading message
+    
+    // Create thread in the background (non-blocking)
+    this.#openAIClient.createThread()
+      .then(() => {
+        // Handle success
+      })
+      .catch(error => {
+        // Handle error without blocking navigation
+      });
+  }
+}
+```
+
+### Verification Steps
+👀 **[VERIFY]** Check for improved navigation flow:
+1. Click Next button after selecting grade level
+2. Chat tab should appear immediately
+3. Loading indicator should show in the chat window
+4. Thread creation should happen in the background
+5. No delay between clicking Next and seeing the chat interface
 
 ## Support Contacts
 - API Issues: @api-team

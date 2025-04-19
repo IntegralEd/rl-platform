@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudWatch Dashboard for Merit API Gateway Monitoring'
+
+Resources:
+  ApiGatewayDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: Merit-ApiGateway-Monitoring
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "Count", "ApiName", "MeritIntegrationApi", { "stat": "Sum", "period": 300 } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "API Requests",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "4XXError", "ApiName", "MeritIntegrationApi", { "stat": "Sum", "period": 300 } ],
+                  [ "AWS/ApiGateway", "5XXError", "ApiName", "MeritIntegrationApi", { "stat": "Sum", "period": 300 } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "API Errors",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 6,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "Latency", "ApiName", "MeritIntegrationApi", { "stat": "Average", "period": 300 } ],
+                  [ "AWS/ApiGateway", "IntegrationLatency", "ApiName", "MeritIntegrationApi", { "stat": "Average", "period": 300 } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "API Latency",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 6,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "CacheHitCount", "ApiName", "MeritIntegrationApi", { "stat": "Sum", "period": 300 } ],
+                  [ "AWS/ApiGateway", "CacheMissCount", "ApiName", "MeritIntegrationApi", { "stat": "Sum", "period": 300 } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "API Cache Performance",
+                "period": 300
+              }
+            }
+          ]
+        }
+
+  ErrorRateAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: MeritApi-HighErrorRate
+      AlarmDescription: Alarm when error rate exceeds 5% of total requests
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: ApiName
+          Value: MeritIntegrationApi
+      TreatMissingData: notBreaching
+
+  LatencyAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: MeritApi-HighLatency
+      AlarmDescription: Alarm when API latency exceeds 1000ms
+      MetricName: Latency
+      Namespace: AWS/ApiGateway
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 3
+      Threshold: 1000
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: ApiName
+          Value: MeritIntegrationApi
+      TreatMissingData: notBreaching
+
+Outputs:
+  DashboardURL:
+    Description: URL for the CloudWatch Dashboard
+    Value: !Sub https://console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${ApiGatewayDashboard.DashboardName} 

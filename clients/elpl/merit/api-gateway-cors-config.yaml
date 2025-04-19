@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Merit API Gateway
+  description: API Gateway configuration with CORS support for Merit integration
+  version: 1.0.0
+  contact:
+    name: Recursive Learning Platform Team
+    url: https://recursivelearning.app
+servers:
+  - url: https://api.recursivelearning.app/merit
+    description: Production API Gateway endpoint
+
+paths:
+  /{proxy+}:
+    options:
+      summary: CORS preflight handler
+      description: Handles OPTIONS requests for CORS preflight checks across all paths
+      parameters:
+        - name: proxy
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The path for which preflight check is being performed
+      responses:
+        '200':
+          description: Successful CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Allowed origins for cross-domain requests
+              example: https://recursivelearning.app
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: HTTP methods allowed for cross-domain requests
+              example: GET,POST,PUT,DELETE,OPTIONS
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed in cross-domain requests
+              example: Content-Type,x-api-key,Authorization
+            Access-Control-Max-Age:
+              schema:
+                type: string
+              description: Duration (in seconds) to cache CORS preflight results
+              example: '7200'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                example:
+                  status: success
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200
+            }
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+              method.response.header.Access-Control-Max-Age: "'7200'"
+            responseTemplates:
+              application/json: |
+                {
+                  "status": "success"
+                }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header
+      description: API key for authentication with the Merit API Gateway
+
+# Gateway response configuration for error scenarios
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+security:
+  - ApiKeyAuth: [] 
