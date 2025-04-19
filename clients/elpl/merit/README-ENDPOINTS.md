@@ -6,21 +6,35 @@ The `_dev` suffix in endpoints is strictly forbidden in production code. It was 
 
 ## Endpoint Architecture
 
-### 1. Lambda Endpoint (REQUIRED)
+### 1. API Gateway Endpoint (PREFERRED)
 ```javascript
 const ENDPOINTS = {
-    lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
+    api: process.env.API_GATEWAY_ENDPOINT || 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+    apiKey: process.env.API_GATEWAY_KEY || '68gmsx2jsk',
     contextPrefix: 'merit:ela:context',
     threadPrefix: 'merit:ela:thread'
 };
 ```
-- **Primary endpoint for ALL business logic**
-- Handles thread creation, message processing, and user management
-- Must be used in production
-- No fallbacks allowed
-- Includes standardized prefixes for context and thread management
+- **Primary endpoint for ALL production traffic**
+- Provides CORS support for browser-based requests
+- Includes proper error handling with CORS headers
+- Verified and deployed May 19, 2025
+- Uses API key authentication
 
-### 2. Redis Endpoint (Caching Only)
+### 2. Lambda Endpoint (FALLBACK)
+```javascript
+const ENDPOINTS = {
+    lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
+    contextPrefix: 'merit:ela:context',
+    threadPrefix: 'merit:ela:thread'
+};
+```
+- Secondary endpoint for business logic
+- Used as fallback if API Gateway is unavailable
+- No CORS support built-in
+- Still supported but API Gateway is preferred
+
+### 3. Redis Endpoint (Caching Only)
 ```javascript
 const REDIS_CONFIG = {
     prefix: 'merit:ela',
@@ -36,44 +50,54 @@ const REDIS_CONFIG = {
 ## Correct Implementation
 
 ```javascript
-// ✅ CORRECT: Single source of truth
+// ✅ CORRECT: Single source of truth with API Gateway preference
 class MeritOpenAIClient {
     constructor() {
         const ENDPOINTS = {
-            lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app',
+            // API Gateway is preferred for production
+            api: process.env.API_GATEWAY_ENDPOINT || 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+            // Lambda still supported as fallback
+            lambda: process.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
             contextPrefix: 'merit:ela:context',
             threadPrefix: 'merit:ela:thread'
         };
         
-        this.baseUrl = ENDPOINTS.lambda;
+        // Prefer API Gateway endpoint
+        this.baseUrl = ENDPOINTS.api;
         this.headers = {
             'Content-Type': 'application/json',
-            'X-Project-ID': this.config.project_id
+            'x-api-key': process.env.API_GATEWAY_KEY || '68gmsx2jsk',
+            'X-Project-ID': this.config.project_id,
+            'Origin': 'https://recursivelearning.app'
         };
     }
 }
 
-// ✅ CORRECT: Error handling with detailed logging
-try {
-    const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: this.headers,
-        body: JSON.stringify({ action, ...payload })
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        console.error('[Merit Flow] Error details:', {
-            endpoint: this.baseUrl,
+// ✅ CORRECT: API request with CORS support
+async sendRequest(action, payload) {
+    try {
+        const response = await fetch(this.baseUrl, {
+            method: 'POST',
             headers: this.headers,
-            error: error.message
+            body: JSON.stringify({ action, ...payload }),
+            mode: 'cors' // Include CORS mode for browser requests
         });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            console.error('[Merit Flow] Error details:', {
+                endpoint: this.baseUrl,
+                headers: this.headers,
+                error: error.message
+            });
+            throw error;
+        }
+        return response.json();
+    } catch (error) {
+        this.state.hasError = true;
+        this.state.errorMessage = error.message;
         throw error;
     }
-    return response.json();
-} catch (error) {
-    this.state.hasError = true;
-    this.state.errorMessage = error.message;
-    throw error;
 }
 ```
 
@@ -83,20 +107,37 @@ try {
 // ❌ WRONG: Using _dev endpoint
 const endpoint = 'https://api.recursivelearning.app/dev';  // NEVER DO THIS
 
-// ❌ WRONG: Implementing fallback logic
+// ❌ WRONG: Implementing fallback logic to dev
 const fallbackEndpoint = endpoint + '/dev';  // NEVER DO THIS
 
 // ❌ WRONG: DNS retry with dev endpoint
 if (error.code === 'ERR_NAME_NOT_RESOLVED') {
     return tryFallbackEndpoint();  // NEVER DO THIS
 }
+
+// ❌ WRONG: Missing CORS mode for browser requests
+fetch(this.baseUrl, {
+    method: 'POST',
+    headers: this.headers,
+    body: JSON.stringify(data)
+    // Missing 'mode: 'cors''
+});
+
+// ❌ WRONG: Missing Origin header
+this.headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': apiKey,
+    // Missing 'Origin': 'https://recursivelearning.app'
+};
 ```
 
 ## Environment Configuration
 
 ```bash
-# Both Development and Production use the same endpoint
-LAMBDA_ENDPOINT=https://api.recursivelearning.app
+# Production Configuration
+API_GATEWAY_ENDPOINT=https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
+API_GATEWAY_KEY=68gmsx2jsk
+LAMBDA_ENDPOINT=https://api.recursivelearning.app/prod
 ```
 
 ## Thread ID Format
@@ -122,20 +163,21 @@ this.state = {
 
 ## Migration Guide
 
-If your code currently uses the `_dev` endpoint:
+If your code currently uses only the Lambda endpoint:
 
-1. Remove all instances of `/dev` from endpoint URLs
-2. Remove any fallback logic or retry attempts
-3. Update error handling to properly report endpoint issues
-4. Verify environment variables are correctly set
-5. Update tests to use proper endpoint mocking
+1. Update your code to use the API Gateway endpoint
+2. Add the necessary CORS headers and mode
+3. Ensure your API key is set correctly
+4. Test with the provided test script (test-prod-endpoint.js)
+5. Verify CORS headers are properly received
 
 ## Support
 
-If you encounter DNS or routing issues:
-1. Verify LAMBDA_ENDPOINT environment variable
-2. Check API gateway configuration
-3. Contact DevOps team for endpoint verification
-4. DO NOT add `/dev` as a temporary fix
+If you encounter API Gateway or CORS issues:
+1. Verify API_GATEWAY_ENDPOINT and API_GATEWAY_KEY environment variables
+2. Check CORS headers in network requests
+3. Ensure 'Origin' header is set correctly
+4. Test OPTIONS preflight request succeeds
+5. Contact DevOps team for API Gateway verification
 
-Remember: The existence of `/dev` in any endpoint URL indicates a configuration issue that must be fixed properly. 
+Remember: For browser-based requests, always include `mode: 'cors'` in your fetch options and set the 'Origin' header appropriately. 

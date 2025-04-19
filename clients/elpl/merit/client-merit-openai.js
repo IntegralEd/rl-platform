@@ -26,7 +26,8 @@ class MeritOpenAIClient {
 
     // API Configuration with validated endpoints
     const ENDPOINTS = {
-      lambda: window.env.API_GATEWAY_ENDPOINT || window.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
+      apiGateway: window.env.API_GATEWAY_ENDPOINT || 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+      lambda: window.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
       REDIS: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
@@ -56,7 +57,9 @@ class MeritOpenAIClient {
       }
     };
 
-    this.baseUrl = ENDPOINTS.lambda;
+    // Prioritize API Gateway endpoint first, fall back to Lambda endpoint
+    this.baseUrl = ENDPOINTS.apiGateway;
+    
     this.config = {
       org_id: window.env.MERIT_ORG_ID,
       assistant_id: this.assistantId,
@@ -70,7 +73,7 @@ class MeritOpenAIClient {
       }
     };
 
-    // Validated API headers
+    // Validated API headers with API Gateway key
     this.headers = {
       'Content-Type': 'application/json',
       'x-api-key': window.env.API_GATEWAY_KEY || window.env.MERIT_API_KEY,
@@ -124,7 +127,7 @@ class MeritOpenAIClient {
     };
 
     console.log('[Merit Flow] OpenAI client initialized with session:', this.userId);
-    console.log('[Merit Flow] Using API endpoint:', this.baseUrl);
+    console.log('[Merit Flow] Using API Gateway endpoint:', this.baseUrl);
     console.log('[Merit Flow] Using Redis endpoint:', this.redisConfig.endpoint);
   }
 
@@ -253,7 +256,8 @@ class MeritOpenAIClient {
           action: 'create_thread',
           project_id: this.config.project_id,
           ...this.config
-        })
+        }),
+        mode: 'cors' // Add CORS mode for browser requests
       });
 
       if (!response.ok) {
@@ -327,12 +331,9 @@ class MeritOpenAIClient {
   async sendMessage(message, options = {}) {
     // Increment message count before sending
     await this.incrementMessageCount();
-    
-    console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
-    
-    if (!this.state.projectPaired || !this.threadId) {
-      console.log('[Merit Flow] No thread found, creating new thread...');
-      await this.createThread();
+
+    if (!this.threadId) {
+      throw new Error('Thread ID is required to send a message');
     }
 
     if (!this.state.projectPaired) {
@@ -348,6 +349,17 @@ class MeritOpenAIClient {
         return cachedResponse;
       }
 
+      console.log('[Merit Flow] Sending message:', { message, threadId: this.threadId, userId: this.userId });
+      
+      if (!this.state.projectPaired || !this.threadId) {
+        console.log('[Merit Flow] No thread found, creating new thread...');
+        await this.createThread();
+      }
+
+      if (!this.state.projectPaired) {
+        throw new Error('OpenAI project must be paired before sending messages');
+      }
+
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: this.headers,
@@ -358,7 +370,8 @@ class MeritOpenAIClient {
           project_id: this.config.project_id,
           ...this.config,
           ...options
-        })
+        }),
+        mode: 'cors' // Add CORS mode for browser requests
       });
 
       if (!response.ok) {
@@ -410,7 +423,8 @@ class MeritOpenAIClient {
       const response = await fetch(`${this.baseUrl}/cache/get`, {
         method: 'POST',
         headers: this.headers,
-        body: JSON.stringify({ key })
+        body: JSON.stringify({ key }),
+        mode: 'cors' // Add CORS mode for browser requests
       });
       
       if (!response.ok) {
@@ -432,7 +446,8 @@ class MeritOpenAIClient {
       const response = await fetch(`${this.baseUrl}/cache/set`, {
         method: 'POST',
         headers: this.headers,
-        body: JSON.stringify({ key, value, ttl })
+        body: JSON.stringify({ key, value, ttl }),
+        mode: 'cors' // Add CORS mode for browser requests
       });
       
       if (!response.ok) {
@@ -452,7 +467,8 @@ class MeritOpenAIClient {
     try {
       const response = await fetch(`${this.baseUrl}/cache/health`, {
         method: 'GET',
-        headers: this.headers
+        headers: this.headers,
+        mode: 'cors' // Add CORS mode for browser requests
       });
       
       if (!response.ok) {
@@ -648,43 +664,45 @@ class MeritOpenAIClient {
 
   async validateSchemaVersion() {
     try {
-        // Use API to get schema version
-        const schemaResponse = await fetch(`${this.baseUrl}/api/v1/schema/version`, {
-            method: 'GET',
-            headers: this.headers
-        });
-        
-        if (!schemaResponse.ok) {
-            throw new Error(`Schema version check failed: ${schemaResponse.status}`);
-        }
-        
-        const schemaData = await schemaResponse.json();
-        const currentSchema = schemaData.version;
-        
-        if (currentSchema !== this.config.schema_version) {
-            throw new Error(`Schema version mismatch. Expected: ${this.config.schema_version}, Got: ${currentSchema}`);
-        }
-        
-        // Verify field registry access
-        const fieldTest = await fetch(`${this.baseUrl}/api/v1/schema/fields`, {
-            method: 'GET',
-            headers: this.headers
-        });
-        
-        if (!fieldTest.ok) {
-            throw new Error('Field registry access failed');
-        }
+      // Use API to get schema version
+      const schemaResponse = await fetch(`${this.baseUrl}/api/v1/schema/version`, {
+        method: 'GET',
+        headers: this.headers,
+        mode: 'cors' // Add CORS mode for browser requests
+      });
+      
+      if (!schemaResponse.ok) {
+        throw new Error(`Schema version check failed: ${schemaResponse.status}`);
+      }
+      
+      const schemaData = await schemaResponse.json();
+      const currentSchema = schemaData.version;
+      
+      if (currentSchema !== this.config.schema_version) {
+        throw new Error(`Schema version mismatch. Expected: ${this.config.schema_version}, Got: ${currentSchema}`);
+      }
+      
+      // Verify field registry access
+      const fieldTest = await fetch(`${this.baseUrl}/api/v1/schema/fields`, {
+        method: 'GET',
+        headers: this.headers,
+        mode: 'cors' // Add CORS mode for browser requests
+      });
+      
+      if (!fieldTest.ok) {
+        throw new Error('Field registry access failed');
+      }
 
-        console.log('[Merit Schema] Version check passed:', this.config.schema_version);
-        console.log('[Merit Schema] Field registry accessible');
-        console.log('[Merit Schema] Validation complete ✓');
-        
-        return true;
+      console.log('[Merit Schema] Version check passed:', this.config.schema_version);
+      console.log('[Merit Schema] Field registry accessible');
+      console.log('[Merit Schema] Validation complete ✓');
+      
+      return true;
     } catch (error) {
-        console.error('[Merit Schema] Validation error:', error);
-        throw error;
+      console.error('[Merit Schema] Validation error:', error);
+      throw error;
     }
   }
 }
 
-export default MeritOpenAIClient; 
+export default MeritOpenAIClient;
