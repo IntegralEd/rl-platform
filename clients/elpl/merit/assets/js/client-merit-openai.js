@@ -1,18 +1,25 @@
 /**
  * @component MeritOpenAIClient
  * @description Handles OpenAI Assistant interactions for Merit chat
- * @version 1.0.21
+ * @version 1.0.23
  */
 class MeritOpenAIClient {
     constructor() {
+        // OpenAI Configuration - Merit Assistant
+        this.OPENAI_CONFIG = {
+            assistant_id: 'asst_QoAA395ibbyMImFJERbG2hKT',
+            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            org_id: 'recdg5Hlm3VVaBA2u'
+        };
+
         // Core configuration
         this.threadId = null;
-        this.assistantId = 'asst_QoAA395ibbyMImFJERbG2hKT'; // Merit Assistant
+        this.assistantId = this.OPENAI_CONFIG.assistant_id;
         this.userId = null;
 
         // API Configuration
         const ENDPOINTS = {
-            prod: 'https://api.recursivelearning.app/prod',
+            prod: window.env.LAMBDA_ENDPOINT,
             contextPrefix: 'context',
             threadPrefix: 'thread'
         };
@@ -22,31 +29,30 @@ class MeritOpenAIClient {
         
         // Project configuration
         this.config = {
-            org_id: 'recdg5Hlm3VVaBA2u',
+            org_id: this.OPENAI_CONFIG.org_id,
             assistant_id: this.assistantId,
-            project_id: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-            model: 'gpt-4o',
-            schema_version: '04102025.B01',
+            project_id: this.OPENAI_CONFIG.project_id,
+            schema_version: window.env.SCHEMA_VERSION,
             ttl: {
-                session: 3600, // 1 hour for MVP phase
+                session: 3600,
                 cache: 3600,
                 temp: 3600
             }
         };
         
-        // Request headers
+        // Request headers with bearer token format
         this.headers = {
             'Content-Type': 'application/json',
-            'x-api-key': window.env.MERIT_API_KEY || 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
-            'X-Project-ID': this.config.project_id
+            'Authorization': `Bearer ${window.env.MERIT_API_KEY}`,
+            'X-Project-ID': this.config.project_id,
+            'Origin': 'https://recursivelearning.app'
         };
 
         // Context fields structure
         this.contextFields = {
             intake: {
                 grade_level: null,
-                curriculum: 'ela',
-                user_context: null
+                curriculum: 'ela'
             },
             system: {
                 schema_version: this.config.schema_version,
@@ -84,7 +90,7 @@ class MeritOpenAIClient {
      * Creates a new thread
      * @returns {Promise<string>} Thread ID
      */
-    async createThread() {
+    async createThread(retryCount = 3) {
         try {
             console.log('[Merit Flow] Creating new thread');
             console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
@@ -92,6 +98,8 @@ class MeritOpenAIClient {
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
+                credentials: 'include',
+                mode: 'cors',
                 body: JSON.stringify({
                     action: 'create_thread',
                     org_id: this.config.org_id,
@@ -123,6 +131,14 @@ class MeritOpenAIClient {
                 headers: { ...this.headers, 'x-api-key': '[REDACTED]' },
                 error: error.message
             });
+
+            // Implement retry logic
+            if (retryCount > 0 && (error.message === 'Failed to fetch' || error.message.includes('CORS'))) {
+                console.log(`[Merit Flow] Retrying thread creation... (${retryCount} attempts remaining)`);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+                return this.createThread(retryCount - 1);
+            }
+
             this.state.hasError = true;
             this.state.errorMessage = error.message;
             this.errors.validation.push({
