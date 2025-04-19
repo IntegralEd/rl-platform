@@ -1,7 +1,7 @@
 # Merit End-to-End Integration Checklist
-**Document Version:** 1.0.7
-**Last Updated:** April 26, 2025 10:15 UTC
-**Status:** Navigation Fixed, Environment Updated, TTL Standardized
+**Document Version:** 1.0.8
+**Last Updated:** April 27, 2025 14:30 UTC
+**Status:** Navigation Fixed, Environment Updated, TTL Standardized, Frontend Redis Removed
 
 ## Overview
 This checklist outlines the required changes to integrate the Merit client with the updated API Gateway and Redis caching system. Items are tagged as:
@@ -119,7 +119,7 @@ Expected Network Flow:
 - Any warnings/errors
 
 ### 3. UI Elements
-�� Capture showing:
+📸 Capture showing:
 - Assistant status indicator
 - Schema version display
 - Context panel state
@@ -173,6 +173,67 @@ Verification points:
 2. Clear naming convention with time unit indication
 3. Centralized TTL configuration for easier adjustments
 4. Comments documenting time periods in human-readable format
+
+## Frontend Redis Dependency Removal ✅ **[FIXED]**
+- Removed direct Redis client connection from frontend code
+- Replaced with API-based approach to eliminate bundling errors
+- Fixed browser compatibility issues with Node.js modules
+
+### Implementation details:
+```javascript
+// BEFORE: Direct Redis connection causing Node.js 'net' module error
+import * as IORedis from 'https://cdn.jsdelivr.net/npm/ioredis@5.3.2/+esm';
+window.Redis = IORedis;
+
+// AFTER: Removed Redis client import in merit.html
+<!-- Redis Client (API-based)
+All Redis operations now go through API Gateway endpoints instead of direct Redis connections,
+eliminating browser compatibility issues with Node.js modules -->
+
+// BEFORE: Direct Redis client connection
+async getRedisClient() {
+  const redis = new window.Redis(this.redisConfig.endpoint, {
+    username: this.redisConfig.auth.username,
+    password: this.redisConfig.auth.password,
+    // ...
+  });
+  // ...
+}
+
+// AFTER: API-based Redis operations
+async redisGet(key) {
+  try {
+    // Use API endpoint instead of direct Redis connection
+    const response = await fetch(`${this.baseUrl}/cache/get`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify({ key })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Cache get failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.value;
+  } catch (error) {
+    console.error('[Merit Flow] Cache get error:', error);
+    this.errors.cache.push(error);
+    return null;
+  }
+}
+```
+
+### Verification Steps
+👀 **[VERIFY]** Check for:
+1. Browser console shows no errors related to:
+   - `Failed to bundle using Rollup: node.js built-in module "net"`
+   - Redis connection failures
+2. Network tab shows API calls to `/cache/get` and `/cache/set` endpoints
+3. Caching operations work as expected:
+   - Context is properly loaded
+   - Chat history is preserved
+   - Settings are maintained
 
 ## Support Contacts
 - API Issues: @api-team
