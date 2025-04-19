@@ -263,28 +263,17 @@ export class MeritInstructionalFlow {
                 const loadingMessage = document.createElement('div');
                 loadingMessage.className = 'alert alert-info';
                 loadingMessage.textContent = 'Connecting to chat service...';
-                document.querySelector('#chat').prepend(loadingMessage);
+                this.#elements.chatWindow.appendChild(loadingMessage);
                 
                 try {
                     await this.#openAIClient.createThread();
                     loadingMessage.remove();
                 } catch (error) {
                     console.error('[Merit Flow] Thread creation failed:', error);
-                    let errorMessage = 'Unable to connect to chat service. ';
-                    
-                    if (error.message.includes('CORS')) {
-                        errorMessage += 'There was a network connectivity issue. ';
-                    } else if (error.message.includes('authentication')) {
-                        errorMessage += 'API authentication failed. ';
-                    } else {
-                        errorMessage += 'An unexpected error occurred. ';
-                    }
-                    
-                    errorMessage += 'Please try again in a few moments.';
                     
                     loadingMessage.className = 'alert alert-danger';
                     loadingMessage.innerHTML = `
-                        ${errorMessage}<br>
+                        ${this.#openAIClient.getState().errorMessage}<br>
                         <button class="btn btn-outline-danger mt-2" onclick="window.location.reload()">
                             Try Again
                         </button>
@@ -294,16 +283,30 @@ export class MeritInstructionalFlow {
             }
             
             // Update active section
-            document.querySelectorAll('section').forEach(section => {
-                section.hidden = section.id !== targetSection;
+            this.#elements.sections.forEach(section => {
+                section.hidden = section.dataset.section !== targetSection;
+                if (!section.hidden) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
             });
             
             // Update navigation links
-            document.querySelectorAll('.nav-link').forEach(link => {
-                const isActive = link.getAttribute('href') === `#${targetSection}`;
+            this.#elements.navLinks.forEach(link => {
+                const isActive = link.dataset.section === targetSection;
                 link.classList.toggle('active', isActive);
                 link.setAttribute('aria-current', isActive ? 'page' : 'false');
             });
+            
+            // Update UI elements based on section
+            if (targetSection === 'chat') {
+                this.#elements.playbar.hidden = true;
+                this.#elements.chatbar.hidden = false;
+            } else {
+                this.#elements.playbar.hidden = false;
+                this.#elements.chatbar.hidden = true;
+            }
             
             // Track navigation
             console.log('[Merit Flow] Navigation successful:', {
@@ -313,16 +316,7 @@ export class MeritInstructionalFlow {
             
         } catch (error) {
             console.error('[Merit Flow] Navigation error:', error);
-            // Show error in current section
-            const errorAlert = document.createElement('div');
-            errorAlert.className = 'alert alert-danger';
-            errorAlert.innerHTML = `
-                An error occurred while loading this section. Please try again.<br>
-                <button class="btn btn-outline-danger mt-2" onclick="location.reload()">
-                    Reload Page
-                </button>
-            `;
-            document.querySelector(`#${targetSection}`).prepend(errorAlert);
+            this.#handleError(error);
         }
     }
 

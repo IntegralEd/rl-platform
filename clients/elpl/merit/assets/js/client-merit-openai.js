@@ -98,8 +98,8 @@ class MeritOpenAIClient {
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: this.headers,
-                credentials: 'include',
                 mode: 'cors',
+                credentials: 'same-origin',
                 body: JSON.stringify({
                     action: 'create_thread',
                     org_id: this.config.org_id,
@@ -112,7 +112,7 @@ class MeritOpenAIClient {
             if (!response.ok) {
                 const error = await response.json();
                 if (error.statusCode === 403) {
-                    throw new Error('API authentication failed');
+                    throw new Error('API authentication failed - please check your API key');
                 }
                 throw new Error(error.error || 'Thread creation failed');
             }
@@ -128,25 +128,41 @@ class MeritOpenAIClient {
             console.error('[Merit Flow] Thread creation error:', error);
             console.error('[Merit Flow] Error details:', {
                 endpoint: this.baseUrl,
-                headers: { ...this.headers, 'x-api-key': '[REDACTED]' },
+                headers: { ...this.headers, 'Authorization': '[REDACTED]' },
                 error: error.message
             });
 
-            // Implement retry logic
-            if (retryCount > 0 && (error.message === 'Failed to fetch' || error.message.includes('CORS'))) {
-                console.log(`[Merit Flow] Retrying thread creation... (${retryCount} attempts remaining)`);
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
-                return this.createThread(retryCount - 1);
+            // Enhanced retry logic with exponential backoff
+            if (retryCount > 0) {
+                if (error.message === 'Failed to fetch' || error.message.includes('CORS')) {
+                    const delay = Math.pow(2, 4 - retryCount) * 1000; // Exponential backoff
+                    console.log(`[Merit Flow] CORS/Network error, retrying in ${delay}ms... (${retryCount} attempts remaining)`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return this.createThread(retryCount - 1);
+                }
             }
 
             this.state.hasError = true;
-            this.state.errorMessage = error.message;
-            this.errors.validation.push({
-                timestamp: new Date().toISOString(),
-                error: error.message
-            });
+            this.state.errorMessage = this.#formatErrorMessage(error);
             throw error;
         }
+    }
+
+    /**
+     * Formats error messages for user display
+     * @private
+     */
+    #formatErrorMessage(error) {
+        if (error.message.includes('CORS')) {
+            return 'Network connection issue. Please check your connection and try again.';
+        }
+        if (error.message.includes('authentication failed')) {
+            return 'Authentication failed. Please refresh the page and try again.';
+        }
+        if (error.message === 'Failed to fetch') {
+            return 'Unable to connect to the server. Please check your connection.';
+        }
+        return error.message || 'An unexpected error occurred';
     }
 
     /**
