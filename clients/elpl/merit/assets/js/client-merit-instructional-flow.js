@@ -250,9 +250,19 @@ export class MeritInstructionalFlow {
         this.#updateActionState();
     }
 
-    async #handleNavigation(event) {
-        event.preventDefault();
-        const targetSection = event.target.getAttribute('href').substring(1);
+    async #handleNavigation(sectionOrEvent) {
+        let targetSection;
+        
+        // Handle both event objects and direct section strings
+        if (typeof sectionOrEvent === 'string') {
+            targetSection = sectionOrEvent;
+        } else if (sectionOrEvent?.preventDefault) {
+            sectionOrEvent.preventDefault();
+            targetSection = sectionOrEvent.target.getAttribute('href').substring(1);
+        } else {
+            console.error('[Merit Flow] Invalid navigation parameter');
+            return;
+        }
         
         try {
             console.log('[Merit Flow] Attempting to navigate to:', targetSection);
