@@ -81,6 +81,13 @@ class MeritOpenAIClient {
       'Origin': 'https://recursivelearning.app'
     };
 
+    // Fetch configuration for all API calls
+    this.fetchConfig = {
+      mode: 'cors',
+      credentials: 'include',
+      headers: this.headers
+    };
+
     this.state = {
       isLoading: false,
       hasError: false,
@@ -249,15 +256,16 @@ class MeritOpenAIClient {
       }
 
       console.log('[Merit Flow] Creating new thread');
+      console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
+      
       const response = await fetch(this.baseUrl, {
+        ...this.fetchConfig,
         method: 'POST',
-        headers: this.headers,
         body: JSON.stringify({
           action: 'create_thread',
           project_id: this.config.project_id,
           ...this.config
-        }),
-        mode: 'cors' // Add CORS mode for browser requests
+        })
       });
 
       if (!response.ok) {

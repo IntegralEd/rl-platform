@@ -7,21 +7,14 @@ info:
     name: Recursive Learning Platform Team
     url: https://recursivelearning.app
 servers:
-  - url: https://api.recursivelearning.app/merit
+  - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
     description: Production API Gateway endpoint
 
 paths:
-  /{proxy+}:
+  /api/v1/context:
     options:
-      summary: CORS preflight handler
-      description: Handles OPTIONS requests for CORS preflight checks across all paths
-      parameters:
-        - name: proxy
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The path for which preflight check is being performed
+      summary: CORS preflight handler for context endpoint
+      description: Handles OPTIONS requests for CORS preflight checks
       responses:
         '200':
           description: Successful CORS preflight response
@@ -35,26 +28,22 @@ paths:
               schema:
                 type: string
               description: HTTP methods allowed for cross-domain requests
-              example: GET,POST,PUT,DELETE,OPTIONS
+              example: GET,POST,OPTIONS
             Access-Control-Allow-Headers:
               schema:
                 type: string
               description: Headers allowed in cross-domain requests
-              example: Content-Type,x-api-key,Authorization
+              example: Content-Type,x-api-key,X-Project-ID,Origin
             Access-Control-Max-Age:
               schema:
                 type: string
               description: Duration (in seconds) to cache CORS preflight results
               example: '7200'
-          content:
-            application/json:
+            Access-Control-Allow-Credentials:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                example:
-                  status: success
+                type: string
+              description: Whether credentials are allowed in cross-domain requests
+              example: 'true'
       x-amazon-apigateway-integration:
         type: mock
         requestTemplates:
@@ -67,14 +56,52 @@ paths:
             statusCode: 200
             responseParameters:
               method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin'"
               method.response.header.Access-Control-Max-Age: "'7200'"
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
             responseTemplates:
               application/json: |
                 {
                   "status": "success"
                 }
+    post:
+      summary: Create or update context
+      description: Endpoint for creating or updating context data
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200,
+              "response": {
+                "message": "Context operation successful"
+              }
+            }
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin'"
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
 
 components:
   securitySchemes:
@@ -89,13 +116,15 @@ x-amazon-apigateway-gateway-responses:
   DEFAULT_4XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
-      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
   DEFAULT_5XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
-      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
 
 security:
   - ApiKeyAuth: [] 

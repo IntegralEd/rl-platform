@@ -23,6 +23,48 @@ const CONFIG = {
     }
 };
 
+// Test CORS preflight first
+async function testCORSPreflight() {
+    console.log('\n📌 Testing CORS preflight request\n');
+    
+    const options = {
+        method: 'OPTIONS',
+        headers: {
+            'Origin': 'https://recursivelearning.app',
+            'Access-Control-Request-Method': 'POST',
+            'Access-Control-Request-Headers': 'Content-Type,x-api-key,X-Project-ID'
+        }
+    };
+
+    console.log(`🔍 Testing endpoint: ${CONFIG.apiGateway.endpoint}`);
+    console.log('Request headers:', options.headers);
+
+    return new Promise((resolve, reject) => {
+        const req = https.request(CONFIG.apiGateway.endpoint, options, (res) => {
+            console.log('\nCORS Headers Check:');
+            console.log(`Status Code: ${res.statusCode}`);
+            console.log(`Access-Control-Allow-Origin: ${res.headers['access-control-allow-origin'] || 'Not present'}`);
+            console.log(`Access-Control-Allow-Methods: ${res.headers['access-control-allow-methods'] || 'Not present'}`);
+            console.log(`Access-Control-Allow-Headers: ${res.headers['access-control-allow-headers'] || 'Not present'}`);
+            console.log(`Access-Control-Allow-Credentials: ${res.headers['access-control-allow-credentials'] || 'Not present'}`);
+            
+            if (res.statusCode === 200) {
+                console.log('\n🟢 CORS preflight successful');
+            } else {
+                console.log('\n🔴 CORS preflight failed');
+            }
+            resolve();
+        });
+        
+        req.on('error', (error) => {
+            console.error('\n❌ CORS preflight error:', error.message);
+            reject(error);
+        });
+        
+        req.end();
+    });
+}
+
 // Create test data for Lambda
 const lambdaData = JSON.stringify({
     action: 'create_thread',
@@ -200,6 +242,7 @@ async function testApiGatewayEndpoint() {
 // Run the tests
 async function runTests() {
     try {
+        await testCORSPreflight();
         await testLambdaEndpoint();
         await testApiGatewayEndpoint();
         console.log('\n\n✅ All tests completed');
