@@ -268,31 +268,7 @@ export class MeritInstructionalFlow {
         try {
             console.log('[Merit Flow] Attempting to navigate to:', targetSection);
             
-            // Only create thread when entering chat section
-            if (targetSection === 'chat' && !this.#openAIClient.threadId) {
-                console.log('[Merit Flow] Creating new thread for chat...');
-                const loadingMessage = document.createElement('div');
-                loadingMessage.className = 'alert alert-info';
-                loadingMessage.textContent = 'Connecting to chat service...';
-                this.#elements.chatWindow.appendChild(loadingMessage);
-                
-                try {
-                    await this.#openAIClient.createThread();
-                    loadingMessage.remove();
-                } catch (error) {
-                    console.error('[Merit Flow] Thread creation failed:', error);
-                    
-                    loadingMessage.className = 'alert alert-danger';
-                    loadingMessage.innerHTML = `
-                        ${this.#openAIClient.getState().errorMessage}<br>
-                        <button class="btn btn-outline-danger mt-2" onclick="window.location.reload()">
-                            Try Again
-                        </button>
-                    `;
-                    return;
-                }
-            }
-            
+            // First update the UI immediately to show the new section
             // Update active section
             this.#elements.sections.forEach(section => {
                 section.hidden = section.dataset.section !== targetSection;
@@ -317,6 +293,33 @@ export class MeritInstructionalFlow {
             } else {
                 this.#elements.playbar.hidden = false;
                 this.#elements.chatbar.hidden = true;
+            }
+            
+            // Now handle background initialization if needed
+            // Only create thread when entering chat section
+            if (targetSection === 'chat' && !this.#openAIClient.threadId) {
+                console.log('[Merit Flow] Creating new thread for chat...');
+                const loadingMessage = document.createElement('div');
+                loadingMessage.className = 'alert alert-info';
+                loadingMessage.textContent = 'Connecting to chat service...';
+                this.#elements.chatWindow.appendChild(loadingMessage);
+                
+                // Create thread in the background
+                this.#openAIClient.createThread()
+                    .then(() => {
+                        loadingMessage.remove();
+                        console.log('[Merit Flow] Thread creation completed');
+                    })
+                    .catch(error => {
+                        console.error('[Merit Flow] Thread creation failed:', error);
+                        loadingMessage.className = 'alert alert-danger';
+                        loadingMessage.innerHTML = `
+                            ${this.#openAIClient.getState().errorMessage}<br>
+                            <button class="btn btn-outline-danger mt-2" onclick="window.location.reload()">
+                                Try Again
+                            </button>
+                        `;
+                    });
             }
             
             // Track navigation
