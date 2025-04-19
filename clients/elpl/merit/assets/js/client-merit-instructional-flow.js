@@ -3,7 +3,7 @@
  * Controls the flow of instruction, navigation, and state management for Merit pages.
  * Integrates admin and client functionality in a unified controller.
  * 
- * @version 1.0.20
+ * @version 1.0.21
  * @module client-merit-instructional-flow
  */
 
@@ -12,7 +12,7 @@ import MeritOpenAIClient from './client-merit-openai.js';
 export class MeritInstructionalFlow {
     #config = {
         id: "merit-ela-flow",
-        version: "1.0.20",
+        version: "1.0.21",
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
         schema_version: window.env.SCHEMA_VERSION
@@ -29,7 +29,8 @@ export class MeritInstructionalFlow {
         isAdmin: false,
         redisConnected: false,
         hasError: false,
-        errorMessage: null
+        errorMessage: null,
+        openAIConfigured: false
     };
 
     #elements = {
@@ -67,8 +68,20 @@ export class MeritInstructionalFlow {
         }
 
         try {
+            // Initialize OpenAI client and verify configuration
             this.#openAIClient = new MeritOpenAIClient();
-            this.#state.redisConnected = true;
+            const clientState = this.#openAIClient.getState();
+            
+            if (!clientState.hasError) {
+                this.#state.openAIConfigured = true;
+                this.#state.redisConnected = true;
+                console.log('[Merit Flow] OpenAI client configured successfully', {
+                    project: this.#openAIClient.config.project_id,
+                    schema: this.#openAIClient.config.schema_version
+                });
+            } else {
+                throw new Error('OpenAI client configuration failed: ' + clientState.errorMessage);
+            }
             
             // Initialize based on role
             if (this.#state.isAdmin) {
@@ -237,59 +250,80 @@ export class MeritInstructionalFlow {
         this.#updateActionState();
     }
 
-    async #handleNavigation(section) {
-        if (!this.#config.sections.includes(section)) {
-            console.error('[Merit Flow] Invalid section:', section);
-            return;
-        }
-
-        // If moving to chat, create user session first
-        if (section === 'chat' && !this.#state.contextLoaded) {
-            try {
-                const context = {
-                    gradeLevel: this.#state.gradeLevel,
-                    curriculum: this.#state.curriculum,
-                    schema_version: window.env.SCHEMA_VERSION
-                };
+    async #handleNavigation(event) {
+        event.preventDefault();
+        const targetSection = event.target.getAttribute('href').substring(1);
+        
+        try {
+            console.log('[Merit Flow] Attempting to navigate to:', targetSection);
+            
+            // Only create thread when entering chat section
+            if (targetSection === 'chat' && !this.#openAIClient.threadId) {
+                console.log('[Merit Flow] Creating new thread for chat...');
+                const loadingMessage = document.createElement('div');
+                loadingMessage.className = 'alert alert-info';
+                loadingMessage.textContent = 'Connecting to chat service...';
+                document.querySelector('#chat').prepend(loadingMessage);
                 
-                // Create new thread using the OpenAI client
-                const threadId = await this.#openAIClient.createThread();
-                console.log('[Merit Flow] Thread created:', threadId);
-                
-                // Preload context for the conversation
-                await this.#openAIClient.preloadContext(context);
-                console.log('[Merit Flow] Context preloaded for session');
-                
-                this.#state.contextLoaded = true;
-            } catch (error) {
-                console.error('[Merit Flow] Failed to create user session:', error);
-                this.#showError('Failed to initialize chat. Please try again.');
-                return;
+                try {
+                    await this.#openAIClient.createThread();
+                    loadingMessage.remove();
+                } catch (error) {
+                    console.error('[Merit Flow] Thread creation failed:', error);
+                    let errorMessage = 'Unable to connect to chat service. ';
+                    
+                    if (error.message.includes('CORS')) {
+                        errorMessage += 'There was a network connectivity issue. ';
+                    } else if (error.message.includes('authentication')) {
+                        errorMessage += 'API authentication failed. ';
+                    } else {
+                        errorMessage += 'An unexpected error occurred. ';
+                    }
+                    
+                    errorMessage += 'Please try again in a few moments.';
+                    
+                    loadingMessage.className = 'alert alert-danger';
+                    loadingMessage.innerHTML = `
+                        ${errorMessage}<br>
+                        <button class="btn btn-outline-danger mt-2" onclick="window.location.reload()">
+                            Try Again
+                        </button>
+                    `;
+                    return;
+                }
             }
+            
+            // Update active section
+            document.querySelectorAll('section').forEach(section => {
+                section.hidden = section.id !== targetSection;
+            });
+            
+            // Update navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const isActive = link.getAttribute('href') === `#${targetSection}`;
+                link.classList.toggle('active', isActive);
+                link.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+            
+            // Track navigation
+            console.log('[Merit Flow] Navigation successful:', {
+                section: targetSection,
+                threadId: this.#openAIClient?.threadId || 'not_created'
+            });
+            
+        } catch (error) {
+            console.error('[Merit Flow] Navigation error:', error);
+            // Show error in current section
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'alert alert-danger';
+            errorAlert.innerHTML = `
+                An error occurred while loading this section. Please try again.<br>
+                <button class="btn btn-outline-danger mt-2" onclick="location.reload()">
+                    Reload Page
+                </button>
+            `;
+            document.querySelector(`#${targetSection}`).prepend(errorAlert);
         }
-
-        // Update active section
-        this.#state.currentSection = section;
-        this.#elements.sections?.forEach(s => {
-            s.classList.toggle('active', s.id === section);
-        });
-
-        // Update navigation
-        this.#elements.navLinks?.forEach(link => {
-            link.classList.toggle('active', link.dataset.section === section);
-        });
-
-        // Update footer visibility and content
-        if (section === 'chat') {
-            this.#elements.playbar?.setAttribute('hidden', '');
-            this.#elements.chatbar?.removeAttribute('hidden');
-            this.#elements.chatInput?.focus();
-        } else {
-            this.#elements.chatbar?.setAttribute('hidden', '');
-            this.#elements.playbar?.removeAttribute('hidden');
-        }
-
-        this.#logState(`Navigated to ${section}`);
     }
 
     async #sendMessage() {
@@ -452,7 +486,8 @@ export class MeritInstructionalFlow {
             isAdmin: this.#state.isAdmin,
             redisConnected: false,
             hasError: false,
-            errorMessage: null
+            errorMessage: null,
+            openAIConfigured: false
         };
         
         this.#openAIClient?.destroy();
