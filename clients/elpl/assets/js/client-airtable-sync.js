@@ -7,15 +7,20 @@
 class AirtableSync {
     constructor() {
         this.config = {
-            baseId: 'appXXXXXXXXXXXXXX', // Replace with actual base ID
-            table: 'IE_ALL_Users',
-            view: 'Merit Users',
-            syncInterval: 5000, // 5 seconds
+            baseId: window.env.AIRTABLE_BASE_ID || 'appqFjYLZiRlgZQDM',
+            table: window.env.AIRTABLE_TABLE || 'tblbiZ0r6hIVfAWsY',
+            view: 'Grid view',
+            syncIntervalMs: 5000, // 5 seconds
             maxRetries: 3,
             redisKeys: {
                 syncQueue: 'merit:sync:airtable',
                 processing: 'merit:sync:processing',
                 failed: 'merit:sync:failed'
+            },
+            ttl: {
+                queue: 3600,   // 1 hour
+                processing: 3600,   // 1 hour
+                failed: 86400  // 24 hours
             }
         };
 
@@ -41,7 +46,7 @@ class AirtableSync {
             } catch (error) {
                 console.error('[Airtable Sync] Process error:', error);
             }
-        }, this.config.syncInterval);
+        }, this.config.syncIntervalMs);
     }
 
     async queueForSync(data) {
@@ -56,7 +61,7 @@ class AirtableSync {
         try {
             // Store in Redis
             const key = `${this.config.redisKeys.syncQueue}:${syncItem.id}`;
-            await this.redisSet(key, JSON.stringify(syncItem), 3600);
+            await this.redisSet(key, JSON.stringify(syncItem), this.config.ttl.queue);
             
             console.log('[Airtable Sync] Queued item:', {
                 id: syncItem.id,
@@ -182,7 +187,7 @@ class AirtableSync {
 
     async moveToProcessing(item) {
         const processingKey = `${this.config.redisKeys.processing}:${item.id}`;
-        await this.redisSet(processingKey, JSON.stringify(item), 3600);
+        await this.redisSet(processingKey, JSON.stringify(item), this.config.ttl.processing);
         console.log('[Airtable Sync] Moved to processing:', item.id);
     }
 
@@ -194,14 +199,14 @@ class AirtableSync {
 
     async requeueItem(item) {
         const queueKey = `${this.config.redisKeys.syncQueue}:${item.id}`;
-        await this.redisSet(queueKey, JSON.stringify(item), 3600);
+        await this.redisSet(queueKey, JSON.stringify(item), this.config.ttl.queue);
         console.log('[Airtable Sync] Requeued item:', item.id);
     }
 
     async moveToFailed(item, error) {
         const failedKey = `${this.config.redisKeys.failed}:${item.id}`;
         item.error = error.message;
-        await this.redisSet(failedKey, JSON.stringify(item), 86400); // 24h retention for failed items
+        await this.redisSet(failedKey, JSON.stringify(item), this.config.ttl.failed);
         console.log('[Airtable Sync] Moved to failed:', item.id);
     }
 

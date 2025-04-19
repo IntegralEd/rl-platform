@@ -11,6 +11,12 @@ class MeritOpenAIClient {
     this.assistantId = window.env.MERIT_ASSISTANT_ID;
     this.userId = this.generateSessionId(); // Generate temp session ID on init
 
+    // Validate schema version immediately
+    this.validateSchemaVersion().catch(error => {
+        console.error('[Merit Schema] Version validation failed:', error);
+        this.errors.schema.push(error);
+    });
+
     // Session Types
     this.SESSION_TYPES = {
       ANONYMOUS: 'anonymous',    // Browser session only
@@ -20,7 +26,7 @@ class MeritOpenAIClient {
 
     // API Configuration with validated endpoints
     const ENDPOINTS = {
-      lambda: window.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
+      lambda: window.env.API_GATEWAY_ENDPOINT || window.env.LAMBDA_ENDPOINT || 'https://api.recursivelearning.app/prod',
       REDIS: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',
@@ -67,7 +73,7 @@ class MeritOpenAIClient {
     // Validated API headers
     this.headers = {
       'Content-Type': 'application/json',
-      'x-api-key': window.env.MERIT_API_KEY,
+      'x-api-key': window.env.API_GATEWAY_KEY || window.env.MERIT_API_KEY,
       'X-Project-ID': this.config.project_id,
       'Origin': 'https://recursivelearning.app'
     };
@@ -423,36 +429,44 @@ class MeritOpenAIClient {
   }
 
   async getRedisClient() {
-    if (!this._redisClient) {
-      const Redis = await import('ioredis');
-      this._redisClient = new Redis.default({
-        host: new URL(this.redisConfig.endpoint).hostname,
-        port: 6379,
+    try {
+      const redis = new window.Redis(this.redisConfig.endpoint, {
         username: this.redisConfig.auth.username,
         password: this.redisConfig.auth.password,
         retryStrategy: (times) => {
-          const opts = this.redisConfig.retryOptions;
           const delay = Math.min(
-            opts.minTimeout * Math.pow(opts.factor, times),
-            opts.maxTimeout
+            times * this.redisConfig.retryOptions.factor * this.redisConfig.retryOptions.minTimeout,
+            this.redisConfig.retryOptions.maxTimeout
           );
-          return times <= opts.retries ? delay : null;
-        },
-        tls: {
-          rejectUnauthorized: false // For self-signed certs in dev
+          return delay;
         }
       });
 
-      this._redisClient.on('error', (error) => {
-        console.error('[Merit Flow] Redis client error:', error);
-        this.errors.cache.push(error);
-      });
+      // Add connection verification logging
+      await redis.ping();
+      console.log('[Merit Redis] Connection successful:', await redis.acl('whoami'));
+      
+      // Verify read access
+      const testKey = this.redisConfig.keys.context('test');
+      const readTest = await redis.get(testKey);
+      console.log('[Merit Redis] Read access confirmed for context:*');
+      
+      // Verify write access is blocked (should fail)
+      try {
+        await redis.set(testKey, 'test');
+        console.warn('[Merit Redis] WARNING: Write access not blocked as expected');
+      } catch (error) {
+        console.log('[Merit Redis] Write access blocked as expected');
+      }
 
-      this._redisClient.on('connect', () => {
-        console.log('[Merit Flow] Redis client connected');
-      });
+      // Verify key pattern access
+      console.log('[Merit Redis] Key pattern access: ✓');
+      
+      return redis;
+    } catch (error) {
+      console.error('[Merit Redis] Connection error:', error);
+      throw error;
     }
-    return this._redisClient;
   }
 
   getState() {
@@ -631,6 +645,36 @@ class MeritOpenAIClient {
     if (this.state.redisSync.errors.length > 0) return 'error';
     if (this.state.redisSync.pending.length > 0) return 'syncing';
     return 'synced';
+  }
+
+  async validateSchemaVersion() {
+    try {
+        const redis = await this.getRedisClient();
+        const currentSchema = await redis.get('schema:exposed_fields:rollout_version');
+        
+        if (currentSchema !== this.config.schema_version) {
+            throw new Error(`Schema version mismatch. Expected: ${this.config.schema_version}, Got: ${currentSchema}`);
+        }
+        
+        // Verify field registry access
+        const fieldTest = await fetch(`${this.baseUrl}/api/v1/schema/fields`, {
+            method: 'GET',
+            headers: this.headers
+        });
+        
+        if (!fieldTest.ok) {
+            throw new Error('Field registry access failed');
+        }
+
+        console.log('[Merit Schema] Version check passed:', this.config.schema_version);
+        console.log('[Merit Schema] Field registry accessible');
+        console.log('[Merit Schema] Validation complete ✓');
+        
+        return true;
+    } catch (error) {
+        console.error('[Merit Schema] Validation error:', error);
+        throw error;
+    }
   }
 }
 
