@@ -406,11 +406,21 @@ class MeritOpenAIClient {
 
   async redisGet(key) {
     try {
-      const client = await this.getRedisClient();
-      const value = await client.get(key);
-      return value;
+      // Use API endpoint instead of direct Redis connection
+      const response = await fetch(`${this.baseUrl}/cache/get`, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify({ key })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Cache get failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.value;
     } catch (error) {
-      console.error('[Merit Flow] Redis get error:', error);
+      console.error('[Merit Flow] Cache get error:', error);
       this.errors.cache.push(error);
       return null;
     }
@@ -418,54 +428,43 @@ class MeritOpenAIClient {
 
   async redisSet(key, value, ttl) {
     try {
-      const client = await this.getRedisClient();
-      await client.set(key, value, 'EX', ttl);
+      // Use API endpoint instead of direct Redis connection
+      const response = await fetch(`${this.baseUrl}/cache/set`, {
+        method: 'POST',
+        headers: this.headers,
+        body: JSON.stringify({ key, value, ttl })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Cache set failed: ${response.status}`);
+      }
+      
       return true;
     } catch (error) {
-      console.error('[Merit Flow] Redis set error:', error);
+      console.error('[Merit Flow] Cache set error:', error);
       this.errors.cache.push(error);
       return false;
     }
   }
 
-  async getRedisClient() {
+  // Replace Redis client connection with API check
+  async checkRedisConnection() {
     try {
-      const redis = new window.Redis(this.redisConfig.endpoint, {
-        username: this.redisConfig.auth.username,
-        password: this.redisConfig.auth.password,
-        retryStrategy: (times) => {
-          const delay = Math.min(
-            times * this.redisConfig.retryOptions.factor * this.redisConfig.retryOptions.minTimeout,
-            this.redisConfig.retryOptions.maxTimeout
-          );
-          return delay;
-        }
+      const response = await fetch(`${this.baseUrl}/cache/health`, {
+        method: 'GET',
+        headers: this.headers
       });
-
-      // Add connection verification logging
-      await redis.ping();
-      console.log('[Merit Redis] Connection successful:', await redis.acl('whoami'));
       
-      // Verify read access
-      const testKey = this.redisConfig.keys.context('test');
-      const readTest = await redis.get(testKey);
-      console.log('[Merit Redis] Read access confirmed for context:*');
-      
-      // Verify write access is blocked (should fail)
-      try {
-        await redis.set(testKey, 'test');
-        console.warn('[Merit Redis] WARNING: Write access not blocked as expected');
-      } catch (error) {
-        console.log('[Merit Redis] Write access blocked as expected');
+      if (!response.ok) {
+        throw new Error(`Redis health check failed: ${response.status}`);
       }
-
-      // Verify key pattern access
-      console.log('[Merit Redis] Key pattern access: ✓');
       
-      return redis;
+      const data = await response.json();
+      console.log('[Merit Redis] Connection status:', data.status);
+      return data.status === 'connected';
     } catch (error) {
       console.error('[Merit Redis] Connection error:', error);
-      throw error;
+      return false;
     }
   }
 
@@ -649,8 +648,18 @@ class MeritOpenAIClient {
 
   async validateSchemaVersion() {
     try {
-        const redis = await this.getRedisClient();
-        const currentSchema = await redis.get('schema:exposed_fields:rollout_version');
+        // Use API to get schema version
+        const schemaResponse = await fetch(`${this.baseUrl}/api/v1/schema/version`, {
+            method: 'GET',
+            headers: this.headers
+        });
+        
+        if (!schemaResponse.ok) {
+            throw new Error(`Schema version check failed: ${schemaResponse.status}`);
+        }
+        
+        const schemaData = await schemaResponse.json();
+        const currentSchema = schemaData.version;
         
         if (currentSchema !== this.config.schema_version) {
             throw new Error(`Schema version mismatch. Expected: ${this.config.schema_version}, Got: ${currentSchema}`);
