@@ -1,6 +1,6 @@
 # Merit End-to-End Integration Checklist
-**Version:** 1.1.6
-**Last Updated:** May 8, 2025, 09:30 UTC
+**Version:** 1.1.7
+**Last Updated:** May 19, 2025, 23:29 UTC
 **Status:** Navigation Issues Identified, TTL Standardized, API Gateway CORS Successfully Verified in Production, Monitoring Dashboards Deployed
 
 ## Document Purpose
@@ -33,7 +33,7 @@ SCHEMA_VERSION=04102025.B01
 
 ## API Gateway Configuration - VERIFIED ✅
 
-Completed and verified in production on May 2, 2025. The API Gateway CORS configuration has been successfully deployed to all environments.
+Completed and verified in production on May 19, 2025. The API Gateway CORS configuration has been successfully deployed to all environments and confirmed with curl testing.
 
 ### Implementation Details
 
@@ -44,11 +44,9 @@ Completed and verified in production on May 2, 2025. The API Gateway CORS config
   - OPTIONS preflight requests
 - Implementation uses OpenAPI specification file located at `../../clients/elpl/merit/api-gateway-cors-config.yaml`
 - All responses include the following headers:
-  - `Access-Control-Allow-Origin: https://merit.example.com`
+  - `Access-Control-Allow-Origin: https://recursivelearning.app`
   - `Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`
   - `Access-Control-Allow-Headers: Content-Type, Authorization, X-API-Key`
-  - `Access-Control-Max-Age: 7200`
-  - `Cache-Control: max-age=7200`
 
 ### Verification Steps - COMPLETE
 
@@ -57,6 +55,7 @@ Completed and verified in production on May 2, 2025. The API Gateway CORS config
 - [x] API calls succeed without CORS errors (POST, GET, PUT)
 - [x] Error responses (4XX, 5XX) include appropriate CORS headers 
 - [x] Production verification completed with zero CORS-related issues
+- [x] Curl testing confirms proper CORS headers are returned
 
 ### Monitoring Dashboard - NEW
 
@@ -80,7 +79,7 @@ The dashboard tracks:
 ## Browser Testing Steps
 
 ### 1. Network Tab Verification
-�� **[VERIFY]** Check request headers:
+👀 **[VERIFY]** Check request headers:
 ```javascript
 // Every API request should include:
 {
