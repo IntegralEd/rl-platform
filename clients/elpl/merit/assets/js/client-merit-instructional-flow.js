@@ -246,16 +246,19 @@ export class MeritInstructionalFlow {
         // If moving to chat, create user session first
         if (section === 'chat' && !this.#state.contextLoaded) {
             try {
-                const email = document.querySelector('#header-span')?.dataset?.userEmail || 'default@integral-ed.com';
                 const context = {
                     gradeLevel: this.#state.gradeLevel,
                     curriculum: this.#state.curriculum,
                     schema_version: window.env.SCHEMA_VERSION
                 };
                 
-                // Create Redis user session
-                const userData = await this.#openAIClient.createUserSession(email, context);
-                console.log('[Merit Flow] User session created:', userData);
+                // Create new thread using the OpenAI client
+                const threadId = await this.#openAIClient.createThread();
+                console.log('[Merit Flow] Thread created:', threadId);
+                
+                // Preload context for the conversation
+                await this.#openAIClient.preloadContext(context);
+                console.log('[Merit Flow] Context preloaded for session');
                 
                 this.#state.contextLoaded = true;
             } catch (error) {
