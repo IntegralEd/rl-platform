@@ -494,11 +494,17 @@
             justify-content: center;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .action-button:not(:disabled) {
+            background: var(--elpl-secondary);
         }
 
         .action-button:not(:disabled):hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(198, 18, 63, 0.25);
+            box-shadow: 0 4px 8px rgba(33, 22, 81, 0.25);
         }
 
         .action-button:disabled {
@@ -511,6 +517,11 @@
             width: 30px;
             height: 30px;
             object-fit: contain;
+            filter: brightness(0) invert(1); /* Makes icon white */
+        }
+
+        .action-button:disabled img {
+            filter: none; /* Return to original color when disabled */
         }
 
         .chat-input-container {
@@ -1206,12 +1217,11 @@
             <div class="footer-content">
                 <div class="footer-spacer"></div>
                 <div class="footer-center">
-                    <div id="playbar" class="playbar" data-test-id="playbar">
+                    <div id="playbar" class="playbar" data-test-id="playbar" style="position: relative; z-index: 100;">
                         <button id="next-button" 
                                 class="action-button" 
                                 aria-label="Continue to chat"
                                 data-active="true"
-                                disabled
                                 data-test-id="next-button">
                             <img src="/clients/elpl/assets/images/client-elpl-next-button.png" 
                                  alt="Next" 

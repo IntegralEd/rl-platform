@@ -376,14 +376,32 @@ export class MeritInstructionalFlow {
 
     #updateActionState() {
         if (this.#elements.nextButton) {
-            this.#elements.nextButton.disabled = !this.#state.formValid;
+            const shouldBeEnabled = this.#state.formValid;
+            this.#elements.nextButton.disabled = !shouldBeEnabled;
+            
+            // Update button visibility and active state
+            if (shouldBeEnabled) {
+                this.#elements.nextButton.style.opacity = '1';
+                this.#elements.nextButton.dataset.active = 'true';
+            } else {
+                this.#elements.nextButton.style.opacity = '0.7';
+                this.#elements.nextButton.dataset.active = 'false';
+            }
+            
+            console.log('[Merit Flow] Next button updated:', {
+                disabled: !shouldBeEnabled,
+                active: shouldBeEnabled,
+                formValid: this.#state.formValid
+            });
         }
+        
         if (this.#elements.sendButton) {
             this.#elements.sendButton.disabled = !this.#state.chatReady;
         }
         if (this.#elements.chatInput) {
             this.#elements.chatInput.disabled = !this.#state.chatReady;
         }
+        
         console.log('[Merit Flow] Action state updated:', {
             nextButton: this.#elements.nextButton?.disabled,
             sendButton: this.#elements.sendButton?.disabled,
