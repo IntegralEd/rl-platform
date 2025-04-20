@@ -7,8 +7,8 @@ info:
     name: Recursive Learning Platform Team
     url: https://recursivelearning.app
 servers:
-  - url: https://m9eljjkdn7.execute-api.us-east-2.amazonaws.com/staging
-    description: Staging API Gateway endpoint
+  - url: https://m9eljjkdn7.execute-api.us-east-2.amazonaws.com/prod
+    description: Merit Staging API Gateway endpoint
   - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
     description: Production API Gateway endpoint
 
