@@ -337,4 +337,213 @@ aws apigateway update-method \
 - Redis Issues: @devops-team
 - Schema Issues: @backend-team
 - API Gateway: @api-team
-- Emergency Rollback: @devops-lead 
+- Emergency Rollback: @devops-lead
+
+## Current Status and Next Steps (Apr 19 Update)
+
+### Current State
+- ✅ API Gateway endpoint created: `https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod`
+- ✅ API key configured: `68gmsx2jsk`
+- ✅ CORS configuration updated for `https://recursivelearning.app`
+- ✅ Basic Lambda integration working
+
+### Sequential Task Tree
+
+1. **API Gateway Configuration** (You are here)
+   ```
+   Root
+   └── API Gateway
+       ├── ✅ Endpoint Created
+       ├── ✅ API Key Set
+       ├── ✅ CORS Headers Updated
+       └── 🔄 Testing Stage
+   ```
+   - Next: Run CORS preflight test
+   - Command: ``curl -v -X OPTIONS https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod/api/v1/context
+
+2. **Frontend Integration**
+   ```
+   Root
+   └── Merit Client
+       ├── merit.html
+       │   ├── ✅ API Gateway endpoint set
+       │   └── ✅ API key configured
+       └── client-merit-openai.js
+           ├── 🔄 Update fetch calls
+           └── 🔄 Add CORS mode
+   ```
+   - Next: Update client-merit-openai.js with CORS mode
+   - Location: `/clients/elpl/merit/client-merit-openai.js`
+
+3. **Redis Integration**
+   ```
+   Root
+   └── Redis
+       ├── ✅ Frontend user configured
+       ├── 🔄 Connection test
+       └── 🔄 Key pattern validation
+   ```
+   - Next: Run Redis connection test
+   - Command: `./test-redis-connection.sh`
+
+4. **End-to-End Testing**
+   ```
+   Root
+   └── Testing
+       ├── 🔄 API Gateway tests
+       ├── 🔄 Frontend integration
+       └── 🔄 Redis operations
+   ```
+   - Next: Run full endpoint test suite
+   - Command: `node test-prod-endpoint.js`
+
+### Immediate Next Actions
+
+1. **Test API Gateway CORS**
+   ```bash
+   # Test preflight request
+   curl -v -X OPTIONS \
+     -H "Origin: https://recursivelearning.app" \
+     -H "Access-Control-Request-Method: POST" \
+     https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod/api/v1/context
+   
+   # Test actual request
+   curl -v -X POST \
+     -H "Origin: https://recursivelearning.app" \
+     -H "x-api-key: 68gmsx2jsk" \
+     https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod/api/v1/context
+   ```
+
+2. **Update Frontend Code**
+   - Open: `/clients/elpl/merit/client-merit-openai.js`
+   - Add: `mode: 'cors'` to fetch calls
+   - Add: `credentials: 'include'` to fetch calls
+   - Update: API endpoint references
+
+3. **Verify Redis Connection**
+   ```bash
+   # Run connection test
+   ./test-redis-connection.sh
+   
+   # Check key pattern access
+   node test-redis.js
+   ```
+
+4. **Run Full Test Suite**
+   ```bash
+   # Run all tests
+   node test-prod-endpoint.js
+   ```
+
+### Success Criteria
+- ✅ CORS preflight returns 200 with correct headers
+- ✅ API requests succeed with API key
+- ✅ Redis operations work through API Gateway
+- ✅ Frontend can make successful calls
+- ✅ Error responses include CORS headers
+
+### Rollback Plan
+If issues occur:
+1. Revert API Gateway to previous working state
+2. Switch frontend back to direct Lambda calls
+3. Document any errors in CloudWatch logs
+4. Contact DevOps team for assistance 
+
+## AWS Console CORS Setup Steps (Apr 19 Update)
+
+### Current Location
+```
+AWS Console
+├── API Gateway
+│   ├── ✅ APIs List
+│   └── 🔄 Merit API (29wtfiieig)
+│       ├── Resources
+│       ├── Stages
+│       └── Gateway Responses
+```
+
+### Step-by-Step Console Navigation
+
+1. **API Gateway Home**
+   ```
+   AWS Console
+   └── API Gateway
+       └── APIs
+           └── Merit API (29wtfiieig)
+   ```
+   - Click "Merit API" to open it
+
+2. **Update CORS for /api/v1/context**
+   ```
+   Resources
+   └── /api/v1/context
+       ├── OPTIONS
+       └── POST
+   ```
+   - Click "Actions" dropdown
+   - Select "Enable CORS"
+   - Enter in the form:
+     - Access-Control-Allow-Origin: `https://recursivelearning.app`
+     - Access-Control-Allow-Headers: `Content-Type,x-api-key,X-Project-ID,Origin,Authorization`
+     - Access-Control-Allow-Methods: Check all boxes
+     - Access-Control-Allow-Credentials: Check the box
+   - Click "Save"
+
+3. **Update Gateway Responses**
+   ```
+   Gateway Responses
+   ├── Default 4XX
+   └── Default 5XX
+   ```
+   For each response:
+   - Click the response type
+   - Under "Response Headers"
+   - Add these headers exactly:
+     ```
+     Access-Control-Allow-Origin: 'https://recursivelearning.app'
+     Access-Control-Allow-Headers: 'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'
+     Access-Control-Allow-Methods: 'GET,POST,PUT,DELETE,OPTIONS'
+     Access-Control-Allow-Credentials: 'true'
+     ```
+   - Click "Save"
+
+4. **Deploy API**
+   ```
+   Resources
+   └── Actions
+       └── Deploy API
+   ```
+   - Click "Actions" dropdown
+   - Select "Deploy API"
+   - Stage: select "prod"
+   - Click "Deploy"
+
+### Verification Steps
+
+1. **Test Current Setup**
+   ```bash
+   # Run this in terminal to verify
+   curl -v -X OPTIONS \
+     -H "Origin: https://recursivelearning.app" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Content-Type,x-api-key,X-Project-ID,Origin,Authorization" \
+     https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod/api/v1/context
+   ```
+
+2. **Check Response Headers**
+   Look for:
+   ```
+   ✓ access-control-allow-origin: https://recursivelearning.app
+   ✓ access-control-allow-methods: GET,POST,PUT,DELETE,OPTIONS
+   ✓ access-control-allow-headers: Content-Type,x-api-key,X-Project-ID,Origin,Authorization
+   ✓ access-control-allow-credentials: true
+   ```
+
+### Next Steps
+```
+Browser Testing
+└── merit.html
+    └── Open Console
+        ├── Check Network Tab
+        └── Verify CORS headers
+``` 

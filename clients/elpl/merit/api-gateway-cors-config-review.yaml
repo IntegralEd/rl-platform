@@ -65,44 +65,13 @@ paths:
                 {
                   "status": "success"
                 }
-    post:
-      summary: Create or update context
-      description: Endpoint for creating or updating context data
-      security:
-        - ApiKeyAuth: []
-      responses:
-        '200':
-          description: Successful operation
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-            Access-Control-Allow-Credentials:
-              schema:
-                type: string
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        uri: arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:${AWS::AccountId}:function:${LambdaFunctionName}/invocations
-        httpMethod: POST
-        responses:
-          default:
-            statusCode: 200
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
-              method.response.header.Access-Control-Allow-Credentials: "'true'"
 
   /api/v1/mock:
     get:
       summary: Mock endpoint for testing
       description: Simple endpoint that returns a mock response for testing
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful mock response
@@ -124,7 +93,12 @@ paths:
         requestTemplates:
           application/json: |
             {
-              "statusCode": 200
+              "statusCode": 200,
+              "response": {
+                "message": "Mock response successful",
+                "timestamp": "$context.requestTimeEpoch",
+                "requestId": "$context.requestId"
+              }
             }
         responses:
           default:
@@ -136,9 +110,11 @@ paths:
               method.response.header.Access-Control-Allow-Credentials: "'true'"
             responseTemplates:
               application/json: |
+                #set($inputRoot = $input.path('$.response'))
                 {
-                  "message": "Mock response successful",
-                  "timestamp": "$context.requestTimeEpoch"
+                  "message": "$inputRoot.message",
+                  "timestamp": $inputRoot.timestamp,
+                  "requestId": "$inputRoot.requestId"
                 }
     options:
       summary: CORS preflight handler for mock endpoint
@@ -188,7 +164,6 @@ components:
       in: header
       description: API key for authentication with the Merit API Gateway
 
-# Gateway response configuration for error scenarios
 x-amazon-apigateway-gateway-responses:
   DEFAULT_4XX:
     responseParameters:
@@ -201,7 +176,4 @@ x-amazon-apigateway-gateway-responses:
       gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
       gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
       gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
-
-security:
-  - ApiKeyAuth: [] 
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'" 

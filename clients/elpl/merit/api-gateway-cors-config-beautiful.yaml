@@ -1,20 +1,41 @@
+# Merit API Gateway Configuration
+# Version: 1.1.0
+# Last Updated: April 20, 2025
+# Environment: Production
+# Description: OpenAPI 3.0 specification for Merit API Gateway with CORS support
+
 openapi: 3.0.3
 info:
   title: Merit API Gateway
-  description: API Gateway configuration with CORS support for Merit integration
-  version: 1.0.0
+  description: |
+    API Gateway configuration for Merit integration with full CORS support.
+    Handles context management, mock testing, and security validation.
+    
+    Key Features:
+    - CORS preflight handling
+    - API key authentication
+    - Mock endpoint testing
+    - Error response standardization
+  version: 1.1.0
   contact:
     name: Recursive Learning Platform Team
     url: https://recursivelearning.app
+
+# Production endpoint configuration
 servers:
   - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
     description: Production API Gateway endpoint
 
 paths:
+  #-----------------------------------------------------------------------------
+  # Context Management Endpoint
+  #-----------------------------------------------------------------------------
   /api/v1/context:
     options:
       summary: CORS preflight handler for context endpoint
-      description: Handles OPTIONS requests for CORS preflight checks
+      description: |
+        Handles OPTIONS requests for CORS preflight checks.
+        Caches preflight results for 2 hours (7200 seconds).
       responses:
         '200':
           description: Successful CORS preflight response
@@ -63,46 +84,21 @@ paths:
             responseTemplates:
               application/json: |
                 {
-                  "status": "success"
+                  "status": "success",
+                  "message": "CORS preflight successful"
                 }
-    post:
-      summary: Create or update context
-      description: Endpoint for creating or updating context data
-      security:
-        - ApiKeyAuth: []
-      responses:
-        '200':
-          description: Successful operation
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-            Access-Control-Allow-Credentials:
-              schema:
-                type: string
-      x-amazon-apigateway-integration:
-        type: aws_proxy
-        uri: arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:${AWS::AccountId}:function:${LambdaFunctionName}/invocations
-        httpMethod: POST
-        responses:
-          default:
-            statusCode: 200
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
-              method.response.header.Access-Control-Allow-Credentials: "'true'"
 
+  #-----------------------------------------------------------------------------
+  # Mock Testing Endpoint
+  #-----------------------------------------------------------------------------
   /api/v1/mock:
     get:
       summary: Mock endpoint for testing
-      description: Simple endpoint that returns a mock response for testing
+      description: |
+        Simple endpoint that returns a mock response for testing.
+        Includes request tracking and timestamp for debugging.
+      security:
+        - ApiKeyAuth: []
       responses:
         '200':
           description: Successful mock response
@@ -124,7 +120,14 @@ paths:
         requestTemplates:
           application/json: |
             {
-              "statusCode": 200
+              "statusCode": 200,
+              "response": {
+                "message": "Mock response successful",
+                "timestamp": "$context.requestTimeEpoch",
+                "requestId": "$context.requestId",
+                "endpoint": "$context.resourcePath",
+                "stage": "$context.stage"
+              }
             }
         responses:
           default:
@@ -136,50 +139,18 @@ paths:
               method.response.header.Access-Control-Allow-Credentials: "'true'"
             responseTemplates:
               application/json: |
+                #set($inputRoot = $input.path('$.response'))
                 {
-                  "message": "Mock response successful",
-                  "timestamp": "$context.requestTimeEpoch"
-                }
-    options:
-      summary: CORS preflight handler for mock endpoint
-      description: Handles OPTIONS requests for CORS preflight checks
-      responses:
-        '200':
-          description: Successful CORS preflight response
-          headers:
-            Access-Control-Allow-Origin:
-              schema:
-                type: string
-            Access-Control-Allow-Methods:
-              schema:
-                type: string
-            Access-Control-Allow-Headers:
-              schema:
-                type: string
-            Access-Control-Allow-Credentials:
-              schema:
-                type: string
-      x-amazon-apigateway-integration:
-        type: mock
-        requestTemplates:
-          application/json: |
-            {
-              "statusCode": 200
-            }
-        responses:
-          default:
-            statusCode: 200
-            responseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
-              method.response.header.Access-Control-Allow-Credentials: "'true'"
-            responseTemplates:
-              application/json: |
-                {
-                  "status": "success"
+                  "message": "$inputRoot.message",
+                  "timestamp": $inputRoot.timestamp,
+                  "requestId": "$inputRoot.requestId",
+                  "endpoint": "$inputRoot.endpoint",
+                  "stage": "$inputRoot.stage"
                 }
 
+#-----------------------------------------------------------------------------
+# Security Definitions
+#-----------------------------------------------------------------------------
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -188,20 +159,38 @@ components:
       in: header
       description: API key for authentication with the Merit API Gateway
 
-# Gateway response configuration for error scenarios
+#-----------------------------------------------------------------------------
+# Error Response Configuration
+#-----------------------------------------------------------------------------
 x-amazon-apigateway-gateway-responses:
+  # 4XX Client Errors
   DEFAULT_4XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
       gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
       gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
       gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+    responseTemplates:
+      application/json: |
+        {
+          "error": true,
+          "type": "client_error",
+          "message": "$context.error.message",
+          "requestId": "$context.requestId"
+        }
+
+  # 5XX Server Errors
   DEFAULT_5XX:
     responseParameters:
       gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
       gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
       gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
       gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
-
-security:
-  - ApiKeyAuth: [] 
+    responseTemplates:
+      application/json: |
+        {
+          "error": true,
+          "type": "server_error",
+          "message": "An internal server error occurred",
+          "requestId": "$context.requestId"
+        } 
