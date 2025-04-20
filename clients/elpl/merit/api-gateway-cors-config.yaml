@@ -7,6 +7,8 @@ info:
     name: Recursive Learning Platform Team
     url: https://recursivelearning.app
 servers:
+  - url: https://api.recursivelearning.app
+    description: Merit API Gateway endpoint with custom domain
   - url: https://m9eljjkdn7.execute-api.us-east-2.amazonaws.com/prod
     description: Merit Staging API Gateway endpoint
   - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
@@ -135,13 +137,20 @@ paths:
             Access-Control-Allow-Credentials:
               schema:
                 type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
       x-amazon-apigateway-integration:
         type: mock
+        passthroughBehavior: when_no_match
         requestTemplates:
-          application/json: |
-            {
-              "statusCode": 200
-            }
+          application/json: '{"statusCode": 200}'
         responses:
           default:
             statusCode: 200
@@ -151,11 +160,7 @@ paths:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
               method.response.header.Access-Control-Allow-Credentials: "'true'"
             responseTemplates:
-              application/json: |
-                {
-                  "message": "Mock response successful",
-                  "timestamp": "$context.requestTimeEpoch"
-                }
+              application/json: '{"message": "Mock response successful", "timestamp": "$context.requestTimeEpoch"}'
     options:
       summary: CORS preflight handler for mock endpoint
       description: Handles OPTIONS requests for CORS preflight checks
