@@ -1,10 +1,15 @@
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+const API_ID = process.env['rl-mock-gateway-api-ID'];
+const API_KEY = process.env['rl-mock-gateway-prod-key-042025'];
 
 const ENDPOINTS = [
-  'https://api.recursivelearning.app',
-  'https://m9eljjkdn7.execute-api.us-east-2.amazonaws.com/prod'
+  `https://${API_ID}.execute-api.us-east-2.amazonaws.com/prod`
 ];
-const API_KEY = process.env.API_KEY || '68gmsx2jsk';
 
 async function testEndpoint(endpoint) {
   console.log(`\n🔍 Testing endpoint: ${endpoint}`);

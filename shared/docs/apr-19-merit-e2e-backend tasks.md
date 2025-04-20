@@ -546,4 +546,10 @@ Browser Testing
     └── Open Console
         ├── Check Network Tab
         └── Verify CORS headers
-``` 
+```
+
+## Deployment Update
+
+- The YAML configuration for the Recursive Mock Gateway (`/shared/templates/Recursive Mock Gateway (l6lzwy3eie).yaml`) has been reviewed and verified. It correctly implements the `/api/v1/context` endpoint with proper CORS preflight (OPTIONS) and POST handling, including necessary headers and AWS integration via Lambda.
+- This configuration aligns with the apr-19-merit-e2e-backend checklist, ensuring API key authentication and error responses with required CORS headers.
+- Next Steps: Deploy the API and run the tests (CORS and context operations) to validate the end-to-end merit chat with context functionality. 
