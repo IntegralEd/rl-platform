@@ -12,10 +12,10 @@ import MeritOpenAIClient from './client-merit-openai.js';
 export class MeritInstructionalFlow {
     #config = {
         id: "merit-ela-flow",
-        version: "1.0.21",
+        version: window.env.RL_SCHEMA_VERSION,
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
-        schema_version: window.env.SCHEMA_VERSION
+        apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT
     };
 
     #state = {
@@ -50,7 +50,12 @@ export class MeritInstructionalFlow {
     #openAIClient = null;
 
     constructor(isAdmin = false) {
-        console.log('[Merit Flow] Initializing unified flow controller');
+        console.log('[Merit Flow] Initializing flow controller:', {
+            version: this.#config.version,
+            endpoint: this.#config.apiEndpoint,
+            timestamp: new Date().toISOString()
+        });
+        
         this.#state.isAdmin = isAdmin;
         
         if (document.readyState === 'loading') {
@@ -62,6 +67,8 @@ export class MeritInstructionalFlow {
     }
 
     #initialize = async () => {
+        console.log('[Merit Flow] Starting initialization...');
+        
         if (!this.#initializeElements()) {
             console.error('[Merit Flow] Failed to initialize elements');
             return;
@@ -74,8 +81,7 @@ export class MeritInstructionalFlow {
             
             if (!clientState.hasError) {
                 this.#state.openAIConfigured = true;
-                this.#state.redisConnected = true;
-                console.log('[Merit Flow] OpenAI client configured successfully', {
+                console.log('[Merit Flow] OpenAI client configured successfully:', {
                     project: this.#openAIClient.config.project_id,
                     schema: this.#openAIClient.config.schema_version
                 });
@@ -101,9 +107,14 @@ export class MeritInstructionalFlow {
 
             this.#setupEventListeners();
             this.#state.chatReady = true;
-            this.#logState('Initialization complete');
+            
+            console.log('[Merit Flow] Initialization complete:', {
+                state: this.getState(),
+                timestamp: new Date().toISOString()
+            });
             
         } catch (error) {
+            console.error('[Merit Flow] Initialization error:', error);
             this.#handleError(error);
         }
     };
@@ -519,6 +530,20 @@ export class MeritInstructionalFlow {
             </div>
         `;
     }
+
+    // Add debug methods
+    debug = {
+        getState: () => this.getState(),
+        getConfig: () => this.#config,
+        testNavigation: (section) => {
+            console.log('[Merit Flow Debug] Testing navigation:', {
+                target: section,
+                current: this.#state.currentSection,
+                timestamp: new Date().toISOString()
+            });
+            return this.#handleNavigation(section);
+        }
+    };
 }
 
 // Initialize when DOM is ready

@@ -28,16 +28,109 @@
     
     <!-- Environment Configuration -->
     <script>
+        // Platform-wide configuration logging
+        console.log('[Platform Config] Initializing platform configuration...');
+        
         window.env = {
-            SCHEMA_VERSION: '1.0.16',
-            MERIT_API_KEY: "qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J",
-            LAMBDA_ENDPOINT: 'https://api.recursivelearning.app/prod',
-            REDIS_URL: 'redis://redis.recursivelearning.app:6379',
-            OPENAI_PROJECT_ID: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            // Platform-wide variables
+            RL_API_GATEWAY_ENDPOINT: 'https://l6lzwy3eie.execute-api.us-east-2.amazonaws.com/prod',
+            RL_API_KEY: '68gmsx2jsk',
+            RL_SCHEMA_VERSION: '1.0.16',
+            
+            // Merit-specific configuration
             MERIT_ASSISTANT_ID: 'asst_QoAA395ibbyMImFJERbG2hKT',
             MERIT_ORG_ID: 'recdg5Hlm3VVaBA2u',
-            API_GATEWAY_ENDPOINT: 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
-            API_GATEWAY_KEY: '68gmsx2jsk'
+            OPENAI_PROJECT_ID: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            
+            // Legacy variables maintained for backwards compatibility
+            API_GATEWAY_ENDPOINT: 'https://l6lzwy3eie.execute-api.us-east-2.amazonaws.com/prod',
+            API_GATEWAY_KEY: '68gmsx2jsk',
+            LAMBDA_ENDPOINT: 'https://api.recursivelearning.app/prod'
+        };
+
+        // Configuration validation and logging
+        console.log('[Platform Config] Environment loaded:', {
+            apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
+            schemaVersion: window.env.RL_SCHEMA_VERSION,
+            timestamp: new Date().toISOString()
+        });
+
+        // API Gateway endpoint verification
+        fetch(`${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/mock`, {
+            method: 'GET',
+            headers: {
+                'x-api-key': window.env.RL_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('[API Gateway] Connection test successful:', {
+                endpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+                status: 'connected',
+                timestamp: new Date().toISOString()
+            });
+        })
+        .catch(error => {
+            console.error('[API Gateway] Connection test failed:', {
+                endpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+                error: error.message,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        // Endpoint validation logging
+        const validateEndpoints = () => {
+            console.log('[Merit Flow] Validating API endpoints...');
+            
+            // Test each endpoint
+            const endpoints = {
+                context: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/context`,
+                mock: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/mock`,
+                assistant: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/assistant`
+            };
+
+            Object.entries(endpoints).forEach(([name, url]) => {
+                console.log(`[Merit Flow] Testing endpoint: ${name}`, {
+                    url,
+                    timestamp: new Date().toISOString()
+                });
+            });
+        };
+
+        // Run validation on DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            validateEndpoints();
+            
+            console.log('[Merit Flow] Configuration complete', {
+                schemaVersion: window.env.RL_SCHEMA_VERSION,
+                assistantId: window.env.MERIT_ASSISTANT_ID,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        // Monitor for API Gateway responses
+        const apiResponseMonitor = (response) => {
+            console.log('[API Gateway] Response received:', {
+                status: response.status,
+                endpoint: response.url,
+                timestamp: new Date().toISOString(),
+                headers: {
+                    cors: response.headers.get('Access-Control-Allow-Origin'),
+                    contentType: response.headers.get('Content-Type')
+                }
+            });
+        };
+
+        // Add to window for debugging
+        window.DEBUG = {
+            validateEndpoints,
+            apiResponseMonitor,
+            getConfig: () => ({
+                apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
+                schemaVersion: window.env.RL_SCHEMA_VERSION,
+                timestamp: new Date().toISOString()
+            })
         };
     </script>
     
