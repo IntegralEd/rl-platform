@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: Merit API Gateway
+  description: API Gateway configuration with CORS support for Merit integration
+  version: 1.0.0-20240420
+  contact:
+    name: Recursive Learning Platform Team
+    url: https://recursivelearning.app
+
+servers:
+  - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
+    description: Production API Gateway endpoint
+
+x-amazon-apigateway-endpoint-configuration:
+  vpcEndpointIds:
+    - !Ref VpcEndpoint
+  types:
+    - PRIVATE
+
+x-amazon-apigateway-vpc-link:
+  id: !Ref VpcLink
+  targetArns:
+    - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-100/1120e7fa7fe27cd1
+    - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-133/bcb4d9ef523a5fed
+    - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-252/cdaafda30bb06c0f
+
+paths:
+  /api/v1/context:
+    options:
+      summary: CORS preflight handler for context endpoint
+      description: Handles OPTIONS requests for CORS preflight checks
+      responses:
+        '200':
+          description: Successful CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+    post:
+      summary: Create or update context
+      security:
+        - ApiKeyAuth: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:lambda:us-east-2:559050208320:function:rl-restapi-lambda-RLRestApiFunction-9inZKf1bUN4O
+        httpMethod: POST
+        type: AWS_PROXY
+        connectionType: VPC_LINK
+        connectionId: !Ref VpcLink
+        timeoutInMillis: 29000
+        passthroughBehavior: when_no_match
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+
+  /api/v1/mock:
+    get:
+      summary: Mock endpoint for testing
+      security:
+        - ApiKeyAuth: []
+      x-amazon-apigateway-integration:
+        uri: arn:aws:lambda:us-east-2:559050208320:function:rl-restapi-lambda-RLRestApiFunction-9inZKf1bUN4O
+        httpMethod: GET
+        type: AWS_PROXY
+        connectionType: VPC_LINK
+        connectionId: !Ref VpcLink
+        timeoutInMillis: 29000
+        passthroughBehavior: when_no_match
+      responses:
+        '200':
+          description: Successful mock response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+    options:
+      summary: CORS preflight handler for mock endpoint
+      description: Handles OPTIONS requests for CORS preflight checks
+      responses:
+        '200':
+          description: Successful CORS preflight response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Access-Control-Allow-Credentials:
+              schema:
+                type: string
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: '{"statusCode": 200}'
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header
+
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+  UNAUTHORIZED:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+  ACCESS_DENIED:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key,X-Project-ID'"
+      gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+      gatewayresponse.header.Access-Control-Allow-Credentials: "'true'" 

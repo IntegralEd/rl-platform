@@ -45,8 +45,8 @@ Resources:
   RLRestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub ${AWS::StackName}-api
-      Description: Recursive Learning REST API
+      Name: Recursive Mock Gateway
+      Description: Recursive Learning REST API with Mock Gateway
       EndpointConfiguration:
         Types:
           - REGIONAL
@@ -56,7 +56,7 @@ Resources:
           - Effect: Allow
             Principal: '*'
             Action: execute-api:Invoke
-            Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*
+            Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:l6lzwy3eie/*/*/*
 
   ApiDomainName:
     Type: AWS::ApiGateway::DomainName
@@ -139,7 +139,7 @@ Resources:
   ApiMethodContextPost:
     Type: AWS::ApiGateway::Method
     Properties:
-      RestApiId: !Ref RLRestApi
+      RestApiId: l6lzwy3eie
       ResourceId: !Ref ApiResourceContextEndpoint
       HttpMethod: POST
       AuthorizationType: NONE

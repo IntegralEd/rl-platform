@@ -3,6 +3,85 @@
 **Last Updated:** May 19, 2025, 23:45 UTC
 **Status:** Navigation Issues Identified, TTL Standardized, API Gateway CORS Successfully Verified in Production, Monitoring Dashboards Deployed, Client-Side Implementation Complete
 
+# 4/20/25 Punch List - Merit Production Launch
+
+## Critical Path Items (Must Fix)
+1. 🚨 **API Gateway CORS Configuration**
+   - [ ] Rebuild API Gateway with corrected CORS headers
+   - [ ] Verify OPTIONS preflight handling for root endpoint
+   - [ ] Test all error responses include CORS headers
+   - [ ] Confirm VPC Link and endpoint configurations
+
+2. 🔒 **Security & Authentication**
+   - [ ] Verify API key validation on all endpoints
+   - [ ] Confirm proper header handling (x-api-key, X-Project-ID)
+   - [ ] Test error responses for invalid authentication
+   - [ ] Validate VPC security group configurations
+
+3. 🌐 **Integration Points**
+   - [ ] Test thread creation endpoint with new API Gateway
+   - [ ] Verify Redis cache operations through API Gateway
+   - [ ] Confirm health check endpoint functionality
+   - [ ] Validate all Lambda integrations
+
+## Frontend Verification
+1. 🔄 **Client Implementation**
+   - [ ] Test navigation flow with background thread creation
+   - [ ] Verify error handling and user feedback
+   - [ ] Confirm grade selection and form validation
+   - [ ] Check chat interface loading states
+
+2. 📝 **Error Handling**
+   - [ ] Implement retry logic for failed API calls
+   - [ ] Add user-friendly error messages
+   - [ ] Test network disconnection scenarios
+   - [ ] Verify error recovery procedures
+
+3. 🎨 **UI/UX Elements**
+   - [ ] Confirm loading indicators during API calls
+   - [ ] Test chat window scroll behavior
+   - [ ] Verify message sending feedback
+   - [ ] Check responsive design on all viewports
+
+## Backend Verification
+1. 🔍 **Monitoring & Logging**
+   - [ ] Set up CloudWatch alarms for API Gateway
+   - [ ] Configure error rate monitoring
+   - [ ] Implement request tracing
+   - [ ] Set up performance metrics dashboard
+
+2. 🗄️ **Data Management**
+   - [ ] Verify Redis TTL configurations
+   - [ ] Test cache invalidation
+   - [ ] Confirm thread cleanup procedures
+   - [ ] Check schema version handling
+
+## Launch Preparation
+1. 📋 **Documentation**
+   - [ ] Update API Gateway configuration docs
+   - [ ] Document rollback procedures
+   - [ ] Create troubleshooting guide
+   - [ ] Update integration testing guide
+
+2. 🚀 **Deployment**
+   - [ ] Create deployment checklist
+   - [ ] Prepare rollback plan
+   - [ ] Schedule maintenance window
+   - [ ] Notify stakeholders
+
+## Post-Launch
+1. 📊 **Monitoring**
+   - [ ] Monitor error rates
+   - [ ] Track API Gateway metrics
+   - [ ] Watch Redis performance
+   - [ ] Check Lambda execution metrics
+
+2. 🔄 **Optimization**
+   - [ ] Analyze performance metrics
+   - [ ] Identify optimization opportunities
+   - [ ] Plan scaling improvements
+   - [ ] Document lessons learned
+
 ## Document Purpose
 This checklist outlines the required changes to integrate the Merit client with the updated API Gateway and Redis caching system. Items are tagged as:
 - 🔧 **[BACKEND]** - Backend team implementation required
