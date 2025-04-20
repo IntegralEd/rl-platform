@@ -252,7 +252,7 @@ Resources:
     Properties:
       FunctionName: rl-restapi-lambda-RLRestApiFunction-9inZKf1bUN4O
       Code:
-        S3Bucket: !Ref S3Bucket
+        S3Bucket: cf-templates--17ity3wl4yuh-us-east-2
         S3Key: !Sub ${Environment}/lambda.zip
       Handler: lambda_handler_integration.handler
       Runtime: nodejs18.x
@@ -261,7 +261,7 @@ Resources:
       Environment:
         Variables:
           NODE_ENV: !Ref Environment
-      Role: !GetAtt LambdaExecutionRole.Arn
+      Role: arn:aws:iam::559050208320:role/rl-restapi-lambda-LambdaExecutionRole-cSTQGj0E6IQ4
       VpcConfig:
         SecurityGroupIds: 
           - !Ref RLApiGatewaySecurityGroup
@@ -269,40 +269,6 @@ Resources:
           - subnet-020aac4490f925b34  # us-east-2a
           - subnet-05d321f42e41149d3  # us-east-2b
           - subnet-0588b74fc8b1585f9  # us-east-2c
-
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: SSMParameterReadPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ssm:GetParameter
-                  - ssm:GetParameters
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/integraled/central/*
-        - PolicyName: CloudWatchLogsPolicy
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*:*
 
   ApiKey:
     Type: AWS::ApiGateway::ApiKey
