@@ -25,6 +25,16 @@ Parameters:
     Default: api.recursivelearning.app
     Description: Existing API Gateway domain name
 
+  S3Bucket:
+    Type: String
+    Description: S3 bucket containing Lambda deployment package
+    Default: rl-lambda-deployments
+
+  AlarmEmail:
+    Type: String
+    Description: Email address to notify when API Gateway alarms are triggered (optional)
+    Default: ''
+
 Resources:
   RLRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -61,33 +71,47 @@ Resources:
         - arn:aws:elasticloadbalancing:us-east-2:559050208320:loadbalancer/app/merit-api-lb/1120e7fa7fe27cd1
 
   # API Resources
-  ApiResourceV1:
+  ApiResourceContext:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref RLRestApi
       ParentId: !GetAtt RLRestApi.RootResourceId
       PathPart: api
 
-  ApiResourceVersion:
+  ApiResourceV1:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RLRestApi
+      ParentId: !Ref ApiResourceContext
+      PathPart: v1
+
+  ApiResourceContextEndpoint:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref RLRestApi
       ParentId: !Ref ApiResourceV1
-      PathPart: v1
-
-  ApiResourceContext:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref RLRestApi
-      ParentId: !Ref ApiResourceVersion
       PathPart: context
 
   ApiResourceMock:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref RLRestApi
-      ParentId: !Ref ApiResourceVersion
+      ParentId: !Ref ApiResourceV1
       PathPart: mock
+
+  ApiResourceAssistant:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RLRestApi
+      ParentId: !Ref ApiResourceV1
+      PathPart: assistant
+
+  ApiResourceThread:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RLRestApi
+      ParentId: !Ref ApiResourceV1
+      PathPart: thread
 
   # CORS Gateway Responses
   GatewayResponseDefault4XX:
@@ -97,7 +121,7 @@ Resources:
       ResponseType: DEFAULT_4XX
       ResponseParameters:
         gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Authorization'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
   GatewayResponseDefault5XX:
@@ -107,7 +131,7 @@ Resources:
       ResponseType: DEFAULT_5XX
       ResponseParameters:
         gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Authorization'"
         gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
 
   # API Methods
@@ -115,18 +139,20 @@ Resources:
     Type: AWS::ApiGateway::Method
     Properties:
       RestApiId: !Ref RLRestApi
-      ResourceId: !Ref ApiResourceContext
+      ResourceId: !Ref ApiResourceContextEndpoint
       HttpMethod: POST
       AuthorizationType: NONE
       ApiKeyRequired: true
       Integration:
-        Type: HTTP_PROXY
+        Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        ConnectionType: VPC_LINK
-        ConnectionId: !Ref VpcLink
-        Uri: !Sub https://api.recursivelearning.app/${Environment}/api/v1/context
-        RequestParameters:
-          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RLRestApiFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
 
   ApiMethodContextOptions:
     Type: AWS::ApiGateway::Method
@@ -263,8 +289,183 @@ Resources:
       KeyType: API_KEY
       UsagePlanId: !Ref UsagePlan
 
+  # Lambda Function and Role
+  RLRestApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: !Sub ${Environment}/lambda.zip
+      Handler: lambda_handler_integration.handler
+      Runtime: nodejs18.x
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          NODE_ENV: !Ref Environment
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SSMParameterReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/integraled/central/*
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*:*
+
+  # CloudWatch Alarms
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${AWS::StackName}-lambda-errors
+      AlarmDescription: Alarm if Lambda function has errors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref RLRestApiFunction
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: !If
+        - HasAlarmEmail
+        - - !Ref ErrorAlarmTopic
+        - !Ref AWS::NoValue
+
+  LambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${AWS::StackName}-lambda-duration
+      AlarmDescription: Alarm if Lambda function duration exceeds 90% of timeout
+      MetricName: Duration
+      Namespace: AWS/Lambda
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref RLRestApiFunction
+      Statistic: Maximum
+      Period: 60
+      EvaluationPeriods: 3
+      Threshold: 27000 # 90% of 30 seconds (in ms)
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: !If
+        - HasAlarmEmail
+        - - !Ref ErrorAlarmTopic
+        - !Ref AWS::NoValue
+
+  LambdaThrottleAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${AWS::StackName}-lambda-throttles
+      AlarmDescription: Alarm if Lambda function is being throttled
+      MetricName: Throttles
+      Namespace: AWS/Lambda
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref RLRestApiFunction
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: !If
+        - HasAlarmEmail
+        - - !Ref ErrorAlarmTopic
+        - !Ref AWS::NoValue
+
+  ApiGateway5xxAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: HasAlarmEmail
+    Properties:
+      AlarmDescription: Alert when API Gateway returns too many 5xx errors
+      Namespace: AWS/ApiGateway
+      MetricName: 5XXError
+      Dimensions:
+        - Name: ApiName
+          Value: !Ref RLRestApi
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref AlarmTopic
+      OKActions:
+        - !Ref AlarmTopic
+
+  LambdaErrorsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Condition: HasAlarmEmail
+    Properties:
+      AlarmDescription: Alert when Lambda function has too many errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref RLRestApiFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref AlarmTopic
+      OKActions:
+        - !Ref AlarmTopic
+
+  AlarmTopic:
+    Type: AWS::SNS::Topic
+    Condition: HasAlarmEmail
+    Properties:
+      DisplayName: RL API Gateway Alarms
+      TopicName: !Sub ${Environment}-api-gateway-alarms
+      Subscription:
+        - Protocol: email
+          Endpoint: !Ref AlarmEmail
+
+  # SNS Topic for Alarms
+  ErrorAlarmTopic:
+    Type: AWS::SNS::Topic
+    Condition: HasAlarmEmail
+    Properties:
+      DisplayName: !Sub ${AWS::StackName} Error Alarms
+      TopicName: !Sub ${AWS::StackName}-error-alarms
+      Subscription:
+        - Endpoint: !Ref AlarmEmail
+          Protocol: email
+
   # CloudWatch Dashboard
-  ApiGatewayDashboard:
+  RLDashboard:
     Type: AWS::CloudWatch::Dashboard
     Properties:
       DashboardName: !Sub ${AWS::StackName}-dashboard
@@ -273,15 +474,56 @@ Resources:
           "widgets": [
             {
               "type": "metric",
+              "x": 0,
+              "y": 0,
               "width": 12,
               "height": 6,
               "properties": {
                 "metrics": [
-                  [ "AWS/ApiGateway", "Count", "ApiName", "${RLRestApi}", "Stage", "${Environment}" ],
-                  [ ".", "4XXError", ".", ".", ".", "." ],
-                  [ ".", "5XXError", ".", ".", ".", "." ]
+                  [ "AWS/Lambda", "Invocations", "FunctionName", "${RLRestApiFunction}" ],
+                  [ ".", "Errors", ".", "." ],
+                  [ ".", "Throttles", ".", "." ]
                 ],
                 "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "Lambda Invocations, Errors, and Throttles",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/Lambda", "Duration", "FunctionName", "${RLRestApiFunction}", { "stat": "Average" } ],
+                  [ "...", { "stat": "Maximum" } ],
+                  [ "...", { "stat": "Minimum" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "Lambda Duration",
+                "period": 300
+              }
+            },
+            {
+              "type": "metric",
+              "x": 0,
+              "y": 6,
+              "width": 12,
+              "height": 6,
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "Count", "ApiName", "${RLRestApi}", "Stage", "${Environment}", "Resource", "/api/v1/context", "Method", "POST" ],
+                  [ ".", "4XXError", ".", ".", ".", ".", ".", ".", ".", "." ],
+                  [ ".", "5XXError", ".", ".", ".", ".", ".", ".", ".", "." ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "API Gateway Requests and Errors",
                 "period": 300
@@ -289,15 +531,18 @@ Resources:
             },
             {
               "type": "metric",
+              "x": 12,
+              "y": 6,
               "width": 12,
               "height": 6,
               "properties": {
                 "metrics": [
-                  [ "AWS/ApiGateway", "Latency", "ApiName", "${RLRestApi}", "Stage", "${Environment}", { "stat": "Average" } ],
+                  [ "AWS/ApiGateway", "Latency", "ApiName", "${RLRestApi}", "Stage", "${Environment}", "Resource", "/api/v1/context", "Method", "POST", { "stat": "Average" } ],
                   [ "...", { "stat": "p90" } ],
                   [ "...", { "stat": "Maximum" } ]
                 ],
                 "view": "timeSeries",
+                "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "API Gateway Latency",
                 "period": 300
@@ -306,21 +551,16 @@ Resources:
           ]
         }
 
-  RLApiGatewaySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
     Properties:
-      GroupDescription: Security group for API Gateway VPC Link
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-      Tags:
-        - Key: Name
-          Value: !Sub rl-api-gateway-sg-${Environment}
-        - Key: Environment
-          Value: !Ref Environment
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref RLRestApiFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RLRestApi}/*
+
+Conditions:
+  HasAlarmEmail: !Not [!Equals [!Ref AlarmEmail, '']]
 
 Outputs:
   ApiEndpoint:
@@ -345,7 +585,7 @@ Outputs:
 
   DashboardUrl:
     Description: CloudWatch Dashboard URL
-    Value: !Sub https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${ApiGatewayDashboard}
+    Value: !Sub https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${RLDashboard}
 
   UsagePlanId:
     Description: Usage Plan ID for API access
