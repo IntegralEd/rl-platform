@@ -504,10 +504,9 @@ Resources:
     Type: AWS::ApiGateway::VpcLink
     Properties:
       Name: !Sub ${AWS::StackName}-vpclink
+      Description: Merit API Gateway VPC Link for Production
       TargetArns:
-        - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-100/1120e7fa7fe27cd1
-        - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-133/bcb4d9ef523a5fed
-        - arn:aws:elasticloadbalancing:us-east-2:718770453195:loadbalancer/app/prod-cmh-1-cdtls-1-2-252/cdaafda30bb06c0f
+        - arn:aws:elasticloadbalancing:us-east-2:559050208320:loadbalancer/app/merit-api-lb/1120e7fa7fe27cd1
 
 Conditions:
   HasAlarmEmail: !Not
