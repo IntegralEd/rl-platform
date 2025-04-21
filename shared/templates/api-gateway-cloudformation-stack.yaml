@@ -20,6 +20,11 @@ Parameters:
     Default: arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c
     Description: ARN of the SSL certificate for the custom domain
 
+  DomainName:
+    Type: String
+    Default: api.recursivelearning.app
+    Description: Existing API Gateway domain name
+
 Resources:
   RLRestApi:
     Type: AWS::ApiGateway::RestApi
@@ -37,23 +42,12 @@ Resources:
             Action: execute-api:Invoke
             Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*
 
-  ApiDomainName:
-    Type: AWS::ApiGateway::DomainName
-    Properties:
-      DomainName: api.recursivelearning.app
-      RegionalCertificateArn: !Ref CertificateArn
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
-      SecurityPolicy: TLS_1_2
-
   ApiBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     DependsOn:
       - ApiStage
-      - ApiDomainName
     Properties:
-      DomainName: !Ref ApiDomainName
+      DomainName: !Ref DomainName
       RestApiId: !Ref RLRestApi
       Stage: !Ref Environment
 
@@ -335,7 +329,7 @@ Outputs:
 
   CustomDomainEndpoint:
     Description: Custom domain endpoint URL
-    Value: !Sub https://${ApiDomainName}
+    Value: !Sub https://${DomainName}
 
   VpcLinkId:
     Description: VPC Link ID
