@@ -1,0 +1,139 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# API Gateway Standards
+
+## Overview
+These rules define the standards for API Gateway configuration and integration in the Recursive Learning platform.
+
+## Endpoint Structure
+- [ ] Base URL pattern:
+  ```
+  https://{api-id}.execute-api.{region}.amazonaws.com/{stage}/api/v1/{resource}
+  ```
+- [ ] Custom domain mapping:
+  ```
+  https://api.recursivelearning.app/{stage}/api/v1/{resource}
+  ```
+- [ ] Resource naming convention:
+  - Use plural nouns for collections
+  - Use kebab-case for multi-word resources
+  - Include version in path
+
+## CORS Configuration
+- [ ] Required headers:
+  ```yaml
+  Access-Control-Allow-Origin: https://recursivelearning.app
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type,X-API-Key,Authorization
+  ```
+- [ ] Configure for all response types:
+  - DEFAULT_4XX
+  - DEFAULT_5XX
+  - Integration responses
+  - OPTIONS preflight
+
+## VPC Link Management
+- [ ] Configuration requirements:
+  ```yaml
+  Type: AWS::ApiGateway::VpcLink
+  Properties:
+    Name: {stack-name}-vpclink
+    Description: VPC Link for API Gateway Integration
+    TargetArns:
+      - !Ref LoadBalancerArn
+  ```
+- [ ] Security group rules:
+  - Allow HTTPS (443) inbound
+  - Restrict to API Gateway IPs
+  - Enable logging
+
+## CloudFormation Standards
+- [ ] Required stack parameters:
+  ```yaml
+  Parameters:
+    Environment:
+      Type: String
+      AllowedValues: [dev, prod]
+    CertificateArn:
+      Type: String
+    VpcId:
+      Type: AWS::EC2::VPC::Id
+  ```
+- [ ] Resource naming:
+  ```yaml
+  Resources:
+    ApiGateway:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: !Sub ${AWS::StackName}-api
+  ```
+- [ ] Required tags on all resources
+
+## Integration Patterns
+- [ ] Lambda integration:
+  ```yaml
+  Type: AWS::ApiGateway::Method
+  Properties:
+    Integration:
+      Type: AWS_PROXY
+      IntegrationHttpMethod: POST
+      Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+  ```
+- [ ] VPC Link integration:
+  ```yaml
+  Type: AWS::ApiGateway::Method
+  Properties:
+    Integration:
+      Type: HTTP_PROXY
+      IntegrationHttpMethod: POST
+      ConnectionType: VPC_LINK
+      ConnectionId: !Ref VpcLink
+  ```
+
+## Error Response Format
+- [ ] Gateway responses:
+  ```yaml
+  GatewayResponseDefault4XX:
+    Type: AWS::ApiGateway::GatewayResponse
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+      ResponseTemplates:
+        application/json: |
+          {
+            "error": {
+              "code": "$context.error.responseType",
+              "message": "$context.error.message"
+            }
+          }
+  ```
+- [ ] Integration responses must include CORS headers
+- [ ] Use consistent error codes
+- [ ] Include detailed error messages
+
+## Implementation Checklist
+- [ ] Configure CORS properly
+- [ ] Set up VPC Link
+- [ ] Deploy CloudFormation stack
+- [ ] Verify integrations
+- [ ] Test error responses
+- [ ] Monitor metrics
+
+## Monitoring Setup
+- [ ] CloudWatch metrics:
+  - 4XX/5XX error rates
+  - Latency (p50, p90, p99)
+  - Integration timeouts
+  - Cache hit ratio
+- [ ] Alarms:
+  - Error rate > 1%
+  - p99 latency > 1000ms
+  - Integration failures
+- [ ] Dashboard:
+  - Error rates by endpoint
+  - Latency by integration type
+  - Cache performance
+  - VPC Link status

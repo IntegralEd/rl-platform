@@ -3,7 +3,6 @@ description: Master index of all platform rulesets
 globs: ["**/*"]
 alwaysApply: true
 ---
-
 # Recursive Learning Platform Rulesets
 
 ## Overview
@@ -24,18 +23,34 @@ This document serves as the master index for all rulesets in the Recursive Learn
   - Navigation flow
   - User experience
 
-### Data & API
-- [Redis Access](mdc:redis-api-access-patterns.mdc)
-  - Key naming conventions
-  - Data structures
-  - Caching strategies
-  - Performance optimization
+### Core Platform Rules
+- [Platform Standards](mdc:platform-standards.mdc)
+  - Header standardization
+  - Authentication flow
+  - Error handling patterns
+  - Resource naming conventions
+  - Monitoring requirements
+  - Security protocols
+
+### API Standards
+- [API Gateway Rules](mdc:api-gateway-standards.mdc)
+  - Endpoint structure
+  - CORS configuration
+  - VPC Link management
+  - CloudFormation standards
+  - Integration patterns
+  - Error response format
+
+### Deprecated Rules
+- ~~[Redis Access](mdc:redis-api-access-patterns.mdc)~~ (Deprecated as of April 21, 2024)
+  - Replaced by Platform Standards and API Gateway Rules
+  - Migration guide available in Platform Standards
 
 ## Application Context
 
 ### Admin Interface
 - Primary: Admin Layout Rules
-- Secondary: Redis Access Rules
+- Secondary: Platform Standards
 - Use Cases:
   - Admin dashboard construction
   - Content management interfaces
@@ -44,7 +59,7 @@ This document serves as the master index for all rulesets in the Recursive Learn
 
 ### Client Interface
 - Primary: Client Layout Rules
-- Secondary: Redis Access Rules
+- Secondary: Platform Standards
 - Use Cases:
   - Learning content display
   - Interactive exercises
@@ -52,20 +67,20 @@ This document serves as the master index for all rulesets in the Recursive Learn
   - User settings
 
 ### API Layer
-- Primary: Redis Access Rules
-- Secondary: Both Layout Rules
+- Primary: API Gateway Rules
+- Secondary: Platform Standards
 - Use Cases:
-  - Data caching
-  - Session management
-  - Real-time updates
+  - Gateway configuration
+  - VPC Link management
+  - Integration patterns
   - Performance optimization
 
 ## Rule Precedence
 
 1. Security Rules (Always highest priority)
-2. Data Access Rules
-3. Layout Rules
-4. Performance Rules
+2. Platform Standards
+3. API Gateway Rules
+4. Layout Rules
 5. Documentation Rules
 
 ## Validation Methods

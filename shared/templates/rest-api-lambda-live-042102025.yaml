@@ -4,7 +4,7 @@ Description: Recursive Learning REST API Lambda with API Gateway
 Parameters:
   Environment:
     Type: String
-    Default: prod
+    Default: dev
     AllowedValues:
       - dev
       - prod
@@ -16,67 +16,14 @@ Parameters:
     Type: String
     Default: ''
     Description: Email address to notify when alarms are triggered (optional)
-  CertificateArn:
-    Type: String
-    Default: 'arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c'
-    Description: ACM certificate ARN for custom domain
 
 Resources:
-  GatewayResponseDefault4XX:
-    Type: AWS::ApiGateway::GatewayResponse
-    Properties:
-      RestApiId: !Ref RLRestApi
-      ResponseType: DEFAULT_4XX
-      ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
-        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-
-  GatewayResponseDefault5XX:
-    Type: AWS::ApiGateway::GatewayResponse
-    Properties:
-      RestApiId: !Ref RLRestApi
-      ResponseType: DEFAULT_5XX
-      ResponseParameters:
-        gatewayresponse.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-        gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,Authorization'"
-        gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
-         
   RLRestApi:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: Recursive Mock Gateway
-      Description: Recursive Learning REST API with Mock Gateway
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
-      Policy:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal: '*'
-            Action: execute-api:Invoke
-            Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:l6lzwy3eie/*/*/*
-
-  ApiDomainName:
-    Type: AWS::ApiGateway::DomainName
-    Properties:
-      DomainName: api.recursivelearning.app
-      RegionalCertificateArn: !Ref CertificateArn
-      EndpointConfiguration:
-        Types:
-          - REGIONAL
-      SecurityPolicy: TLS_1_2
-
-  ApiBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    DependsOn:
-      - ApiStage
-      - ApiDomainName
-    Properties:
-      DomainName: !Ref ApiDomainName
-      RestApiId: !Ref RLRestApi
-      Stage: !Ref Environment
+      Name: !Sub ${AWS::StackName}-api
+      Description: Recursive Learning REST API
+      FailOnWarnings: true
 
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -98,8 +45,6 @@ Resources:
       DeploymentId: !Ref ApiDeployment
       RestApiId: !Ref RLRestApi
       StageName: !Ref Environment
-      Variables:
-        lambdaAlias: !Ref Environment
       MethodSettings:
         - ResourcePath: /*
           HttpMethod: '*'
@@ -136,22 +81,38 @@ Resources:
       ParentId: !Ref ApiResourceV1
       PathPart: mock
 
+  ApiResourceAssistant:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RLRestApi
+      ParentId: !Ref ApiResourceV1
+      PathPart: assistant
+
+  ApiResourceThread:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RLRestApi
+      ParentId: !Ref ApiResourceV1
+      PathPart: thread
+
   ApiMethodContextPost:
     Type: AWS::ApiGateway::Method
     Properties:
-      RestApiId: l6lzwy3eie
+      RestApiId: !Ref RLRestApi
       ResourceId: !Ref ApiResourceContextEndpoint
       HttpMethod: POST
       AuthorizationType: NONE
       ApiKeyRequired: true
       Integration:
-        Type: HTTP_PROXY
+        Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        ConnectionType: VPC_LINK
-        ConnectionId: !Ref VpcLink
-        Uri: !Sub https://api.recursivelearning.app/${Environment}/api/v1/context
-        RequestParameters:
-          integration.request.header.X-Forwarded-For: context.identity.sourceIp
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RLRestApiFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
 
   ApiMethodContextOptions:
     Type: AWS::ApiGateway::Method
@@ -165,9 +126,10 @@ Resources:
         IntegrationResponses:
           - StatusCode: 200
             ResponseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS,HEAD'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,x-api-key,X-Project-ID,Origin,Authorization'"
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Max-Age: "'7200'"
         RequestTemplates:
           application/json: '{"statusCode": 200}'
       MethodResponses:
@@ -189,9 +151,10 @@ Resources:
         IntegrationResponses:
           - StatusCode: 200
             ResponseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
+              method.response.header.Access-Control-Allow-Origin: '''https://recursivelearning.app'''
             ResponseTemplates:
-              application/json: '{"message": "Mock response successful", "timestamp": "$context.requestTimeEpoch"}'
+              application/json: '{"message": "Mock response successful", "timestamp":
+                "$context.requestTimeEpoch"}'
         RequestTemplates:
           application/json: '{"statusCode": 200}'
       MethodResponses:
@@ -211,9 +174,9 @@ Resources:
         IntegrationResponses:
           - StatusCode: 200
             ResponseParameters:
-              method.response.header.Access-Control-Allow-Origin: "'https://recursivelearning.app'"
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,x-api-key'"
-              method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: '''https://recursivelearning.app'''
+              method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+              method.response.header.Access-Control-Allow-Methods: '''GET,POST,OPTIONS'''
         RequestTemplates:
           application/json: '{"statusCode": 200}'
       MethodResponses:
@@ -223,36 +186,29 @@ Resources:
             method.response.header.Access-Control-Allow-Headers: true
             method.response.header.Access-Control-Allow-Methods: true
 
-  RLApiGatewaySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+  ApiMethodContextAll:
+    Type: AWS::ApiGateway::Method
     Properties:
-      GroupDescription: Security group for Recursive Learning API Gateway and Lambda integration
-      VpcId: vpc-07e76ce384fa696e0
-      GroupName: !Sub ${AWS::StackName}-api-gateway-sg
-      Tags:
-        - Key: Name
-          Value: !Sub ${AWS::StackName}-api-gateway-sg
-        - Key: Environment
-          Value: !Ref Environment
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-          Description: HTTPS from API Gateway
-      SecurityGroupEgress:
-        - IpProtocol: -1
-          FromPort: -1
-          ToPort: -1
-          CidrIp: 0.0.0.0/0
-          Description: Allow all outbound traffic
+      HttpMethod: ANY  # Support all methods
+      AuthorizationType: NONE
+      ApiKeyRequired: true
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RLRestApiFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Credentials: true
 
   RLRestApiFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: rl-restapi-lambda-RLRestApiFunction-9inZKf1bUN4O
       Code:
-        S3Bucket: cf-templates--17ity3wl4yuh-us-east-2
+        S3Bucket: !Ref S3Bucket
         S3Key: !Sub ${Environment}/lambda.zip
       Handler: lambda_handler_integration.handler
       Runtime: nodejs18.x
@@ -261,14 +217,41 @@ Resources:
       Environment:
         Variables:
           NODE_ENV: !Ref Environment
-      Role: arn:aws:iam::559050208320:role/rl-restapi-lambda-LambdaExecutionRole-cSTQGj0E6IQ4
-      VpcConfig:
-        SecurityGroupIds: 
-          - !Ref RLApiGatewaySecurityGroup
-        SubnetIds: 
-          - subnet-020aac4490f925b34  # us-east-2a
-          - subnet-05d321f42e41149d3  # us-east-2b
-          - subnet-0588b74fc8b1585f9  # us-east-2c
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SSMParameterReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/integraled/central/*
+        - PolicyName: CloudWatchLogsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*:*
 
   ApiKey:
     Type: AWS::ApiGateway::ApiKey
@@ -499,43 +482,6 @@ Resources:
           ]
         }
 
-  # Add VPC Link for ALB integration
-  VpcLink:
-    Type: AWS::ApiGateway::VpcLink
-    Properties:
-      Name: !Sub ${AWS::StackName}-vpclink
-      Description: Merit API Gateway VPC Link for Production
-      TargetArns:
-        - arn:aws:elasticloadbalancing:us-east-2:559050208320:loadbalancer/app/merit-api-lb/1120e7fa7fe27cd1
-
-  AssistantErrorAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: !Sub ${AWS::StackName}-assistant-errors
-      MetricName: AssistantErrors
-      Namespace: Merit/Assistant
-      Statistic: Sum
-      Period: 300
-      EvaluationPeriods: 2
-      Threshold: 5
-      ComparisonOperator: GreaterThanThreshold
-      AlarmActions: 
-        - !Ref AlertsTopic
-
-  AssistantLatencyAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmName: !Sub ${AWS::StackName}-assistant-latency
-      MetricName: AssistantLatency
-      Namespace: Merit/Assistant
-      Statistic: Average
-      Period: 300
-      EvaluationPeriods: 2
-      Threshold: 10000  # 10 seconds
-      ComparisonOperator: GreaterThanThreshold
-      AlarmActions: 
-        - !Ref AlertsTopic
-
 Conditions:
   HasAlarmEmail: !Not
     - !Equals
@@ -546,14 +492,6 @@ Outputs:
   ApiEndpoint:
     Description: API Gateway endpoint URL
     Value: !Sub https://${RLRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/api/v1/context
-
-  CustomDomainEndpoint:
-    Description: Custom domain endpoint URL
-    Value: !Sub https://${ApiDomainName}/api/v1/context
-
-  VpcLinkId:
-    Description: VPC Link ID
-    Value: !Ref VpcLink
 
   ApiId:
     Description: API Gateway ID

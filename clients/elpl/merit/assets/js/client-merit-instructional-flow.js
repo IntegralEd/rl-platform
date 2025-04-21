@@ -8,6 +8,7 @@
  */
 
 import MeritOpenAIClient from './client-merit-openai.js';
+import { AssistantManager, ASSISTANT_CONFIGS, ENV } from './assistant-config.js';
 
 export class MeritInstructionalFlow {
     #config = {
@@ -30,7 +31,9 @@ export class MeritInstructionalFlow {
         redisConnected: false,
         hasError: false,
         errorMessage: null,
-        openAIConfigured: false
+        openAIConfigured: false,
+        threadId: null,
+        context: {}
     };
 
     #elements = {
@@ -48,6 +51,7 @@ export class MeritInstructionalFlow {
     };
 
     #openAIClient = null;
+    assistant = null;
 
     constructor(isAdmin = false) {
         console.log('[Merit Flow] Initializing flow controller:', {
@@ -506,7 +510,9 @@ export class MeritInstructionalFlow {
             redisConnected: false,
             hasError: false,
             errorMessage: null,
-            openAIConfigured: false
+            openAIConfigured: false,
+            threadId: null,
+            context: {}
         };
         
         this.#openAIClient?.destroy();
@@ -544,6 +550,76 @@ export class MeritInstructionalFlow {
             return this.#handleNavigation(section);
         }
     };
+
+    async initializeAssistant() {
+        try {
+            const context = {
+                grade_level: this.#state.gradeLevel,
+                curriculum: this.#state.curriculum,
+                schema_version: ASSISTANT_CONFIGS.merit[ENV].schema_version
+            };
+            
+            const { threadId } = await this.assistant.createThread(context);
+            this.#state.threadId = threadId;
+            
+            console.log('[Merit Flow] Assistant initialized:', {
+                threadId,
+                context
+            });
+            
+            return true;
+        } catch (error) {
+            console.error('[Merit Flow] Assistant initialization failed:', error);
+            this.#showError('Failed to initialize assistant. Please refresh and try again.');
+            return false;
+        }
+    }
+
+    async sendMessage(content) {
+        if (!content?.trim()) return;
+        
+        try {
+            this.#showLoading();
+            
+            // Ensure thread exists
+            if (!this.#state.threadId) {
+                const initialized = await this.initializeAssistant();
+                if (!initialized) return;
+            }
+            
+            // Send message with current context
+            const response = await this.assistant.sendMessage(
+                this.#state.threadId,
+                content,
+                {
+                    grade_level: this.#state.gradeLevel,
+                    curriculum: this.#state.curriculum
+                }
+            );
+            
+            this.#hideLoading();
+            this.displayMessage(response);
+            
+        } catch (error) {
+            console.error('[Merit Flow] Message error:', error);
+            this.#hideLoading();
+            this.#showError('Failed to send message. Please try again.');
+        }
+    }
+
+    displayMessage(response) {
+        const { role, content } = response;
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${role}`;
+        messageElement.innerHTML = this.formatMessage(content);
+        this.#elements.chatWindow.appendChild(messageElement);
+        messageElement.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    formatMessage(content) {
+        // Implement message formatting (markdown, etc.)
+        return content;
+    }
 }
 
 // Initialize when DOM is ready

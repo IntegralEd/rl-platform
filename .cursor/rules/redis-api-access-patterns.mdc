@@ -3,8 +3,17 @@ description: Rules for Redis API access patterns
 globs: ["**/*.js", "**/*.ts"]
 alwaysApply: true
 ---
+# Redis API Access Patterns (DEPRECATED)
 
-# Redis API Access Patterns
+⚠️ **DEPRECATED as of April 21, 2024**
+This ruleset has been replaced by:
+1. [Platform Standards](mdc:platform-standards.mdc)
+2. [API Gateway Standards](mdc:api-gateway-standards.mdc)
+
+Please refer to the Platform Standards migration guide for transitioning from Redis to API Gateway patterns.
+
+## Historical Reference Only
+The content below is maintained for historical reference only. Do not use for new development.
 
 ## Overview
 These rules define the standard patterns for accessing Redis in the Recursive Learning platform. They ensure consistent, performant, and secure data access across all components.

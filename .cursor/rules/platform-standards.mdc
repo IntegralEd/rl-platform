@@ -1,0 +1,108 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Platform Standards
+
+## Overview
+These rules define core platform standards for the Recursive Learning platform, ensuring consistency and maintainability across all components.
+
+## Header Standards
+- [ ] All HTML files must include:
+  ```html
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  ```
+- [ ] Required CSS variables:
+  ```css
+  :root {
+    --header-height: 60px;
+    --nav-width: 260px;
+    --admin-bg: #f4f5f7;
+    --admin-text: #2c3e50;
+    --admin-border: #e1e4e8;
+    --content-width: 1200px;
+  }
+  ```
+
+## Authentication Flow
+- [ ] Use standard header span pattern for auth:
+  ```html
+  <span id="auth-data" 
+        data-user-id="${userId}"
+        data-org-id="${orgId}"
+        data-role="${userRole}"
+        style="display:none;">
+  </span>
+  ```
+- [ ] Validate auth on page load
+- [ ] Implement role-based access control
+- [ ] Handle session expiration gracefully
+
+## Error Handling
+- [ ] Standardized error response format:
+  ```javascript
+  {
+    error: {
+      code: string,
+      message: string,
+      details?: object
+    }
+  }
+  ```
+- [ ] Implement retry logic for API calls
+- [ ] Show user-friendly error messages
+- [ ] Log errors to CloudWatch
+
+## Resource Naming
+- [ ] File naming convention:
+  - HTML: `{project}_{type}.html`
+  - JS: `client-{project}-{purpose}.js`
+  - YAML: `client-{project}-{purpose}.yaml`
+- [ ] Resource tagging:
+  ```yaml
+  Tags:
+    Project: RecursiveLearning
+    Component: {component-name}
+    Environment: {env}
+  ```
+
+## Monitoring Requirements
+- [ ] Required CloudWatch metrics:
+  - API latency
+  - Error rates
+  - Cache hit/miss ratio
+  - User session duration
+- [ ] Implement health checks
+- [ ] Set up alerting thresholds
+- [ ] Create operational dashboards
+
+## Security Protocols
+- [ ] API key management:
+  - Store in AWS SSM Parameter Store
+  - Rotate every 90 days
+  - Use separate keys per environment
+- [ ] Input validation:
+  - Sanitize all user inputs
+  - Validate request parameters
+  - Check content types
+- [ ] Access control:
+  - Implement least privilege
+  - Use role-based access
+  - Audit access logs
+
+## Migration Guide (From Redis Rules)
+1. Replace direct Redis calls with API Gateway endpoints
+2. Update caching strategy to use API Gateway caching
+3. Migrate session management to cookie-based auth
+4. Update monitoring to focus on API metrics
+
+## Implementation Checklist
+- [ ] Verify header standards
+- [ ] Test authentication flow
+- [ ] Implement error handling
+- [ ] Set up monitoring
+- [ ] Configure security protocols
+- [ ] Complete migration steps
