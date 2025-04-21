@@ -1,16 +1,16 @@
 # Merit End-to-End Integration Checklist
-**Version:** 1.1.8
+**Version:** 1.2.3
 **Last Updated:** May 19, 2025, 23:45 UTC
-**Status:** Navigation Issues Identified, TTL Standardized, API Gateway CORS Successfully Verified in Production, Monitoring Dashboards Deployed, Client-Side Implementation Complete
+**Status:** Resource Ownership Verification Required, Stack Cleanup Needed
 
 # 4/20/25 Punch List - Merit Production Launch
 
 ## Critical Path Items (Must Fix)
-1. 🚨 **API Gateway CORS Configuration**
-   - [ ] Rebuild API Gateway with corrected CORS headers
-   - [ ] Verify OPTIONS preflight handling for root endpoint
-   - [ ] Test all error responses include CORS headers
-   - [ ] Confirm VPC Link and endpoint configurations
+1. 🚨 **Stack Rebuild Required**
+   - [ ] Delete existing stack in ROLLBACK_COMPLETE state
+   - [ ] Deploy new stack with corrected VPC Link configuration
+   - [ ] Verify VPC Link connectivity
+   - [ ] Update API Gateway endpoints
 
 2. 🔒 **Security & Authentication**
    - [ ] Verify API key validation on all endpoints
@@ -571,4 +571,120 @@ async #handleNavigation(sectionOrEvent) {
 // 2. Remove Node.js dependencies
 // Replace 'net' module usage with browser-compatible alternative
 // or move server-side functionality to API
+```
+
+## Deployment Steps (Updated May 19, 2025)
+
+1. **Delete Existing Stack**
+   ```bash
+   # Delete stack in ROLLBACK_COMPLETE state
+   aws cloudformation delete-stack --stack-name merit-api-vpc-link
+   
+   # Wait for deletion to complete
+   aws cloudformation wait stack-delete-complete --stack-name merit-api-vpc-link
+   ```
+
+2. **Deploy New Stack**
+   ```bash
+   # Deploy new stack using canonical template
+   aws cloudformation create-stack \
+     --stack-name merit-api-gateway \
+     --template-body file://shared/templates/api-gateway-cloudformation-stack.yaml \
+     --parameters \
+       ParameterKey=Environment,ParameterValue=prod \
+       ParameterKey=CertificateArn,ParameterValue=arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c \
+     --capabilities CAPABILITY_IAM
+   ```
+
+3. **Verify Deployment**
+   ```bash
+   # Test CORS preflight
+   curl -v -X OPTIONS \
+     -H "Origin: https://recursivelearning.app" \
+     -H "Access-Control-Request-Method: POST" \
+     https://api.recursivelearning.app/prod/api/v1/context
+   ```
+
+## Verification Checklist
+
+### Stack Deployment
+- [ ] Stack deletion completed successfully
+- [ ] New stack created without rollback
+- [ ] VPC Link created and active
+- [ ] API Gateway endpoints accessible
+
+## Resource Ownership Verification
+🔐 **Active Owned Resources** (Account: 559050208320)
+- Certificate: `arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c`
+- API Gateway: `l6lzwy3eie`
+- VPC: `vpc-07e76ce384fa696e0`
+
+⛔ **Deprecated/Different Owner Resources - DO NOT USE**
+- S3 Bucket: `bemorelikebmore`
+- Legacy access points from OLAP configuration
+- Old `cf-templates--*` buckets
+
+## Deployment Strategy (Updated)
+1. **Resource Validation**
+   ```bash
+   # Verify ownership of resources
+   aws sts get-caller-identity
+   
+   # List owned buckets only
+   aws s3 ls --query 'Buckets[?contains(Name, `rl-restapi`)]'
+   
+   # Verify API Gateway ownership
+   aws apigateway get-rest-api --rest-api-id l6lzwy3eie
+   ```
+
+2. **Stack Deployment**
+   ```bash
+   # Create new deployment bucket if needed
+   aws s3 mb s3://rl-restapi-merit-$(date +%Y%m%d) --region us-east-2
+   
+   # Upload template
+   aws s3 cp shared/templates/api-gateway-cloudformation-stack.yaml \
+     s3://rl-restapi-merit-$(date +%Y%m%d)/template.yaml
+   
+   # Deploy stack
+   aws cloudformation create-stack \
+     --stack-name merit-api-gateway \
+     --template-url https://rl-restapi-merit-$(date +%Y%m%d).s3.us-east-2.amazonaws.com/template.yaml \
+     --parameters \
+       ParameterKey=Environment,ParameterValue=prod \
+       ParameterKey=CertificateArn,ParameterValue=arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c \
+       ParameterKey=S3Bucket,ParameterValue=rl-restapi-merit-$(date +%Y%m%d) \
+     --capabilities CAPABILITY_IAM
+   ```
+
+3. **Access Verification**
+   ```bash
+   # Test API Gateway access
+   curl -v -X OPTIONS \
+     -H "Origin: https://recursivelearning.app" \
+     -H "Access-Control-Request-Method: POST" \
+     https://api.recursivelearning.app/prod/api/v1/context
+   ```
+
+## Testing Strategy
+Use owned test scripts from `/clients/elpl/merit/`:
+```bash
+# Set correct ownership context
+export AWS_ACCOUNT_ID=559050208320
+export AWS_REGION=us-east-2
+
+# Run tests
+./test-context-endpoint.sh
+./test-assistant-health.js
+./test-redis-connection.sh
+```
+
+## Resource Cleanup (Post-Verification)
+```bash
+# List resources for cleanup (DO NOT DELETE UNTIL VERIFIED)
+aws cloudformation list-stacks \
+  --stack-status-filter ROLLBACK_COMPLETE \
+  --query 'StackSummaries[?contains(StackName, `merit`)]'
+
+aws s3 ls --query 'Buckets[?contains(Name, `cf-templates`)]'
 ```
