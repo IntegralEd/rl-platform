@@ -15,7 +15,7 @@ class MeritOpenAIClient {
 
     // API Configuration with platform-wide endpoints
     const ENDPOINTS = {
-      apiGateway: window.env.RL_API_GATEWAY_ENDPOINT || 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+      apiGateway: window.env.RL_API_GATEWAY_ENDPOINT || 'https://api.recursivelearning.app/prod',
       REDIS: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       contextPrefix: 'merit:ela:context',
       threadPrefix: 'merit:ela:thread',

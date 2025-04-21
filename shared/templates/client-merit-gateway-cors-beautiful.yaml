@@ -4,17 +4,18 @@
 # Environment: Production
 # Description: OpenAPI 3.0 specification for Merit API Gateway with CORS and VPC Link Support
 
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: Merit API Gateway
-  description: Merit Learning REST API with CORS and VPC Link Support
-  version: 1.1.0
+  description: API Gateway configuration with CORS support for Merit integration
+  version: 1.0.0
+  contact:
+    name: Recursive Learning Platform Team
+    url: https://recursivelearning.app
 
 servers:
   - url: https://api.recursivelearning.app/prod
-    description: Production server
-  - url: https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod
-    description: API Gateway endpoint
+    description: Merit Production API Gateway endpoint
 
 x-amazon-apigateway-domain-name:
   domainName: api.recursivelearning.app
