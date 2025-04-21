@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Client Layout Structure & Behavior Rules
+
+## Overview
+These rules define the standard structure and behavior for client pages across the Recursive Learning platform. They ensure consistency, maintainability, and proper functionality of client interfaces.
+
+## Always Apply
+- [ ] All client pages must follow these structural and behavioral patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled
+
+## Directory Structure
+- [ ] Page-specific files must stay with their HTML page:
+  ```
+  /clients/{client}/{project}/
+    ├── project.html
+    ├── .env            # Client-specific environment variables
+    └── assets/
+        └── js/
+            └── client-project-logic.js  # Controls this specific page
+  ```
+- [ ] Shared client assets must be in `/clients/{client}/assets/` for reuse:
+  - JS files in `/assets/js/` (auth, routing, shared utilities)
+  - CSS files in `/assets/css/` (shared styles)
+  - Images in `/assets/images/` (shared icons, logos, SVGs)
+  - Variables in `/assets/variables.css` (client-wide variables)
+- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
+
+## Environment Variables
+- [ ] Platform-level variables in `/shared/platform/env.config`:
+  - OpenAI API key and project ID
+  - Infrastructure configurations (VPC, subnets, etc.)
+  - API Gateway settings
+- [ ] Client-level variables in `/clients/{client}/{project}/.env`:
+  - Client-specific assistant IDs
+  - Client-specific organization IDs (e.g., Airtable)
+  - Project-specific configurations
+
+## File Naming
+// ... existing code ...

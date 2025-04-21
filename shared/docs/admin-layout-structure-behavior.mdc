@@ -1,0 +1,38 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Admin Layout Structure & Behavior Rules
+
+## Overview
+These rules define the standard structure and behavior for admin pages across the Recursive Learning platform. They ensure consistency, maintainability, and proper functionality of admin interfaces.
+
+## Always Apply
+- [ ] All admin pages must follow these structural and behavioral patterns
+- [ ] Deviations require explicit documentation and approval
+- [ ] Changes to these rules must be version controlled
+
+## Directory Structure
+- [ ] Admin-specific assets must be in `/admin/assets/`
+  - JS files in `/admin/assets/js/`
+  - CSS files in `/admin/assets/css/`
+  - Images in `/admin/assets/images/`
+- [ ] Admin components must be in `/admin/components/`
+- [ ] Admin pages must be in `/admin/pages/{client}/{project}/`
+  - Must include `.env` for project-specific variables
+  - Must follow client variable structure for consistency
+- [ ] Page ingredients must be in `/shared/page_ingredients/{ingredient}/`
+
+## Environment Variables
+- [ ] Platform-level variables in `/shared/platform/env.config`:
+  - OpenAI API key and project ID (shared across platform)
+  - Infrastructure configurations
+  - API Gateway settings
+- [ ] Admin-level variables in `/admin/pages/{client}/{project}/.env`:
+  - Project-specific assistant IDs
+  - Project-specific organization IDs
+  - Admin-specific configurations
+
+## File Naming
+// ... existing code ...
