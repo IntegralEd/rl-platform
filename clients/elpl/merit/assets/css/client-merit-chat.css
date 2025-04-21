@@ -124,4 +124,250 @@
     height: 18px;
     border: 2px solid var(--primary-color);
     border-radius: 4px;
+}
+
+/* Loading States */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--client-border);
+    border-top: 4px solid var(--client-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-message {
+    margin-top: 20px;
+    color: var(--client-text);
+    font-size: 1.1em;
+    text-align: center;
+    animation: fadeInOut 3s ease-in-out infinite;
+}
+
+.loading-progress {
+    width: 200px;
+    height: 4px;
+    background: var(--client-border);
+    border-radius: 2px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    background: var(--client-primary);
+    animation: progress 2s ease-in-out infinite;
+    transform-origin: left;
+}
+
+/* Connection Status */
+.status-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.status-indicator::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.connecting {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-indicator.connecting::before {
+    background: #856404;
+    animation: pulse 1s infinite;
+}
+
+.status-indicator.connected {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-indicator.connected::before {
+    background: #155724;
+}
+
+.status-indicator.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-indicator.error::before {
+    background: #721c24;
+}
+
+/* Error Banner */
+.error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    z-index: 1002;
+    transition: transform 0.3s ease;
+}
+
+.error-banner.hidden {
+    transform: translateY(-100%);
+}
+
+.error-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.error-icon {
+    font-size: 1.2em;
+}
+
+.error-content button {
+    margin-left: auto;
+    padding: 4px 12px;
+    border: 1px solid #721c24;
+    background: transparent;
+    color: #721c24;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.error-content button:hover {
+    background: #721c24;
+    color: white;
+}
+
+/* Version Display */
+.version-display {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    color: var(--client-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+}
+
+.environment-tag {
+    background: var(--client-primary);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.build-date {
+    color: var(--client-text-light);
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+@keyframes progress {
+    0% { transform: scaleX(0); }
+    50% { transform: scaleX(1); }
+    100% { transform: scaleX(0); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .status-indicator {
+        top: 10px;
+        right: 10px;
+        font-size: 0.8em;
+    }
+    
+    .version-display {
+        bottom: 10px;
+        right: 10px;
+        font-size: 0.7em;
+    }
+    
+    .loading-message {
+        font-size: 1em;
+        padding: 0 20px;
+    }
+}
+
+/* High Contrast & Accessibility */
+@media (prefers-contrast: high) {
+    .status-indicator,
+    .error-banner,
+    .version-display {
+        border: 1px solid currentColor;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-spinner,
+    .progress-bar,
+    .status-indicator::before {
+        animation: none;
+    }
+    
+    .loading-message {
+        animation: none;
+        opacity: 1;
+    }
 } 

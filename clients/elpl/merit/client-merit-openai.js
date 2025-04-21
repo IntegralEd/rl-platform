@@ -13,34 +13,50 @@ class MeritOpenAIClient {
     this.assistantId = window.env.MERIT_ASSISTANT_ID;
     this.userId = this.generateSessionId();
 
-    // API Configuration with platform-wide endpoints
-    const ENDPOINTS = {
-      apiGateway: window.env.RL_API_GATEWAY_ENDPOINT || 'https://api.recursivelearning.app/prod',
-      REDIS: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
-      contextPrefix: 'merit:ela:context',
-      threadPrefix: 'merit:ela:thread',
-      cachePrefix: 'merit:ela:cache'
+    // Base configuration
+    this.baseUrl = window.env.RL_API_GATEWAY_ENDPOINT;
+    this.config = {
+      project_id: window.env.OPENAI_PROJECT_ID,
+      assistant_id: window.env.MERIT_ASSISTANT_ID,
+      schema_version: window.env.RL_SCHEMA_VERSION,
+      ttl: {
+        session: 3600,
+        cache: 3600,
+        context: 3600
+      }
     };
 
-    console.log('[Merit OpenAI] Configuration loaded:', {
-      assistantId: this.assistantId,
-      userId: this.userId,
-      apiGateway: ENDPOINTS.apiGateway,
-      timestamp: new Date().toISOString()
-    });
+    // Fetch configuration
+    this.fetchConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': window.env.RL_API_KEY,
+        'X-Project-ID': window.env.OPENAI_PROJECT_ID,
+        'Origin': 'https://recursivelearning.app'
+      },
+      mode: 'cors',
+      credentials: 'include'
+    };
+
+    // Error handling configuration
+    this.retryConfig = {
+      maxAttempts: 3,
+      baseDelay: 2000,
+      maxDelay: 8000
+    };
 
     // Redis Configuration with validated auth
     this.redisConfig = {
-      endpoint: ENDPOINTS.REDIS,
+      endpoint: window.env.REDIS_URL || 'redis://redis.recursivelearning.app:6379',
       auth: {
         username: 'recursive-frontend',
         password: window.env.REDIS_PASSWORD
       },
       defaultTTL: 3600, // 1 hour for MVP
       keys: {
-        context: (sessionId) => `${ENDPOINTS.contextPrefix}:${sessionId}`,
-        thread: (sessionId) => `${ENDPOINTS.threadPrefix}:${sessionId}`,
-        cache: (key) => `${ENDPOINTS.cachePrefix}:${key}`,
+        context: (sessionId) => `merit:ela:context:${sessionId}`,
+        thread: (sessionId) => `merit:ela:thread:${sessionId}`,
+        cache: (key) => `merit:ela:cache:${key}`,
         session: (sessionId) => `merit:session:${sessionId}`,
         messageCount: (sessionId) => `merit:messages:${sessionId}`
       },
@@ -52,35 +68,12 @@ class MeritOpenAIClient {
       }
     };
 
-    // Prioritize API Gateway endpoint
-    this.baseUrl = ENDPOINTS.apiGateway;
-    
-    this.config = {
-      org_id: window.env.MERIT_ORG_ID,
-      assistant_id: this.assistantId,
-      model: 'gpt-4',
-      schema_version: '04102025.B01', // Updated to match backend
-      project_id: window.env.OPENAI_PROJECT_ID || 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-      ttl: {
-        session: 3600,    // 1 hour for MVP
-        cache: 3600,      // 1 hour for MVP
-        temp: 900         // 15 minutes for temp data
-      }
-    };
-
     // Headers with platform-wide API key
     this.headers = {
       'Content-Type': 'application/json',
       'x-api-key': window.env.RL_API_KEY,
       'X-Project-ID': this.config.project_id,
       'Origin': 'https://recursivelearning.app'
-    };
-
-    // Fetch configuration for all API calls
-    this.fetchConfig = {
-      mode: 'cors',
-      credentials: 'include',
-      headers: this.headers
     };
 
     this.state = {
@@ -258,61 +251,69 @@ class MeritOpenAIClient {
   }
 
   async createThread() {
-    try {
-      // Check Redis for existing thread
-      const cachedThread = await this.checkCache(`thread:${this.userId}`);
-      if (cachedThread) {
-        console.log('[Merit Flow] Using cached thread:', cachedThread);
-        this.threadId = cachedThread.threadId;
+    let attempts = 0;
+    const maxAttempts = this.retryConfig.maxAttempts;
+
+    while (attempts < maxAttempts) {
+      try {
+        // Check Redis for existing thread
+        const cachedThread = await this.checkCache(`thread:${this.userId}`);
+        if (cachedThread) {
+          console.log('[Merit Flow] Using cached thread:', cachedThread);
+          this.threadId = cachedThread.threadId;
+          this.state.projectPaired = true;
+          return this.threadId;
+        }
+
+        console.log('[Merit Flow] Creating new thread');
+        console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
+        
+        const response = await fetch(`${this.baseUrl}/api/v1/thread`, {
+          ...this.fetchConfig,
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'create_thread',
+            project_id: this.config.project_id,
+            ...this.config
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        this.threadId = data.threadId;
         this.state.projectPaired = true;
+
+        // Cache the thread ID
+        await this.setCache(`thread:${this.userId}`, {
+          threadId: this.threadId,
+          created: Date.now()
+        });
+
         return this.threadId;
-      }
-
-      console.log('[Merit Flow] Creating new thread');
-      console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
-      
-      const response = await fetch(this.baseUrl, {
-        ...this.fetchConfig,
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'create_thread',
-          project_id: this.config.project_id,
-          ...this.config
-        })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('[Merit Flow] Error details:', {
+      } catch (error) {
+        attempts++;
+        console.error('[Merit Flow] Thread creation error:', error);
+        console.log('[Merit Flow] Error details:', {
           endpoint: this.baseUrl,
-          headers: this.headers,
+          headers: this.fetchConfig.headers,
           error: error.message
         });
-        if (error.statusCode === 403) {
-          throw new Error('OpenAI project pairing required');
+
+        if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+          const delay = Math.min(this.retryConfig.baseDelay * Math.pow(2, attempts - 1), this.retryConfig.maxDelay);
+          console.log(`[Merit Flow] CORS/Network error, retrying in ${delay}ms... (${maxAttempts - attempts} attempts remaining)`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
         }
-        throw new Error(error.error || 'Thread creation failed');
+
+        throw error;
       }
-
-      const data = await response.json();
-      this.threadId = `threads:${this.config.org_id}:${this.userId}:${data.thread_id}`;
-      this.state.projectPaired = true;
-
-      // Cache the new thread with session TTL
-      await this.setCache(`thread:${this.userId}`, {
-        threadId: this.threadId,
-        created: Date.now(),
-        expiresAt: Date.now() + this.config.ttl.session * 1000
-      }, this.config.ttl.session);
-
-      console.log('[Merit Flow] Thread created and cached:', this.threadId);
-      return this.threadId;
-    } catch (error) {
-      console.error('[Merit Flow] Thread creation error:', error);
-      this.state.hasError = true;
-      this.state.errorMessage = error.message;
-      throw error;
     }
+
+    throw new Error(`Failed to create thread after ${maxAttempts} attempts`);
   }
 
   async preloadContext(context) {

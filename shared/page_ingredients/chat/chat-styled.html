@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Main</title>
+  <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
+  <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #E6F6FA;
+      font-family: var(--client-font-body);
+    }
+    .chat-container {
+      background: white;
+      max-width: 860px;
+      margin: 0 auto;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 4rem);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    .chat-window {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .chat-day-divider {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #888;
+      position: relative;
+    }
+    .chat-day-divider::before,
+    .chat-day-divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #ccc;
+    }
+    .chat-day-divider::before {
+      left: 0;
+    }
+    .chat-day-divider::after {
+      right: 0;
+    }
+    .message {
+      display: flex;
+      align-items: flex-end;
+      max-width: 90%;
+    }
+    .message.assistant {
+      align-self: flex-start;
+      flex-direction: row;
+    }
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background: #ccc;
+      border-radius: 50%;
+      margin: 0 0.75rem;
+    }
+    .bubble {
+      padding: 1rem;
+      border-radius: 12px;
+      line-height: 1.5;
+      font-size: 1rem;
+    }
+    .assistant .bubble {
+      background: white;
+      border: 1px solid #E6F6FA;
+      color: var(--text-color);
+    }
+    .user .bubble {
+      background: #E6F6FA;
+      color: var(--text-color);
+    }
+    .timestamp {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 0.25rem;
+      padding: 0 0.75rem;
+    }
+    .chat-input-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid var(--chat-input-border);
+      background: white;
+    }
+    .chat-input {
+      flex: 1;
+      resize: none;
+      padding: 0.75rem;
+      border: 1px solid var(--chat-input-border);
+      border-radius: 8px;
+      font-size: 1rem;
+      line-height: 1.4;
+      height: 44px;
+    }
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--chat-input-focus);
+    }
+    .icon-button {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-window">
+      <div class="chat-day-divider">August 21</div>
+
+      <div class="message assistant">
+        <div class="avatar"></div>
+        <div>
+          <div class="bubble">Hi there! How can I support your professional learning today?</div>
+          <div class="timestamp">10:02 AM</div>
+        </div>
+      </div>
+
+      <div class="message user">
+        <div class="avatar"></div>
+        <div>
+          <div class="bubble">Can you tell me more about the upcoming training?</div>
+          <div class="timestamp">10:03 AM</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-container">
+      <button class="icon-button">📎</button>
+      <button class="icon-button">😊</button>
+      <textarea class="chat-input" placeholder="Type your message..."></textarea>
+      <button class="icon-button">➤</button>
+    </div>
+  </div>
+</body>
+</html>

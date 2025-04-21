@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Deploy: 2024-04-12 -->
+<!-- Deploy: 2024-04-21 18:00 CST -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,6 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
-    
-    <!-- Public access - no auth required -->
     
     <!-- Platform level styles -->
     <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
@@ -26,6 +24,9 @@
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
+    <!-- Assistant Configuration -->
+    <script type="module" src="assets/js/assistant-config.js"></script>
+    
     <!-- Environment Configuration -->
     <script>
         // Platform-wide configuration logging
@@ -33,8 +34,8 @@
         
         window.env = {
             // Platform-wide variables
-            RL_API_GATEWAY_ENDPOINT: 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
-            RL_API_KEY: '68gmsx2jsk',
+            RL_API_GATEWAY_ENDPOINT: 'https://api.recursivelearning.app/prod',
+            RL_API_KEY: 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
             RL_SCHEMA_VERSION: '04102025.B01',
             
             // Merit-specific configuration
@@ -53,12 +54,8 @@
             
             // Build Information
             BUILD_VERSION: '1.16',
-            BUILD_DATE: '04212024',
+            BUILD_DATE: '04212024.1800',
             ENVIRONMENT: 'prod'
-            // Legacy variables maintained for backwards compatibility
-            API_GATEWAY_ENDPOINT: 'https://l6lzwy3eie.execute-api.us-east-2.amazonaws.com/prod',
-            API_GATEWAY_KEY: '68gmsx2jsk',
-            LAMBDA_ENDPOINT: 'https://api.recursivelearning.app/prod'
         };
 
         // Configuration validation and logging
@@ -73,16 +70,27 @@
             method: 'GET',
             headers: {
                 'x-api-key': window.env.RL_API_KEY,
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Origin': 'https://recursivelearning.app'
+            },
+            mode: 'cors',
+            credentials: 'include'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log('[API Gateway] Connection test successful:', {
                 endpoint: window.env.RL_API_GATEWAY_ENDPOINT,
                 status: 'connected',
                 timestamp: new Date().toISOString()
             });
+            document.getElementById('connection-status').classList.remove('connecting', 'error');
+            document.getElementById('connection-status').classList.add('connected');
+            document.getElementById('connection-message').textContent = 'Connected';
         })
         .catch(error => {
             console.error('[API Gateway] Connection test failed:', {
@@ -90,6 +98,11 @@
                 error: error.message,
                 timestamp: new Date().toISOString()
             });
+            document.getElementById('connection-status').classList.remove('connecting', 'connected');
+            document.getElementById('connection-status').classList.add('error');
+            document.getElementById('connection-message').textContent = 'Connection Error';
+            document.getElementById('error-details').textContent = error.message;
+            document.getElementById('error-banner').classList.remove('hidden');
         });
 
         // Endpoint validation logging
@@ -120,6 +133,26 @@
                 assistantId: window.env.MERIT_ASSISTANT_ID,
                 timestamp: new Date().toISOString()
             });
+            
+            // Initialize loading messages
+            const loadingMessages = [
+                'Connecting to your assistant...',
+                'Loading curriculum resources...',
+                'Preparing your personalized experience...'
+            ];
+            let currentMessageIndex = 0;
+            
+            const updateLoadingMessage = () => {
+                const loadingMessageElement = document.getElementById('loading-message');
+                if (loadingMessageElement) {
+                    loadingMessageElement.textContent = loadingMessages[currentMessageIndex];
+                    currentMessageIndex = (currentMessageIndex + 1) % loadingMessages.length;
+                }
+            };
+            
+            // Update loading message every 3 seconds
+            setInterval(updateLoadingMessage, 3000);
+            updateLoadingMessage(); // Initial message
         });
 
         // Monitor for API Gateway responses
@@ -1202,6 +1235,36 @@
     </style>
 </head>
 <body>
+    <!-- Connection Status -->
+    <div id="connection-status" class="status-indicator connecting">
+        <span id="connection-message">Connecting...</span>
+    </div>
+    
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner hidden">
+        <div class="error-content">
+            <span class="error-icon">⚠️</span>
+            <span id="error-details">An error occurred</span>
+            <button onclick="this.parentElement.classList.add('hidden')">Dismiss</button>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Version Display -->
+    <div class="version-display">
+        <span>v<span id="version-number">1.16</span></span>
+        <span class="environment-tag">PROD</span>
+        <span class="build-date">04/21/24</span>
+    </div>
+    
     <div class="client-layout" data-client-component="merit-page" data-test-id="page-container">
         <header class="client-header" role="banner" data-test-id="header-bar">
             <div class="header-content">
@@ -1312,6 +1375,9 @@
                              class="chat-window" 
                              role="log" 
                              aria-live="polite"
+                             aria-label="Chat conversation"
+                             role="article"
+                             aria-label="Assistant message"
                              data-test-id="chat-window">
                         </div>
                     </div>
