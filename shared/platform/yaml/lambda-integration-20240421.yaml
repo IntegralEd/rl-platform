@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Recursive Learning Lambda Integration Configuration
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - prod
+      - dev
+    Description: Environment for deployment
+
+  LambdaExecutionRole:
+    Type: String
+    Description: ARN of the Lambda execution role
+
+Resources:
+  RLContextFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub rl-context-${Environment}
+      Handler: index.handler
+      Role: !Ref LambdaExecutionRole
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            const response = {
+              statusCode: 200,
+              headers: {
+                'Access-Control-Allow-Origin': 'https://recursivelearning.app',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS,HEAD',
+                'Access-Control-Allow-Credentials': true
+              },
+              body: JSON.stringify({
+                message: 'Context function executed successfully'
+              })
+            };
+            return response;
+          };
+      Runtime: nodejs18.x
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue RLLambdaSecurityGroupId
+        SubnetIds:
+          - !ImportValue RLPrivateSubnet1Id
+          - !ImportValue RLPrivateSubnet2Id
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  RLMockFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub rl-mock-${Environment}
+      Handler: index.handler
+      Role: !Ref LambdaExecutionRole
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            const response = {
+              statusCode: 200,
+              headers: {
+                'Access-Control-Allow-Origin': 'https://recursivelearning.app',
+                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                'Access-Control-Allow-Credentials': true
+              },
+              body: JSON.stringify({
+                message: 'Mock function executed successfully'
+              })
+            };
+            return response;
+          };
+      Runtime: nodejs18.x
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+      VpcConfig:
+        SecurityGroupIds:
+          - !ImportValue RLLambdaSecurityGroupId
+        SubnetIds:
+          - !ImportValue RLPrivateSubnet1Id
+          - !ImportValue RLPrivateSubnet2Id
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+Outputs:
+  ContextFunctionArn:
+    Description: ARN of the Context Lambda function
+    Value: !GetAtt RLContextFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-ContextFunctionArn
+
+  MockFunctionArn:
+    Description: ARN of the Mock Lambda function
+    Value: !GetAtt RLMockFunction.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-MockFunctionArn 

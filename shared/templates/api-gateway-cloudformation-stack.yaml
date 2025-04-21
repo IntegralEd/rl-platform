@@ -2,17 +2,23 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Recursive Learning REST API with API Gateway and VPC Link Integration
 
 Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-07e76ce384fa696e0
+    Description: VPC ID for the VPC Link (us-east-2)
+
   Environment:
     Type: String
     Default: prod
     AllowedValues:
-      - dev
       - prod
-    Description: Environment name
+      - review
+    Description: Environment name for deployment
+
   CertificateArn:
     Type: String
-    Default: 'arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c'
-    Description: ACM certificate ARN for custom domain
+    Default: arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c
+    Description: ARN of the SSL certificate for the custom domain
 
 Resources:
   RLRestApi:
@@ -305,6 +311,22 @@ Resources:
             }
           ]
         }
+
+  RLApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API Gateway VPC Link
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub rl-api-gateway-sg-${Environment}
+        - Key: Environment
+          Value: !Ref Environment
 
 Outputs:
   ApiEndpoint:

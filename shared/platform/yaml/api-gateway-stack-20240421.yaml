@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Recursive Learning REST API with API Gateway - Production Stack (04/21/2024)'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - prod
+      - review
+    Description: Environment name for deployment
+
+  CertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c
+    Description: ARN of the SSL certificate for the custom domain
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for the VPC Link
+
+Resources:
+  # API Gateway Resources
+  RLRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub rl-rest-api-${Environment}
+      Description: Recursive Learning REST API Gateway
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      ApiKeySourceType: HEADER
+
+  # Usage Plan
+  RLUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: rl-rest-api-usage-plan
+      Description: Standard usage plan for Recursive Learning API
+      ApiStages:
+        - ApiId: !Ref RLRestApi
+          Stage: !Ref Environment
+      Quota:
+        Limit: 5000
+        Period: MONTH
+      Throttle:
+        RateLimit: 50
+        BurstLimit: 100
+
+  # API Key
+  RLApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: !Sub rl-rest-api-key-${Environment}
+      Description: API Key for Recursive Learning API
+      Enabled: true
+
+  # Usage Plan Key
+  RLUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref RLApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref RLUsagePlan
+
+  # VPC Link
+  RLApiGatewaySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for API Gateway VPC Link
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  RLVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties:
+      Name: !Sub rl-vpc-link-${Environment}
+      Description: VPC Link for private API Gateway integration
+      TargetArns:
+        - !Sub arn:aws:elasticloadbalancing:us-east-2:559050208320:loadbalancer/net/rl-nlb-${Environment}/abcdef1234567890
+
+  # Custom Domain
+  ApiDomainName:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      DomainName: api.recursivelearning.app
+      RegionalCertificateArn: !Ref CertificateArn
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # Base Path Mapping
+  ApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      DomainName: !Ref ApiDomainName
+      RestApiId: !Ref RLRestApi
+      Stage: !Ref Environment
+
+  # CloudWatch Role
+  ApiGatewayCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  # CloudWatch Log Group
+  ApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${RLRestApi}
+      RetentionInDays: 30
+
+  # Monitoring Resources
+  ApiGateway5xxAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ${RLRestApi}-5xx-errors
+      AlarmDescription: Alert when 5XX errors exceed threshold
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: ApiName
+          Value: !Ref RLRestApi
+        - Name: Stage
+          Value: !Ref Environment
+
+Outputs:
+  ApiId:
+    Description: API Gateway ID
+    Value: !Ref RLRestApi
+
+  ApiEndpoint:
+    Description: API Gateway Endpoint
+    Value: !Sub https://${RLRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}
+
+  CustomDomainEndpoint:
+    Description: Custom Domain Endpoint
+    Value: !Sub https://${ApiDomainName}
+
+  UsagePlanId:
+    Description: Usage Plan ID
+    Value: !Ref RLUsagePlan
+
+  ApiKeyId:
+    Description: API Key ID
+    Value: !Ref RLApiKey 

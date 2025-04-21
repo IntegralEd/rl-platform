@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Recursive Learning API Gateway CORS Configuration
+  version: '2024-04-21'
+  description: CORS configuration for Recursive Learning API Gateway endpoints
+
+paths:
+  /api/v1/context:
+    options:
+      summary: CORS support for context endpoint
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: Default CORS response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+              example: 'https://recursivelearning.app'
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+              example: 'GET,POST,PUT,DELETE,OPTIONS,HEAD'
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+              example: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              description: Credentials support
+              example: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'CORS enabled'
+
+  /api/v1/mock:
+    options:
+      summary: CORS support for mock endpoint
+      description: Enable CORS by returning correct headers
+      responses:
+        '200':
+          description: Default CORS response
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+              description: Origin allowed
+              example: 'https://recursivelearning.app'
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+              description: Methods allowed
+              example: 'GET,OPTIONS'
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+              description: Headers allowed
+              example: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+            Access-Control-Allow-Credentials:
+              schema:
+                type: boolean
+              description: Credentials support
+              example: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'CORS enabled'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header 
