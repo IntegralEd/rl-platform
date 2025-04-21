@@ -181,3 +181,56 @@ If you encounter API Gateway or CORS issues:
 5. Contact DevOps team for API Gateway verification
 
 Remember: For browser-based requests, always include `mode: 'cors'` in your fetch options and set the 'Origin' header appropriately. 
+
+# Merit API Gateway Endpoints
+
+## Critical Blockers (May 19, 2025)
+
+🚨 **VPC Link Creation Required**
+- Current Status: Failed
+- Error: "Vpc link VpcLink was not found in account 559050208320"
+- Impact: API Gateway deployment blocked
+- Resolution Path:
+  1. Verify Load Balancer in account 559050208320
+  2. Create VPC Link manually
+  3. Update YAML configurations
+  4. Redeploy API Gateway
+
+## Configuration Files
+
+- `client-merit-gateway-cors.yaml` - Primary production configuration (BLOCKED)
+- `client-merit-gateway-cors-beautiful.yaml` - Testing/staging configuration (DO NOT DEPLOY)
+- `client-merit-gateway-monitoring.yaml` - CloudWatch monitoring setup
+- `client-merit-vpc-link.yaml` - VPC Link CloudFormation template (PENDING)
+
+## Deployment Flow
+
+1. **VPC Link Setup** (CRITICAL)
+   - Create VPC Link in AWS Console
+   - Document VPC Link ID
+   - Update YAML configurations
+   - Verify connectivity
+
+2. **API Gateway Deployment** (BLOCKED)
+   - Update configurations with VPC Link ID
+   - Deploy to staging
+   - Verify CORS and endpoints
+   - Deploy to production
+
+3. **Integration Testing** (PENDING)
+   - Test all endpoints
+   - Verify CORS headers
+   - Validate error responses
+   - Check monitoring
+
+## Configuration Files
+
+- `client-merit-gateway-cors.yaml` - Primary production CORS configuration
+- `client-merit-gateway-cors-beautiful.yaml` - Testing/staging configuration (DO NOT DEPLOY)
+  - Used for testing configuration changes
+  - Parallel development file
+  - Changes should be tested here first
+  - Once verified, copy to primary configuration
+- `client-merit-gateway-monitoring.yaml` - CloudWatch monitoring setup
+- `client-merit-gateway-cors-review.yaml` - Review environment configuration
+- `client-merit-gateway-cors-20240420.yaml` - Dated snapshot configuration 
