@@ -24,6 +24,67 @@
    - [ ] Confirm health check endpoint functionality
    - [ ] Validate all Lambda integrations
 
+## 11:00 AM CST - Stack Delete & Rebuild
+**Status**: In Progress
+**Lead**: @api-team
+**Reviewers**: @backend-team
+
+### 1. Stack Deletion (11:00 AM)
+```bash
+# Delete existing stack in ROLLBACK_COMPLETE state
+aws cloudformation delete-stack \
+  --stack-name merit-api-vpc-link \
+  --region us-east-2
+
+# Verify deletion completion
+aws cloudformation wait stack-delete-complete \
+  --stack-name merit-api-vpc-link \
+  --region us-east-2
+```
+
+### 2. New Stack Deployment (11:15 AM)
+```bash
+# Deploy new stack with corrected VPC Link
+aws cloudformation create-stack \
+  --stack-name merit-api-gateway \
+  --template-body file://shared/templates/api-gateway-cloudformation-stack.yaml \
+  --parameters \
+    ParameterKey=Environment,ParameterValue=prod \
+    ParameterKey=CertificateArn,ParameterValue=arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c \
+  --capabilities CAPABILITY_IAM \
+  --region us-east-2
+```
+
+### 3. Verification Steps (11:30 AM)
+1. **VPC Link Status**
+   - [ ] Check VPC Link creation in console
+   - [ ] Verify Load Balancer association
+   - [ ] Confirm security group configuration
+
+2. **API Gateway Deployment**
+   - [ ] Verify API Gateway creation
+   - [ ] Check CORS configuration
+   - [ ] Test mock endpoint
+   - [ ] Validate custom domain setup
+
+3. **Integration Testing**
+   - [ ] Test context endpoint
+   - [ ] Verify thread creation
+   - [ ] Check Redis operations
+   - [ ] Validate error responses
+
+### 4. Rollback Plan
+If issues occur during deployment:
+1. Delete new stack
+2. Restore from backup configuration
+3. Update DNS if needed
+4. Notify stakeholders
+
+### 5. Monitoring
+- CloudWatch Dashboard: [Merit API Gateway](https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#dashboards:name=MeritAPIGatewayMonitoring)
+- Slack Channel: #merit-api-alerts
+- Status Page: https://status.recursivelearning.app
+
 ## Frontend Verification
 1. 🔄 **Client Implementation**
    - [ ] Test navigation flow with background thread creation
