@@ -12,4 +12,5 @@ node_modules/
 
 # Airtable exports
 *-Grid view.csv
-QC_Review_Session-*.csv 
+QC_Review_Session-*.csv .env
+shared/platform/env.config
