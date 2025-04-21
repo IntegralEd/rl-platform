@@ -1,0 +1,34 @@
+# Version: 042102025.B01 - API Gateway CORS Deployment Configuration
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deployment configuration for existing Recursive Learning API Gateway (a7uj0mi1o3) April 21, 2024 @ 23:45 CST
+
+Parameters:
+  ApiId:
+    Type: String
+    Default: a7uj0mi1o3
+    Description: Rest API for Recursive Learning
+
+  UsagePlanId:
+    Type: String
+    Default: r4plrt
+    Description: ID of the API Gateway usage plan (rl-rest-api-usage-plan)
+
+Resources:
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiId
+      Description: CORS configuration deployment for existing API Gateway with usage plan r4plrt
+      StageName: prod
+
+  UsagePlanAssociation:
+    Type: AWS::ApiGateway::UsagePlanStage
+    Properties:
+      UsagePlanId: !Ref UsagePlanId
+      RestApiId: !Ref ApiId
+      Stage: prod
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL for CORS configuration
+    Value: !Sub https://${ApiId}.execute-api.us-east-2.amazonaws.com/prod 
