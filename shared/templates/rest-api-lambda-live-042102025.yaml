@@ -267,8 +267,8 @@ Resources:
     Type: AWS::ApiGateway::UsagePlan
     DependsOn: ApiStage
     Properties:
-      UsagePlanName: !Sub ${AWS::StackName}-usage-plan
-      Description: Usage plan for RL REST API
+      UsagePlanName: rl-rest-api-usage-plan
+      Description: Usage plan for Recursive Learning REST API
       ApiStages:
         - ApiId: !Ref RLRestApi
           Stage: !Ref Environment
@@ -512,3 +512,11 @@ Outputs:
   LambdaLogGroup:
     Description: CloudWatch Log Group for Lambda function
     Value: !Sub /aws/lambda/${RLRestApiFunction}
+
+  UsagePlanId:
+    Description: Usage Plan ID for API access
+    Value: !Ref UsagePlan
+    
+  UsagePlanName:
+    Description: Usage Plan Name
+    Value: rl-rest-api-usage-plan

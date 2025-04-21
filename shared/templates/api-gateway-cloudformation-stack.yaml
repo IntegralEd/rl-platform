@@ -241,7 +241,7 @@ Resources:
     Type: AWS::ApiGateway::UsagePlan
     DependsOn: ApiStage
     Properties:
-      UsagePlanName: !Sub ${AWS::StackName}-usage-plan
+      UsagePlanName: rl-rest-api-usage-plan
       Description: Usage plan for Recursive Learning API
       ApiStages:
         - ApiId: !Ref RLRestApi
@@ -255,6 +255,9 @@ Resources:
 
   UsagePlanKey:
     Type: AWS::ApiGateway::UsagePlanKey
+    DependsOn:
+      - UsagePlan
+      - ApiKey
     Properties:
       KeyId: !Ref ApiKey
       KeyType: API_KEY
@@ -327,3 +330,11 @@ Outputs:
   DashboardUrl:
     Description: CloudWatch Dashboard URL
     Value: !Sub https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=${ApiGatewayDashboard}
+
+  UsagePlanId:
+    Description: Usage Plan ID for API access
+    Value: !Ref UsagePlan
+    
+  UsagePlanName:
+    Description: Usage Plan Name
+    Value: rl-rest-api-usage-plan
