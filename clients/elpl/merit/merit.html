@@ -24,7 +24,12 @@
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
-    <!-- Environment Configuration -->
+    <!-- Environment Configuration - Must load first -->
+    <script type="module" src="assets/js/assistant-config.js"></script>
+    
+    <!-- Merit specific logic - instructional flow controller -->
+    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+    
     <script>
         // Platform-wide configuration logging
         console.log('[Platform Config] Initializing platform configuration...');
@@ -181,200 +186,196 @@
     All Redis operations now go through API Gateway endpoints instead of direct Redis connections,
     eliminating browser compatibility issues with Node.js modules -->
     
-    <!-- Merit specific logic - instructional flow controller -->
-    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
-    
-    <script>
-        // Monitor for deprecated script loading
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.tagName === 'SCRIPT') {
-                            const src = node.src || '';
-                            if (src.includes('client-merit-admin-logic.js')) {
-                                console.error('[MERIT ERROR] Attempting to load deprecated admin logic script. This file has been removed. Use client-merit-instructional-flow.js instead.');
-                                throw new Error('Deprecated script detected: client-merit-admin-logic.js');
-                            }
-                            if (src.includes('D_client-merit')) {
-                                console.error('[MERIT ERROR] Attempting to load deprecated script:', src);
-                                throw new Error('Deprecated script detected: ' + src);
-                            }
+    <!-- Monitor for deprecated script loading
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.tagName === 'SCRIPT') {
+                        const src = node.src || '';
+                        if (src.includes('client-merit-admin-logic.js')) {
+                            console.error('[MERIT ERROR] Attempting to load deprecated admin logic script. This file has been removed. Use client-merit-instructional-flow.js instead.');
+                            throw new Error('Deprecated script detected: client-merit-admin-logic.js');
                         }
-                    });
-                }
-            });
-        });
-
-        observer.observe(document.documentElement, {
-            childList: true,
-            subtree: true
-        });
-
-        // Log any attempts to use old admin functions
-        window.addEventListener('error', (event) => {
-            if (event.message.includes('MeritInstructionalFlow')) {
-                console.error('[MERIT ERROR] Attempting to use deprecated MeritInstructionalFlow. Use the new unified controller instead.');
-            }
-        });
-
-        // Initialize version display with build counter
-        document.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            // Convert to Central Time
-            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-            
-            // Format date as MMDDYYYY
-            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-            const day = String(centralTime.getDate()).padStart(2, '0');
-            const year = centralTime.getFullYear();
-            const buildDate = `${month}${day}${year}`;
-            
-            // Format time as HH:MMam/pm
-            const hours = centralTime.getHours();
-            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-            const buildTime = `${formattedHours}:${minutes}${ampm}`;
-            
-            // Version 1.0.15 simplified to 1.16
-            const version = '1.16';
-            
-            // Format: merit.html/04132024.09:09am.v.1.15
-            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-            
-            // Store for debugging and build tracking
-            localStorage.setItem('meritVersion', version);
-            localStorage.setItem('meritBuildDate', buildDate);
-            localStorage.setItem('meritBuildTime', buildTime);
-            localStorage.setItem('meritFullVersion', displayVersion);
-            
-            console.log('[Merit Flow] Build version:', displayVersion);
-        });
-
-        // MVP validation logging
-        console.log('[Merit Flow] All validations passed for MVP testing');
-        console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.16');
-        console.log('[Merit Flow] Form validation hardcoded to pass for testing');
-        console.log('[Merit Flow] Navigation validation hardcoded to pass for testing');
-
-        // Redis Flow Logging with enhanced error handling
-        window.REDIS_FLOW = {
-            logStep: (step, data) => {
-                const timestamp = new Date().toISOString();
-                console.log(`[${timestamp}] REDIS FLOW - ${step}:`, data);
-                
-                // Add to debug panel if it exists
-                const debugPanel = document.getElementById('debug-panel');
-                if (debugPanel) {
-                    const logEntry = document.createElement('div');
-                    logEntry.className = 'log-entry';
-                    logEntry.innerHTML = `
-                        <span class="timestamp">${timestamp}</span>
-                        <span class="step">${step}</span>
-                        <span class="data">${JSON.stringify(data)}</span>
-                    `;
-                    debugPanel.appendChild(logEntry);
-                }
-            },
-            logError: (step, error) => {
-                const timestamp = new Date().toISOString();
-                console.error(`[${timestamp}] REDIS FLOW ERROR - ${step}:`, error);
-                
-                // Add to error panel if it exists
-                const errorPanel = document.getElementById('error-panel');
-                if (errorPanel) {
-                    const errorEntry = document.createElement('div');
-                    errorEntry.className = 'error-entry';
-                    errorEntry.innerHTML = `
-                        <span class="timestamp">${timestamp}</span>
-                        <span class="step">${step}</span>
-                        <span class="error">${error.message}</span>
-                        <button onclick="retryOperation('${step}')">Retry</button>
-                    `;
-                    errorPanel.appendChild(errorEntry);
-                }
-                
-                // Trigger error recovery if available
-                if (window.REDIS_FLOW.errorRecovery && typeof window.REDIS_FLOW.errorRecovery[step] === 'function') {
-                    window.REDIS_FLOW.errorRecovery[step](error);
-                }
-            },
-            errorRecovery: {
-                'REDIS_CONNECT': async (error) => {
-                    console.log('[Merit Flow] Attempting Redis reconnection...');
-                    // Implement reconnection logic
-                },
-                'CACHE_OPERATION': async (error) => {
-                    console.log('[Merit Flow] Attempting cache operation recovery...');
-                    // Implement cache recovery logic
-                }
-            }
-        };
-
-        // Debug panel for development
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            const debugPanel = document.createElement('div');
-            debugPanel.id = 'debug-panel';
-            debugPanel.style.cssText = 'position:fixed;bottom:0;right:0;width:300px;height:200px;background:rgba(0,0,0,0.8);color:#fff;overflow:auto;padding:10px;font-family:monospace;font-size:12px;z-index:9999;';
-            document.body.appendChild(debugPanel);
-        }
-
-        // Log initialization
-        window.REDIS_FLOW.logStep('INIT', {
-            timestamp: Date.now(),
-            environment: window.location.hostname,
-            intakeToken: 'elpl-merit'
-        });
-
-        // Session Management Logging
-        window.SESSION_FLOW = {
-            logSession: (sessionId, type, data) => {
-                const timestamp = new Date().toISOString();
-                console.log(`[${timestamp}] SESSION FLOW - ${type}:`, {
-                    sessionId,
-                    type,
-                    ...data
+                        if (src.includes('D_client-merit')) {
+                            console.error('[MERIT ERROR] Attempting to load deprecated script:', src);
+                            throw new Error('Deprecated script detected: ' + src);
+                        }
+                    }
                 });
-                
-                // Add to debug panel if it exists
-                const debugPanel = document.getElementById('debug-panel');
-                if (debugPanel) {
-                    const logEntry = document.createElement('div');
-                    logEntry.className = 'log-entry';
-                    logEntry.innerHTML = `
-                        <span class="timestamp">${timestamp}</span>
-                        <span class="type">${type}</span>
-                        <span class="data">${JSON.stringify({ sessionId, ...data })}</span>
-                    `;
-                    debugPanel.appendChild(logEntry);
-                }
             }
-        };
-
-        // Listen for session events
-        window.addEventListener('merit-session-created', (event) => {
-            window.SESSION_FLOW.logSession(
-                event.detail.sessionId,
-                'SESSION_CREATED',
-                event.detail
-            );
         });
+    });
 
-        // Listen for persistence prompt
-        window.addEventListener('merit-persistence-prompt', (event) => {
-            window.SESSION_FLOW.logSession(
-                event.detail.sessionId,
-                'PERSISTENCE_PROMPT',
-                event.detail
-            );
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+    // Log any attempts to use old admin functions
+    window.addEventListener('error', (event) => {
+        if (event.message.includes('MeritInstructionalFlow')) {
+            console.error('[MERIT ERROR] Attempting to use deprecated MeritInstructionalFlow. Use the new unified controller instead.');
+        }
+    });
+
+    // Initialize version display with build counter
+    document.addEventListener('DOMContentLoaded', () => {
+        const now = new Date();
+        // Convert to Central Time
+        const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        
+        // Format date as MMDDYYYY
+        const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+        const day = String(centralTime.getDate()).padStart(2, '0');
+        const year = centralTime.getFullYear();
+        const buildDate = `${month}${day}${year}`;
+        
+        // Format time as HH:MMam/pm
+        const hours = centralTime.getHours();
+        const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'pm' : 'am';
+        const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+        const buildTime = `${formattedHours}:${minutes}${ampm}`;
+        
+        // Version 1.0.15 simplified to 1.16
+        const version = '1.16';
+        
+        // Format: merit.html/04132024.09:09am.v.1.15
+        const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+        
+        // Store for debugging and build tracking
+        localStorage.setItem('meritVersion', version);
+        localStorage.setItem('meritBuildDate', buildDate);
+        localStorage.setItem('meritBuildTime', buildTime);
+        localStorage.setItem('meritFullVersion', displayVersion);
+        
+        console.log('[Merit Flow] Build version:', displayVersion);
+    });
+
+    // MVP validation logging
+    console.log('[Merit Flow] All validations passed for MVP testing');
+    console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.16');
+    console.log('[Merit Flow] Form validation hardcoded to pass for testing');
+    console.log('[Merit Flow] Navigation validation hardcoded to pass for testing');
+
+    // Redis Flow Logging with enhanced error handling
+    window.REDIS_FLOW = {
+        logStep: (step, data) => {
+            const timestamp = new Date().toISOString();
+            console.log(`[${timestamp}] REDIS FLOW - ${step}:`, data);
             
-            // Show the persistence prompt
-            const promptPanel = document.getElementById('persistence-prompt');
-            if (promptPanel) {
-                promptPanel.hidden = false;
+            // Add to debug panel if it exists
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugPanel) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `
+                    <span class="timestamp">${timestamp}</span>
+                    <span class="step">${step}</span>
+                    <span class="data">${JSON.stringify(data)}</span>
+                `;
+                debugPanel.appendChild(logEntry);
             }
-        });
+        },
+        logError: (step, error) => {
+            const timestamp = new Date().toISOString();
+            console.error(`[${timestamp}] REDIS FLOW ERROR - ${step}:`, error);
+            
+            // Add to error panel if it exists
+            const errorPanel = document.getElementById('error-panel');
+            if (errorPanel) {
+                const errorEntry = document.createElement('div');
+                errorEntry.className = 'error-entry';
+                errorEntry.innerHTML = `
+                    <span class="timestamp">${timestamp}</span>
+                    <span class="step">${step}</span>
+                    <span class="error">${error.message}</span>
+                    <button onclick="retryOperation('${step}')">Retry</button>
+                `;
+                errorPanel.appendChild(errorEntry);
+            }
+            
+            // Trigger error recovery if available
+            if (window.REDIS_FLOW.errorRecovery && typeof window.REDIS_FLOW.errorRecovery[step] === 'function') {
+                window.REDIS_FLOW.errorRecovery[step](error);
+            }
+        },
+        errorRecovery: {
+            'REDIS_CONNECT': async (error) => {
+                console.log('[Merit Flow] Attempting Redis reconnection...');
+                // Implement reconnection logic
+            },
+            'CACHE_OPERATION': async (error) => {
+                console.log('[Merit Flow] Attempting cache operation recovery...');
+                // Implement cache recovery logic
+            }
+        }
+    };
+
+    // Debug panel for development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const debugPanel = document.createElement('div');
+        debugPanel.id = 'debug-panel';
+        debugPanel.style.cssText = 'position:fixed;bottom:0;right:0;width:300px;height:200px;background:rgba(0,0,0,0.8);color:#fff;overflow:auto;padding:10px;font-family:monospace;font-size:12px;z-index:9999;';
+        document.body.appendChild(debugPanel);
+    }
+
+    // Log initialization
+    window.REDIS_FLOW.logStep('INIT', {
+        timestamp: Date.now(),
+        environment: window.location.hostname,
+        intakeToken: 'elpl-merit'
+    });
+
+    // Session Management Logging
+    window.SESSION_FLOW = {
+        logSession: (sessionId, type, data) => {
+            const timestamp = new Date().toISOString();
+            console.log(`[${timestamp}] SESSION FLOW - ${type}:`, {
+                sessionId,
+                type,
+                ...data
+            });
+            
+            // Add to debug panel if it exists
+            const debugPanel = document.getElementById('debug-panel');
+            if (debugPanel) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `
+                    <span class="timestamp">${timestamp}</span>
+                    <span class="type">${type}</span>
+                    <span class="data">${JSON.stringify({ sessionId, ...data })}</span>
+                `;
+                debugPanel.appendChild(logEntry);
+            }
+        }
+    };
+
+    // Listen for session events
+    window.addEventListener('merit-session-created', (event) => {
+        window.SESSION_FLOW.logSession(
+            event.detail.sessionId,
+            'SESSION_CREATED',
+            event.detail
+        );
+    });
+
+    // Listen for persistence prompt
+    window.addEventListener('merit-persistence-prompt', (event) => {
+        window.SESSION_FLOW.logSession(
+            event.detail.sessionId,
+            'PERSISTENCE_PROMPT',
+            event.detail
+        );
+        
+        // Show the persistence prompt
+        const promptPanel = document.getElementById('persistence-prompt');
+        if (promptPanel) {
+            promptPanel.hidden = false;
+        }
+    });
     </script>
 
     <style>
