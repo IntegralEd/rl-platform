@@ -26,30 +26,38 @@
     
     <!-- Environment Configuration -->
     <script>
+        // Build timestamp is static to match deployment
+        const BUILD_TIMESTAMP = '20240422T172600Z';
+        
         window.env = {
             // Core Configuration
             SCHEMA_VERSION: '04212025.B01',
-            BUILD_DATE: '2024-04-22',
-            BUILD_TIME: '17:26:00',
+            BUILD_DATE: BUILD_TIMESTAMP.slice(0, 8),
+            BUILD_TIME: `${BUILD_TIMESTAMP.slice(9, 11)}:${BUILD_TIMESTAMP.slice(11, 13)}:${BUILD_TIMESTAMP.slice(13, 15)}`,
             BUILD_VERSION: '1.16',
-            BUILD_TIMESTAMP: '20240422T172600Z',
+            BUILD_TIMESTAMP: BUILD_TIMESTAMP,
             
-            // API Configuration (with fallbacks for testing)
-            RL_API_GATEWAY_ENDPOINT: 'https://api.recursivelearning.app/prod',
-            RL_API_KEY: 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
+            // API Configuration
+            RL_API_GATEWAY_ENDPOINT: "https://api.recursivelearning.app/prod",
+            RL_API_KEY: "qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J",
             
-            // Assistant Configuration (with fallbacks)
-            MERIT_ASSISTANT_ID: 'asst_QoAA395ibbyMImFJERbG2hKT',
-            OPENAI_PROJECT_ID: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-            MERIT_ORG_ID: 'recdg5Hlm3VVaBA2u',
+            // Assistant Configuration
+            MERIT_ASSISTANT_ID: "asst_QoAA395ibbyMImFJERbG2hKT",
+            OPENAI_PROJECT_ID: "proj_V4lrL1OSfydWCFW0zjgwrFRT",
+            MERIT_ORG_ID: "recdg5Hlm3VVaBA2u",
+            
+            // CORS Configuration
+            CORS_ORIGIN: "https://recursivelearning.app",
+            CORS_METHODS: "GET,POST,PUT,DELETE,OPTIONS",
+            CORS_HEADERS: "Content-Type,x-api-key,Authorization",
             
             // Feature Flags
-            ENABLE_MOCK_MODE: true, // Enable mock mode when API is unavailable
-            SKIP_API_VALIDATION: true, // Skip API validation during rebuild
-            DEBUG_MODE: true
+            ENABLE_MOCK_MODE: false, // Disable mock mode for production
+            SKIP_API_VALIDATION: false, // Enable API validation for production
+            DEBUG_MODE: false
         };
 
-        // Log environment and build info
+        // Log build information
         console.log('[Merit Flow] Build Information:', {
             version: window.env.BUILD_VERSION,
             schema: window.env.SCHEMA_VERSION,
@@ -93,11 +101,6 @@
             API_RATE_LIMIT: 50,
             API_BURST_LIMIT: 100,
             API_MONTHLY_QUOTA: 5000,
-            
-            // CORS Configuration
-            CORS_ORIGIN: 'https://recursivelearning.app',
-            CORS_METHODS: 'GET,POST,PUT,DELETE,OPTIONS',
-            CORS_HEADERS: 'Content-Type,x-api-key,Authorization',
             
             // Build Information
             BUILD_VERSION: '1.16',

@@ -20,29 +20,33 @@ export class MeritInstructionalFlow {
             id: window.env.MERIT_ASSISTANT_ID,
             project: window.env.OPENAI_PROJECT_ID,
             org: window.env.MERIT_ORG_ID
+        },
+        cors: {
+            origin: window.env.CORS_ORIGIN,
+            methods: window.env.CORS_METHODS,
+            headers: window.env.CORS_HEADERS
         }
     };
 
     #state = {
-        currentSection: null,
+        currentSection: 'welcome',
         formValid: false,
         gradeLevel: null,
         curriculum: "ela",
         initialized: false,
-        chatReady: true, // Always allow chat UI in testing
+        chatReady: false,
         contextLoaded: false,
         isAdmin: false,
-        redisConnected: false,
         hasError: false,
         errorMessage: null,
         openAIConfigured: false,
         threadId: null,
         context: {},
-        mockMode: window.env.ENABLE_MOCK_MODE
+        mockMode: window.env?.ENABLE_MOCK_MODE || false
     };
 
     #elements = {
-        sections: null,
+        sections: [],
         navLinks: null,
         footer: null,
         playbar: null,
@@ -52,7 +56,8 @@ export class MeritInstructionalFlow {
         sendButton: null,
         chatInput: null,
         chatWindow: null,
-        adminControls: null
+        adminControls: null,
+        gradeSelect: null
     };
 
     #openAIClient = null;
@@ -197,7 +202,8 @@ export class MeritInstructionalFlow {
             nextButton: document.getElementById('next-button'),
             sendButton: document.getElementById('send-button'),
             chatInput: document.getElementById('chat-input'),
-            chatWindow: document.getElementById('chat-window')
+            chatWindow: document.getElementById('chat-window'),
+            gradeSelect: document.getElementById('grade-select')
         };
 
         // Verify all elements exist
@@ -565,28 +571,25 @@ export class MeritInstructionalFlow {
     };
 
     async #initializeAssistant() {
-        if (!this.#openAIClient) {
-            this.#openAIClient = new MeritOpenAIClient();
-        }
-
         try {
-            const context = {
-                grade_level: this.#state.gradeLevel,
-                curriculum: this.#state.curriculum
-            };
-            
-            await this.#openAIClient.createThread();
-            this.#state.openAIConfigured = true;
+            // Check if OpenAI client is already initialized
+            if (!window.openAIClient) {
+                console.warn('[Merit Flow] OpenAI client not initialized');
+                return;
+            }
+
+            // Create new thread
+            const thread = await window.openAIClient.createThread();
             console.log('[Merit Flow] Assistant initialized:', {
-                threadId: this.#openAIClient.threadId,
-                context
+                threadId: thread.id,
+                assistantId: window.env.MERIT_ASSISTANT_ID
             });
-            
-            return true;
+
+            this.#state.openAIConfigured = true;
         } catch (error) {
-            console.warn('[Merit Flow] Assistant initialization deferred:', error);
+            console.warn('[Merit Flow] Assistant initialization deferred:', error.message);
+            // Don't throw - let the UI remain functional
             this.#state.openAIConfigured = false;
-            return false;
         }
     }
 
