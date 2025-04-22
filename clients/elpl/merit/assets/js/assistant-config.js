@@ -115,4 +115,33 @@ export const initializeConfig = () => {
 };
 
 // Export default configuration
-export default AssistantConfig; 
+export default AssistantConfig;
+
+// Assistant Configuration
+window.env = window.env || {};
+
+// API Gateway Configuration
+window.env.RL_API_GATEWAY_ENDPOINT = 'https://api.recursivelearning.app/prod';
+window.env.RL_API_KEY = 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J';
+window.env.RL_SCHEMA_VERSION = '04102025.B01';
+
+// Assistant Configuration
+window.env.MERIT_ASSISTANT_ID = 'asst_QoAA395ibbyMImFJERbG2hKT';
+window.env.MERIT_PROJECT_ID = 'proj_V4lrL1OSfydWCFW0zjgwrFRT';
+window.env.MERIT_ORG_ID = 'recdg5Hlm3VVaBA2u';
+
+// VPC Configuration
+window.env.VPC_ID = 'vpc-07e76ce384fa696e0';
+window.env.USAGE_PLAN_ID = 'r4plrt';
+
+// Build Information
+window.env.BUILD_VERSION = '1.16';
+window.env.BUILD_DATE = '04212024.1800';
+window.env.ENVIRONMENT = 'prod';
+
+// Log configuration load
+console.log('[Assistant Config] Environment variables loaded:', {
+    apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
+    schemaVersion: window.env.RL_SCHEMA_VERSION,
+    timestamp: new Date().toISOString()
+}); 
