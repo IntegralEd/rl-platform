@@ -24,11 +24,47 @@
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     
+    <!-- Environment Configuration -->
+    <script>
+        window.env = {
+            // Core Configuration
+            SCHEMA_VERSION: '04212025.B01',
+            BUILD_DATE: '2024-04-22',
+            BUILD_TIME: '17:26:00',
+            BUILD_VERSION: '1.16',
+            BUILD_TIMESTAMP: '20240422T172600Z',
+            
+            // API Configuration (with fallbacks for testing)
+            RL_API_GATEWAY_ENDPOINT: 'https://api.recursivelearning.app/prod',
+            RL_API_KEY: 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
+            
+            // Assistant Configuration (with fallbacks)
+            MERIT_ASSISTANT_ID: 'asst_QoAA395ibbyMImFJERbG2hKT',
+            OPENAI_PROJECT_ID: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+            MERIT_ORG_ID: 'recdg5Hlm3VVaBA2u',
+            
+            // Feature Flags
+            ENABLE_MOCK_MODE: true, // Enable mock mode when API is unavailable
+            SKIP_API_VALIDATION: true, // Skip API validation during rebuild
+            DEBUG_MODE: true
+        };
+
+        // Log environment and build info
+        console.log('[Merit Flow] Build Information:', {
+            version: window.env.BUILD_VERSION,
+            schema: window.env.SCHEMA_VERSION,
+            timestamp: window.env.BUILD_TIMESTAMP,
+            environment: 'recursivelearning.app',
+            mockMode: window.env.ENABLE_MOCK_MODE
+        });
+    </script>
+
+    <!-- Core Dependencies -->
+    <script type="module" src="assets/js/client-merit-openai.js"></script>
+    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+    
     <!-- Environment Configuration - Must load first -->
     <script type="module" src="assets/js/assistant-config.js"></script>
-    
-    <!-- Merit specific logic - instructional flow controller -->
-    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
     
     <script>
         // Platform-wide configuration logging

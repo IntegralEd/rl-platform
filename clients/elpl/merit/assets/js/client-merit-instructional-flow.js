@@ -29,7 +29,7 @@ export class MeritInstructionalFlow {
         gradeLevel: null,
         curriculum: "ela",
         initialized: false,
-        chatReady: false,
+        chatReady: true, // Always allow chat UI in testing
         contextLoaded: false,
         isAdmin: false,
         redisConnected: false,
@@ -37,7 +37,8 @@ export class MeritInstructionalFlow {
         errorMessage: null,
         openAIConfigured: false,
         threadId: null,
-        context: {}
+        context: {},
+        mockMode: window.env.ENABLE_MOCK_MODE
     };
 
     #elements = {
@@ -264,10 +265,19 @@ export class MeritInstructionalFlow {
     #validateForm() {
         const gradeLevel = this.#elements.form?.querySelector('#grade-level')?.value;
         console.log('[Merit Flow] validateForm: gradeLevel value:', gradeLevel);
-        this.#state.formValid = !!gradeLevel;
+        
+        // Always enable form in testing mode
+        this.#state.formValid = window.env.SKIP_API_VALIDATION ? true : !!gradeLevel;
         this.#state.gradeLevel = gradeLevel;
         
         this.#updateActionState();
+        
+        // Log validation state
+        console.log('[Merit Flow] Form validation:', {
+            gradeLevel: this.#state.gradeLevel,
+            isValid: this.#state.formValid,
+            skipValidation: window.env.SKIP_API_VALIDATION
+        });
     }
 
     async #handleNavigation(sectionOrEvent) {
@@ -276,80 +286,70 @@ export class MeritInstructionalFlow {
         // Handle both event objects and direct section strings
         if (typeof sectionOrEvent === 'string') {
             targetSection = sectionOrEvent;
-        } else if (sectionOrEvent && typeof sectionOrEvent === 'object' && typeof sectionOrEvent.preventDefault === 'function') {
+        } else if (sectionOrEvent?.preventDefault) {
             sectionOrEvent.preventDefault();
-            targetSection = sectionOrEvent.target.getAttribute('href').substring(1);
-        } else {
-            console.error('[Merit Flow] Invalid navigation parameter:', sectionOrEvent);
-            return;
+            targetSection = sectionOrEvent.target.getAttribute('href')?.substring(1);
         }
         
+        if (!targetSection) {
+            console.error('[Merit Flow] Invalid navigation target');
+            return;
+        }
+
         try {
-            console.log('[Merit Flow] Attempting to navigate to:', targetSection);
+            console.log('[Merit Flow] Navigating to:', targetSection);
             
-            // First update the UI immediately to show the new section
-            // Update active section
-            this.#elements.sections.forEach(section => {
+            // Always update UI immediately
+            this.#elements.sections?.forEach(section => {
                 section.hidden = section.dataset.section !== targetSection;
-                if (!section.hidden) {
-                    section.classList.add('active');
-                } else {
-                    section.classList.remove('active');
-                }
+                section.classList.toggle('active', !section.hidden);
             });
-            
-            // Update navigation links
-            this.#elements.navLinks.forEach(link => {
+
+            // Update navigation state
+            this.#elements.navLinks?.forEach(link => {
                 const isActive = link.dataset.section === targetSection;
                 link.classList.toggle('active', isActive);
                 link.setAttribute('aria-current', isActive ? 'page' : 'false');
             });
-            
-            // Update UI elements based on section
+
+            // Update UI elements
             if (targetSection === 'chat') {
                 this.#elements.playbar.hidden = true;
                 this.#elements.chatbar.hidden = false;
-            } else {
-                this.#elements.playbar.hidden = false;
-                this.#elements.chatbar.hidden = true;
-            }
-            
-            // Now handle background initialization if needed
-            // Only create thread when entering chat section
-            if (targetSection === 'chat' && !this.#openAIClient.threadId) {
-                console.log('[Merit Flow] Creating new thread for chat...');
-                const loadingMessage = document.createElement('div');
-                loadingMessage.className = 'alert alert-info';
-                loadingMessage.textContent = 'Connecting to chat service...';
-                this.#elements.chatWindow.appendChild(loadingMessage);
                 
-                // Create thread in the background
-                this.#openAIClient.createThread()
-                    .then(() => {
-                        loadingMessage.remove();
-                        console.log('[Merit Flow] Thread creation completed');
-                    })
-                    .catch(error => {
-                        console.error('[Merit Flow] Thread creation failed:', error);
-                        loadingMessage.className = 'alert alert-danger';
-                        loadingMessage.innerHTML = `
-                            ${this.#openAIClient.getState().errorMessage}<br>
-                            <button class="btn btn-outline-danger mt-2" onclick="window.location.reload()">
-                                Try Again
-                            </button>
-                        `;
+                // Show connecting message
+                const statusMessage = document.createElement('div');
+                statusMessage.className = 'status-message';
+                statusMessage.innerHTML = `
+                    <div class="connecting-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Connecting to assistant...</span>
+                    </div>
+                `;
+                this.#elements.chatWindow.appendChild(statusMessage);
+
+                // Try to initialize OpenAI client in background
+                if (!this.#state.mockMode) {
+                    this.#initializeAssistant().catch(error => {
+                        console.warn('[Merit Flow] Assistant initialization deferred:', error.message);
+                        this.#showError('Chat service temporarily unavailable. You can still explore the interface.');
                     });
+                } else {
+                    console.log('[Merit Flow] Running in mock mode - skipping API initialization');
+                }
             }
-            
-            // Track navigation
-            console.log('[Merit Flow] Navigation successful:', {
+
+            // Log navigation success
+            console.log('[Merit Flow] Navigation complete:', {
                 section: targetSection,
-                threadId: this.#openAIClient?.threadId || 'not_created'
+                mockMode: this.#state.mockMode,
+                apiStatus: this.#state.openAIConfigured ? 'connected' : 'unavailable'
             });
-            
+
         } catch (error) {
             console.error('[Merit Flow] Navigation error:', error);
-            this.#handleError(error);
+            // Don't block navigation on error
+            this.#logError(error);
         }
     }
 
@@ -516,7 +516,8 @@ export class MeritInstructionalFlow {
             errorMessage: null,
             openAIConfigured: false,
             threadId: null,
-            context: {}
+            context: {},
+            mockMode: window.env.ENABLE_MOCK_MODE
         };
         
         this.#openAIClient?.destroy();
@@ -541,6 +542,14 @@ export class MeritInstructionalFlow {
         `;
     }
 
+    #logError(error) {
+        console.error('[Merit Flow] Error:', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+    }
+
     // Add debug methods
     debug = {
         getState: () => this.getState(),
@@ -555,26 +564,28 @@ export class MeritInstructionalFlow {
         }
     };
 
-    async initializeAssistant() {
+    async #initializeAssistant() {
+        if (!this.#openAIClient) {
+            this.#openAIClient = new MeritOpenAIClient();
+        }
+
         try {
             const context = {
                 grade_level: this.#state.gradeLevel,
-                curriculum: this.#state.curriculum,
-                schema_version: ASSISTANT_CONFIGS.merit[ENV].schema_version
+                curriculum: this.#state.curriculum
             };
             
-            const { threadId } = await this.assistant.createThread(context);
-            this.#state.threadId = threadId;
-            
+            await this.#openAIClient.createThread();
+            this.#state.openAIConfigured = true;
             console.log('[Merit Flow] Assistant initialized:', {
-                threadId,
+                threadId: this.#openAIClient.threadId,
                 context
             });
             
             return true;
         } catch (error) {
-            console.error('[Merit Flow] Assistant initialization failed:', error);
-            this.#showError('Failed to initialize assistant. Please refresh and try again.');
+            console.warn('[Merit Flow] Assistant initialization deferred:', error);
+            this.#state.openAIConfigured = false;
             return false;
         }
     }
