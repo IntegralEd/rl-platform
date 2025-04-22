@@ -753,7 +753,7 @@
 
         .select-wrapper::after {
             content: "";
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23211651' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("/clients/elpl/assets/images/client-elpl-dropdown-arrow.png");
             width: 16px;
             height: 16px;
             position: absolute;
@@ -762,6 +762,8 @@
             transform: translateY(-50%);
             pointer-events: none;
             transition: transform 0.2s ease;
+            background-size: contain;
+            background-repeat: no-repeat;
         }
 
         .select-wrapper:hover::after {
@@ -1459,7 +1461,7 @@
                                 class="action-button"
                                 aria-label="Send message"
                                 data-test-id="send-button">
-                            <img src="/clients/elpl/assets/images/client-elpl-send-button-crimson.png" 
+                            <img src="/clients/elpl/assets/images/client-elpl-send-button.png" 
                                  alt="Send" 
                                  class="button-icon"
                                  loading="lazy">
