@@ -7,16 +7,20 @@
  * @module client-merit-instructional-flow
  */
 
-import MeritOpenAIClient from './client-merit-openai.js';
-import { AssistantManager, ASSISTANT_CONFIGS, ENV } from './assistant-config.js';
+import { MeritOpenAIClient } from './client-merit-openai.js';
 
 export class MeritInstructionalFlow {
     #config = {
         id: "merit-ela-flow",
-        version: window.env.RL_SCHEMA_VERSION,
+        version: window.env.SCHEMA_VERSION,
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
-        apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT
+        apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+        assistant: {
+            id: window.env.MERIT_ASSISTANT_ID,
+            project: window.env.OPENAI_PROJECT_ID,
+            org: window.env.MERIT_ORG_ID
+        }
     };
 
     #state = {

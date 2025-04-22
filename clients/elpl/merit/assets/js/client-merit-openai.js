@@ -3,49 +3,43 @@
  * @description Handles OpenAI Assistant interactions for Merit chat
  * @version 1.0.23
  */
-class MeritOpenAIClient {
+export class MeritOpenAIClient {
     constructor() {
-        // OpenAI Configuration - Merit Assistant
-        this.OPENAI_CONFIG = {
-            assistant_id: window.env.MERIT_ASSISTANT_ID || 'asst_QoAA395ibbyMImFJERbG2hKT',
-            project_id: window.env.OPENAI_PROJECT_ID || 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-            org_id: window.env.MERIT_ORG_ID || 'recdg5Hlm3VVaBA2u'
+        // Validate required environment variables
+        this.validateConfig();
+        
+        // Initialize core configuration
+        this.assistant_id = window.env.MERIT_ASSISTANT_ID;
+        this.project_id = window.env.OPENAI_PROJECT_ID;
+        this.org_id = window.env.MERIT_ORG_ID;
+        
+        // API Configuration
+        this.baseUrl = `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1`;
+        this.headers = {
+            'Content-Type': 'application/json',
+            'x-api-key': window.env.RL_API_KEY
         };
+        
+        // Error tracking
+        this.errorCount = 0;
+        this.maxRetries = 3;
+        this.retryDelay = 1000; // ms
 
         // Core configuration
         this.threadId = null;
-        this.assistantId = this.OPENAI_CONFIG.assistant_id;
         this.userId = null;
 
-        // API Configuration
-        const ENDPOINTS = {
-            prod: window.env.API_GATEWAY_ENDPOINT || window.env.LAMBDA_ENDPOINT,
-            contextPrefix: 'context',
-            threadPrefix: 'thread'
-        };
-        
-        // Core state
-        this.baseUrl = ENDPOINTS.prod;
-        
         // Project configuration
         this.config = {
-            org_id: this.OPENAI_CONFIG.org_id,
-            assistant_id: this.assistantId,
-            project_id: this.OPENAI_CONFIG.project_id,
+            org_id: this.org_id,
+            assistant_id: this.assistant_id,
+            project_id: this.project_id,
             schema_version: window.env.SCHEMA_VERSION,
             ttl: {
                 session: 3600,
                 cache: 3600,
                 temp: 3600
             }
-        };
-        
-        // Request headers with API Gateway key format
-        this.headers = {
-            'Content-Type': 'application/json',
-            'x-api-key': window.env.API_GATEWAY_KEY || window.env.MERIT_API_KEY,
-            'X-Project-ID': this.config.project_id,
-            'Origin': 'https://recursivelearning.app'
         };
 
         // Context fields structure
@@ -58,13 +52,6 @@ class MeritOpenAIClient {
                 schema_version: this.config.schema_version,
                 thread_id: null
             }
-        };
-
-        // Error tracking
-        this.errors = {
-            validation: [],
-            cache: [],
-            schema: []
         };
 
         // State management
@@ -80,10 +67,25 @@ class MeritOpenAIClient {
         };
 
         console.log('[Merit Flow] OpenAI client initialized', {
-            assistant: this.assistantId,
-            project: this.config.project_id,
+            assistant: this.assistant_id,
+            project: this.project_id,
             endpoint: this.baseUrl
         });
+    }
+
+    validateConfig() {
+        const required = [
+            'MERIT_ASSISTANT_ID',
+            'OPENAI_PROJECT_ID',
+            'MERIT_ORG_ID',
+            'RL_API_GATEWAY_ENDPOINT',
+            'RL_API_KEY'
+        ];
+        
+        const missing = required.filter(key => !window.env[key]);
+        if (missing.length > 0) {
+            throw new Error(`Missing required configuration: ${missing.join(', ')}`);
+        }
     }
 
     /**
@@ -282,6 +284,4 @@ class MeritOpenAIClient {
         };
         console.log('[Merit Flow] Client destroyed');
     }
-}
-
-export default MeritOpenAIClient; 
+} 
