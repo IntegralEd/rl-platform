@@ -79,282 +79,291 @@
                 timestamp: new Date().toISOString()
             });
         }
-
-        // Initialize version display with build counter
-        document.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            // Convert to Central Time
-            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-            
-            // Format date as MMDDYYYY
-            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-            const day = String(centralTime.getDate()).padStart(2, '0');
-            const year = centralTime.getFullYear();
-            const buildDate = `${month}${day}${year}`;
-            
-            // Format time as HH:MMam/pm
-            const hours = centralTime.getHours();
-            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-            const buildTime = `${formattedHours}:${minutes}${ampm}`;
-            
-            // Version 1.0.15 simplified to 1.16
-            const version = '1.16';
-            
-            // Format: merit.html/04132024.09:09am.v.1.15
-            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-            
-            // Store for debugging and build tracking
-            localStorage.setItem('meritVersion', version);
-            localStorage.setItem('meritBuildDate', buildDate);
-            localStorage.setItem('meritBuildTime', buildTime);
-            localStorage.setItem('meritFullVersion', displayVersion);
-            
-            if (window.env.DEBUG_MODE) {
-                console.log('[Merit Flow] Build version:', displayVersion);
-            }
-        });
     </script>
 
     <!-- Core Dependencies -->
     <script type="module" src="assets/js/client-merit-openai.js"></script>
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
-    
-    <!-- Remove Redis Flow Logging -->
+
+    <!-- Add API Connection Status Handler -->
     <script>
-        // Initialize version display with build counter
-        document.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            // Convert to Central Time
-            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-            
-            // Format date as MMDDYYYY
-            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-            const day = String(centralTime.getDate()).padStart(2, '0');
-            const year = centralTime.getFullYear();
-            const buildDate = `${month}${day}${year}`;
-            
-            // Format time as HH:MMam/pm
-            const hours = centralTime.getHours();
-            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-            const buildTime = `${formattedHours}:${minutes}${ampm}`;
-            
-            // Version 1.0.15 simplified to 1.16
-            const version = '1.16';
-            
-            // Format: merit.html/04132024.09:09am.v.1.15
-            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-            
-            // Store for debugging and build tracking
-            localStorage.setItem('meritVersion', version);
-            localStorage.setItem('meritBuildDate', buildDate);
-            localStorage.setItem('meritBuildTime', buildTime);
-            localStorage.setItem('meritFullVersion', displayVersion);
-            
-            if (window.env.DEBUG_MODE) {
-                console.log('[Merit Flow] Build version:', displayVersion);
+        class APIConnectionManager {
+            constructor() {
+                this.retryAttempts = 0;
+                this.maxRetries = window.env.RL_API_RETRY_ATTEMPTS;
+                this.connectionStatus = document.getElementById('connection-status');
+                this.errorBanner = document.getElementById('error-banner');
             }
-        });
-    </script>
 
-    <!-- Redis Client (API-based)
-    All Redis operations now go through API Gateway endpoints instead of direct Redis connections,
-    eliminating browser compatibility issues with Node.js modules -->
-    
-    <!-- Monitor for deprecated script loading
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.tagName === 'SCRIPT') {
-                        const src = node.src || '';
-                        if (src.includes('client-merit-admin-logic.js')) {
-                            console.error('[MERIT ERROR] Attempting to load deprecated admin logic script. This file has been removed. Use client-merit-instructional-flow.js instead.');
-                            throw new Error('Deprecated script detected: client-merit-admin-logic.js');
-                        }
-                        if (src.includes('D_client-merit')) {
-                            console.error('[MERIT ERROR] Attempting to load deprecated script:', src);
-                            throw new Error('Deprecated script detected: ' + src);
-                        }
+            async testConnection() {
+                try {
+                    const response = await fetch(`${window.env.RL_API_GATEWAY_ENDPOINT}/health`, {
+                        method: 'GET',
+                        headers: {
+                            'x-api-key': window.env.RL_API_KEY
+                        },
+                        timeout: window.env.RL_API_TIMEOUT
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API responded with status: ${response.status}`);
                     }
-                });
+
+                    this.updateConnectionStatus('connected');
+                    return true;
+                } catch (error) {
+                    console.error('[API Gateway] Connection test failed:', error);
+                    
+                    if (this.retryAttempts < this.maxRetries) {
+                        this.retryAttempts++;
+                        this.updateConnectionStatus('retrying');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        return this.testConnection();
+                    }
+
+                    this.updateConnectionStatus('failed');
+                    this.showErrorBanner(`Connection failed: ${error.message}`);
+                    return false;
+                }
+            }
+
+            updateConnectionStatus(status) {
+                if (this.connectionStatus) {
+                    this.connectionStatus.className = `status-indicator ${status}`;
+                    this.connectionStatus.querySelector('#connection-message').textContent = 
+                        status === 'connected' ? 'Connected' :
+                        status === 'retrying' ? `Retrying (${this.retryAttempts}/${this.maxRetries})...` :
+                        'Connection Failed';
+                }
+            }
+
+            showErrorBanner(message) {
+                if (this.errorBanner) {
+                    this.errorBanner.classList.remove('hidden');
+                    this.errorBanner.querySelector('#error-details').textContent = message;
+                }
+            }
+        }
+
+        // Initialize API Connection Manager
+        document.addEventListener('DOMContentLoaded', async () => {
+            const apiManager = new APIConnectionManager();
+            await apiManager.testConnection();
+            
+            // Initialize Merit Flow only after connection test
+            if (window.MeritInstructionalFlow) {
+                try {
+                    const flow = new MeritInstructionalFlow({
+                        gradeSelect: document.getElementById('grade-level'),
+                        curriculumSelect: document.getElementById('curriculum'),
+                        apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+                        apiKey: window.env.RL_API_KEY
+                    });
+                    await flow.initialize();
+                } catch (error) {
+                    console.error('[Merit Flow] Failed to initialize:', error);
+                    apiManager.showErrorBanner('Failed to initialize Merit Flow. Please refresh the page.');
+                }
             }
         });
-    });
-
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
-
-    // Log any attempts to use old admin functions
-    window.addEventListener('error', (event) => {
-        if (event.message.includes('MeritInstructionalFlow')) {
-            console.error('[MERIT ERROR] Attempting to use deprecated MeritInstructionalFlow. Use the new unified controller instead.');
-        }
-    });
-
-    // Initialize version display with build counter
-    document.addEventListener('DOMContentLoaded', () => {
-        const now = new Date();
-        // Convert to Central Time
-        const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-        
-        // Format date as MMDDYYYY
-        const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-        const day = String(centralTime.getDate()).padStart(2, '0');
-        const year = centralTime.getFullYear();
-        const buildDate = `${month}${day}${year}`;
-        
-        // Format time as HH:MMam/pm
-        const hours = centralTime.getHours();
-        const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'pm' : 'am';
-        const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-        const buildTime = `${formattedHours}:${minutes}${ampm}`;
-        
-        // Version 1.0.15 simplified to 1.16
-        const version = '1.16';
-        
-        // Format: merit.html/04132024.09:09am.v.1.15
-        const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-        
-        // Store for debugging and build tracking
-        localStorage.setItem('meritVersion', version);
-        localStorage.setItem('meritBuildDate', buildDate);
-        localStorage.setItem('meritBuildTime', buildTime);
-        localStorage.setItem('meritFullVersion', displayVersion);
-        
-        console.log('[Merit Flow] Build version:', displayVersion);
-    });
-
-    // MVP validation logging
-    console.log('[Merit Flow] All validations passed for MVP testing');
-    console.log('[Merit Flow] Note: Proper validation will be implemented in v1.0.16');
-    console.log('[Merit Flow] Form validation hardcoded to pass for testing');
-    console.log('[Merit Flow] Navigation validation hardcoded to pass for testing');
-
-    // Redis Flow Logging with enhanced error handling
-    window.REDIS_FLOW = {
-        logStep: (step, data) => {
-            const timestamp = new Date().toISOString();
-            console.log(`[${timestamp}] REDIS FLOW - ${step}:`, data);
-            
-            // Add to debug panel if it exists
-            const debugPanel = document.getElementById('debug-panel');
-            if (debugPanel) {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry';
-                logEntry.innerHTML = `
-                    <span class="timestamp">${timestamp}</span>
-                    <span class="step">${step}</span>
-                    <span class="data">${JSON.stringify(data)}</span>
-                `;
-                debugPanel.appendChild(logEntry);
-            }
-        },
-        logError: (step, error) => {
-            const timestamp = new Date().toISOString();
-            console.error(`[${timestamp}] REDIS FLOW ERROR - ${step}:`, error);
-            
-            // Add to error panel if it exists
-            const errorPanel = document.getElementById('error-panel');
-            if (errorPanel) {
-                const errorEntry = document.createElement('div');
-                errorEntry.className = 'error-entry';
-                errorEntry.innerHTML = `
-                    <span class="timestamp">${timestamp}</span>
-                    <span class="step">${step}</span>
-                    <span class="error">${error.message}</span>
-                    <button onclick="retryOperation('${step}')">Retry</button>
-                `;
-                errorPanel.appendChild(errorEntry);
-            }
-            
-            // Trigger error recovery if available
-            if (window.REDIS_FLOW.errorRecovery && typeof window.REDIS_FLOW.errorRecovery[step] === 'function') {
-                window.REDIS_FLOW.errorRecovery[step](error);
-            }
-        },
-        errorRecovery: {
-            'REDIS_CONNECT': async (error) => {
-                console.log('[Merit Flow] Attempting Redis reconnection...');
-                // Implement reconnection logic
-            },
-            'CACHE_OPERATION': async (error) => {
-                console.log('[Merit Flow] Attempting cache operation recovery...');
-                // Implement cache recovery logic
-            }
-        }
-    };
-
-    // Debug panel for development
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const debugPanel = document.createElement('div');
-        debugPanel.id = 'debug-panel';
-        debugPanel.style.cssText = 'position:fixed;bottom:0;right:0;width:300px;height:200px;background:rgba(0,0,0,0.8);color:#fff;overflow:auto;padding:10px;font-family:monospace;font-size:12px;z-index:9999;';
-        document.body.appendChild(debugPanel);
-    }
-
-    // Log initialization
-    window.REDIS_FLOW.logStep('INIT', {
-        timestamp: Date.now(),
-        environment: window.location.hostname,
-        intakeToken: 'elpl-merit'
-    });
-
-    // Session Management Logging
-    window.SESSION_FLOW = {
-        logSession: (sessionId, type, data) => {
-            const timestamp = new Date().toISOString();
-            console.log(`[${timestamp}] SESSION FLOW - ${type}:`, {
-                sessionId,
-                type,
-                ...data
-            });
-            
-            // Add to debug panel if it exists
-            const debugPanel = document.getElementById('debug-panel');
-            if (debugPanel) {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry';
-                logEntry.innerHTML = `
-                    <span class="timestamp">${timestamp}</span>
-                    <span class="type">${type}</span>
-                    <span class="data">${JSON.stringify({ sessionId, ...data })}</span>
-                `;
-                debugPanel.appendChild(logEntry);
-            }
-        }
-    };
-
-    // Listen for session events
-    window.addEventListener('merit-session-created', (event) => {
-        window.SESSION_FLOW.logSession(
-            event.detail.sessionId,
-            'SESSION_CREATED',
-            event.detail
-        );
-    });
-
-    // Listen for persistence prompt
-    window.addEventListener('merit-persistence-prompt', (event) => {
-        window.SESSION_FLOW.logSession(
-            event.detail.sessionId,
-            'PERSISTENCE_PROMPT',
-            event.detail
-        );
-        
-        // Show the persistence prompt
-        const promptPanel = document.getElementById('persistence-prompt');
-        if (promptPanel) {
-            promptPanel.hidden = false;
-        }
-    });
     </script>
+</head>
+<body>
+    <!-- Connection Status -->
+    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite">
+        <span id="connection-message">Connecting to Merit...</span>
+    </div>
+    
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner hidden" role="alert" aria-live="assertive">
+        <span class="error-icon">⚠️</span>
+        <span id="error-details">An error occurred</span>
+        <button onclick="this.parentElement.classList.add('hidden')" aria-label="Dismiss error">
+            Dismiss
+        </button>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+        <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Version Display -->
+    <div class="version-display">
+        <span>v<span id="version-number">1.16</span></span>
+        <span class="environment-tag">PROD</span>
+        <span class="build-date">04/21/24</span>
+    </div>
+    
+    <div class="client-layout" data-client-component="merit-page" data-test-id="page-container">
+        <header class="client-header">
+            <img 
+                src="/clients/elpl/assets/images/client-elpl-logo-white.png"
+                alt="ELPL Logo"
+                class="client-logo"
+                loading="lazy"
+                aria-live="polite"
+            />
+        </header>
+
+        <main class="client-content" role="main" data-test-id="main-content">
+            <!-- Sidebar with fixed width -->
+            <nav class="sidebar expanded" 
+                 role="navigation" 
+                 aria-label="Main navigation"
+                 data-test-id="sidebar">
+                <div class="sidebar-content" style="padding-top: 30px;">
+                    <div class="sidebar-nav">
+                        <a href="#welcome" 
+                           class="nav-link active" 
+                           data-section="welcome" 
+                           aria-current="page"
+                           data-test-id="nav-welcome">
+                            <span class="nav-text">Welcome</span>
+                        </a>
+                        <a href="#chat" 
+                           class="nav-link" 
+                           data-section="chat"
+                           data-test-id="nav-chat">
+                            <span class="nav-text">Chat</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main content area -->
+            <div class="content-area" 
+                 role="region" 
+                 aria-label="Main content"
+                 data-test-id="content-area">
+                <div class="section active" 
+                     data-section="welcome" 
+                     role="tabpanel" 
+                     aria-labelledby="welcome-tab"
+                     data-test-id="welcome-section">
+                    <div class="welcome-content">
+                        <h1>Welcome to Merit</h1>
+                        <h2>Your EL Education Curriculum Support Assistant</h2>
+                        
+                        <form class="welcome-form" 
+                              id="welcome-form"
+                              data-test-id="welcome-form"
+                              aria-label="Welcome Form">
+                            <div class="form-group">
+                                <label for="grade-level" id="grade-level-label">What grade level do you teach or support?</label>
+                                <div class="select-wrapper">
+                                    <select id="grade-level" 
+                                            class="form-control" 
+                                            required
+                                            data-test-id="grade-select"
+                                            aria-labelledby="grade-level-label"
+                                            aria-describedby="grade-level-description"
+                                            aria-required="true">
+                                        <option value="" disabled selected>Select a grade level</option>
+                                        <option value="Kindergarten">Kindergarten</option>
+                                        <option value="Grade 1">Grade 1</option>
+                                        <option value="Grade 2">Grade 2</option>
+                                        <option value="Grade 3">Grade 3</option>
+                                        <option value="Grade 4">Grade 4</option>
+                                        <option value="Grade 5">Grade 5</option>
+                                    </select>
+                                    <span id="grade-level-description" class="sr-only">
+                                        Choose your grade level from Kindergarten through Grade 5
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="curriculum" id="curriculum-label">Which curriculum are you here with questions about?</label>
+                                <div class="select-wrapper">
+                                    <select id="curriculum" 
+                                            class="form-control" 
+                                            required
+                                            data-test-id="curriculum-select"
+                                            aria-labelledby="curriculum-label"
+                                            aria-describedby="curriculum-description"
+                                            aria-required="true">
+                                        <option value="ela" selected>English Language Arts (ELA)</option>
+                                    </select>
+                                    <span id="curriculum-description" class="sr-only">
+                                        Currently only ELA curriculum is available
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="section" 
+                     data-section="chat" 
+                     role="tabpanel" 
+                     aria-labelledby="chat-tab" 
+                     hidden
+                     data-test-id="chat-section">
+                    <div class="chat-container" data-test-id="chat-container">
+                        <div id="chat-window" 
+                             class="chat-window" 
+                             role="log" 
+                             aria-live="polite"
+                             aria-label="Chat conversation"
+                             role="article"
+                             aria-label="Assistant message"
+                             data-test-id="chat-window">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="client-footer" role="contentinfo" data-test-id="footer">
+            <div class="footer-content">
+                <div class="footer-spacer"></div>
+                <div class="footer-center">
+                    <div id="playbar" class="playbar" data-test-id="playbar" style="position: relative; z-index: 100;">
+                        <button id="next-button" 
+                                class="action-button" 
+                                aria-label="Continue to chat"
+                                data-active="true"
+                                data-test-id="next-button">
+                            <img src="/clients/elpl/assets/images/client-elpl-next-button.png" 
+                                 alt="Next" 
+                                 class="button-icon"
+                                 loading="lazy">
+                        </button>
+                    </div>
+                    <div id="chatbar" class="chatbar" hidden data-test-id="chatbar">
+            <div class="chat-input-container">
+                            <textarea id="chat-input"
+                                    class="chat-input"
+                                    aria-label="Type your message"
+                    placeholder="Type your message..." 
+                                    rows="1"
+                                    maxlength="1000"
+                                    data-test-id="chat-input"></textarea>
+                        </div>
+                        <button id="send-button" 
+                                class="action-button"
+                                aria-label="Send message"
+                                data-test-id="send-button">
+                            <img src="/clients/elpl/assets/images/client-elpl-send-button.png" 
+                                 alt="Send" 
+                                 class="button-icon"
+                                 loading="lazy">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Copyright Footer -->
+        <div class="copyright-footer" role="contentinfo" aria-label="Copyright information">
+            <div>© Recursive Learning Platform</div>
+        </div>
+    </div>
+</body>
+</html>
 
     <style>
         /* Layout Variables */
