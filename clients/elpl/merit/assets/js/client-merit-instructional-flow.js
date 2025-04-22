@@ -3,7 +3,7 @@
  * Controls the flow of instruction, navigation, and state management for Merit pages.
  * Integrates admin and client functionality in a unified controller.
  * 
- * @version 1.0.21
+ * @version 1.0.22
  * @module client-merit-instructional-flow
  */
 
@@ -16,6 +16,7 @@ export class MeritInstructionalFlow {
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
         apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+        apiFallback: window.env.RL_API_FALLBACK_ENDPOINT,
         assistant: {
             id: window.env.MERIT_ASSISTANT_ID,
             project: window.env.OPENAI_PROJECT_ID,
@@ -25,7 +26,9 @@ export class MeritInstructionalFlow {
             origin: window.env.CORS_ORIGIN,
             methods: window.env.CORS_METHODS,
             headers: window.env.CORS_HEADERS
-        }
+        },
+        retryAttempts: window.env.RL_API_RETRY_ATTEMPTS || 3,
+        timeout: window.env.RL_API_TIMEOUT || 30000
     };
 
     #state = {
@@ -42,7 +45,9 @@ export class MeritInstructionalFlow {
         openAIConfigured: false,
         threadId: null,
         context: {},
-        mockMode: window.env?.ENABLE_MOCK_MODE || false
+        mockMode: window.env?.ENABLE_MOCK_MODE || false,
+        connectionAttempts: 0,
+        lastEndpoint: null
     };
 
     #elements = {
@@ -572,71 +577,97 @@ export class MeritInstructionalFlow {
 
     async #initializeAssistant() {
         try {
-            // Check if OpenAI client is already initialized
-            if (!window.openAIClient) {
-                console.warn('[Merit Flow] OpenAI client not initialized');
-                return;
+            if (this.#state.connectionAttempts >= this.#config.retryAttempts) {
+                throw new Error('Maximum connection attempts reached');
             }
 
-            // Create new thread
-            const thread = await window.openAIClient.createThread();
-            console.log('[Merit Flow] Assistant initialized:', {
-                threadId: thread.id,
-                assistantId: window.env.MERIT_ASSISTANT_ID
+            this.#state.connectionAttempts++;
+            
+            // Try primary endpoint first
+            try {
+                const response = await this.#testConnection(this.#config.apiEndpoint);
+                if (response.ok) {
+                    this.#state.lastEndpoint = this.#config.apiEndpoint;
+                    return true;
+                }
+            } catch (error) {
+                console.warn('[Merit Flow] Primary endpoint failed:', error);
+            }
+
+            // Try fallback if available
+            if (this.#config.apiFallback) {
+                try {
+                    const response = await this.#testConnection(this.#config.apiFallback);
+                    if (response.ok) {
+                        this.#state.lastEndpoint = this.#config.apiFallback;
+                        return true;
+                    }
+                } catch (error) {
+                    console.warn('[Merit Flow] Fallback endpoint failed:', error);
+                }
+            }
+
+            // If we get here, both endpoints failed
+            throw new Error('All endpoints failed');
+
+        } catch (error) {
+            console.error('[Merit Flow] Assistant initialization failed:', error);
+            this.#state.hasError = true;
+            this.#state.errorMessage = 'Unable to connect to the assistant service';
+            
+            // Show user-friendly error
+            this.#showError(`
+                <div class="connection-error">
+                    <p>Unable to connect to the assistant service.</p>
+                    <button onclick="window.location.reload()">Try Again</button>
+                    ${this.#state.isAdmin ? `<pre>${error.message}</pre>` : ''}
+                </div>
+            `);
+            
+            return false;
+        }
+    }
+
+    async #testConnection(endpoint) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.#config.timeout);
+
+        try {
+            const response = await fetch(`${endpoint}/health`, {
+                method: 'GET',
+                headers: {
+                    'x-api-key': this.#config.assistant.apiKey,
+                    'X-Request-ID': `merit-health-${Date.now()}`
+                },
+                signal: controller.signal
             });
 
-            this.#state.openAIConfigured = true;
+            clearTimeout(timeoutId);
+            return response;
+
         } catch (error) {
-            console.warn('[Merit Flow] Assistant initialization deferred:', error.message);
-            // Don't throw - let the UI remain functional
-            this.#state.openAIConfigured = false;
+            clearTimeout(timeoutId);
+            throw error;
         }
     }
 
-    async sendMessage(content) {
-        if (!content?.trim()) return;
-        
-        try {
-            this.#showLoading();
-            
-            // Ensure thread exists
-            if (!this.#state.threadId) {
-                const initialized = await this.initializeAssistant();
-                if (!initialized) return;
-            }
-            
-            // Send message with current context
-            const response = await this.assistant.sendMessage(
-                this.#state.threadId,
-                content,
-                {
-                    grade_level: this.#state.gradeLevel,
-                    curriculum: this.#state.curriculum
-                }
-            );
-            
-            this.#hideLoading();
-            this.displayMessage(response);
-            
-        } catch (error) {
-            console.error('[Merit Flow] Message error:', error);
-            this.#hideLoading();
-            this.#showError('Failed to send message. Please try again.');
+    #showError(message, isHtml = false) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'message error';
+        if (isHtml) {
+            errorDiv.innerHTML = message;
+        } else {
+            errorDiv.textContent = message;
         }
-    }
+        this.#elements.chatWindow?.appendChild(errorDiv);
+        errorDiv.scrollIntoView({ behavior: 'smooth' });
 
-    displayMessage(response) {
-        const { role, content } = response;
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${role}`;
-        messageElement.innerHTML = this.formatMessage(content);
-        this.#elements.chatWindow.appendChild(messageElement);
-        messageElement.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    formatMessage(content) {
-        // Implement message formatting (markdown, etc.)
-        return content;
+        // Log error for monitoring
+        console.error('[Merit Flow] Error displayed:', {
+            message: message,
+            timestamp: new Date().toISOString(),
+            endpoint: this.#state.lastEndpoint
+        });
     }
 }
 

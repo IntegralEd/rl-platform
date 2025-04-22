@@ -37,24 +37,29 @@
             BUILD_VERSION: '1.16',
             BUILD_TIMESTAMP: BUILD_TIMESTAMP,
             
-            // API Configuration
+            // API Configuration - Updated endpoints and error handling
             RL_API_GATEWAY_ENDPOINT: "https://api.recursivelearning.app/prod",
+            RL_API_FALLBACK_ENDPOINT: "https://api-backup.recursivelearning.app/prod", // Fallback endpoint
             RL_API_KEY: "qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J",
+            RL_API_TIMEOUT: 30000, // 30 second timeout
+            RL_API_RETRY_ATTEMPTS: 3, // Number of retry attempts
             
-            // Assistant Configuration
+            // Assistant Configuration - Updated with error handling
             MERIT_ASSISTANT_ID: "asst_QoAA395ibbyMImFJERbG2hKT",
             OPENAI_PROJECT_ID: "proj_V4lrL1OSfydWCFW0zjgwrFRT",
             MERIT_ORG_ID: "recdg5Hlm3VVaBA2u",
+            MERIT_FALLBACK_MODE: false, // Enable if assistant is unavailable
             
-            // CORS Configuration
+            // CORS Configuration - Updated with additional headers
             CORS_ORIGIN: "https://recursivelearning.app",
             CORS_METHODS: "GET,POST,PUT,DELETE,OPTIONS",
-            CORS_HEADERS: "Content-Type,x-api-key,Authorization",
+            CORS_HEADERS: "Content-Type,x-api-key,Authorization,X-Request-ID",
             
             // Feature Flags
-            ENABLE_MOCK_MODE: false, // Disable mock mode for production
-            SKIP_API_VALIDATION: false, // Enable API validation for production
-            DEBUG_MODE: false
+            ENABLE_MOCK_MODE: false,
+            SKIP_API_VALIDATION: false,
+            DEBUG_MODE: true, // Temporarily enabled for troubleshooting
+            ENABLE_ERROR_REPORTING: true
         };
 
         // Log build information
@@ -65,171 +70,96 @@
             environment: 'recursivelearning.app',
             mockMode: window.env.ENABLE_MOCK_MODE
         });
+
+        // Configuration validation and logging
+        if (window.env.DEBUG_MODE) {
+            console.log('[Merit Flow] Environment loaded:', {
+                apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
+                schemaVersion: window.env.SCHEMA_VERSION,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        // Initialize version display with build counter
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            // Convert to Central Time
+            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+            
+            // Format date as MMDDYYYY
+            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+            const day = String(centralTime.getDate()).padStart(2, '0');
+            const year = centralTime.getFullYear();
+            const buildDate = `${month}${day}${year}`;
+            
+            // Format time as HH:MMam/pm
+            const hours = centralTime.getHours();
+            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+            const buildTime = `${formattedHours}:${minutes}${ampm}`;
+            
+            // Version 1.0.15 simplified to 1.16
+            const version = '1.16';
+            
+            // Format: merit.html/04132024.09:09am.v.1.15
+            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+            
+            // Store for debugging and build tracking
+            localStorage.setItem('meritVersion', version);
+            localStorage.setItem('meritBuildDate', buildDate);
+            localStorage.setItem('meritBuildTime', buildTime);
+            localStorage.setItem('meritFullVersion', displayVersion);
+            
+            if (window.env.DEBUG_MODE) {
+                console.log('[Merit Flow] Build version:', displayVersion);
+            }
+        });
     </script>
 
     <!-- Core Dependencies -->
     <script type="module" src="assets/js/client-merit-openai.js"></script>
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
     
-    <!-- Environment Configuration - Must load first -->
-    <script type="module" src="assets/js/assistant-config.js"></script>
-    
+    <!-- Remove Redis Flow Logging -->
     <script>
-        // Platform-wide configuration logging
-        console.log('[Platform Config] Initializing platform configuration...');
-        
-        window.env = {
-            // Platform-wide variables
-            RL_API_GATEWAY_ENDPOINT: 'https://api.recursivelearning.app/prod',
-            RL_API_KEY: 'qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J',
-            RL_SCHEMA_VERSION: '04102025.B01',
-            
-            // Merit-specific configuration
-            MERIT_ASSISTANT_ID: 'asst_QoAA395ibbyMImFJERbG2hKT',
-            MERIT_ORG_ID: 'recdg5Hlm3VVaBA2u',
-            OPENAI_PROJECT_ID: 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
-            
-            // API Configuration
-            API_GATEWAY_ENDPOINT: 'https://api.recursivelearning.app',
-            API_GATEWAY_STAGE: 'prod',
-            API_GATEWAY_REGION: 'us-east-2',
-            API_GATEWAY_VPC: 'vpc-07e76ce384fa696e0',
-            API_GATEWAY_CERT: 'arn:aws:acm:us-east-2:559050208320:certificate/d1ba7f15-1f1b-400c-942e-c5e5a60ddf8c',
-            API_GATEWAY_USAGE_PLAN: 'rl-rest-api-usage-plan',
-            
-            // API Rate Limits
-            API_RATE_LIMIT: 50,
-            API_BURST_LIMIT: 100,
-            API_MONTHLY_QUOTA: 5000,
-            
-            // Build Information
-            BUILD_VERSION: '1.16',
-            BUILD_DATE: '04212024.1800',
-            ENVIRONMENT: 'prod'
-        };
-
-        // Configuration validation and logging
-        console.log('[Platform Config] Environment loaded:', {
-            apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
-            schemaVersion: window.env.RL_SCHEMA_VERSION,
-            timestamp: new Date().toISOString()
-        });
-
-        // API Gateway endpoint verification
-        fetch(`${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/mock`, {
-            method: 'GET',
-            headers: {
-                'x-api-key': window.env.RL_API_KEY,
-                'Content-Type': 'application/json',
-                'Origin': 'https://recursivelearning.app'
-            },
-            mode: 'cors',
-            credentials: 'include'
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('[API Gateway] Connection test successful:', {
-                endpoint: window.env.RL_API_GATEWAY_ENDPOINT,
-                status: 'connected',
-                timestamp: new Date().toISOString()
-            });
-            document.getElementById('connection-status').classList.remove('connecting', 'error');
-            document.getElementById('connection-status').classList.add('connected');
-            document.getElementById('connection-message').textContent = 'Connected';
-        })
-        .catch(error => {
-            console.error('[API Gateway] Connection test failed:', {
-                endpoint: window.env.RL_API_GATEWAY_ENDPOINT,
-                error: error.message,
-                timestamp: new Date().toISOString()
-            });
-            document.getElementById('connection-status').classList.remove('connecting', 'connected');
-            document.getElementById('connection-status').classList.add('error');
-            document.getElementById('connection-message').textContent = 'Connection Error';
-            document.getElementById('error-details').textContent = error.message;
-            document.getElementById('error-banner').classList.remove('hidden');
-        });
-
-        // Endpoint validation logging
-        const validateEndpoints = () => {
-            console.log('[Merit Flow] Validating API endpoints...');
-            
-            // Test each endpoint
-            const endpoints = {
-                context: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/context`,
-                mock: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/mock`,
-                assistant: `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1/assistant`
-            };
-
-            Object.entries(endpoints).forEach(([name, url]) => {
-                console.log(`[Merit Flow] Testing endpoint: ${name}`, {
-                    url,
-                    timestamp: new Date().toISOString()
-                });
-            });
-        };
-
-        // Run validation on DOMContentLoaded
+        // Initialize version display with build counter
         document.addEventListener('DOMContentLoaded', () => {
-            validateEndpoints();
+            const now = new Date();
+            // Convert to Central Time
+            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
             
-            console.log('[Merit Flow] Configuration complete', {
-                schemaVersion: window.env.RL_SCHEMA_VERSION,
-                assistantId: window.env.MERIT_ASSISTANT_ID,
-                timestamp: new Date().toISOString()
-            });
+            // Format date as MMDDYYYY
+            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+            const day = String(centralTime.getDate()).padStart(2, '0');
+            const year = centralTime.getFullYear();
+            const buildDate = `${month}${day}${year}`;
             
-            // Initialize loading messages
-            const loadingMessages = [
-                'Connecting to your assistant...',
-                'Loading curriculum resources...',
-                'Preparing your personalized experience...'
-            ];
-            let currentMessageIndex = 0;
+            // Format time as HH:MMam/pm
+            const hours = centralTime.getHours();
+            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+            const buildTime = `${formattedHours}:${minutes}${ampm}`;
             
-            const updateLoadingMessage = () => {
-                const loadingMessageElement = document.getElementById('loading-message');
-                if (loadingMessageElement) {
-                    loadingMessageElement.textContent = loadingMessages[currentMessageIndex];
-                    currentMessageIndex = (currentMessageIndex + 1) % loadingMessages.length;
-                }
-            };
+            // Version 1.0.15 simplified to 1.16
+            const version = '1.16';
             
-            // Update loading message every 3 seconds
-            setInterval(updateLoadingMessage, 3000);
-            updateLoadingMessage(); // Initial message
+            // Format: merit.html/04132024.09:09am.v.1.15
+            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+            
+            // Store for debugging and build tracking
+            localStorage.setItem('meritVersion', version);
+            localStorage.setItem('meritBuildDate', buildDate);
+            localStorage.setItem('meritBuildTime', buildTime);
+            localStorage.setItem('meritFullVersion', displayVersion);
+            
+            if (window.env.DEBUG_MODE) {
+                console.log('[Merit Flow] Build version:', displayVersion);
+            }
         });
-
-        // Monitor for API Gateway responses
-        const apiResponseMonitor = (response) => {
-            console.log('[API Gateway] Response received:', {
-                status: response.status,
-                endpoint: response.url,
-                timestamp: new Date().toISOString(),
-                headers: {
-                    cors: response.headers.get('Access-Control-Allow-Origin'),
-                    contentType: response.headers.get('Content-Type')
-                }
-            });
-        };
-
-        // Add to window for debugging
-        window.DEBUG = {
-            validateEndpoints,
-            apiResponseMonitor,
-            getConfig: () => ({
-                apiGateway: window.env.RL_API_GATEWAY_ENDPOINT,
-                schemaVersion: window.env.RL_SCHEMA_VERSION,
-                timestamp: new Date().toISOString()
-            })
-        };
     </script>
-    
+
     <!-- Redis Client (API-based)
     All Redis operations now go through API Gateway endpoints instead of direct Redis connections,
     eliminating browser compatibility issues with Node.js modules -->
@@ -1278,25 +1208,95 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Add Error Handling Styles */
+        .status-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.connecting {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-indicator.retrying {
+            background-color: #fff3e0;
+            color: #e65100;
+            animation: pulse 1s infinite;
+        }
+
+        .status-indicator.connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .status-indicator.failed {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .error-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffebee;
+            padding: 12px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .error-banner.hidden {
+            display: none;
+        }
+
+        .error-banner button {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: #c62828;
+            color: white;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
     <!-- Connection Status -->
-    <div id="connection-status" class="status-indicator connecting">
-        <span id="connection-message">Connecting...</span>
+    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite">
+        <span id="connection-message">Connecting to Merit...</span>
     </div>
     
     <!-- Error Banner -->
-    <div id="error-banner" class="error-banner hidden">
-        <div class="error-content">
-            <span class="error-icon">⚠️</span>
-            <span id="error-details">An error occurred</span>
-            <button onclick="this.parentElement.classList.add('hidden')">Dismiss</button>
-        </div>
+    <div id="error-banner" class="error-banner hidden" role="alert" aria-live="assertive">
+        <span class="error-icon">⚠️</span>
+        <span id="error-details">An error occurred</span>
+        <button onclick="this.parentElement.classList.add('hidden')" aria-label="Dismiss error">
+            Dismiss
+        </button>
     </div>
     
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
         <div class="loading-spinner"></div>
         <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
         <div class="loading-progress">
@@ -1312,16 +1312,14 @@
     </div>
     
     <div class="client-layout" data-client-component="merit-page" data-test-id="page-container">
-        <header class="client-header" role="banner" data-test-id="header-bar">
-            <div class="header-content">
-                <div class="header-logo-container" data-test-id="logo-container"> 
-                    <img src="/clients/elpl/assets/images/client-elpl-logo-white.png" 
-                         alt="EL Education Logo" 
-                         class="header-logo"
-                         loading="lazy"
-                         aria-live="polite">
-                </div>
-            </div>
+        <header class="client-header">
+            <img 
+                src="/clients/elpl/assets/images/client-elpl-logo-white.png"
+                alt="ELPL Logo"
+                class="client-logo"
+                loading="lazy"
+                aria-live="polite"
+            />
         </header>
 
         <main class="client-content" role="main" data-test-id="main-content">
@@ -1597,5 +1595,88 @@
     </script>
 
     <!-- End Debugging Script -->
+
+    <!-- Add API Connection Status Handler -->
+    <script>
+        class APIConnectionManager {
+            constructor() {
+                this.retryAttempts = 0;
+                this.maxRetries = window.env.RL_API_RETRY_ATTEMPTS;
+                this.connectionStatus = document.getElementById('connection-status');
+                this.errorBanner = document.getElementById('error-banner');
+            }
+
+            async testConnection() {
+                try {
+                    const response = await fetch(`${window.env.RL_API_GATEWAY_ENDPOINT}/health`, {
+                        method: 'GET',
+                        headers: {
+                            'x-api-key': window.env.RL_API_KEY
+                        },
+                        timeout: window.env.RL_API_TIMEOUT
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API responded with status: ${response.status}`);
+                    }
+
+                    this.updateConnectionStatus('connected');
+                    return true;
+                } catch (error) {
+                    console.error('[API Gateway] Connection test failed:', error);
+                    
+                    if (this.retryAttempts < this.maxRetries) {
+                        this.retryAttempts++;
+                        this.updateConnectionStatus('retrying');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        return this.testConnection();
+                    }
+
+                    this.updateConnectionStatus('failed');
+                    this.showErrorBanner(`Connection failed: ${error.message}`);
+                    return false;
+                }
+            }
+
+            updateConnectionStatus(status) {
+                if (this.connectionStatus) {
+                    this.connectionStatus.className = `status-indicator ${status}`;
+                    this.connectionStatus.querySelector('#connection-message').textContent = 
+                        status === 'connected' ? 'Connected' :
+                        status === 'retrying' ? `Retrying (${this.retryAttempts}/${this.maxRetries})...` :
+                        'Connection Failed';
+                }
+            }
+
+            showErrorBanner(message) {
+                if (this.errorBanner) {
+                    this.errorBanner.classList.remove('hidden');
+                    this.errorBanner.querySelector('#error-details').textContent = message;
+                }
+            }
+        }
+
+        // Initialize API Connection Manager
+        document.addEventListener('DOMContentLoaded', async () => {
+            const apiManager = new APIConnectionManager();
+            await apiManager.testConnection();
+            
+            // Initialize Merit Flow only after connection test
+            if (window.MeritInstructionalFlow) {
+                try {
+                    const flow = new MeritInstructionalFlow({
+                        gradeSelect: document.getElementById('grade-level'),
+                        curriculumSelect: document.getElementById('curriculum'),
+                        apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT,
+                        apiKey: window.env.RL_API_KEY
+                    });
+                    await flow.initialize();
+                } catch (error) {
+                    console.error('[Merit Flow] Failed to initialize:', error);
+                    apiManager.showErrorBanner('Failed to initialize Merit Flow. Please refresh the page.');
+                }
+            }
+        });
+    </script>
 </body>
 </html> 
