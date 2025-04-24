@@ -68,19 +68,21 @@
             height: 100vh;
             padding: 20px;
             box-sizing: border-box;
+            background-color: #E6F6FA;
         }
 
         /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            height: 100vh;
+            height: 645px;
             background: #ffffff;
             display: flex;
             flex-direction: column;
             padding: 24px 0;
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
-            border-bottom-right-radius: 12px;
-            grid-row: 1 / span 3;
+            border-bottom-right-radius: 10px;
+            grid-row: 1 / span 2;
+            grid-column: 1;
         }
 
         .sidebar-header {
@@ -151,11 +153,12 @@
             align-items: center;
             padding: 16px 24px;
             background-color: #E6F6FA;
-            border-bottom: 1px solid #ccc;
+            border-radius: 10px;
             font-family: var(--client-font-body, sans-serif);
             grid-column: 2;
-            height: var(--header-height);
-            border-radius: 12px;
+            grid-row: 1;
+            height: 52px;
+            width: 860px;
         }
 
         .chat-title {
@@ -204,11 +207,14 @@
 
         /* Main Content Area */
         .chat-main {
+            display: flex;
+            flex-direction: column;
+            height: 573px;
+            align-items: center;
+            justify-content: center;
             grid-column: 2;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            overflow-y: auto;
+            grid-row: 2;
+            width: 860px;
         }
 
         /* Footer */
@@ -217,13 +223,15 @@
             justify-content: space-between;
             align-items: center;
             background-color: #E6F6FA;
-            padding: 20px 24px;
+            padding: 16px 24px;
             font-family: var(--client-font-body, sans-serif);
             font-size: 14px;
             color: var(--text-color, #2b2b2b);
             grid-column: 1 / span 2;
-            height: var(--footer-height);
-            border-radius: 12px;
+            grid-row: 3;
+            height: 50px;
+            border-radius: 10px;
+            width: 1100px;
         }
 
         .footer-left,
@@ -368,7 +376,6 @@
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            margin: 0 auto;
         }
 
         .chat-window {
@@ -380,7 +387,7 @@
             gap: 18px;
         }
 
-        .chat-day-divider {
+        .day-divider {
             text-align: center;
             font-size: 14px;
             color: #999;
@@ -388,8 +395,8 @@
             position: relative;
         }
 
-        .chat-day-divider::before,
-        .chat-day-divider::after {
+        .day-divider::before,
+        .day-divider::after {
             content: "";
             display: inline-block;
             width: 40%;
@@ -399,18 +406,13 @@
             margin: 0 8px;
         }
 
-        .message {
+        .message-block {
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            max-width: 90%;
         }
 
-        .message.assistant {
-            align-self: flex-start;
-        }
-
-        .message.user {
+        .message-block.user {
             flex-direction: row-reverse;
             align-self: flex-end;
         }
@@ -423,24 +425,24 @@
             flex-shrink: 0;
         }
 
-        .bubble {
+        .message {
             padding: 14px;
             border-radius: 16px;
             font-size: 16px;
             line-height: 1.5;
         }
 
-        .assistant .bubble {
+        .message.user {
+            background: #E6F6FA;
+            color: var(--text-color, #2b2b2b);
+            max-width: 90%;
+        }
+
+        .message.assistant {
             background: #ffffff;
             color: var(--text-color, #2b2b2b);
             border: 1px solid #E6F6FA;
             max-width: 80%;
-        }
-
-        .user .bubble {
-            background: #E6F6FA;
-            color: var(--text-color, #2b2b2b);
-            max-width: 90%;
         }
 
         .timestamp {
@@ -449,11 +451,11 @@
             margin-top: 4px;
         }
 
-        .message.assistant .timestamp {
+        .message-block.assistant .timestamp {
             text-align: left;
         }
 
-        .message.user .timestamp {
+        .message-block.user .timestamp {
             text-align: right;
         }
 
@@ -483,29 +485,16 @@
             gap: 8px;
         }
 
-        .icon-button {
+        .chat-actions button {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 18px;
             color: #aaa;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
         }
 
-        .icon-button:hover {
-            color: var(--elpl-primary);
-        }
-
-        .icon-button.send-button {
-            background: var(--qipu-secondary) url('/shared/assets/images/qipu/qipu_paintbrush.svg') center/50% no-repeat;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
+        .chat-actions button:hover {
+            color: var(--primary-color, #c6123f);
         }
 
         /* Review Banner */
@@ -848,34 +837,48 @@
 
         <!-- Main Chat Area -->
         <main class="chat-main" role="main" data-test-id="main-content">
-            <div class="chat-container">
-                <div class="chat-window">
-                    <div class="chat-day-divider">August 21</div>
-
-                    <div class="message assistant">
-                        <div class="avatar"></div>
-                        <div>
-                            <div class="bubble">Hi there! How can I support your professional learning today?</div>
-                            <div class="timestamp">10:02 AM</div>
+            <div class="section" 
+                 data-section="chat" 
+                 role="tabpanel" 
+                 aria-labelledby="chat-tab" 
+                 hidden
+                 data-test-id="chat-section">
+                <div class="chat-main">
+                    <div class="chat-container">
+                        <div id="chat-window" 
+                             class="chat-window" 
+                             role="log" 
+                             aria-live="polite"
+                             aria-label="Chat conversation"
+                             data-test-id="chat-window">
+                            <div class="day-divider">Today</div>
+                            <div class="message-block assistant">
+                                <div class="avatar"></div>
+                                <div>
+                                    <div class="message assistant">Hi there! How can I support your professional learning today?</div>
+                                    <div class="timestamp">Just now</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <textarea id="chat-input"
+                                    class="chat-input"
+                                    aria-label="Type your message"
+                                    placeholder="Type your message..." 
+                                    rows="1"
+                                    maxlength="1000"
+                                    data-test-id="chat-input"></textarea>
+                            <div class="chat-actions">
+                                <button title="Attach">📎</button>
+                                <button title="Emoji">😊</button>
+                                <button id="send-button" 
+                                        class="send-button"
+                                        aria-label="Send message"
+                                        data-test-id="send-button"
+                                        title="Send">➤</button>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="message user">
-                        <div class="avatar"></div>
-                        <div>
-                            <div class="bubble">Can you tell me more about the upcoming training?</div>
-                            <div class="timestamp">10:03 AM</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chat-input-container">
-                    <div class="chat-actions">
-                        <button class="icon-button">📎</button>
-                        <button class="icon-button">😊</button>
-                    </div>
-                    <textarea class="chat-input" placeholder="Type your message..."></textarea>
-                    <button class="icon-button send-button" title="Send"></button>
                 </div>
             </div>
         </main>
@@ -901,7 +904,6 @@
                 <a href="https://twitter.com/ELeducation" class="social-icon" aria-label="X">
                     <img src="/clients/elpl/assets/icons/x.svg" alt="X (Twitter)">
                 </a>
-                <span class="dev-mode">v1.16</span>
             </div>
         </footer>
     </div>
@@ -1064,11 +1066,6 @@
             }
         });
     </script>
-
-    <!-- Development Mode Indicator -->
-    <div class="dev-mode-indicator" style="position: fixed; top: 0; right: 0; background: #ff6b6b; color: white; padding: 5px 10px; font-size: 12px; z-index: 9999;">
-        Development Mode
-    </div>
 
     <!-- Development Timestamp -->
     <div class="dev-timestamp" id="dev-timestamp"></div>
