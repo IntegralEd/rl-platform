@@ -85,7 +85,7 @@
             padding: 24px 0;
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            height: calc(100vh - (var(--layout-gap) * 2));
+            height: 645px;
             display: flex;
             flex-direction: column;
         }
@@ -263,7 +263,7 @@
             padding: 20px;
             overflow-y: auto;
             margin-top: var(--layout-gap);
-            height: calc(100vh - var(--header-height) - var(--footer-height) - (var(--layout-gap) * 3));
+            height: 573px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
@@ -569,6 +569,11 @@
             .rl-footer__right {
                 justify-content: center;
             }
+        }
+
+        /* Remove the old timestamp elements */
+        #dev-timestamp, .dev-timestamp {
+            display: none;
         }
     </style>
     
@@ -1146,14 +1151,15 @@
                     hour12: true
                 };
                 const formattedTime = now.toLocaleString('en-US', options).replace(',', '');
-                document.getElementById('update-timestamp').textContent = `Last Updated: ${formattedTime}`;
+                const timestampElement = document.getElementById('update-timestamp');
+                if (timestampElement) {
+                    timestampElement.textContent = `Last Updated: ${formattedTime}`;
+                }
             }
 
             // Update timestamp immediately and every minute
             updateTimestamp();
             setInterval(updateTimestamp, 60000);
-
-            // Rest of the existing DOMContentLoaded code...
         });
     </script>
 </body>
