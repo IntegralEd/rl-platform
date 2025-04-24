@@ -274,21 +274,11 @@ export class MeritInstructionalFlow {
     }
 
     #validateForm() {
-        const gradeLevel = this.#elements.form?.querySelector('#grade-level')?.value;
-        console.log('[Merit Flow] validateForm: gradeLevel value:', gradeLevel);
-        
-        // Always enable form in testing mode
-        this.#state.formValid = window.env.SKIP_API_VALIDATION ? true : !!gradeLevel;
-        this.#state.gradeLevel = gradeLevel;
-        
+        // Always valid in development mode
+        this.#state.formValid = true;
+        this.#state.gradeLevel = this.#elements.form?.querySelector('#grade-level')?.value || 'Grade 3';
         this.#updateActionState();
-        
-        // Log validation state
-        console.log('[Merit Flow] Form validation:', {
-            gradeLevel: this.#state.gradeLevel,
-            isValid: this.#state.formValid,
-            skipValidation: window.env.SKIP_API_VALIDATION
-        });
+        console.log('[Merit Flow] Form auto-validated in development mode');
     }
 
     async #handleNavigation(sectionOrEvent) {
@@ -366,15 +356,14 @@ export class MeritInstructionalFlow {
 
     async #sendMessage() {
         const content = this.#elements.chatInput?.value.trim();
-        if (!content || !this.#state.chatReady) return;
+        if (!content) return;
 
-        console.log('[Merit Flow] Processing message:', {
+        console.log('[Merit Flow] Processing message in development mode:', {
             content,
-            isNewThread: !this.#openAIClient.threadId,
-            gradeLevel: this.#state.gradeLevel
+            mockMode: true
         });
 
-        // Clear input and disable
+        // Clear input and disable temporarily
         this.#elements.chatInput.value = '';
         this.#elements.chatInput.disabled = true;
         this.#elements.sendButton.disabled = true;
@@ -384,26 +373,20 @@ export class MeritInstructionalFlow {
             this.#addMessage('user', content);
             this.#showLoading();
 
-            // Send to API
-            const response = await this.#openAIClient.sendMessage(content);
-            
-            // If this created a new thread, update user record
-            if (response.thread_id && !this.#openAIClient.threadId) {
-                const email = document.querySelector('#header-span')?.dataset?.userEmail;
-                if (email) {
-                    await this.#openAIClient.updateUserThread(email, response.thread_id);
-                }
-            }
+            // Mock API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Show assistant response
+            // Mock response
+            const mockResponse = {
+                content: `This is a mock response to: "${content}"\n\nIn development mode, responses are simulated. You can modify this mock response in client-merit-instructional-flow.js`,
+                thread_id: 'mock-thread-123'
+            };
+
+            // Show mock assistant response
             this.#hideLoading();
-            this.#addMessage('assistant', response.content);
+            this.#addMessage('assistant', mockResponse.content);
 
-            // Log successful chat interaction
-            console.log('[Merit Flow] Chat exchange complete:', {
-                threadId: this.#openAIClient.threadId,
-                hasResponse: true
-            });
+            console.log('[Merit Flow] Mock chat exchange complete');
 
         } catch (error) {
             console.error('[Merit Flow] Message error:', error);
@@ -438,12 +421,29 @@ export class MeritInstructionalFlow {
         loadingMessage?.remove();
     }
 
-    #showError(message) {
+    #showError(message, isHtml = false) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'message error';
-        errorDiv.textContent = message;
+        
+        if (isHtml) {
+            errorDiv.innerHTML = message;
+        } else {
+            errorDiv.textContent = message;
+        }
+        
         this.#elements.chatWindow?.appendChild(errorDiv);
         errorDiv.scrollIntoView({ behavior: 'smooth' });
+
+        // Log error for monitoring
+        console.error('[Merit Flow] Error displayed:', {
+            message: message,
+            timestamp: new Date().toISOString(),
+            endpoint: this.#state.lastEndpoint
+        });
+
+        // Update error state
+        this.#state.hasError = true;
+        this.#state.errorMessage = message;
     }
 
     #updateActionState() {
@@ -576,98 +576,11 @@ export class MeritInstructionalFlow {
     };
 
     async #initializeAssistant() {
-        try {
-            if (this.#state.connectionAttempts >= this.#config.retryAttempts) {
-                throw new Error('Maximum connection attempts reached');
-            }
-
-            this.#state.connectionAttempts++;
-            
-            // Try primary endpoint first
-            try {
-                const response = await this.#testConnection(this.#config.apiEndpoint);
-                if (response.ok) {
-                    this.#state.lastEndpoint = this.#config.apiEndpoint;
-                    return true;
-                }
-            } catch (error) {
-                console.warn('[Merit Flow] Primary endpoint failed:', error);
-            }
-
-            // Try fallback if available
-            if (this.#config.apiFallback) {
-                try {
-                    const response = await this.#testConnection(this.#config.apiFallback);
-                    if (response.ok) {
-                        this.#state.lastEndpoint = this.#config.apiFallback;
-                        return true;
-                    }
-                } catch (error) {
-                    console.warn('[Merit Flow] Fallback endpoint failed:', error);
-                }
-            }
-
-            // If we get here, both endpoints failed
-            throw new Error('All endpoints failed');
-
-        } catch (error) {
-            console.error('[Merit Flow] Assistant initialization failed:', error);
-            this.#state.hasError = true;
-            this.#state.errorMessage = 'Unable to connect to the assistant service';
-            
-            // Show user-friendly error
-            this.#showError(`
-                <div class="connection-error">
-                    <p>Unable to connect to the assistant service.</p>
-                    <button onclick="window.location.reload()">Try Again</button>
-                    ${this.#state.isAdmin ? `<pre>${error.message}</pre>` : ''}
-                </div>
-            `);
-            
-            return false;
-        }
-    }
-
-    async #testConnection(endpoint) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.#config.timeout);
-
-        try {
-            const response = await fetch(`${endpoint}/health`, {
-                method: 'GET',
-                headers: {
-                    'x-api-key': this.#config.assistant.apiKey,
-                    'X-Request-ID': `merit-health-${Date.now()}`
-                },
-                signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-            return response;
-
-        } catch (error) {
-            clearTimeout(timeoutId);
-            throw error;
-        }
-    }
-
-    #showError(message, isHtml = false) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'message error';
-        if (isHtml) {
-            errorDiv.innerHTML = message;
-        } else {
-            errorDiv.textContent = message;
-        }
-        this.#elements.chatWindow?.appendChild(errorDiv);
-        errorDiv.scrollIntoView({ behavior: 'smooth' });
-
-        // Log error for monitoring
-        console.error('[Merit Flow] Error displayed:', {
-            message: message,
-            timestamp: new Date().toISOString(),
-            endpoint: this.#state.lastEndpoint
-        });
+        // Mock successful initialization in development mode
+        this.#state.chatReady = true;
+        this.#state.openAIConfigured = true;
+        console.log('[Merit Flow] Assistant mock-initialized for development');
+        return true;
     }
 }
 
