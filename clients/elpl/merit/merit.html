@@ -559,6 +559,7 @@
         .rl-footer__logo {
             height: 24px;
             width: auto;
+            filter: brightness(0);
         }
 
         .rl-footer__text {
@@ -768,13 +769,13 @@
                 <ul>
                     <li>
                         <a href="#welcome" class="client-nav__item active" data-section="welcome">
-                            <img src="/shared/platform/images/layout-dashboard.svg" alt="" width="20" height="20" class="icon icon--nav">
+                            <img src="/rl-platform/shared/platform/images/layout-dashboard.svg" alt="" width="20" height="20" class="icon icon--nav">
                             <span>Welcome</span>
                         </a>
                     </li>
                     <li>
                         <a href="#chat" class="client-nav__item disabled" data-section="chat">
-                            <img src="/shared/platform/images/message-circle.svg" alt="" width="20" height="20" class="icon icon--nav">
+                            <img src="/rl-platform/shared/platform/images/message-circle.svg" alt="" width="20" height="20" class="icon icon--nav">
                             <span>Chat</span>
                         </a>
                     </li>
@@ -791,11 +792,11 @@
             <nav class="rl-header__nav">
                 <button class="rl-button--primary">New Chat</button>
                 <div class="rl-nav__profile">
-                    <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
+                    <img src="/rl-platform/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
                     <span class="rl-nav__username">John Doe</span>
                 </div>
                 <button class="rl-nav__settings" aria-label="Settings">
-                    <img src="/shared/platform/images/settings.svg" alt="" width="20" height="20">
+                    <img src="/rl-platform/shared/platform/images/settings.svg" alt="" width="20" height="20">
                 </button>
             </nav>
         </header>
@@ -845,7 +846,7 @@
                         <div class="client-chat__day-divider">Today</div>
                         <div class="client-chat__message">
                             <div class="client-chat__avatar">
-                                <img src="/clients/elpl/assets/images/chatbot-avatar.svg" alt="Assistant Avatar" width="40" height="40">
+                                <img src="/rl-platform/clients/elpl/assets/images/chatbot-avatar.svg" alt="Assistant Avatar" width="40" height="40">
                             </div>
                             <div class="client-chat__content">
                                 <div class="client-chat__bubble">Hi there! How can I support your professional learning today?</div>
@@ -877,7 +878,7 @@
                                     aria-label="Send message"
                                     data-test-id="send-button"
                                     title="Send">
-                                <img src="/shared/platform/images/send-icon.svg" alt="" width="20" height="20" class="icon icon--action">
+                                <img src="/rl-platform/shared/platform/images/send-icon.svg" alt="" width="20" height="20" class="icon icon--action">
                             </button>
                         </div>
                     </div>
@@ -1270,7 +1271,7 @@
                 const avatar = document.createElement('div');
                 avatar.className = 'client-chat__avatar';
                 const avatarImg = document.createElement('img');
-                avatarImg.src = isUser ? '/clients/elpl/assets/images/leslie-avatar.svg' : '/clients/elpl/assets/images/chatbot-avatar.svg';
+                avatarImg.src = isUser ? '/rl-platform/clients/elpl/assets/images/leslie-avatar.svg' : '/rl-platform/clients/elpl/assets/images/chatbot-avatar.svg';
                 avatarImg.alt = isUser ? 'User Avatar' : 'Assistant Avatar';
                 avatarImg.width = 40;
                 avatarImg.height = 40;
