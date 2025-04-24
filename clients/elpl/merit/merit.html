@@ -262,7 +262,7 @@
             border-radius: 10px;
             padding: 20px;
             overflow-y: auto;
-            margin-top: var(--layout-gap);
+            margin-top: 0;
             height: 573px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
@@ -1160,6 +1160,72 @@
             // Update timestamp immediately and every minute
             updateTimestamp();
             setInterval(updateTimestamp, 60000);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Chat functionality for development
+            const chatWindow = document.getElementById('chat-window');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+
+            function addMessage(message, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `client-chat__message ${isUser ? 'user' : 'assistant'}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'client-chat__avatar';
+                
+                const content = document.createElement('div');
+                content.className = 'client-chat__content';
+                
+                const bubble = document.createElement('div');
+                bubble.className = `client-chat__bubble ${isUser ? 'user' : 'assistant'}`;
+                bubble.textContent = message;
+                
+                const timestamp = document.createElement('div');
+                timestamp.className = 'client-chat__timestamp';
+                timestamp.textContent = 'Just now';
+                
+                content.appendChild(bubble);
+                content.appendChild(timestamp);
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(content);
+                
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            function handleSendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    chatInput.value = '';
+                    
+                    // Simulate assistant response after a short delay
+                    setTimeout(() => {
+                        addMessage('Thank you for your message. This is a development mode response.');
+                    }, 1000);
+                }
+            }
+
+            // Send message on button click
+            sendButton.addEventListener('click', handleSendMessage);
+
+            // Send message on Enter key
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                }
+            });
+
+            // Auto-resize input field
+            chatInput.addEventListener('input', () => {
+                chatInput.style.height = 'auto';
+                chatInput.style.height = (chatInput.scrollHeight) + 'px';
+            });
         });
     </script>
 </body>
