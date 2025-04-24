@@ -35,13 +35,19 @@
 
     <style>
         :root {
-            --header-height: 52px;
-            --footer-height: 50px;
-            --sidebar-width: 200px;
-            --client-bg: #E6F6FA;
+            /* Required Platform Variables */
+            --header-height: 60px;
+            --footer-height: 40px;
+            --client-bg: #ffffff;
             --client-text: #2c3e50;
             --client-border: #e1e4e8;
             --content-width: 1200px;
+            --ring-color: #007bff;
+            --ring-size: 2px;
+            --ring-spacing: 4px;
+
+            /* Project-specific Variables */
+            --sidebar-width: 200px;
             --elpl-primary: #8B0D37;
             --elpl-primary-hover: #6d0a2b;
             --elpl-text-light: #ffffff;
@@ -60,19 +66,19 @@
             font-family: var(--client-font-body, sans-serif);
         }
 
-        .layout-wrapper {
+        .rl-layout {
             display: grid;
             grid-template-columns: var(--sidebar-width) 1fr;
             grid-template-rows: auto 1fr auto;
             gap: 20px;
-            height: 100vh;
+            min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
             background-color: #E6F6FA;
         }
 
         /* Sidebar */
-        .sidebar {
+        .client-sidebar {
             width: var(--sidebar-width);
             height: 645px;
             background: #ffffff;
@@ -85,7 +91,7 @@
             grid-column: 1;
         }
 
-        .sidebar-header {
+        .client-sidebar__header {
             padding: 0 24px;
             display: flex;
             flex-direction: column;
@@ -93,18 +99,18 @@
             margin-bottom: 32px;
         }
 
-        .client-logo {
+        .client-sidebar__logo {
             width: 120px;
             height: auto;
         }
 
-        .sidebar-subtitle {
+        .client-sidebar__subtitle {
             font-size: 14px;
             color: var(--elpl-primary);
             margin-top: 4px;
         }
 
-        .sidebar-nav ul {
+        .client-sidebar__nav {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -113,7 +119,7 @@
             gap: 12px;
         }
 
-        .nav-item {
+        .client-nav__item {
             display: flex;
             align-items: center;
             padding: 10px 24px;
@@ -124,57 +130,55 @@
             position: relative;
         }
 
-        .nav-item.active {
+        .client-nav__item--active {
             color: var(--elpl-primary);
             background-color: rgba(139, 13, 55, 0.08);
         }
 
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: var(--elpl-primary);
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-
-        .nav-icon {
+        .client-nav__icon {
             width: 20px;
             height: 20px;
         }
 
         /* Header */
-        .client-header {
+        .rl-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 24px;
             background-color: #E6F6FA;
             border-radius: 10px;
-            font-family: var(--client-font-body, sans-serif);
             grid-column: 2;
             grid-row: 1;
-            height: 52px;
+            height: var(--header-height);
             width: 860px;
             margin-left: auto;
         }
 
-        .chat-title {
-            font-size: 24px;
-            font-weight: bold;
+        .rl-header__left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .rl-header__logo {
+            height: 32px;
+            width: auto;
+        }
+
+        .rl-header__nav {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .rl-header__version {
+            font-size: 14px;
+            font-weight: 500;
             color: var(--elpl-primary);
         }
 
-        .chat-controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .new-chat-btn {
+        .rl-button {
             background: var(--elpl-primary);
             color: white;
             border: none;
@@ -184,54 +188,113 @@
             cursor: pointer;
         }
 
-        .new-chat-btn:hover {
+        .rl-button:hover {
             background: var(--elpl-primary-hover);
         }
 
-        .chat-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .profile-avatar {
+        .rl-nav__avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
         }
 
-        .profile-name {
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text-color, #2b2b2b);
+        .rl-nav__dropdown {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        /* Main Content Area */
-        .chat-main {
-            display: flex;
-            flex-direction: column;
-            height: 573px;
-            align-items: center;
-            justify-content: center;
+        .rl-nav__link {
+            color: var(--elpl-primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* Main Content */
+        .client-main {
             grid-column: 2;
             grid-row: 2;
             width: 860px;
             margin-left: auto;
-            background: #E6F6FA;
         }
 
-        .chat-container {
-            width: 860px;
+        .client-section {
+            display: none;
             height: 573px;
+        }
+
+        .client-section--active {
+            display: block;
+        }
+
+        /* Welcome Section */
+        .client-welcome {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            height: 100%;
+        }
+
+        .client-welcome__header {
+            margin-bottom: 24px;
+        }
+
+        .client-welcome__title {
+            font-size: 24px;
+            color: var(--elpl-primary);
+            margin-bottom: 8px;
+        }
+
+        .client-welcome__subtitle {
+            font-size: 16px;
+            color: var(--elpl-primary);
+        }
+
+        .client-welcome__grade-selection {
+            margin-top: 20px;
+        }
+
+        .client-welcome__grade-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .client-grade__option {
+            padding: 0.75rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .client-grade__option:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .client-grade__option.selected {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Chat Section */
+        .client-chat {
+            height: 100%;
+        }
+
+        .client-chat__container {
+            width: 100%;
+            height: 100%;
             background: white;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .chat-window {
+        .client-chat__window {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
@@ -240,7 +303,7 @@
             gap: 18px;
         }
 
-        .day-divider {
+        .client-chat__day-divider {
             text-align: center;
             font-size: 14px;
             color: #999;
@@ -248,8 +311,8 @@
             position: relative;
         }
 
-        .day-divider::before,
-        .day-divider::after {
+        .client-chat__day-divider::before,
+        .client-chat__day-divider::after {
             content: "";
             display: inline-block;
             width: 40%;
@@ -259,18 +322,13 @@
             margin: 0 8px;
         }
 
-        .message-block {
+        .client-chat__message {
             display: flex;
             align-items: flex-start;
             gap: 12px;
         }
 
-        .message-block.user {
-            flex-direction: row-reverse;
-            align-self: flex-end;
-        }
-
-        .avatar {
+        .client-chat__avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -278,41 +336,45 @@
             flex-shrink: 0;
         }
 
-        .message {
+        .client-chat__content {
+            flex: 1;
+        }
+
+        .client-chat__bubble {
             padding: 14px;
             border-radius: 16px;
             font-size: 16px;
             line-height: 1.5;
         }
 
-        .message.user {
+        .client-chat__bubble.user {
             background: #E6F6FA;
             color: var(--text-color, #2b2b2b);
             max-width: 90%;
         }
 
-        .message.assistant {
+        .client-chat__bubble.assistant {
             background: #ffffff;
             color: var(--text-color, #2b2b2b);
             border: 1px solid #E6F6FA;
             max-width: 80%;
         }
 
-        .timestamp {
+        .client-chat__timestamp {
             font-size: 12px;
             color: #888;
             margin-top: 4px;
         }
 
-        .message-block.assistant .timestamp {
+        .client-chat__message.assistant .client-chat__timestamp {
             text-align: left;
         }
 
-        .message-block.user .timestamp {
+        .client-chat__message.user .client-chat__timestamp {
             text-align: right;
         }
 
-        .chat-input-container {
+        .client-chat__input-container {
             padding: 12px 18px;
             background: #ffffff;
             border-top: 1px solid #e1e4e8;
@@ -321,7 +383,7 @@
             gap: 12px;
         }
 
-        .chat-input {
+        .client-chat__input {
             flex: 1;
             height: 36px;
             padding: 8px 12px;
@@ -332,13 +394,13 @@
             background: #f9f9f9;
         }
 
-        .chat-actions {
+        .client-chat__actions {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .chat-actions button {
+        .client-chat__action {
             background: none;
             border: none;
             cursor: pointer;
@@ -346,180 +408,68 @@
             color: #aaa;
         }
 
-        .chat-actions button:hover {
+        .client-chat__action:hover {
             color: var(--primary-color, #c6123f);
         }
 
-        /* Review Banner */
-        .review-banner {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 4px 12px;
-            background: rgba(255, 152, 0, 0.8);
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 1000;
-            pointer-events: none;
-        }
-
-        /* Qipu Toggle Button */
-        #qipu-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--qipu-secondary) url('/shared/assets/images/qipu/qipu_paintbrush.svg') center/50% no-repeat;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-            cursor: pointer;
-            z-index: 10001;
-        }
-
-        /* Status Notification */
-        .status-notification {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 4px;
+        /* Footer */
+        .rl-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #E6F6FA;
+            padding: 20px 24px;
+            font-family: var(--client-font-body, sans-serif);
             font-size: 14px;
-            z-index: 1500;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        
-        .status-notification.visible {
-            opacity: 1;
-            transform: translateY(0);
+            color: var(--text-color, #2b2b2b);
+            grid-column: 1 / span 2;
+            grid-row: 3;
         }
 
-        /* Menu dropdown */
-        .menu-dropdown {
-            position: relative;
-        }
-
-        .menu-trigger {
-            background: none;
-            border: none;
-            color: white;
-            padding: 0.5rem;
+        .rl-footer__left,
+        .rl-footer__center,
+        .rl-footer__right {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            font-size: 0.875rem;
+            gap: 12px;
         }
 
-        .menu-caret {
-            transition: transform 0.2s;
+        .rl-footer__center {
+            flex: 1;
+            justify-content: center;
         }
 
-        .menu-trigger[aria-expanded="true"] .menu-caret {
-            transform: rotate(180deg);
+        .rl-footer__logo {
+            height: 24px;
+            width: auto;
         }
 
-        .menu-content {
-            position: absolute;
-            top: calc(100% + 0.5rem);
-            right: 0;
-            background: var(--elpl-primary);
-            border-radius: 4px;
-            min-width: 200px;
-            display: none;
-            z-index: 1000;
-            padding: 0.5rem 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        .rl-footer__text {
+            font-size: 14px;
         }
 
-        .menu-content.show {
-            display: block;
+        .rl-footer__right {
+            gap: 16px;
         }
 
-        .menu-link {
-            display: block;
-            padding: 0.5rem 1rem;
-            color: white;
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            line-height: 1.5;
+        .rl-social-icon img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
         }
 
-        .menu-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
+        @media (max-width: 600px) {
+            .rl-footer {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
 
-        /* Grade selection */
-        .section {
-            display: none;
-            flex-direction: column;
-            padding: 1rem;
-            gap: 0.75rem;
-            background: var(--chat-bg);
-            height: 100%;
-        }
-
-        .section.active {
-            display: flex;
-        }
-
-        .section h2 {
-            color: var(--secondary-color);
-            font-size: 1.25rem;
-            margin: 0;
-        }
-
-        .welcome-form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .grade-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-        }
-
-        .grade-option {
-            padding: 0.75rem;
-            border: 1px solid var(--secondary-color);
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .grade-option:hover {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .grade-option.selected {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        /* Add development timestamp styles */
-        .dev-timestamp {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 9999;
-            font-family: monospace;
+            .rl-footer__left,
+            .rl-footer__center,
+            .rl-footer__right {
+                justify-content: center;
+            }
         }
     </style>
     
@@ -642,117 +592,135 @@
     </div>
 
     <!-- Main Layout -->
-    <div class="layout-wrapper" data-client-component="merit-page" data-test-id="page-container">
+    <div class="rl-layout" data-client-component="merit-page" data-test-id="page-container">
         <!-- Sidebar -->
-        <aside class="sidebar" role="navigation" aria-label="Main navigation" data-test-id="sidebar">
-            <div class="sidebar-header">
-                <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education Logo" class="client-logo">
-                <span class="sidebar-subtitle">Professional Learning</span>
+        <aside class="client-sidebar" role="navigation" aria-label="Main navigation" data-test-id="sidebar">
+            <div class="client-sidebar__header">
+                <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education Logo" class="client-sidebar__logo">
+                <span class="client-sidebar__subtitle">Professional Learning</span>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="client-sidebar__nav">
                 <ul>
-                    <li class="nav-item">
-                        <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="nav-icon">
-                        <span>Welcome</span>
+                    <li>
+                        <a href="#welcome" class="client-nav__item client-nav__item--active" data-section="welcome">
+                            <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="client-nav__icon">
+                            <span>Welcome</span>
+                        </a>
                     </li>
-                    <li class="nav-item active">
-                        <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="nav-icon">
-                        <span>Chat</span>
+                    <li>
+                        <a href="#chat" class="client-nav__item" data-section="chat">
+                            <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="client-nav__icon">
+                            <span>Chat</span>
+                        </a>
                     </li>
                 </ul>
             </nav>
         </aside>
 
         <!-- Header -->
-        <header class="client-header">
-            <div class="chat-title">Chat</div>
-            <div class="chat-controls">
-                <button class="new-chat-btn">+ Chat</button>
-                <div class="chat-profile">
-                    <img src="/clients/elpl/assets/images/avatar-leslie.png" alt="Profile Avatar" class="profile-avatar">
-                    <span class="profile-name">Leslie Alexander</span>
-                </div>
+        <header class="rl-header">
+            <div class="rl-header__left">
+                <a href="https://recursivelearning.app/" class="rl-header__logo">
+                    <img src="/platform/images/recursive-learning-logo.svg" alt="Recursive Learning" />
+                </a>
+                <span class="rl-header__version">v1.16</span>
             </div>
+            <nav class="rl-header__nav">
+                <div class="rl-nav__item">
+                    <button class="rl-button rl-button--primary">+ New Chat</button>
+                </div>
+                <div class="rl-nav__item rl-nav__item--dropdown">
+                    <button class="rl-nav__button">
+                        <img src="/clients/elpl/assets/images/avatar-leslie.png" alt="Profile Avatar" class="rl-nav__avatar">
+                        <span>Leslie Alexander</span>
+                    </button>
+                    <div class="rl-nav__dropdown">
+                        <a href="#settings" class="rl-nav__link">Settings</a>
+                        <a href="#help" class="rl-nav__link">Help</a>
+                        <a href="/platform/auth/logout" class="rl-nav__link">Log Out</a>
+                    </div>
+                </div>
+            </nav>
         </header>
 
-        <!-- Grade Selection Section -->
-        <section id="welcome-section" class="section">
-            <h2>Select Your Grade Level</h2>
-            <form class="welcome-form">
-                <div class="grade-options">
-                    <div class="grade-option" data-grade="k2">K-2</div>
-                    <div class="grade-option" data-grade="35">3-5</div>
-                    <div class="grade-option" data-grade="68">6-8</div>
-                    <div class="grade-option" data-grade="912">9-12</div>
+        <!-- Main Content Area -->
+        <main class="client-main">
+            <!-- Welcome Section -->
+            <section id="welcome-section" class="client-section client-welcome client-section--active" data-section="welcome">
+                <div class="client-welcome__header">
+                    <h1 class="client-welcome__title">Welcome to Merit</h1>
+                    <p class="client-welcome__subtitle">Your AI-powered professional learning assistant</p>
                 </div>
-            </form>
-        </section>
+                <div class="client-welcome__grade-selection">
+                    <h2>Select Your Grade Level</h2>
+                    <div class="client-welcome__grade-options">
+                        <div class="client-grade__option" data-grade="k2">K-2</div>
+                        <div class="client-grade__option" data-grade="35">3-5</div>
+                        <div class="client-grade__option" data-grade="68">6-8</div>
+                        <div class="client-grade__option" data-grade="912">9-12</div>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Main Chat Area -->
-        <main class="chat-main" role="main" data-test-id="main-content">
-            <div class="section" 
-                 data-section="chat" 
-                 role="tabpanel" 
-                 aria-labelledby="chat-tab" 
-                 hidden
-                 data-test-id="chat-section">
-                <div class="chat-container">
+            <!-- Chat Section -->
+            <section id="chat-section" class="client-section client-chat" data-section="chat">
+                <div class="client-chat__container">
                     <div id="chat-window" 
-                         class="chat-window" 
+                         class="client-chat__window" 
                          role="log" 
                          aria-live="polite"
                          aria-label="Chat conversation"
                          data-test-id="chat-window">
-                        <div class="day-divider">Today</div>
-                        <div class="message-block assistant">
-                            <div class="avatar"></div>
-                            <div>
-                                <div class="message assistant">Hi there! How can I support your professional learning today?</div>
-                                <div class="timestamp">Just now</div>
+                        <div class="client-chat__day-divider">Today</div>
+                        <div class="client-chat__message">
+                            <div class="client-chat__avatar"></div>
+                            <div class="client-chat__content">
+                                <div class="client-chat__bubble">Hi there! How can I support your professional learning today?</div>
+                                <div class="client-chat__timestamp">Just now</div>
                             </div>
                         </div>
                     </div>
-                    <div class="chat-input-container">
+                    <div class="client-chat__input-container">
                         <textarea id="chat-input"
-                                class="chat-input"
+                                class="client-chat__input"
                                 aria-label="Type your message"
                                 placeholder="Type your message..." 
                                 rows="1"
                                 maxlength="1000"
                                 data-test-id="chat-input"></textarea>
-                        <div class="chat-actions">
+                        <div class="client-chat__actions">
                             <button title="Attach">📎</button>
                             <button title="Emoji">😊</button>
                             <button id="send-button" 
-                                    class="send-button"
+                                    class="client-chat__action client-chat__action--send"
                                     aria-label="Send message"
                                     data-test-id="send-button"
                                     title="Send">➤</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </main>
 
         <!-- Footer -->
-        <footer class="client-footer">
-            <div class="footer-left">
-                <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="footer-logo">
+        <footer class="rl-footer">
+            <div class="rl-footer__left">
+                <img src="/clients/elpl/assets/images/logo-placeholder-purple.png" alt="Platform Logo" class="rl-footer__logo">
             </div>
-            <div class="footer-center">
-                <span class="footer-text">© 2024 EL Education. All rights reserved.</span>
+            <div class="rl-footer__center">
+                <span class="rl-footer__text">© 2025 Platform Name. All rights reserved.</span>
             </div>
-            <div class="footer-right">
-                <a href="https://www.linkedin.com/company/el-education" class="social-icon" aria-label="LinkedIn">
+            <div class="rl-footer__right">
+                <a href="#" class="rl-social-icon" aria-label="LinkedIn">
                     <img src="/clients/elpl/assets/icons/linkedin.svg" alt="LinkedIn">
                 </a>
-                <a href="https://www.instagram.com/eleducation" class="social-icon" aria-label="Instagram">
+                <a href="#" class="rl-social-icon" aria-label="Instagram">
                     <img src="/clients/elpl/assets/icons/instagram.svg" alt="Instagram">
                 </a>
-                <a href="https://www.facebook.com/ELeducation" class="social-icon" aria-label="Facebook">
+                <a href="#" class="rl-social-icon" aria-label="Facebook">
                     <img src="/clients/elpl/assets/icons/facebook.svg" alt="Facebook">
                 </a>
-                <a href="https://twitter.com/ELeducation" class="social-icon" aria-label="X">
+                <a href="#" class="rl-social-icon" aria-label="X">
                     <img src="/clients/elpl/assets/icons/x.svg" alt="X (Twitter)">
                 </a>
             </div>
@@ -993,6 +961,48 @@
         // Set the timestamp once, no need for interval
         document.getElementById('dev-timestamp').textContent = 
             `Last Updated: ${lastUpdateTime.toLocaleString('en-US', options).replace(',', '')}`;
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation handling
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.section');
+
+            function showSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.getAttribute('data-section') === sectionId) {
+                        section.classList.add('active');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-section') === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = item.getAttribute('data-section');
+                    showSection(sectionId);
+                    window.location.hash = sectionId;
+                });
+            });
+
+            // Handle initial load and hash changes
+            function handleHashChange() {
+                const hash = window.location.hash.slice(1) || 'welcome';
+                showSection(hash);
+            }
+
+            window.addEventListener('hashchange', handleHashChange);
+            handleHashChange(); // Handle initial load
+        });
     </script>
 </body>
 </html> 
