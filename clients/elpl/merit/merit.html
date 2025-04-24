@@ -37,32 +37,32 @@
             BUILD_VERSION: '1.16',
             BUILD_TIMESTAMP: BUILD_TIMESTAMP,
             
-            // API Configuration - Bypass for development
-            RL_API_GATEWAY_ENDPOINT: "http://localhost:3000",
-            RL_API_FALLBACK_ENDPOINT: "http://localhost:3001",
-            RL_API_KEY: "qoCr1UHh8A9IDFA55NDdO4CYMaB9LvL66Rmrga3J",
-            RL_API_TIMEOUT: 30000,
-            RL_API_RETRY_ATTEMPTS: 3,
+            // Development Configuration - Skip all connections
+            ENABLE_MOCK_MODE: true,
+            SKIP_API_VALIDATION: true,
+            SKIP_AUTH: true,
+            SKIP_LOADING: true,  // New flag to skip loading states
+            DEBUG_MODE: true,
             
-            // Assistant Configuration
-            MERIT_ASSISTANT_ID: "asst_QoAA395ibbyMImFJERbG2hKT",
-            OPENAI_PROJECT_ID: "proj_V4lrL1OSfydWCFW0zjgwrFRT",
-            MERIT_ORG_ID: "recdg5Hlm3VVaBA2u",
+            // Bypass all API calls
+            RL_API_GATEWAY_ENDPOINT: "mock://localhost",
+            RL_API_KEY: "dev-key",
+            RL_API_TIMEOUT: 1,
+            RL_API_RETRY_ATTEMPTS: 0,
+            
+            // Mock Assistant Configuration
+            MERIT_ASSISTANT_ID: "mock-assistant",
+            OPENAI_PROJECT_ID: "mock-project",
+            MERIT_ORG_ID: "mock-org",
             MERIT_FALLBACK_MODE: false,
             
-            // CORS Configuration
-            CORS_ORIGIN: "http://localhost:3000",
-            CORS_METHODS: "GET,POST,PUT,DELETE,OPTIONS",
-            CORS_HEADERS: "Content-Type,x-api-key,Authorization,X-Request-ID",
-            
-            // Feature Flags - Just enable what we need
-            ENABLE_MOCK_MODE: false,
-            SKIP_API_VALIDATION: true,  // This is the key flag we need
-            DEBUG_MODE: true,
-            ENABLE_ERROR_REPORTING: true
+            // Development CORS settings
+            CORS_ORIGIN: "*",
+            CORS_METHODS: "*",
+            CORS_HEADERS: "*"
         };
 
-        console.log('[Merit Flow] Development mode enabled');
+        console.log('[Merit Flow] Development mode enabled - skipping connection checks');
     </script>
 
     <!-- Core Dependencies -->
@@ -108,7 +108,7 @@
     </script>
 
     <!-- Connection Status -->
-    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite">
+    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite" style="display: none;">
         <span id="connection-message">Connecting to Merit...</span>
     </div>
     
@@ -122,7 +122,7 @@
     </div>
     
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" style="display: none;">
         <div class="loading-spinner"></div>
         <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
         <div class="loading-progress">
@@ -426,28 +426,20 @@
     <script>
         class APIConnectionManager {
             constructor() {
-                this.connectionStatus = document.getElementById('connection-status');
-                this.errorBanner = document.getElementById('error-banner');
-                // Immediately show as connected in development mode
-                this.updateConnectionStatus('connected');
+                // Skip all connection checks in development mode
+                console.log('[Development] Skipping API connection checks');
             }
 
             async testConnection() {
-                // Always return success in development mode
-                this.updateConnectionStatus('connected');
                 return true;
             }
 
-            updateConnectionStatus(status) {
-                if (this.connectionStatus) {
-                    this.connectionStatus.className = `status-indicator ${status}`;
-                    this.connectionStatus.querySelector('#connection-message').textContent = 
-                        'Development Mode Active';
-                }
+            updateConnectionStatus() {
+                // Do nothing in development mode
             }
 
-            showErrorBanner(message) {
-                console.log('[Development] Error Banner:', message);
+            showErrorBanner() {
+                // Do nothing in development mode
             }
         }
 
@@ -462,11 +454,15 @@
                         gradeSelect: document.getElementById('grade-level'),
                         curriculumSelect: document.getElementById('curriculum')
                     });
-                    // Mock successful initialization
-                    console.log('[Development] Merit Flow initialized in mock mode');
                 } catch (error) {
-                    console.log('[Development] Merit Flow initialization error:', error);
+                    console.log('[Development] Flow initialization error:', error);
                 }
+            }
+
+            // Hide loading overlay immediately
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
             }
         });
     </script>
