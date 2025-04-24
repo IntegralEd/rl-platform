@@ -85,6 +85,9 @@
             padding: 24px 0;
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
+            height: calc(100vh - (var(--layout-gap) * 2));
+            display: flex;
+            flex-direction: column;
         }
 
         .client-sidebar__header {
@@ -104,9 +107,9 @@
         }
 
         .client-sidebar__nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .nav-link {
@@ -130,11 +133,21 @@
             height: 20px;
         }
 
+        .client-sidebar__timestamp {
+            padding: 12px 24px;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
         /* Header and Navigation Styles */
         .rl-header {
             grid-column: 2;
             grid-row: 1;
-            height: 52px;
+            height: var(--header-height);
+            min-height: 52px;
+            max-height: 52px;
             background: #E6F6FA;
             display: flex;
             justify-content: space-between;
@@ -148,12 +161,14 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            height: 100%;
         }
 
         .section-name {
             font-size: 18px;
             font-weight: 500;
             color: var(--client-text);
+            line-height: 52px;
         }
 
         .rl-header__logo {
@@ -165,6 +180,7 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            height: 100%;
         }
 
         .rl-button--primary {
@@ -190,7 +206,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 6px;
+            height: 36px;
+            padding: 0 8px;
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -297,24 +314,28 @@
             margin: 0;
         }
 
-        .client-welcome__grade-selection {
+        .client-welcome__grade-selection,
+        .client-welcome__curriculum-selection {
             margin-bottom: 24px;
         }
 
-        .client-welcome__grade-selection h2 {
+        .client-welcome__grade-selection h2,
+        .client-welcome__curriculum-selection h2 {
             font-size: 1.25rem;
             margin: 0 0 16px;
             color: var(--text-color);
         }
 
-        .client-welcome__grade-options {
+        .client-welcome__grade-options,
+        .client-welcome__curriculum-options {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             margin-bottom: 24px;
         }
 
-        .client-grade__option {
+        .client-grade__option,
+        .client-curriculum__option {
             padding: 16px;
             text-align: center;
             background: #f5f5f5;
@@ -324,15 +345,44 @@
             border: 2px solid transparent;
         }
 
-        .client-grade__option:hover {
+        .client-grade__option:hover,
+        .client-curriculum__option:hover {
             background: #e0e0e0;
             border-color: var(--elpl-primary);
         }
 
-        .client-grade__option.selected {
+        .client-grade__option.selected,
+        .client-curriculum__option.selected {
             background: var(--elpl-primary);
             color: white;
             border-color: var(--elpl-primary);
+        }
+
+        .client-welcome__actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+        }
+
+        .client-welcome__next-button {
+            padding: 12px 32px;
+            background: var(--elpl-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .client-welcome__next-button:hover {
+            background: var(--elpl-primary-hover);
+        }
+
+        .client-welcome__next-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
         /* Chat Section */
@@ -657,6 +707,7 @@
                     </li>
                 </ul>
             </nav>
+            <div class="client-sidebar__timestamp" id="update-timestamp"></div>
         </aside>
 
         <!-- Header -->
@@ -696,6 +747,18 @@
                             <div class="client-grade__option" data-grade="68">6-8</div>
                             <div class="client-grade__option" data-grade="912">9-12</div>
                         </div>
+                    </div>
+                    <div class="client-welcome__curriculum-selection">
+                        <h2>Select Your Curriculum</h2>
+                        <div class="client-welcome__curriculum-options">
+                            <div class="client-curriculum__option" data-curriculum="k5">K-5 Language Arts</div>
+                            <div class="client-curriculum__option" data-curriculum="68">6-8 Language Arts</div>
+                            <div class="client-curriculum__option" data-curriculum="912">9-12 Language Arts</div>
+                            <div class="client-curriculum__option" data-curriculum="all">All Grades</div>
+                        </div>
+                    </div>
+                    <div class="client-welcome__actions">
+                        <button class="client-welcome__next-button" disabled>Next</button>
                     </div>
                 </div>
             </section>
@@ -966,73 +1029,46 @@
 
             // Grade selection functionality
             const gradeOptions = document.querySelectorAll('.client-grade__option');
+            const curriculumOptions = document.querySelectorAll('.client-curriculum__option');
+            const nextButton = document.querySelector('.client-welcome__next-button');
+            const chatNav = document.querySelector('[data-section="chat"]');
+
+            function checkSelections() {
+                const hasGrade = localStorage.getItem('merit_grade_level');
+                const hasCurriculum = localStorage.getItem('merit_curriculum');
+                nextButton.disabled = !(hasGrade && hasCurriculum);
+                
+                if (hasGrade && hasCurriculum) {
+                    chatNav?.classList.remove('disabled');
+                } else {
+                    chatNav?.classList.add('disabled');
+                }
+            }
+
             gradeOptions.forEach(option => {
                 option.addEventListener('click', () => {
-                    // Remove selected class from all options
                     gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                    // Add selected class to clicked option
                     option.classList.add('selected');
-                    // Store selected grade
-                    const selectedGrade = option.getAttribute('data-grade');
-                    localStorage.setItem('merit_grade_level', selectedGrade);
-                    
-                    // Enable chat section if grade is selected
-                    const chatNav = document.querySelector('[data-section="chat"]');
-                    if (chatNav) {
-                        chatNav.classList.remove('disabled');
-                    }
+                    localStorage.setItem('merit_grade_level', option.getAttribute('data-grade'));
+                    checkSelections();
                 });
             });
 
-            // Navigation handling
-            const navItems = document.querySelectorAll('.client-nav__item');
-            const sections = document.querySelectorAll('.section');
-
-            function showSection(sectionId) {
-                // Only allow navigation to chat if grade is selected
-                if (sectionId === 'chat' && !localStorage.getItem('merit_grade_level')) {
-                    alert('Please select a grade level first.');
-                    return;
-                }
-
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.getAttribute('data-section') === sectionId) {
-                        section.classList.add('active');
-                    }
-                });
-
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-section') === sectionId) {
-                        item.classList.add('active');
-                    }
-                });
-
-                // Update section name in header
-                const sectionName = document.querySelector('.section-name');
-                if (sectionName) {
-                    sectionName.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
-                }
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const sectionId = item.getAttribute('data-section');
-                    showSection(sectionId);
-                    window.location.hash = sectionId;
+            curriculumOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    curriculumOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    localStorage.setItem('merit_curriculum', option.getAttribute('data-curriculum'));
+                    checkSelections();
                 });
             });
 
-            // Handle initial load and hash changes
-            function handleHashChange() {
-                const hash = window.location.hash.slice(1) || 'welcome';
-                showSection(hash);
-            }
+            nextButton.addEventListener('click', () => {
+                window.location.hash = 'chat';
+            });
 
-            window.addEventListener('hashchange', handleHashChange);
-            handleHashChange(); // Handle initial load
+            // Initial check
+            checkSelections();
         });
     </script>
 
@@ -1093,6 +1129,31 @@
 
             window.addEventListener('hashchange', handleHashChange);
             handleHashChange(); // Handle initial load
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update timestamp function
+            function updateTimestamp() {
+                const now = new Date();
+                const options = {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                };
+                const formattedTime = now.toLocaleString('en-US', options).replace(',', '');
+                document.getElementById('update-timestamp').textContent = `Last Updated: ${formattedTime}`;
+            }
+
+            // Update timestamp immediately and every minute
+            updateTimestamp();
+            setInterval(updateTimestamp, 60000);
+
+            // Rest of the existing DOMContentLoaded code...
         });
     </script>
 </body>
