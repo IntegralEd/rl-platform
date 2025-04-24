@@ -318,29 +318,30 @@ export class MeritInstructionalFlow {
                 this.#elements.playbar.hidden = true;
                 this.#elements.chatbar.hidden = false;
                 
-                // Show connecting message
-                const statusMessage = document.createElement('div');
-                statusMessage.className = 'status-message';
-                statusMessage.innerHTML = `
-                    <div class="connecting-indicator">
-                        <span class="status-dot"></span>
-                        <span class="status-text">Connecting to assistant...</span>
-                    </div>
-                `;
-                this.#elements.chatWindow.appendChild(statusMessage);
+                // In development mode, skip connection attempts
+                if (!window.env.ENABLE_MOCK_MODE) {
+                    // Show connecting message
+                    const statusMessage = document.createElement('div');
+                    statusMessage.className = 'status-message';
+                    statusMessage.innerHTML = `
+                        <div class="connecting-indicator">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Connecting to assistant...</span>
+                        </div>
+                    `;
+                    this.#elements.chatWindow.appendChild(statusMessage);
 
-                // Try to initialize OpenAI client in background
-                if (!this.#state.mockMode) {
+                    // Try to initialize OpenAI client in background
                     this.#initializeAssistant().catch(error => {
                         console.warn('[Merit Flow] Assistant initialization deferred:', error.message);
                         this.#showError('Chat service temporarily unavailable. You can still explore the interface.');
                     });
                 } else {
                     console.log('[Merit Flow] Running in mock mode - skipping API initialization');
+                    this.#state.chatReady = true;
                 }
             }
 
-            // Log navigation success
             console.log('[Merit Flow] Navigation complete:', {
                 section: targetSection,
                 mockMode: this.#state.mockMode,
@@ -349,7 +350,6 @@ export class MeritInstructionalFlow {
 
         } catch (error) {
             console.error('[Merit Flow] Navigation error:', error);
-            // Don't block navigation on error
             this.#logError(error);
         }
     }
