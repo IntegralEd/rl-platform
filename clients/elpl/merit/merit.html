@@ -58,6 +58,7 @@
             --comment-panel-width: 300px;
         }
 
+        /* Base Styles */
         html, body {
             margin: 0;
             padding: 0;
@@ -70,9 +71,9 @@
             display: grid;
             grid-template-columns: var(--sidebar-width) 1fr;
             grid-template-rows: auto 1fr auto;
-            gap: 20px;
+            gap: 12px;
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
             box-sizing: border-box;
             background-color: #E6F6FA;
         }
@@ -80,13 +81,13 @@
         /* Sidebar */
         .client-sidebar {
             width: var(--sidebar-width);
-            height: 645px;
-            background: #ffffff;
+            height: calc(100vh - 32px);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
             padding: 24px 0;
-            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
-            border-bottom-right-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
             grid-row: 1 / span 2;
             grid-column: 1;
         }
@@ -119,95 +120,40 @@
             gap: 12px;
         }
 
-        .client-nav__item {
+        .nav-link {
             display: flex;
             align-items: center;
-            padding: 10px 24px;
+            padding: 12px 24px;
             color: var(--text-color);
             text-decoration: none;
             font-size: 16px;
-            gap: 10px;
+            gap: 12px;
             position: relative;
+            transition: all 0.2s ease;
         }
 
-        .client-nav__item--active {
+        .nav-link:hover {
+            background-color: rgba(139, 13, 55, 0.05);
+        }
+
+        .nav-link.active {
             color: var(--elpl-primary);
             background-color: rgba(139, 13, 55, 0.08);
         }
 
-        .client-nav__icon {
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--elpl-primary);
+        }
+
+        .nav-icon {
             width: 20px;
             height: 20px;
-        }
-
-        /* Header */
-        .rl-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background-color: #E6F6FA;
-            border-radius: 10px;
-            grid-column: 2;
-            grid-row: 1;
-            height: var(--header-height);
-            width: 860px;
-            margin-left: auto;
-        }
-
-        .rl-header__left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .rl-header__logo {
-            height: 32px;
-            width: auto;
-        }
-
-        .rl-header__nav {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .rl-header__version {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--elpl-primary);
-        }
-
-        .rl-button {
-            background: var(--elpl-primary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .rl-button:hover {
-            background: var(--elpl-primary-hover);
-        }
-
-        .rl-nav__avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-        }
-
-        .rl-nav__dropdown {
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .rl-nav__link {
-            color: var(--elpl-primary);
-            text-decoration: none;
-            font-size: 14px;
         }
 
         /* Main Content */
@@ -215,52 +161,50 @@
             grid-column: 2;
             grid-row: 2;
             width: 860px;
-            margin-left: auto;
+            margin-left: 24px;
+            height: calc(100vh - 140px);
         }
 
-        .client-section {
+        .section {
             display: none;
-            height: 573px;
+            height: 100%;
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .client-section--active {
+        .section.active {
             display: block;
         }
 
         /* Welcome Section */
-        .client-welcome {
-            background: white;
-            border-radius: 12px;
-            padding: 32px;
-            height: 100%;
-        }
-
-        .client-welcome__header {
+        .welcome-header {
             margin-bottom: 24px;
         }
 
-        .client-welcome__title {
+        .welcome-title {
             font-size: 24px;
             color: var(--elpl-primary);
             margin-bottom: 8px;
         }
 
-        .client-welcome__subtitle {
+        .welcome-subtitle {
             font-size: 16px;
             color: var(--elpl-primary);
         }
 
-        .client-welcome__grade-selection {
+        .welcome-grade-selection {
             margin-top: 20px;
         }
 
-        .client-welcome__grade-options {
+        .grade-options {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
         }
 
-        .client-grade__option {
+        .grade-option {
             padding: 0.75rem;
             border: 1px solid var(--secondary-color);
             border-radius: 4px;
@@ -269,32 +213,24 @@
             transition: all 0.2s;
         }
 
-        .client-grade__option:hover {
+        .grade-option:hover {
             background: var(--secondary-color);
             color: white;
         }
 
-        .client-grade__option.selected {
+        .grade-option.selected {
             background: var(--secondary-color);
             color: white;
         }
 
         /* Chat Section */
-        .client-chat {
+        .chat-container {
             height: 100%;
-        }
-
-        .client-chat__container {
-            width: 100%;
-            height: 100%;
-            background: white;
-            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        .client-chat__window {
+        .chat-window {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
@@ -303,7 +239,7 @@
             gap: 18px;
         }
 
-        .client-chat__day-divider {
+        .chat-day-divider {
             text-align: center;
             font-size: 14px;
             color: #999;
@@ -311,8 +247,8 @@
             position: relative;
         }
 
-        .client-chat__day-divider::before,
-        .client-chat__day-divider::after {
+        .chat-day-divider::before,
+        .chat-day-divider::after {
             content: "";
             display: inline-block;
             width: 40%;
@@ -322,13 +258,13 @@
             margin: 0 8px;
         }
 
-        .client-chat__message {
+        .chat-message {
             display: flex;
             align-items: flex-start;
             gap: 12px;
         }
 
-        .client-chat__avatar {
+        .chat-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -336,45 +272,34 @@
             flex-shrink: 0;
         }
 
-        .client-chat__content {
+        .chat-content {
             flex: 1;
         }
 
-        .client-chat__bubble {
+        .chat-bubble {
             padding: 14px;
             border-radius: 16px;
             font-size: 16px;
             line-height: 1.5;
-        }
-
-        .client-chat__bubble.user {
-            background: #E6F6FA;
-            color: var(--text-color, #2b2b2b);
-            max-width: 90%;
-        }
-
-        .client-chat__bubble.assistant {
             background: #ffffff;
             color: var(--text-color, #2b2b2b);
             border: 1px solid #E6F6FA;
             max-width: 80%;
         }
 
-        .client-chat__timestamp {
+        .chat-message.user .chat-bubble {
+            background: #E6F6FA;
+            border: none;
+            max-width: 90%;
+        }
+
+        .chat-timestamp {
             font-size: 12px;
             color: #888;
             margin-top: 4px;
         }
 
-        .client-chat__message.assistant .client-chat__timestamp {
-            text-align: left;
-        }
-
-        .client-chat__message.user .client-chat__timestamp {
-            text-align: right;
-        }
-
-        .client-chat__input-container {
+        .chat-input-container {
             padding: 12px 18px;
             background: #ffffff;
             border-top: 1px solid #e1e4e8;
@@ -383,7 +308,7 @@
             gap: 12px;
         }
 
-        .client-chat__input {
+        .chat-input {
             flex: 1;
             height: 36px;
             padding: 8px 12px;
@@ -394,13 +319,13 @@
             background: #f9f9f9;
         }
 
-        .client-chat__actions {
+        .chat-actions {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .client-chat__action {
+        .chat-action {
             background: none;
             border: none;
             cursor: pointer;
@@ -408,7 +333,7 @@
             color: #aaa;
         }
 
-        .client-chat__action:hover {
+        .chat-action:hover {
             color: var(--primary-color, #c6123f);
         }
 
@@ -470,6 +395,25 @@
             .rl-footer__right {
                 justify-content: center;
             }
+        }
+
+        .rl-header__section-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--elpl-primary);
+            text-transform: capitalize;
+        }
+
+        .dev-timestamp {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            font-size: 12px;
+            color: #666;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 1000;
         }
     </style>
     
@@ -602,14 +546,14 @@
             <nav class="client-sidebar__nav">
                 <ul>
                     <li>
-                        <a href="#welcome" class="client-nav__item client-nav__item--active" data-section="welcome">
-                            <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="client-nav__icon">
+                        <a href="#welcome" class="nav-link active" data-section="welcome">
+                            <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="nav-icon">
                             <span>Welcome</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#chat" class="client-nav__item" data-section="chat">
-                            <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="client-nav__icon">
+                        <a href="#chat" class="nav-link" data-section="chat">
+                            <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="nav-icon">
                             <span>Chat</span>
                         </a>
                     </li>
@@ -623,7 +567,7 @@
                 <a href="https://recursivelearning.app/" class="rl-header__logo">
                     <img src="/platform/images/recursive-learning-logo.svg" alt="Recursive Learning" />
                 </a>
-                <span class="rl-header__version">v1.16</span>
+                <span class="rl-header__section-name">Welcome</span>
             </div>
             <nav class="rl-header__nav">
                 <div class="rl-nav__item">
@@ -646,53 +590,55 @@
         <!-- Main Content Area -->
         <main class="client-main">
             <!-- Welcome Section -->
-            <section id="welcome-section" class="client-section client-welcome client-section--active" data-section="welcome">
-                <div class="client-welcome__header">
-                    <h1 class="client-welcome__title">Welcome to Merit</h1>
-                    <p class="client-welcome__subtitle">Your AI-powered professional learning assistant</p>
+            <section id="welcome-section" class="section active" data-section="welcome">
+                <div class="welcome-header">
+                    <h1 class="welcome-title">Welcome to Merit</h1>
+                    <p class="welcome-subtitle">Your AI-powered professional learning assistant</p>
                 </div>
-                <div class="client-welcome__grade-selection">
-                    <h2>Select Your Grade Level</h2>
-                    <div class="client-welcome__grade-options">
-                        <div class="client-grade__option" data-grade="k2">K-2</div>
-                        <div class="client-grade__option" data-grade="35">3-5</div>
-                        <div class="client-grade__option" data-grade="68">6-8</div>
-                        <div class="client-grade__option" data-grade="912">9-12</div>
+                <form id="welcome-form" class="welcome-form">
+                    <div class="welcome-grade-selection">
+                        <h2>Select Your Grade Level</h2>
+                        <div class="grade-options">
+                            <div class="grade-option" data-grade="k2">K-2</div>
+                            <div class="grade-option" data-grade="35">3-5</div>
+                            <div class="grade-option" data-grade="68">6-8</div>
+                            <div class="grade-option" data-grade="912">9-12</div>
+                        </div>
                     </div>
-                </div>
+                </form>
             </section>
 
             <!-- Chat Section -->
-            <section id="chat-section" class="client-section client-chat" data-section="chat">
-                <div class="client-chat__container">
+            <section id="chat-section" class="section" data-section="chat">
+                <div class="chat-container">
                     <div id="chat-window" 
-                         class="client-chat__window" 
+                         class="chat-window" 
                          role="log" 
                          aria-live="polite"
                          aria-label="Chat conversation"
                          data-test-id="chat-window">
-                        <div class="client-chat__day-divider">Today</div>
-                        <div class="client-chat__message">
-                            <div class="client-chat__avatar"></div>
-                            <div class="client-chat__content">
-                                <div class="client-chat__bubble">Hi there! How can I support your professional learning today?</div>
-                                <div class="client-chat__timestamp">Just now</div>
+                        <div class="chat-day-divider">Today</div>
+                        <div class="chat-message">
+                            <div class="chat-avatar"></div>
+                            <div class="chat-content">
+                                <div class="chat-bubble">Hi there! How can I support your professional learning today?</div>
+                                <div class="chat-timestamp">Just now</div>
                             </div>
                         </div>
                     </div>
-                    <div class="client-chat__input-container">
+                    <div class="chat-input-container">
                         <textarea id="chat-input"
-                                class="client-chat__input"
+                                class="chat-input"
                                 aria-label="Type your message"
                                 placeholder="Type your message..." 
                                 rows="1"
                                 maxlength="1000"
                                 data-test-id="chat-input"></textarea>
-                        <div class="client-chat__actions">
+                        <div class="chat-actions">
                             <button title="Attach">📎</button>
                             <button title="Emoji">😊</button>
                             <button id="send-button" 
-                                    class="client-chat__action client-chat__action--send"
+                                    class="chat-action chat-action-send"
                                     aria-label="Send message"
                                     data-test-id="send-button"
                                     title="Send">➤</button>
@@ -906,36 +852,6 @@
                 window.location.href = 'merit.html';
             }
 
-            // Menu dropdown functionality
-            const menuTrigger = document.querySelector('.menu-trigger');
-            const menuContent = document.querySelector('.menu-content');
-            
-            if (menuTrigger && menuContent) {
-                menuTrigger.addEventListener('click', (e) => {
-                    const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
-                    menuTrigger.setAttribute('aria-expanded', !isExpanded);
-                    menuContent.classList.toggle('show');
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!menuTrigger.contains(e.target)) {
-                        menuTrigger.setAttribute('aria-expanded', 'false');
-                        menuContent.classList.remove('show');
-                    }
-                });
-            }
-
-            // Grade selection functionality
-            const gradeOptions = document.querySelectorAll('.grade-option');
-            gradeOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    localStorage.setItem('merit_grade_level', option.dataset.grade);
-                });
-            });
-
             // Initialize review mode if needed
             const isReviewMode = new URLSearchParams(window.location.search).has('review');
             if (isReviewMode) {
@@ -946,62 +862,65 @@
     </script>
 
     <script>
-        // Get the last update timestamp from the environment configuration
-        const lastUpdateTime = new Date(BUILD_TIMESTAMP);
-        const options = {
-            month: '2-digit',
-            day: '2-digit',
-            year: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        };
-        
-        // Set the timestamp once, no need for interval
-        document.getElementById('dev-timestamp').textContent = 
-            `Last Updated: ${lastUpdateTime.toLocaleString('en-US', options).replace(',', '')}`;
+        function updateTimestamp() {
+            const now = new Date();
+            const options = {
+                month: '2-digit',
+                day: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            
+            const formattedTime = now.toLocaleString('en-US', options);
+            document.getElementById('dev-timestamp').textContent = `Last Updated: ${formattedTime}`;
+        }
+
+        // Update timestamp immediately and then every minute
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTimestamp();
+            setInterval(updateTimestamp, 60000); // Update every minute
+        });
+    </script>
+
+    <!-- Initialize Merit Flow -->
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                window.meritFlow = new MeritInstructionalFlow();
+                console.log('[Merit Flow] Initialized successfully');
+            } catch (error) {
+                console.error('[Merit Flow] Initialization error:', error);
+            }
+        });
     </script>
 
     <script>
+        // Update section name in header when section changes
         document.addEventListener('DOMContentLoaded', () => {
-            // Navigation handling
-            const navItems = document.querySelectorAll('.nav-item');
-            const sections = document.querySelectorAll('.section');
-
-            function showSection(sectionId) {
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.getAttribute('data-section') === sectionId) {
-                        section.classList.add('active');
-                    }
-                });
-
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-section') === sectionId) {
-                        item.classList.add('active');
-                    }
-                });
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const sectionId = item.getAttribute('data-section');
-                    showSection(sectionId);
-                    window.location.hash = sectionId;
-                });
-            });
-
-            // Handle initial load and hash changes
-            function handleHashChange() {
+            const sectionNameElement = document.querySelector('.rl-header__section-name');
+            
+            // Update section name based on hash change
+            function updateSectionName() {
                 const hash = window.location.hash.slice(1) || 'welcome';
-                showSection(hash);
+                if (sectionNameElement) {
+                    sectionNameElement.textContent = hash.charAt(0).toUpperCase() + hash.slice(1);
+                }
             }
 
-            window.addEventListener('hashchange', handleHashChange);
-            handleHashChange(); // Handle initial load
+            // Listen for hash changes
+            window.addEventListener('hashchange', updateSectionName);
+            
+            // Initial update
+            updateSectionName();
+
+            // Also listen for MeritInstructionalFlow section changes
+            window.addEventListener('merit-section-change', (event) => {
+                if (sectionNameElement && event.detail && event.detail.section) {
+                    sectionNameElement.textContent = event.detail.section.charAt(0).toUpperCase() + event.detail.section.slice(1);
+                }
+            });
         });
     </script>
 </body>
