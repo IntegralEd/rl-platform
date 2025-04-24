@@ -78,6 +78,7 @@
 
         /* Sidebar */
         .client-sidebar {
+            grid-column: 1;
             grid-row: 1 / span 3;
             background: white;
             border-bottom-right-radius: 10px;
@@ -308,27 +309,30 @@
 
         .client-welcome__grade-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
             margin-bottom: 24px;
         }
 
         .client-grade__option {
-            padding: 12px;
+            padding: 16px;
             text-align: center;
             background: #f5f5f5;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
         }
 
         .client-grade__option:hover {
             background: #e0e0e0;
+            border-color: var(--elpl-primary);
         }
 
         .client-grade__option.selected {
             background: var(--elpl-primary);
             color: white;
+            border-color: var(--elpl-primary);
         }
 
         /* Chat Section */
@@ -628,13 +632,6 @@
             <div class="progress-bar"></div>
         </div>
     </div>
-    
-    <!-- Version Display -->
-    <div class="version-display">
-        <span>v<span id="version-number">1.16</span></span>
-        <span class="environment-tag">PROD</span>
-        <span class="build-date">04/21/24</span>
-    </div>
 
     <!-- Main Layout -->
     <div class="rl-layout" data-client-component="merit-page" data-test-id="page-container">
@@ -647,13 +644,13 @@
             <nav class="client-sidebar__nav">
                 <ul>
                     <li>
-                        <a href="#welcome" class="client-nav__item client-nav__item--active" data-section="welcome">
+                        <a href="#welcome" class="client-nav__item active" data-section="welcome">
                             <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="client-nav__icon">
                             <span>Welcome</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#chat" class="client-nav__item" data-section="chat">
+                        <a href="#chat" class="client-nav__item disabled" data-section="chat">
                             <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="client-nav__icon">
                             <span>Chat</span>
                         </a>
@@ -968,21 +965,74 @@
             }
 
             // Grade selection functionality
-            const gradeOptions = document.querySelectorAll('.grade-option');
+            const gradeOptions = document.querySelectorAll('.client-grade__option');
             gradeOptions.forEach(option => {
                 option.addEventListener('click', () => {
+                    // Remove selected class from all options
                     gradeOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Add selected class to clicked option
                     option.classList.add('selected');
-                    localStorage.setItem('merit_grade_level', option.dataset.grade);
+                    // Store selected grade
+                    const selectedGrade = option.getAttribute('data-grade');
+                    localStorage.setItem('merit_grade_level', selectedGrade);
+                    
+                    // Enable chat section if grade is selected
+                    const chatNav = document.querySelector('[data-section="chat"]');
+                    if (chatNav) {
+                        chatNav.classList.remove('disabled');
+                    }
                 });
             });
 
-            // Initialize review mode if needed
-            const isReviewMode = new URLSearchParams(window.location.search).has('review');
-            if (isReviewMode) {
-                document.getElementById('review-banner').style.display = 'block';
-                document.getElementById('qipu-toggle').style.display = 'block';
+            // Navigation handling
+            const navItems = document.querySelectorAll('.client-nav__item');
+            const sections = document.querySelectorAll('.section');
+
+            function showSection(sectionId) {
+                // Only allow navigation to chat if grade is selected
+                if (sectionId === 'chat' && !localStorage.getItem('merit_grade_level')) {
+                    alert('Please select a grade level first.');
+                    return;
+                }
+
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.getAttribute('data-section') === sectionId) {
+                        section.classList.add('active');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-section') === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
+
+                // Update section name in header
+                const sectionName = document.querySelector('.section-name');
+                if (sectionName) {
+                    sectionName.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
+                }
             }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = item.getAttribute('data-section');
+                    showSection(sectionId);
+                    window.location.hash = sectionId;
+                });
+            });
+
+            // Handle initial load and hash changes
+            function handleHashChange() {
+                const hash = window.location.hash.slice(1) || 'welcome';
+                showSection(hash);
+            }
+
+            window.addEventListener('hashchange', handleHashChange);
+            handleHashChange(); // Handle initial load
         });
     </script>
 
