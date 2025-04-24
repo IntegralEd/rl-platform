@@ -86,108 +86,115 @@
         /* Sidebar */
         .sidebar {
             grid-row: 1 / -1;
-            background: #8B0D37;
-            color: white;
-            padding: 1rem;
+            background: white;
+            padding: 2rem 1rem;
+            border-right: 1px solid #E6F6FA;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-header {
-            padding: 1rem 0;
+            padding: 0 0 2rem 0;
             text-align: center;
+            border-bottom: 1px solid #E6F6FA;
+            margin-bottom: 2rem;
         }
 
         .client-logo {
-            max-width: 180px;
+            max-width: 160px;
             height: auto;
         }
 
         .sidebar-subtitle {
             display: block;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            opacity: 0.9;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: #666;
         }
 
         .nav-item {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
-            color: var(--client-text);
+            transition: all 0.2s;
+            color: #666;
             text-decoration: none;
+            font-size: 0.9375rem;
         }
 
         .nav-item:hover {
-            background-color: var(--elpl-primary-hover);
-            color: var(--elpl-text-light);
+            background-color: #E6F6FA;
+            color: var(--elpl-primary);
         }
 
         .nav-item.active {
-            background-color: var(--elpl-primary);
-            color: var(--elpl-text-light);
+            background-color: #E6F6FA;
+            color: var(--elpl-primary);
+            font-weight: 600;
         }
 
         .nav-icon {
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
+            width: 20px;
+            height: 20px;
             margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            opacity: 0.8;
         }
 
         /* Header */
         .client-header {
             height: var(--header-height);
-            border-bottom: 1px solid var(--client-border);
+            border-bottom: 1px solid #E6F6FA;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            background-color: var(--elpl-primary);
-            color: var(--elpl-text-light);
+            padding: 0 2rem;
+            background-color: white;
         }
 
         .chat-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
+            color: #2c3e50;
         }
 
         .chat-controls {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
-        .new-chat-btn {
-            padding: 0.5rem 1rem;
-            background: #8B0D37;
-            color: white;
+        .notification-bell {
+            background: none;
             border: none;
-            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            color: #666;
+            font-size: 1.25rem;
         }
 
-        .new-chat-btn:hover {
-            background: #6d0a2b;
-        }
-
-        .chat-profile {
+        .profile-section {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .profile-avatar {
-            width: 32px;
-            height: 32px;
-            background: #e1e4e8;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            background: #E6F6FA;
+            overflow: hidden;
+        }
+
+        .profile-name {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #2c3e50;
         }
 
         /* Footer */
@@ -232,134 +239,131 @@
 
         /* Chat Styles */
         .chat-container {
-            width: min(860px, var(--content-width));
-            height: 645px;
-            background: var(--client-bg);
+            background: white;
+            max-width: 860px;
+            margin: 0 auto;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--client-border);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: calc(100vh - 4rem);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
 
-        .chat-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--client-border);
-            background-color: var(--client-bg);
-            border-radius: 12px 12px 0 0;
-        }
-
-        /* Message Styles */
         .chat-window {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 1.5rem;
         }
 
-        .day-divider {
+        .chat-day-divider {
             text-align: center;
-            font-size: 14px;
-            color: #999;
-            margin: 20px 0 10px;
+            font-size: 0.875rem;
+            color: #888;
             position: relative;
         }
 
-        .day-divider::before,
-        .day-divider::after {
+        .chat-day-divider::before,
+        .chat-day-divider::after {
             content: "";
-            display: inline-block;
+            position: absolute;
+            top: 50%;
             width: 40%;
             height: 1px;
-            background-color: #ccc;
-            vertical-align: middle;
-            margin: 0 8px;
-        }
-
-        .message-block {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .message-block.user {
-            flex-direction: row-reverse;
-            align-self: flex-end;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             background: #ccc;
-            flex-shrink: 0;
+        }
+
+        .chat-day-divider::before {
+            left: 0;
+        }
+
+        .chat-day-divider::after {
+            right: 0;
         }
 
         .message {
-            padding: 14px;
-            border-radius: 16px;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .message.user {
-            background: #E6F6FA;
-            color: var(--text-color, #2b2b2b);
+            display: flex;
+            align-items: flex-end;
             max-width: 90%;
         }
 
         .message.assistant {
-            background: #ffffff;
-            color: var(--text-color, #2b2b2b);
+            align-self: flex-start;
+            flex-direction: row;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: #ccc;
+            border-radius: 50%;
+            margin: 0 0.75rem;
+        }
+
+        .bubble {
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .assistant .bubble {
+            background: white;
             border: 1px solid #E6F6FA;
-            max-width: 80%;
+            color: var(--text-color);
+        }
+
+        .user .bubble {
+            background: #E6F6FA;
+            color: var(--text-color);
         }
 
         .timestamp {
-            font-size: 12px;
-            color: #888;
-            margin-top: 4px;
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.25rem;
+            padding: 0 0.75rem;
         }
 
         .chat-input-container {
-            padding: 12px 18px;
-            background: #ffffff;
-            border-top: 1px solid #e1e4e8;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--chat-input-border);
+            background: white;
         }
 
         .chat-input {
             flex: 1;
-            height: 36px;
-            padding: 8px 12px;
-            border: 1px solid #e1e4e8;
-            border-radius: 12px;
-            font-size: 16px;
             resize: none;
-            background: #f9f9f9;
+            padding: 0.75rem;
+            border: 1px solid var(--chat-input-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.4;
+            height: 44px;
         }
 
-        .chat-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--chat-input-focus);
         }
 
-        .chat-actions button {
+        .icon-button {
             background: none;
             border: none;
+            font-size: 1.2rem;
             cursor: pointer;
-            font-size: 18px;
-            color: #aaa;
-        }
-
-        .chat-actions button:hover {
-            color: var(--primary-color, #c6123f);
+            color: #555;
         }
 
         /* Review Banner */
@@ -662,23 +666,15 @@
         </aside>
 
         <!-- Header -->
-        <header class="chat-header">
+        <header class="client-header">
             <div class="chat-title">Chat</div>
             <div class="chat-controls">
-                <button class="new-chat-btn">+ New Chat</button>
-                <div class="chat-profile">
-                    <div class="profile-avatar"></div>
-                    <div class="menu-dropdown">
-                        <button class="menu-trigger" aria-expanded="false">
-                            <span class="profile-name">Development Mode</span>
-                            <span class="menu-caret">▼</span>
-                        </button>
-                        <div class="menu-content">
-                            <a href="#" class="menu-link">Settings</a>
-                            <a href="#" class="menu-link">Help</a>
-                            <a href="#" class="menu-link">Sign Out</a>
-                        </div>
+                <button class="notification-bell">🔔</button>
+                <div class="profile-section">
+                    <div class="profile-avatar">
+                        <img src="/clients/elpl/assets/images/default-avatar.png" alt="Leslie Alexander" />
                     </div>
+                    <span class="profile-name">Leslie Alexander</span>
                 </div>
             </div>
         </header>
@@ -700,32 +696,30 @@
         <main class="chat-main" role="main" data-test-id="main-content">
             <div class="chat-container">
                 <div class="chat-window">
-                    <div class="day-divider">August 21</div>
-                    <div class="message-block assistant">
+                    <div class="chat-day-divider">August 21</div>
+
+                    <div class="message assistant">
                         <div class="avatar"></div>
                         <div>
-                            <div class="message assistant">Hi there! How can I support your professional learning today?</div>
-                            <div class="timestamp">10:15 pm</div>
+                            <div class="bubble">Hi there! How can I support your professional learning today?</div>
+                            <div class="timestamp">10:02 AM</div>
                         </div>
                     </div>
 
-                    <div class="day-divider">August 22</div>
-                    <div class="message-block user">
+                    <div class="message user">
                         <div class="avatar"></div>
                         <div>
-                            <div class="message user">Can you tell me more about the upcoming training?</div>
-                            <div class="timestamp">12:15 pm</div>
+                            <div class="bubble">Can you tell me more about the upcoming training?</div>
+                            <div class="timestamp">10:03 AM</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="chat-input-container">
+                    <button class="icon-button">📎</button>
+                    <button class="icon-button">😊</button>
                     <textarea class="chat-input" placeholder="Type your message..."></textarea>
-                    <div class="chat-actions">
-                        <button title="Attach">📎</button>
-                        <button title="Emoji">😊</button>
-                        <button class="send-button" title="Send">➤</button>
-                    </div>
+                    <button class="icon-button">➤</button>
                 </div>
             </div>
         </main>
