@@ -206,28 +206,33 @@
 
         .grade-option {
             padding: 0.75rem;
-            border: 1px solid var(--secondary-color);
-            border-radius: 4px;
+            border: 1px solid var(--elpl-primary);
+            border-radius: 8px;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
         }
 
         .grade-option:hover {
-            background: var(--secondary-color);
+            background: var(--elpl-primary);
             color: white;
         }
 
         .grade-option.selected {
-            background: var(--secondary-color);
+            background: var(--elpl-primary);
             color: white;
         }
 
         /* Chat Section */
         .chat-container {
-            height: 100%;
+            width: 860px;
+            height: 645px;
+            background: white;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .chat-window {
@@ -239,7 +244,7 @@
             gap: 18px;
         }
 
-        .chat-day-divider {
+        .day-divider {
             text-align: center;
             font-size: 14px;
             color: #999;
@@ -247,8 +252,8 @@
             position: relative;
         }
 
-        .chat-day-divider::before,
-        .chat-day-divider::after {
+        .day-divider::before,
+        .day-divider::after {
             content: "";
             display: inline-block;
             width: 40%;
@@ -258,13 +263,18 @@
             margin: 0 8px;
         }
 
-        .chat-message {
+        .message-block {
             display: flex;
             align-items: flex-start;
             gap: 12px;
         }
 
-        .chat-avatar {
+        .message-block.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+        .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -272,31 +282,38 @@
             flex-shrink: 0;
         }
 
-        .chat-content {
-            flex: 1;
-        }
-
-        .chat-bubble {
+        .message {
             padding: 14px;
             border-radius: 16px;
             font-size: 16px;
             line-height: 1.5;
+        }
+
+        .message.user {
+            background: #E6F6FA;
+            color: var(--text-color, #2b2b2b);
+            max-width: 90%;
+        }
+
+        .message.assistant {
             background: #ffffff;
             color: var(--text-color, #2b2b2b);
             border: 1px solid #E6F6FA;
             max-width: 80%;
         }
 
-        .chat-message.user .chat-bubble {
-            background: #E6F6FA;
-            border: none;
-            max-width: 90%;
-        }
-
-        .chat-timestamp {
+        .timestamp {
             font-size: 12px;
             color: #888;
             margin-top: 4px;
+        }
+
+        .message-block.assistant .timestamp {
+            text-align: left;
+        }
+
+        .message-block.user .timestamp {
+            text-align: right;
         }
 
         .chat-input-container {
@@ -325,7 +342,7 @@
             gap: 8px;
         }
 
-        .chat-action {
+        .chat-actions button {
             background: none;
             border: none;
             cursor: pointer;
@@ -333,7 +350,7 @@
             color: #aaa;
         }
 
-        .chat-action:hover {
+        .chat-actions button:hover {
             color: var(--primary-color, #c6123f);
         }
 
@@ -410,25 +427,97 @@
             left: 8px;
             font-size: 12px;
             color: #666;
-            background: rgba(255, 255, 255, 0.9);
+            opacity: 0.7;
+            background: transparent;
             padding: 4px 8px;
-            border-radius: 4px;
             z-index: 1000;
+        }
+
+        /* Remove version display */
+        .version-display, .bottom-version {
+            display: none !important;
+        }
+
+        .welcome-form {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .welcome-grade-selection,
+        .welcome-curriculum-selection {
+            margin-top: 20px;
+        }
+
+        .welcome-grade-selection h2,
+        .welcome-curriculum-selection h2 {
+            font-size: 18px;
+            color: var(--elpl-primary);
+            margin-bottom: 16px;
+        }
+
+        .grade-options,
+        .curriculum-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .grade-option,
+        .curriculum-option {
+            padding: 12px;
+            border: 1px solid var(--elpl-primary);
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--elpl-primary);
+            transition: all 0.2s ease;
+        }
+
+        .grade-option:hover,
+        .curriculum-option:hover {
+            background: rgba(139, 13, 55, 0.05);
+        }
+
+        .grade-option.selected,
+        .curriculum-option.selected {
+            background: var(--elpl-primary);
+            color: white;
+        }
+
+        .welcome-actions {
+            margin-top: 32px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-button {
+            background: var(--elpl-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .next-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .next-button:not(:disabled):hover {
+            background: var(--elpl-primary-hover);
         }
     </style>
     
     <!-- Environment Configuration -->
     <script>
-        // Build timestamp is static to match deployment
-        const BUILD_TIMESTAMP = '20240422T172600Z';
-        
         window.env = {
             // Core Configuration
             SCHEMA_VERSION: '04212025.B01',
-            BUILD_DATE: BUILD_TIMESTAMP.slice(0, 8),
-            BUILD_TIME: `${BUILD_TIMESTAMP.slice(9, 11)}:${BUILD_TIMESTAMP.slice(11, 13)}:${BUILD_TIMESTAMP.slice(13, 15)}`,
-            BUILD_VERSION: '1.16',
-            BUILD_TIMESTAMP: BUILD_TIMESTAMP,
             
             // Development Mode Settings
             ENABLE_MOCK_MODE: true,
@@ -460,46 +549,6 @@
     <!-- Core Dependencies -->
     <script type="module" src="assets/js/client-merit-openai.js"></script>
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
-    
-    <!-- Version Display Initialization -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-            
-            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
-            const day = String(centralTime.getDate()).padStart(2, '0');
-            const year = centralTime.getFullYear();
-            const buildDate = `${month}${day}${year}`;
-            
-            const hours = centralTime.getHours();
-            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
-            const buildTime = `${formattedHours}:${minutes}${ampm}`;
-            
-            const version = '1.16';
-            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
-            
-            localStorage.setItem('meritVersion', version);
-            localStorage.setItem('meritBuildDate', buildDate);
-            localStorage.setItem('meritBuildTime', buildTime);
-            localStorage.setItem('meritFullVersion', displayVersion);
-            
-            if (window.env.DEBUG_MODE) {
-                console.log('[Merit Flow] Build version:', displayVersion);
-            }
-
-            const versionNumber = document.getElementById('version-number');
-            if (versionNumber) {
-                versionNumber.textContent = version;
-            }
-        });
-    </script>
-
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
 </head>
 <body>
     <!-- Review Banner -->
@@ -564,26 +613,20 @@
         <!-- Header -->
         <header class="rl-header">
             <div class="rl-header__left">
-                <a href="https://recursivelearning.app/" class="rl-header__logo">
-                    <img src="/platform/images/recursive-learning-logo.svg" alt="Recursive Learning" />
-                </a>
                 <span class="rl-header__section-name">Welcome</span>
             </div>
             <nav class="rl-header__nav">
-                <div class="rl-nav__item">
-                    <button class="rl-button rl-button--primary">+ New Chat</button>
+                <button class="rl-button rl-button--primary">+ New Chat</button>
+                <div class="rl-nav__profile">
+                    <img src="/clients/elpl/assets/images/avatar-leslie.png" alt="Profile Avatar" class="rl-nav__avatar">
+                    <span class="rl-nav__username">Leslie Alexander</span>
                 </div>
-                <div class="rl-nav__item rl-nav__item--dropdown">
-                    <button class="rl-nav__button">
-                        <img src="/clients/elpl/assets/images/avatar-leslie.png" alt="Profile Avatar" class="rl-nav__avatar">
-                        <span>Leslie Alexander</span>
-                    </button>
-                    <div class="rl-nav__dropdown">
-                        <a href="#settings" class="rl-nav__link">Settings</a>
-                        <a href="#help" class="rl-nav__link">Help</a>
-                        <a href="/platform/auth/logout" class="rl-nav__link">Log Out</a>
-                    </div>
-                </div>
+                <button class="rl-nav__settings" title="Settings">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </nav>
         </header>
 
@@ -599,11 +642,27 @@
                     <div class="welcome-grade-selection">
                         <h2>Select Your Grade Level</h2>
                         <div class="grade-options">
-                            <div class="grade-option" data-grade="k2">K-2</div>
-                            <div class="grade-option" data-grade="35">3-5</div>
-                            <div class="grade-option" data-grade="68">6-8</div>
-                            <div class="grade-option" data-grade="912">9-12</div>
+                            <button type="button" class="grade-option" data-grade="k2" id="grade-k2">K-2</button>
+                            <button type="button" class="grade-option" data-grade="35" id="grade-35">3-5</button>
+                            <button type="button" class="grade-option" data-grade="68" id="grade-68">6-8</button>
+                            <button type="button" class="grade-option" data-grade="912" id="grade-912">9-12</button>
                         </div>
+                        <input type="hidden" id="grade-level" name="grade-level" required>
+                    </div>
+
+                    <div class="welcome-curriculum-selection">
+                        <h2>What do you teach?</h2>
+                        <div class="curriculum-options">
+                            <button type="button" class="curriculum-option" data-curriculum="ela" id="curriculum-ela">ELA</button>
+                            <button type="button" class="curriculum-option" data-curriculum="math" id="curriculum-math">Math</button>
+                            <button type="button" class="curriculum-option" data-curriculum="science" id="curriculum-science">Science</button>
+                            <button type="button" class="curriculum-option" data-curriculum="social" id="curriculum-social">Social Studies</button>
+                        </div>
+                        <input type="hidden" id="curriculum" name="curriculum" required>
+                    </div>
+
+                    <div class="welcome-actions">
+                        <button type="button" id="next-button" class="next-button" disabled>Next</button>
                     </div>
                 </form>
             </section>
@@ -617,12 +676,12 @@
                          aria-live="polite"
                          aria-label="Chat conversation"
                          data-test-id="chat-window">
-                        <div class="chat-day-divider">Today</div>
-                        <div class="chat-message">
-                            <div class="chat-avatar"></div>
-                            <div class="chat-content">
-                                <div class="chat-bubble">Hi there! How can I support your professional learning today?</div>
-                                <div class="chat-timestamp">Just now</div>
+                        <div class="day-divider">Today</div>
+                        <div class="message-block assistant">
+                            <div class="avatar"></div>
+                            <div>
+                                <div class="message assistant">Hi there! How can I support your professional learning today?</div>
+                                <div class="timestamp">Just now</div>
                             </div>
                         </div>
                     </div>
@@ -638,7 +697,7 @@
                             <button title="Attach">📎</button>
                             <button title="Emoji">😊</button>
                             <button id="send-button" 
-                                    class="chat-action chat-action-send"
+                                    class="send-button"
                                     aria-label="Send message"
                                     data-test-id="send-button"
                                     title="Send">➤</button>
@@ -683,45 +742,99 @@
         </div>
     </div>
 
-    <script type="module">
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('welcome-form');
-            
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                // Log form submission
-                window.REDIS_FLOW.logStep('FORM_SUBMIT', {
-                    gradeLevel: form.querySelector('#grade-level').value,
-                    subject: 'ela', // hardcoded for now
-                    timestamp: Date.now()
+            const gradeOptions = document.querySelectorAll('.grade-option');
+            const curriculumOptions = document.querySelectorAll('.curriculum-option');
+            const gradeInput = document.getElementById('grade-level');
+            const curriculumInput = document.getElementById('curriculum');
+            const nextButton = document.getElementById('next-button');
+
+            function validateForm() {
+                const isValid = gradeInput.value && curriculumInput.value;
+                nextButton.disabled = !isValid;
+                return isValid;
+            }
+
+            gradeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    gradeInput.value = option.dataset.grade;
+                    validateForm();
                 });
+            });
 
-                // Generate anonymous session ID
-                const sessionId = `merit-${Date.now()}`;
-                window.REDIS_FLOW.logStep('SESSION_CREATED', {
-                    sessionId,
-                    timestamp: Date.now()
+            curriculumOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    curriculumOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    curriculumInput.value = option.dataset.curriculum;
+                    validateForm();
                 });
+            });
 
-                try {
-                    // Create Redis record
-                    window.REDIS_FLOW.logStep('REDIS_WRITE_START', {
-                        sessionId,
-                        timestamp: Date.now()
-                    });
+            // Pre-select ELA curriculum as it's the default in InstructionalFlow
+            const elaOption = document.getElementById('curriculum-ela');
+            if (elaOption) {
+                elaOption.click();
+            }
 
-                    // After Redis write
-                    window.REDIS_FLOW.logStep('REDIS_WRITE_COMPLETE', {
-                        sessionId,
-                        ttl: 3600,
-                        timestamp: Date.now()
-                    });
-
-                } catch (error) {
-                    window.REDIS_FLOW.logError('REDIS_FLOW_ERROR', error);
+            // Handle next button click
+            nextButton.addEventListener('click', () => {
+                if (validateForm()) {
+                    // Update navigation
+                    const welcomeSection = document.querySelector('[data-section="welcome"]');
+                    const chatSection = document.querySelector('[data-section="chat"]');
+                    const welcomeLink = document.querySelector('[data-section="welcome"]');
+                    const chatLink = document.querySelector('[data-section="chat"]');
+                    
+                    // Hide welcome, show chat
+                    welcomeSection.classList.remove('active');
+                    chatSection.classList.add('active');
+                    
+                    // Update navigation links
+                    welcomeLink?.classList.remove('active');
+                    chatLink?.classList.add('active');
+                    
+                    // Update URL hash
+                    window.location.hash = '#chat';
+                    
+                    // Dispatch event for MeritInstructionalFlow
+                    window.dispatchEvent(new CustomEvent('merit-section-change', {
+                        detail: { section: 'chat' }
+                    }));
                 }
             });
+        });
+    </script>
+
+    <!-- Update section visibility handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle hash-based navigation
+            function handleHashChange() {
+                const hash = window.location.hash.slice(1) || 'welcome';
+                const sections = document.querySelectorAll('.section');
+                const links = document.querySelectorAll('.nav-link');
+                
+                sections.forEach(section => {
+                    const isActive = section.dataset.section === hash;
+                    section.classList.toggle('active', isActive);
+                });
+                
+                links.forEach(link => {
+                    const isActive = link.dataset.section === hash;
+                    link.classList.toggle('active', isActive);
+                });
+            }
+
+            // Listen for hash changes
+            window.addEventListener('hashchange', handleHashChange);
+            
+            // Initial load
+            handleHashChange();
         });
     </script>
 

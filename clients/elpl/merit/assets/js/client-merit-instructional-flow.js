@@ -401,38 +401,98 @@ export class MeritInstructionalFlow {
     }
 
     #addMessage(type, content) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content;
-        this.#elements.chatWindow?.appendChild(messageDiv);
-        messageDiv.scrollIntoView({ behavior: 'smooth' });
+        const messageBlock = document.createElement('div');
+        messageBlock.className = `message-block ${type}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+
+        const messageContainer = document.createElement('div');
+        
+        const message = document.createElement('div');
+        message.className = `message ${type}`;
+        message.textContent = content;
+
+        const timestamp = document.createElement('div');
+        timestamp.className = 'timestamp';
+        timestamp.textContent = new Date().toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        }).toLowerCase();
+
+        messageContainer.appendChild(message);
+        messageContainer.appendChild(timestamp);
+
+        if (type === 'user') {
+            messageBlock.appendChild(messageContainer);
+            messageBlock.appendChild(avatar);
+        } else {
+            messageBlock.appendChild(avatar);
+            messageBlock.appendChild(messageContainer);
+        }
+
+        this.#elements.chatWindow?.appendChild(messageBlock);
+        messageBlock.scrollIntoView({ behavior: 'smooth' });
     }
 
     #showLoading() {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'message loading';
-        loadingDiv.textContent = 'Assistant is thinking...';
-        this.#elements.chatWindow?.appendChild(loadingDiv);
-        loadingDiv.scrollIntoView({ behavior: 'smooth' });
+        const messageBlock = document.createElement('div');
+        messageBlock.className = 'message-block assistant loading';
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar';
+
+        const messageContainer = document.createElement('div');
+        
+        const message = document.createElement('div');
+        message.className = 'message assistant';
+        message.textContent = 'Assistant is thinking...';
+
+        const timestamp = document.createElement('div');
+        timestamp.className = 'timestamp';
+        timestamp.textContent = 'now';
+
+        messageContainer.appendChild(message);
+        messageContainer.appendChild(timestamp);
+
+        messageBlock.appendChild(avatar);
+        messageBlock.appendChild(messageContainer);
+
+        this.#elements.chatWindow?.appendChild(messageBlock);
+        messageBlock.scrollIntoView({ behavior: 'smooth' });
     }
 
     #hideLoading() {
-        const loadingMessage = this.#elements.chatWindow?.querySelector('.message.loading');
+        const loadingMessage = this.#elements.chatWindow?.querySelector('.message-block.loading');
         loadingMessage?.remove();
     }
 
     #showError(message, isHtml = false) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'message error';
+        const messageBlock = document.createElement('div');
+        messageBlock.className = 'message-block system';
+
+        const messageContainer = document.createElement('div');
+        
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'message system error';
         
         if (isHtml) {
-            errorDiv.innerHTML = message;
+            errorMessage.innerHTML = message;
         } else {
-            errorDiv.textContent = message;
+            errorMessage.textContent = message;
         }
-        
-        this.#elements.chatWindow?.appendChild(errorDiv);
-        errorDiv.scrollIntoView({ behavior: 'smooth' });
+
+        const timestamp = document.createElement('div');
+        timestamp.className = 'timestamp';
+        timestamp.textContent = 'now';
+
+        messageContainer.appendChild(errorMessage);
+        messageContainer.appendChild(timestamp);
+        messageBlock.appendChild(messageContainer);
+
+        this.#elements.chatWindow?.appendChild(messageBlock);
+        messageBlock.scrollIntoView({ behavior: 'smooth' });
 
         // Log error for monitoring
         console.error('[Merit Flow] Error displayed:', {
