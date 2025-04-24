@@ -1127,25 +1127,21 @@
     </script>
 
     <script>
-        // Update timestamp every second
-        function updateTimestamp() {
-            const now = new Date();
-            const options = {
-                month: '2-digit',
-                day: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            };
-            document.getElementById('dev-timestamp').textContent = 
-                now.toLocaleString('en-US', options).replace(',', '');
-        }
+        // Get the last update timestamp from the environment configuration
+        const lastUpdateTime = new Date(BUILD_TIMESTAMP);
+        const options = {
+            month: '2-digit',
+            day: '2-digit',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
         
-        // Initial update and start interval
-        updateTimestamp();
-        setInterval(updateTimestamp, 1000);
+        // Set the timestamp once, no need for interval
+        document.getElementById('dev-timestamp').textContent = 
+            `Last Updated: ${lastUpdateTime.toLocaleString('en-US', options).replace(',', '')}`;
     </script>
 </body>
 </html> 
