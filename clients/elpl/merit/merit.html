@@ -35,66 +35,129 @@
 
     <style>
         :root {
-            --header-height: 64px;
-            --footer-height: 48px;
-            --sidebar-width: 240px;
-            --primary-color: #0066cc;
-            --text-color: #333333;
-            --border-color: #e0e0e0;
-            --background-color: #f5f5f5;
+            --header-height: 52px;
+            --footer-height: 50px;
+            --sidebar-width: 200px;
+            --layout-gap: 20px;
+            --border-radius: 12px;
+            --background-color: #E6F6FA;
+            --client-bg: #ffffff;
+            --client-text: #2c3e50;
+            --client-border: #e1e4e8;
+            --content-width: 1200px;
+            --ring-color: #007bff;
+            --ring-size: 2px;
+            --ring-spacing: 4px;
+            --elpl-primary: #8B0D37;
+            --elpl-primary-hover: #6d0a2b;
+            --elpl-text-light: #ffffff;
+            --elpl-text-dark: #2c3e50;
+            --qipu-secondary: #f2b632;
+            --review-banner-height: 40px;
+            --qipu-bar-height: 60px;
+            --comment-panel-width: 300px;
         }
 
-        * {
+        html, body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.5;
-            color: var(--text-color);
+            height: 100%;
             background-color: var(--background-color);
+            font-family: var(--client-font-body, sans-serif);
         }
 
         .rl-layout {
             display: grid;
-            grid-template-areas:
-                "header header"
-                "sidebar main"
-                "footer footer";
-            grid-template-rows: var(--header-height) 1fr var(--footer-height);
             grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: var(--layout-gap);
             height: 100vh;
-            width: 100vw;
+            padding: var(--layout-gap);
+            box-sizing: border-box;
+        }
+
+        /* Sidebar */
+        .client-sidebar {
+            grid-row: 1 / span 3;
+            background: white;
+            border-bottom-right-radius: 10px;
+            padding: 24px 0;
+            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
 
-        /* Header Styles */
+        .client-sidebar__header {
+            padding: 0 24px;
+            margin-bottom: 32px;
+        }
+
+        .client-sidebar__logo {
+            width: 120px;
+            height: auto;
+        }
+
+        .client-sidebar__subtitle {
+            font-size: 14px;
+            color: var(--elpl-primary);
+            margin-top: 4px;
+        }
+
+        .client-sidebar__nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: var(--client-text);
+            text-decoration: none;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(139, 13, 55, 0.05);
+            color: var(--elpl-primary);
+        }
+
+        .nav-link svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Header and Navigation Styles */
         .rl-header {
-            grid-area: header;
+            grid-column: 2;
+            grid-row: 1;
+            height: 52px;
+            background: #E6F6FA;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 24px;
-            background-color: white;
-            border-bottom: 1px solid var(--border-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            z-index: 1000;
+            padding: 0 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .rl-header__section {
-            flex: 1;
+        .rl-header__left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .section-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--client-text);
+        }
+
+        .rl-header__logo {
+            height: 32px;
+            width: auto;
         }
 
         .rl-header__nav {
@@ -104,32 +167,36 @@
         }
 
         .rl-button--primary {
-            background-color: var(--primary-color);
+            height: 36px;
+            padding: 0 16px;
+            background: var(--elpl-primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
             transition: background-color 0.2s;
         }
 
         .rl-button--primary:hover {
-            background-color: #0052a3;
+            background: var(--elpl-primary-hover);
         }
 
         .rl-nav__profile {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px;
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
         .rl-nav__profile:hover {
-            background-color: var(--background-color);
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .rl-nav__avatar {
@@ -140,230 +207,135 @@
         }
 
         .rl-nav__username {
+            font-size: 14px;
             font-weight: 500;
+            color: var(--client-text);
         }
 
         .rl-nav__settings {
+            width: 36px;
+            height: 36px;
+            padding: 0;
             background: none;
             border: none;
-            padding: 8px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--client-text);
             transition: background-color 0.2s;
         }
 
         .rl-nav__settings:hover {
-            background-color: var(--background-color);
+            background: rgba(0, 0, 0, 0.05);
         }
 
-        /* Sidebar Styles */
-        .client-sidebar {
-            grid-area: sidebar;
-            background-color: white;
-            border-right: 1px solid var(--border-color);
-            padding: 24px 16px;
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            bottom: var(--footer-height);
-            width: var(--sidebar-width);
-            overflow-y: auto;
-        }
-
-        .client-sidebar__header {
-            margin-bottom: 24px;
-        }
-
-        .client-sidebar__nav {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 4px;
-            color: var(--text-color);
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background-color: var(--background-color);
-        }
-
-        .nav-link svg {
+        .rl-nav__settings svg {
             width: 20px;
             height: 20px;
         }
 
-        /* Main Content Styles */
+        /* Main Content */
         .client-main {
-            grid-area: main;
-            padding: 24px;
-            margin-top: var(--header-height);
-            margin-left: var(--sidebar-width);
-            margin-bottom: var(--footer-height);
+            grid-column: 2;
+            grid-row: 2;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
             overflow-y: auto;
-            height: calc(100vh - var(--header-height) - var(--footer-height));
+            margin-top: var(--layout-gap);
+            height: calc(100vh - var(--header-height) - var(--footer-height) - (var(--layout-gap) * 3));
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
+        /* Section Styles */
         .section {
             display: none;
-            max-width: 800px;
-            margin: 0 auto;
+            height: 100%;
         }
 
         .section.active {
             display: block;
         }
 
+        /* Welcome Section */
+        #welcome-section {
+            display: none;
+            height: 100%;
+        }
+
+        #welcome-section.active {
+            display: block;
+        }
+
+        /* Chat Section */
+        #chat-section {
+            display: none;
+            height: 100%;
+        }
+
+        #chat-section.active {
+            display: block;
+        }
+
         .welcome-header {
             text-align: center;
-            margin-bottom: 48px;
+            margin-bottom: 32px;
         }
 
         .welcome-title {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
+            font-size: 2rem;
+            margin: 0 0 8px;
             color: var(--text-color);
         }
 
         .welcome-subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .client-welcome__grade-selection {
+            margin-bottom: 24px;
+        }
+
+        .client-welcome__grade-selection h2 {
             font-size: 1.25rem;
-            color: #666;
+            margin: 0 0 16px;
+            color: var(--text-color);
         }
 
-        .welcome-form {
-            display: flex;
-            flex-direction: column;
-            gap: 48px;
-        }
-
-        .welcome-grade-selection,
-        .welcome-curriculum-selection {
-            text-align: center;
-        }
-
-        .grade-options,
-        .curriculum-options {
+        .client-welcome__grade-options {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        .grade-option,
-        .curriculum-option {
-            padding: 24px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .grade-option:hover,
-        .curriculum-option:hover {
-            border-color: var(--primary-color);
-            background-color: #f0f7ff;
-        }
-
-        .grade-option.selected,
-        .curriculum-option.selected {
-            border-color: var(--primary-color);
-            background-color: #e6f0ff;
-            color: var(--primary-color);
-        }
-
-        .welcome-actions {
+        .client-grade__option {
+            padding: 12px;
             text-align: center;
-            margin-top: 48px;
-        }
-
-        .next-button {
-            padding: 12px 32px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
+            background: #f5f5f5;
+            border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
 
-        .next-button:hover:not(:disabled) {
-            background-color: #0052a3;
+        .client-grade__option:hover {
+            background: #e0e0e0;
         }
 
-        .next-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
+        .client-grade__option.selected {
+            background: var(--elpl-primary);
+            color: white;
         }
 
-        /* Footer Styles */
-        .rl-footer {
-            grid-area: footer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            background-color: white;
-            border-top: 1px solid var(--border-color);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--footer-height);
-            z-index: 1000;
-        }
-
-        .dev-timestamp {
-            font-size: 0.875rem;
-            color: #666;
-            background-color: rgba(0, 0, 0, 0.05);
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .rl-footer__logo {
-            height: 24px;
-        }
-
-        .rl-social-icon {
-            display: inline-flex;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .rl-social-icon:hover {
-            background-color: var(--background-color);
-        }
-
-        .rl-social-icon img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* Chat Section Styles */
+        /* Chat Section */
         .chat-section {
+            height: 100%;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .chat-messages {
@@ -375,147 +347,189 @@
             gap: 16px;
         }
 
-        .chat-message {
-            display: flex;
-            gap: 12px;
-            max-width: 80%;
-        }
-
-        .chat-message.assistant {
-            align-self: flex-start;
-        }
-
-        .chat-message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .message-content {
-            background: var(--background-color);
-            padding: 12px 16px;
-            border-radius: 12px;
+        .client-chat__day-divider {
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+            margin: 20px 0 10px;
             position: relative;
         }
 
-        .chat-message.assistant .message-content {
-            background: var(--background-color);
-            border-top-left-radius: 4px;
+        .client-chat__day-divider::before,
+        .client-chat__day-divider::after {
+            content: "";
+            display: inline-block;
+            width: 40%;
+            height: 1px;
+            background-color: #ccc;
+            vertical-align: middle;
+            margin: 0 8px;
         }
 
-        .chat-message.user .message-content {
-            background: var(--primary-color);
-            color: white;
-            border-top-right-radius: 4px;
+        .client-chat__message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
         }
 
-        .message-time {
-            font-size: 0.75rem;
-            color: #666;
+        .client-chat__avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+            flex-shrink: 0;
+        }
+
+        .client-chat__content {
+            flex: 1;
+        }
+
+        .client-chat__bubble {
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .client-chat__bubble.user {
+            background: #E6F6FA;
+            color: var(--text-color, #2b2b2b);
+            max-width: 90%;
+        }
+
+        .client-chat__bubble.assistant {
+            background: #ffffff;
+            color: var(--text-color, #2b2b2b);
+            border: 1px solid #E6F6FA;
+            max-width: 80%;
+        }
+
+        .client-chat__timestamp {
+            font-size: 12px;
+            color: #888;
             margin-top: 4px;
         }
 
-        .chat-input-container {
-            padding: 16px;
-            border-top: 1px solid var(--border-color);
-            background: white;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
+        .client-chat__message.assistant .client-chat__timestamp {
+            text-align: left;
         }
 
-        .chat-input-wrapper {
+        .client-chat__message.user .client-chat__timestamp {
+            text-align: right;
+        }
+
+        .client-chat__input-container {
+            padding: 12px 18px;
+            background: #ffffff;
+            border-top: 1px solid #e1e4e8;
             display: flex;
+            align-items: center;
             gap: 12px;
-            align-items: flex-end;
         }
 
-        .chat-input {
+        .client-chat__input {
             flex: 1;
-            min-height: 48px;
-            max-height: 120px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            height: 36px;
+            padding: 8px 12px;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            font-size: 16px;
             resize: none;
-            font-family: inherit;
-            font-size: 1rem;
-            line-height: 1.5;
-            overflow-y: auto;
+            background: #f9f9f9;
         }
 
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .send-button {
-            padding: 12px 24px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.2s;
-            height: 48px;
+        .client-chat__actions {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .send-button:hover {
-            background: #0052a3;
+        .client-chat__action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #aaa;
         }
 
-        .send-button svg {
+        .client-chat__action:hover {
+            color: var(--primary-color, #c6123f);
+        }
+
+        /* Footer */
+        .rl-footer {
+            grid-column: 1 / span 2;
+            grid-row: 3;
+            height: var(--footer-height);
+            background: #E6F6FA;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            font-family: var(--client-font-body, sans-serif);
+            font-size: 14px;
+            color: var(--text-color, #2b2b2b);
+        }
+
+        .rl-footer__left,
+        .rl-footer__center,
+        .rl-footer__right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rl-footer__center {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .rl-footer__logo {
+            height: 24px;
+            width: auto;
+        }
+
+        .rl-footer__text {
+            font-size: 14px;
+        }
+
+        .rl-footer__right {
+            gap: 16px;
+        }
+
+        .rl-social-icon img {
             width: 20px;
             height: 20px;
+            object-fit: contain;
         }
 
-        /* Date Separator */
-        .date-separator {
-            text-align: center;
-            margin: 24px 0;
-            position: relative;
-        }
+        @media (max-width: 600px) {
+            .rl-footer {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
 
-        .date-separator::before,
-        .date-separator::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            width: 45%;
-            height: 1px;
-            background: var(--border-color);
-        }
-
-        .date-separator::before {
-            left: 0;
-        }
-
-        .date-separator::after {
-            right: 0;
-        }
-
-        .date-text {
-            background: white;
-            padding: 0 16px;
-            color: #666;
-            font-size: 0.875rem;
+            .rl-footer__left,
+            .rl-footer__center,
+            .rl-footer__right {
+                justify-content: center;
+            }
         }
     </style>
     
     <!-- Environment Configuration -->
     <script>
+        // Build timestamp is static to match deployment
+        const BUILD_TIMESTAMP = '20240422T172600Z';
+        
         window.env = {
             // Core Configuration
             SCHEMA_VERSION: '04212025.B01',
+            BUILD_DATE: BUILD_TIMESTAMP.slice(0, 8),
+            BUILD_TIME: `${BUILD_TIMESTAMP.slice(9, 11)}:${BUILD_TIMESTAMP.slice(11, 13)}:${BUILD_TIMESTAMP.slice(13, 15)}`,
+            BUILD_VERSION: '1.16',
+            BUILD_TIMESTAMP: BUILD_TIMESTAMP,
             
             // Development Mode Settings
             ENABLE_MOCK_MODE: true,
@@ -547,6 +561,46 @@
     <!-- Core Dependencies -->
     <script type="module" src="assets/js/client-merit-openai.js"></script>
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+    
+    <!-- Version Display Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const centralTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+            
+            const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+            const day = String(centralTime.getDate()).padStart(2, '0');
+            const year = centralTime.getFullYear();
+            const buildDate = `${month}${day}${year}`;
+            
+            const hours = centralTime.getHours();
+            const minutes = String(centralTime.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            const formattedHours = String(hours % 12 || 12).padStart(2, '0');
+            const buildTime = `${formattedHours}:${minutes}${ampm}`;
+            
+            const version = '1.16';
+            const displayVersion = `merit.html/${buildDate}.${buildTime}.v.${version}`;
+            
+            localStorage.setItem('meritVersion', version);
+            localStorage.setItem('meritBuildDate', buildDate);
+            localStorage.setItem('meritBuildTime', buildTime);
+            localStorage.setItem('meritFullVersion', displayVersion);
+            
+            if (window.env.DEBUG_MODE) {
+                console.log('[Merit Flow] Build version:', displayVersion);
+            }
+
+            const versionNumber = document.getElementById('version-number');
+            if (versionNumber) {
+                versionNumber.textContent = version;
+            }
+        });
+    </script>
+
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
 </head>
 <body>
     <!-- Review Banner -->
@@ -583,9 +637,34 @@
     </div>
 
     <!-- Main Layout -->
-    <div class="rl-layout">
+    <div class="rl-layout" data-client-component="merit-page" data-test-id="page-container">
+        <!-- Sidebar -->
+        <aside class="client-sidebar" role="navigation" aria-label="Main navigation" data-test-id="sidebar">
+            <div class="client-sidebar__header">
+                <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education Logo" class="client-sidebar__logo">
+                <span class="client-sidebar__subtitle">Professional Learning</span>
+            </div>
+            <nav class="client-sidebar__nav">
+                <ul>
+                    <li>
+                        <a href="#welcome" class="client-nav__item client-nav__item--active" data-section="welcome">
+                            <img src="/clients/elpl/assets/icons/dashboard.svg" alt="Welcome Icon" class="client-nav__icon">
+                            <span>Welcome</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#chat" class="client-nav__item" data-section="chat">
+                            <img src="/clients/elpl/assets/icons/chat.svg" alt="Chat Icon" class="client-nav__icon">
+                            <span>Chat</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Header -->
         <header class="rl-header">
-            <div class="rl-header__section">
+            <div class="rl-header__left">
                 <span class="section-name">Welcome</span>
             </div>
             <nav class="rl-header__nav">
@@ -595,7 +674,7 @@
                     <span class="rl-nav__username">John Doe</span>
                 </div>
                 <button class="rl-nav__settings">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -603,93 +682,87 @@
             </nav>
         </header>
 
-        <aside class="client-sidebar">
-            <div class="client-sidebar__header">
-                <h2>Navigation</h2>
-            </div>
-            <nav class="client-sidebar__nav">
-                <a href="#welcome" class="nav-link active">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Welcome
-                </a>
-                <!-- Add more navigation items as needed -->
-            </nav>
-        </aside>
-
+        <!-- Main Content Area -->
         <main class="client-main">
-            <section id="welcome" class="section welcome-section active">
-                <div class="welcome-header">
-                    <h1 class="welcome-title">Welcome to Merit</h1>
-                    <p class="welcome-subtitle">Let's get started by selecting your grade and curriculum.</p>
+            <!-- Welcome Section -->
+            <section id="welcome-section" class="section" data-section="welcome">
+                <div class="welcome-section">
+                    <div class="welcome-header">
+                        <h1 class="welcome-title">Welcome to Merit</h1>
+                        <p class="welcome-subtitle">Your AI-powered professional learning assistant</p>
+                    </div>
+                    <div class="client-welcome__grade-selection">
+                        <h2>Select Your Grade Level</h2>
+                        <div class="client-welcome__grade-options">
+                            <div class="client-grade__option" data-grade="k2">K-2</div>
+                            <div class="client-grade__option" data-grade="35">3-5</div>
+                            <div class="client-grade__option" data-grade="68">6-8</div>
+                            <div class="client-grade__option" data-grade="912">9-12</div>
+                        </div>
+                    </div>
                 </div>
-                <form class="welcome-form">
-                    <div class="welcome-grade-selection">
-                        <h2>Select Your Grade</h2>
-                        <div class="grade-options">
-                            <button type="button" class="grade-option">Grade 6</button>
-                            <button type="button" class="grade-option">Grade 7</button>
-                            <button type="button" class="grade-option">Grade 8</button>
-                            <button type="button" class="grade-option">Grade 9</button>
-                        </div>
-                    </div>
-                    <div class="welcome-curriculum-selection">
-                        <h2>Select Your Curriculum</h2>
-                        <div class="curriculum-options">
-                            <button type="button" class="curriculum-option">Math</button>
-                            <button type="button" class="curriculum-option">Science</button>
-                            <button type="button" class="curriculum-option">English</button>
-                            <button type="button" class="curriculum-option">History</button>
-                        </div>
-                    </div>
-                    <div class="welcome-actions">
-                        <button type="button" class="next-button" disabled>Next</button>
-                    </div>
-                </form>
             </section>
-            <section id="chat" class="section chat-section">
-                <div class="chat-messages">
-                    <div class="date-separator">
-                        <span class="date-text">Today</span>
-                    </div>
-                    <div class="chat-message assistant">
-                        <img src="assets/images/assistant-avatar.png" alt="Assistant" class="message-avatar">
-                        <div class="message-content">
-                            <p>Hi there! How can I support your professional learning today?</p>
-                            <div class="message-time">Just now</div>
+
+            <!-- Chat Section -->
+            <section id="chat-section" class="section" data-section="chat">
+                <div class="chat-section">
+                    <div id="chat-window" 
+                         class="chat-messages" 
+                         role="log" 
+                         aria-live="polite"
+                         aria-label="Chat conversation"
+                         data-test-id="chat-window">
+                        <div class="client-chat__day-divider">Today</div>
+                        <div class="client-chat__message">
+                            <div class="client-chat__avatar"></div>
+                            <div class="client-chat__content">
+                                <div class="client-chat__bubble">Hi there! How can I support your professional learning today?</div>
+                                <div class="client-chat__timestamp">Just now</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="chat-input-container">
-                    <div class="chat-input-wrapper">
-                        <textarea class="chat-input" placeholder="Type your message..." rows="1"></textarea>
-                        <button class="send-button">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Send
-                        </button>
+                    <div class="client-chat__input-container">
+                        <textarea id="chat-input"
+                                class="client-chat__input"
+                                aria-label="Type your message"
+                                placeholder="Type your message..." 
+                                rows="1"
+                                maxlength="1000"
+                                data-test-id="chat-input"></textarea>
+                        <div class="client-chat__actions">
+                            <button title="Attach">📎</button>
+                            <button title="Emoji">😊</button>
+                            <button id="send-button" 
+                                    class="client-chat__action client-chat__action--send"
+                                    aria-label="Send message"
+                                    data-test-id="send-button"
+                                    title="Send">➤</button>
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
 
+        <!-- Footer -->
         <footer class="rl-footer">
             <div class="rl-footer__left">
-                <div class="dev-timestamp">Last Updated: <span id="timestamp"></span></div>
+                <img src="/clients/elpl/assets/images/logo-placeholder-purple.png" alt="Platform Logo" class="rl-footer__logo">
             </div>
             <div class="rl-footer__center">
-                <img src="assets/images/logo.png" alt="Logo" class="rl-footer__logo">
+                <span class="rl-footer__text">© 2025 The Platform Name. All rights reserved.</span>
             </div>
             <div class="rl-footer__right">
-                <a href="#" class="rl-social-icon">
-                    <img src="assets/images/facebook.png" alt="Facebook">
+                <a href="#" class="rl-social-icon" aria-label="LinkedIn">
+                    <img src="/clients/elpl/assets/icons/linkedin.svg" alt="LinkedIn">
                 </a>
-                <a href="#" class="rl-social-icon">
-                    <img src="assets/images/twitter.png" alt="Twitter">
+                <a href="#" class="rl-social-icon" aria-label="Instagram">
+                    <img src="/clients/elpl/assets/icons/instagram.svg" alt="Instagram">
+                </a>
+                <a href="#" class="rl-social-icon" aria-label="Facebook">
+                    <img src="/clients/elpl/assets/icons/facebook.svg" alt="Facebook">
+                </a>
+                <a href="#" class="rl-social-icon" aria-label="X">
+                    <img src="/clients/elpl/assets/icons/x.svg" alt="X (Twitter)">
                 </a>
             </div>
         </footer>
@@ -705,172 +778,43 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
-            const form = document.querySelector('.welcome-form');
-            const gradeOptions = document.querySelectorAll('.grade-option');
-            const curriculumOptions = document.querySelectorAll('.curriculum-option');
-            const gradeInput = document.getElementById('grade-level');
-            const curriculumInput = document.getElementById('curriculum');
-            const nextButton = document.querySelector('.next-button');
-
-            function validateForm() {
-                const isValid = gradeInput.value && curriculumInput.value;
-                nextButton.disabled = !isValid;
-                return isValid;
-            }
-
-            gradeOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    gradeInput.value = option.dataset.grade;
-                    validateForm();
-                });
-            });
-
-            curriculumOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    curriculumOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    curriculumInput.value = option.dataset.curriculum;
-                    validateForm();
-                });
-            });
-
-            // Pre-select ELA curriculum as it's the default in InstructionalFlow
-            const elaOption = document.getElementById('curriculum-ela');
-            if (elaOption) {
-                elaOption.click();
-            }
-
-            // Handle next button click
-            nextButton.addEventListener('click', () => {
-                if (validateForm()) {
-                    // Update navigation
-                    const welcomeSection = document.querySelector('.welcome-section.active');
-                    const chatSection = document.querySelector('.section.active');
-                    const welcomeLink = document.querySelector('.nav-link.active');
-                    const chatLink = document.querySelector('.nav-link.active');
-                    
-                    // Hide welcome, show chat
-                    welcomeSection.classList.remove('active');
-                    chatSection.classList.add('active');
-                    
-                    // Update navigation links
-                    welcomeLink?.classList.remove('active');
-                    chatLink?.classList.add('active');
-                    
-                    // Update URL hash
-                    window.location.hash = '#chat';
-                    
-                    // Dispatch event for MeritInstructionalFlow
-                    window.dispatchEvent(new CustomEvent('merit-section-change', {
-                        detail: { section: 'chat' }
-                    }));
-                }
-            });
-        });
-    </script>
-
-    <!-- Update section visibility handling -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let gradeSelected = false;
-            let curriculumSelected = false;
-
-            // Function to check if navigation to chat is allowed
-            function canAccessChat() {
-                return gradeSelected && curriculumSelected;
-            }
-
-            // Handle hash-based navigation
-            function handleHashChange() {
-                const hash = window.location.hash.slice(1) || 'welcome';
-                
-                // If trying to access chat without completing selections, redirect back to welcome
-                if (hash === 'chat' && !canAccessChat()) {
-                    console.log('[Merit Flow] Cannot access chat without completing selections');
-                    window.location.hash = 'welcome';
-                    return;
-                }
-
-                const sections = document.querySelectorAll('.section');
-                const links = document.querySelectorAll('.nav-link');
-                
-                sections.forEach(section => {
-                    section.classList.toggle('active', section.id === hash);
-                });
-                
-                links.forEach(link => {
-                    const href = link.getAttribute('href').slice(1);
-                    link.classList.toggle('active', href === hash);
-                });
-
-                // Update section name in header
-                const sectionNameElement = document.querySelector('.section-name');
-                if (sectionNameElement) {
-                    sectionNameElement.textContent = hash.charAt(0).toUpperCase() + hash.slice(1);
-                }
-            }
-
-            // Listen for hash changes
-            window.addEventListener('hashchange', handleHashChange);
+            const form = document.getElementById('welcome-form');
             
-            // Initial load
-            handleHashChange();
-
-            // Update selection tracking
-            const gradeOptions = document.querySelectorAll('.grade-option');
-            const curriculumOptions = document.querySelectorAll('.curriculum-option');
-            const nextButton = document.querySelector('.next-button');
-
-            gradeOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    gradeSelected = true;
-                    validateForm();
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Log form submission
+                window.REDIS_FLOW.logStep('FORM_SUBMIT', {
+                    gradeLevel: form.querySelector('#grade-level').value,
+                    subject: 'ela', // hardcoded for now
+                    timestamp: Date.now()
                 });
-            });
 
-            curriculumOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    curriculumOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    curriculumSelected = true;
-                    validateForm();
+                // Generate anonymous session ID
+                const sessionId = `merit-${Date.now()}`;
+                window.REDIS_FLOW.logStep('SESSION_CREATED', {
+                    sessionId,
+                    timestamp: Date.now()
                 });
-            });
 
-            function validateForm() {
-                const isValid = gradeSelected && curriculumSelected;
-                nextButton.disabled = !isValid;
-                return isValid;
-            }
+                try {
+                    // Create Redis record
+                    window.REDIS_FLOW.logStep('REDIS_WRITE_START', {
+                        sessionId,
+                        timestamp: Date.now()
+                    });
 
-            // Handle next button click
-            nextButton.addEventListener('click', () => {
-                if (validateForm()) {
-                    window.location.hash = 'chat';
-                    
-                    // Dispatch event for MeritInstructionalFlow
-                    window.dispatchEvent(new CustomEvent('merit-section-change', {
-                        detail: { 
-                            section: 'chat',
-                            grade: document.querySelector('.grade-option.selected').textContent,
-                            curriculum: document.querySelector('.curriculum-option.selected').textContent
-                        }
-                    }));
-                }
-            });
+                    // After Redis write
+                    window.REDIS_FLOW.logStep('REDIS_WRITE_COMPLETE', {
+                        sessionId,
+                        ttl: 3600,
+                        timestamp: Date.now()
+                    });
 
-            // Disable direct navigation through sidebar when requirements aren't met
-            document.querySelector('.client-sidebar__nav').addEventListener('click', (event) => {
-                const link = event.target.closest('.nav-link');
-                if (link && link.getAttribute('href') === '#chat' && !canAccessChat()) {
-                    event.preventDefault();
-                    console.log('[Merit Flow] Cannot access chat without completing selections');
+                } catch (error) {
+                    window.REDIS_FLOW.logError('REDIS_FLOW_ERROR', error);
                 }
             });
         });
@@ -916,7 +860,7 @@
     <!-- Debugging script added for console logging -->
     <script>
       console.log('[Merit HTML] Loaded.');
-      const nextButton = document.querySelector('.next-button');
+      const nextButton = document.getElementById('next-button');
       if (nextButton) {
         console.log('[Merit HTML] Next button initial state:', nextButton.disabled);
       } else {
@@ -1003,6 +947,36 @@
                 window.location.href = 'merit.html';
             }
 
+            // Menu dropdown functionality
+            const menuTrigger = document.querySelector('.menu-trigger');
+            const menuContent = document.querySelector('.menu-content');
+            
+            if (menuTrigger && menuContent) {
+                menuTrigger.addEventListener('click', (e) => {
+                    const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
+                    menuTrigger.setAttribute('aria-expanded', !isExpanded);
+                    menuContent.classList.toggle('show');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!menuTrigger.contains(e.target)) {
+                        menuTrigger.setAttribute('aria-expanded', 'false');
+                        menuContent.classList.remove('show');
+                    }
+                });
+            }
+
+            // Grade selection functionality
+            const gradeOptions = document.querySelectorAll('.grade-option');
+            gradeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    localStorage.setItem('merit_grade_level', option.dataset.grade);
+                });
+            });
+
             // Initialize review mode if needed
             const isReviewMode = new URLSearchParams(window.location.search).has('review');
             if (isReviewMode) {
@@ -1013,77 +987,62 @@
     </script>
 
     <script>
-        function updateTimestamp() {
-            const now = new Date();
-            const options = {
-                month: '2-digit',
-                day: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            };
-            
-            const formattedTime = now.toLocaleString('en-US', options);
-            document.getElementById('dev-timestamp').textContent = `Last Updated: ${formattedTime}`;
-        }
-
-        // Update timestamp immediately and then every minute
-        document.addEventListener('DOMContentLoaded', () => {
-            updateTimestamp();
-            setInterval(updateTimestamp, 60000); // Update every minute
-        });
-    </script>
-
-    <!-- Initialize Merit Flow -->
-    <script type="module">
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                window.meritFlow = new MeritInstructionalFlow();
-                console.log('[Merit Flow] Initialized successfully');
-
-                // Listen for section changes from MeritInstructionalFlow
-                window.addEventListener('merit-section-change', (event) => {
-                    if (event.detail) {
-                        console.log('[Merit Flow] Section changed:', event.detail);
-                        // Update any UI elements that need to reflect the change
-                        const sectionNameElement = document.querySelector('.section-name');
-                        if (sectionNameElement) {
-                            sectionNameElement.textContent = event.detail.section.charAt(0).toUpperCase() + event.detail.section.slice(1);
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('[Merit Flow] Initialization error:', error);
-            }
-        });
+        // Get the last update timestamp from the environment configuration
+        const lastUpdateTime = new Date(BUILD_TIMESTAMP);
+        const options = {
+            month: '2-digit',
+            day: '2-digit',
+            year: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        
+        // Set the timestamp once, no need for interval
+        document.getElementById('dev-timestamp').textContent = 
+            `Last Updated: ${lastUpdateTime.toLocaleString('en-US', options).replace(',', '')}`;
     </script>
 
     <script>
-        // Update section name in header when section changes
         document.addEventListener('DOMContentLoaded', () => {
-            const sectionNameElement = document.querySelector('.section-name');
-            
-            // Update section name based on hash change
-            function updateSectionName() {
-                const hash = window.location.hash.slice(1) || 'welcome';
-                if (sectionNameElement) {
-                    sectionNameElement.textContent = hash.charAt(0).toUpperCase() + hash.slice(1);
-                }
+            // Navigation handling
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.section');
+
+            function showSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.getAttribute('data-section') === sectionId) {
+                        section.classList.add('active');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-section') === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
             }
 
-            // Listen for hash changes
-            window.addEventListener('hashchange', updateSectionName);
-            
-            // Initial update
-            updateSectionName();
-
-            // Also listen for MeritInstructionalFlow section changes
-            window.addEventListener('merit-section-change', (event) => {
-                if (sectionNameElement && event.detail && event.detail.section) {
-                    sectionNameElement.textContent = event.detail.section.charAt(0).toUpperCase() + event.detail.section.slice(1);
-                }
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = item.getAttribute('data-section');
+                    showSection(sectionId);
+                    window.location.hash = sectionId;
+                });
             });
+
+            // Handle initial load and hash changes
+            function handleHashChange() {
+                const hash = window.location.hash.slice(1) || 'welcome';
+                showSection(hash);
+            }
+
+            window.addEventListener('hashchange', handleHashChange);
+            handleHashChange(); // Handle initial load
         });
     </script>
 </body>
