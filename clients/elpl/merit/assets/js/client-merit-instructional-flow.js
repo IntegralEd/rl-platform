@@ -35,7 +35,6 @@ export class MeritInstructionalFlow {
         currentSection: 'welcome',
         formValid: false,
         gradeLevel: null,
-        curriculum: "ela",
         initialized: false,
         chatReady: false,
         contextLoaded: false,
@@ -250,6 +249,9 @@ export class MeritInstructionalFlow {
                 // Create thread using new API
                 const thread = await this.#openAIClient.createThread();
                 this.#state.threadId = thread.id;
+                // Send preflight context message
+                const contextMsg = `New user is an English Language Arts user of ${selectedGrade} curriculum. Say: 'Hi, I'm Merit. How can I help with ${selectedGrade} ELA curriculum questions?'`;
+                await this.#openAIClient.sendMessage(contextMsg);
                 // Switch to chat section
                 this.#handleNavigation('chat');
             } catch (err) {
@@ -447,7 +449,6 @@ export class MeritInstructionalFlow {
             section: this.#state.currentSection,
             formValid: this.#state.formValid,
             gradeLevel: this.#state.gradeLevel,
-            curriculum: this.#state.curriculum,
             chatReady: this.#state.chatReady,
             isAdmin: this.#state.isAdmin,
             redisConnected: this.#state.redisConnected
@@ -469,7 +470,6 @@ export class MeritInstructionalFlow {
             currentSection: this.#config.defaultSection,
             formValid: false,
             gradeLevel: null,
-            curriculum: "ela",
             initialized: false,
             chatReady: false,
             contextLoaded: false,
