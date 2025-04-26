@@ -63,12 +63,20 @@
 - Change button text from 'Create Assistant' to 'Launch Chat'.
 - After grade selection and clicking 'Launch Chat', immediately start a new chat thread and show the chat UI.
 
+### Intake Context and Curriculum Note (April 26, 2025)
+
+- **Curriculum is not an active field** in the intake or chat context for MVP. It is always prefilled as 'English Language Arts (ELA)'.
+- The only intake field is grade level (K, 1, 2, 3, 4, 5).
+- When a new chat is started, the context for the assistant is set by sending a preflight message like:
+  > "New user ABC is an English Language Arts user of {grade} curriculum. Say: 'Hi, I'm Merit. How can I help with {grade level} ELA curriculum questions?'"
+- This context message is sent as the first message in the thread after creation.
+
 ### Chat API Flow (MVP, no streaming)
 1. **Create a thread**
    - `POST /v1/threads`
    - Response: `{ id: "thread_xxx", ... }`
 2. **Add a message**
-   - `POST /v1/threads/{thread_id}/messages` with `{ role: "user", content: [...] }`
+   - `POST /v1/threads/{thread_id}/messages` with `{ role: "user", content: [context message] }`
    - Response: `{ id: "msg_xxx", ... }`
 3. **Run the thread**
    - `POST /v1/threads/{thread_id}/runs` with `{ assistant_id: ..., ... }`

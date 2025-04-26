@@ -829,9 +829,6 @@
                             <div class="client-grade__option" data-grade="5">5</div>
                         </div>
                     </div>
-                    <div class="client-welcome__curriculum-selection" style="display:none;">
-                        <input type="hidden" name="curriculum" value="ELA">
-                    </div>
                     <div class="client-welcome__actions">
                         <button class="client-welcome__next-button" disabled>LAUNCH CHAT</button>
                     </div>
@@ -1149,16 +1146,14 @@
 
             // Grade selection functionality
             const gradeOptions = document.querySelectorAll('.client-grade__option');
-            const curriculumOptions = document.querySelectorAll('.client-curriculum__option');
             const nextButton = document.querySelector('.client-welcome__next-button');
             const chatNav = document.querySelector('[data-section="chat"]');
 
             function checkSelections() {
                 const hasGrade = localStorage.getItem('merit_grade_level');
-                const hasCurriculum = localStorage.getItem('merit_curriculum');
-                nextButton.disabled = !(hasGrade && hasCurriculum);
+                nextButton.disabled = !hasGrade;
                 
-                if (hasGrade && hasCurriculum) {
+                if (hasGrade) {
                     chatNav?.classList.remove('disabled');
                 } else {
                     chatNav?.classList.add('disabled');
@@ -1170,15 +1165,6 @@
                     gradeOptions.forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
                     localStorage.setItem('merit_grade_level', option.getAttribute('data-grade'));
-                    checkSelections();
-                });
-            });
-
-            curriculumOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    curriculumOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    localStorage.setItem('merit_curriculum', option.getAttribute('data-curriculum'));
                     checkSelections();
                 });
             });
