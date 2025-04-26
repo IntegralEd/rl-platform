@@ -821,23 +821,19 @@
                     <div class="client-welcome__grade-selection">
                         <h2>Select Your Grade Level</h2>
                         <div class="client-welcome__grade-options">
-                            <div class="client-grade__option" data-grade="k2">K-2</div>
-                            <div class="client-grade__option" data-grade="35">3-5</div>
-                            <div class="client-grade__option" data-grade="68">6-8</div>
-                            <div class="client-grade__option" data-grade="912">9-12</div>
+                            <div class="client-grade__option" data-grade="K">K</div>
+                            <div class="client-grade__option" data-grade="1">1</div>
+                            <div class="client-grade__option" data-grade="2">2</div>
+                            <div class="client-grade__option" data-grade="3">3</div>
+                            <div class="client-grade__option" data-grade="4">4</div>
+                            <div class="client-grade__option" data-grade="5">5</div>
                         </div>
                     </div>
-                    <div class="client-welcome__curriculum-selection">
-                        <h2>Select Your Curriculum</h2>
-                        <div class="client-welcome__curriculum-options">
-                            <div class="client-curriculum__option" data-curriculum="k5">K-5 Language Arts</div>
-                            <div class="client-curriculum__option" data-curriculum="68">6-8 Language Arts</div>
-                            <div class="client-curriculum__option" data-curriculum="912">9-12 Language Arts</div>
-                            <div class="client-curriculum__option" data-curriculum="all">All Grades</div>
-                        </div>
+                    <div class="client-welcome__curriculum-selection" style="display:none;">
+                        <input type="hidden" name="curriculum" value="ELA">
                     </div>
                     <div class="client-welcome__actions">
-                        <button class="client-welcome__next-button" disabled>CREATE ASSISTANT</button>
+                        <button class="client-welcome__next-button" disabled>LAUNCH CHAT</button>
                     </div>
                 </div>
             </section>
@@ -1352,6 +1348,11 @@
                 chatInput.style.height = (chatInput.scrollHeight) + 'px';
             });
         });
+    </script>
+
+    <script>
+        // Log commit datetime on load
+        console.log('[Merit HTML] Commit: apr26 at 6:50am');
     </script>
 </body>
 </html> 

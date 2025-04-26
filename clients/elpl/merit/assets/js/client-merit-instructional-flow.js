@@ -229,36 +229,33 @@ export class MeritInstructionalFlow {
     }
 
     #setupEventListeners() {
-        // Form validation
-        this.#elements.form?.addEventListener('change', () => {
-            this.#validateForm();
-        });
-
-        const gradeSelect = this.#elements.form?.querySelector('#grade-level');
-        if (gradeSelect) {
-            gradeSelect.addEventListener('input', () => {
-                console.log('[Merit Flow] gradeSelect input event fired');
-                this.#validateForm();
+        // Grade selection (individual buttons)
+        const gradeOptions = document.querySelectorAll('.client-grade__option');
+        const nextButton = document.querySelector('.client-welcome__next-button');
+        let selectedGrade = null;
+        gradeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                gradeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedGrade = option.getAttribute('data-grade');
+                this.#state.gradeLevel = selectedGrade;
+                nextButton.disabled = !selectedGrade;
             });
-        }
-
-        // Next button
-        this.#elements.nextButton?.addEventListener('click', (e) => {
-            if (this.#state.formValid) {
-                e.preventDefault();
+        });
+        // Launch Chat button
+        nextButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!selectedGrade) return;
+            try {
+                // Create thread using new API
+                const thread = await this.#openAIClient.createThread();
+                this.#state.threadId = thread.id;
+                // Switch to chat section
                 this.#handleNavigation('chat');
+            } catch (err) {
+                this.#showError('Failed to start chat. Please try again.');
             }
         });
-
-        // Navigation
-        this.#elements.navLinks?.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = link.dataset.section;
-                this.#handleNavigation(section);
-            });
-        });
-
         // Chat input
         this.#elements.chatInput?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -266,134 +263,29 @@ export class MeritInstructionalFlow {
                 this.#sendMessage();
             }
         });
-
         // Send button
         this.#elements.sendButton?.addEventListener('click', () => {
             this.#sendMessage();
         });
     }
 
-    #validateForm() {
-        // Always valid in development mode
-        this.#state.formValid = true;
-        this.#state.gradeLevel = this.#elements.form?.querySelector('#grade-level')?.value || 'Grade 3';
-        this.#updateActionState();
-        console.log('[Merit Flow] Form auto-validated in development mode');
-    }
-
-    async #handleNavigation(sectionOrEvent) {
-        let targetSection;
-        
-        // Handle both event objects and direct section strings
-        if (typeof sectionOrEvent === 'string') {
-            targetSection = sectionOrEvent;
-        } else if (sectionOrEvent?.preventDefault) {
-            sectionOrEvent.preventDefault();
-            targetSection = sectionOrEvent.target.getAttribute('href')?.substring(1);
-        }
-        
-        if (!targetSection) {
-            console.error('[Merit Flow] Invalid navigation target');
-            return;
-        }
-
-        try {
-            console.log('[Merit Flow] Navigating to:', targetSection);
-            
-            // Always update UI immediately
-            this.#elements.sections?.forEach(section => {
-                section.hidden = section.dataset.section !== targetSection;
-                section.classList.toggle('active', !section.hidden);
-            });
-
-            // Update navigation state
-            this.#elements.navLinks?.forEach(link => {
-                const isActive = link.dataset.section === targetSection;
-                link.classList.toggle('active', isActive);
-                link.setAttribute('aria-current', isActive ? 'page' : 'false');
-            });
-
-            // Update UI elements
-            if (targetSection === 'chat') {
-                this.#elements.playbar.hidden = true;
-                this.#elements.chatbar.hidden = false;
-                
-                // In development mode, skip connection attempts
-                if (!window.env.ENABLE_MOCK_MODE) {
-                    // Show connecting message
-                    const statusMessage = document.createElement('div');
-                    statusMessage.className = 'status-message';
-                    statusMessage.innerHTML = `
-                        <div class="connecting-indicator">
-                            <span class="status-dot"></span>
-                            <span class="status-text">Connecting to assistant...</span>
-                        </div>
-                    `;
-                    this.#elements.chatWindow.appendChild(statusMessage);
-
-                    // Try to initialize OpenAI client in background
-                    this.#initializeAssistant().catch(error => {
-                        console.warn('[Merit Flow] Assistant initialization deferred:', error.message);
-                        this.#showError('Chat service temporarily unavailable. You can still explore the interface.');
-                    });
-                } else {
-                    console.log('[Merit Flow] Running in mock mode - skipping API initialization');
-                    this.#state.chatReady = true;
-                }
-            }
-
-            console.log('[Merit Flow] Navigation complete:', {
-                section: targetSection,
-                mockMode: this.#state.mockMode,
-                apiStatus: this.#state.openAIConfigured ? 'connected' : 'unavailable'
-            });
-
-        } catch (error) {
-            console.error('[Merit Flow] Navigation error:', error);
-            this.#logError(error);
-        }
-    }
-
     async #sendMessage() {
         const content = this.#elements.chatInput?.value.trim();
         if (!content) return;
-
-        console.log('[Merit Flow] Processing message in development mode:', {
-            content,
-            mockMode: true
-        });
-
-        // Clear input and disable temporarily
         this.#elements.chatInput.value = '';
         this.#elements.chatInput.disabled = true;
         this.#elements.sendButton.disabled = true;
-
         try {
-            // Show user message
             this.#addMessage('user', content);
             this.#showLoading();
-
-            // Mock API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Mock response
-            const mockResponse = {
-                content: `This is a mock response to: "${content}"\n\nIn development mode, responses are simulated. You can modify this mock response in client-merit-instructional-flow.js`,
-                thread_id: 'mock-thread-123'
-            };
-
-            // Show mock assistant response
+            // Use new sendMessage API (thread/message/run)
+            const response = await this.#openAIClient.sendMessage(content);
             this.#hideLoading();
-            this.#addMessage('assistant', mockResponse.content);
-
-            console.log('[Merit Flow] Mock chat exchange complete');
-
+            this.#addMessage('assistant', response.content);
         } catch (error) {
-            console.error('[Merit Flow] Message error:', error);
             this.#hideLoading();
             this.#showError('Failed to send message. Please try again.');
         } finally {
-            // Re-enable input
             this.#elements.chatInput.disabled = false;
             this.#elements.sendButton.disabled = false;
             this.#elements.chatInput.focus();
@@ -641,6 +533,35 @@ export class MeritInstructionalFlow {
         this.#state.openAIConfigured = true;
         console.log('[Merit Flow] Assistant mock-initialized for development');
         return true;
+    }
+
+    // Restore #handleNavigation method for navigation
+    async #handleNavigation(sectionOrEvent) {
+        let targetSection;
+        if (typeof sectionOrEvent === 'string') {
+            targetSection = sectionOrEvent;
+        } else if (sectionOrEvent?.preventDefault) {
+            sectionOrEvent.preventDefault();
+            targetSection = sectionOrEvent.target.getAttribute('href')?.substring(1);
+        }
+        if (!targetSection) {
+            console.error('[Merit Flow] Invalid navigation target');
+            return;
+        }
+        try {
+            this.#elements.sections?.forEach(section => {
+                section.hidden = section.dataset.section !== targetSection;
+                section.classList.toggle('active', !section.hidden);
+            });
+            this.#elements.navLinks?.forEach(link => {
+                const isActive = link.dataset.section === targetSection;
+                link.classList.toggle('active', isActive);
+                link.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+        } catch (error) {
+            console.error('[Merit Flow] Navigation error:', error);
+            this.#logError(error);
+        }
     }
 }
 

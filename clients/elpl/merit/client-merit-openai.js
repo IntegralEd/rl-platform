@@ -78,7 +78,8 @@ class MeritOpenAIClient {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.#config.timeout);
 
-        const response = await fetch(`${endpoint}/api/v1/context`, {
+        // New API: POST /v1/threads
+        const response = await fetch(`${endpoint}/v1/threads`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -88,9 +89,7 @@ class MeritOpenAIClient {
             'X-Organization-ID': this.#config.orgId,
             'X-Request-ID': `merit-${Date.now()}`
           },
-          body: JSON.stringify({
-            schema_version: this.#config.schemaVersion
-          }),
+          body: JSON.stringify({ metadata: {} }),
           signal: controller.signal
         });
 
@@ -101,20 +100,17 @@ class MeritOpenAIClient {
         }
 
         const data = await response.json();
-        this.#state.threadId = data.thread_id;
+        this.#state.threadId = data.id;
         this.#state.lastEndpoint = endpoint;
         return { id: this.#state.threadId };
 
       } catch (error) {
         console.error(`[OpenAI Client] Thread creation failed for endpoint ${endpoint}:`, error);
-        
-        // If this is the last endpoint, throw the error
         if (endpoint === endpoints[endpoints.length - 1]) {
           this.#state.hasError = true;
           this.#state.errorMessage = error.message;
           throw error;
         }
-        // Otherwise continue to next endpoint
         continue;
       }
     }
@@ -134,64 +130,72 @@ class MeritOpenAIClient {
     if (!this.#state.threadId) {
       throw new Error('Thread not initialized');
     }
-
     if (this.#state.isProcessing) {
       throw new Error('Message processing in progress');
     }
-
     if (this.#config.mockMode) {
       return this.#handleMockResponse(content);
     }
-
     this.#state.isProcessing = true;
-
     try {
       const endpoint = this.#state.lastEndpoint || this.#config.apiEndpoint;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.#config.timeout);
-
-      const response = await fetch(`${endpoint}/api/v1/context/threads`, {
+      // 1. Add user message: POST /v1/threads/{thread_id}/messages
+      const msgRes = await fetch(`${endpoint}/v1/threads/${this.#state.threadId}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.#config.apiKey,
           'X-Request-ID': `merit-${Date.now()}`
         },
-        body: JSON.stringify({
-          thread_id: this.#state.threadId,
-          content: content
-        }),
-        signal: controller.signal
+        body: JSON.stringify({ role: 'user', content: [content] })
       });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      if (!msgRes.ok) throw new Error(`Message API error: ${msgRes.status}`);
+      const msgData = await msgRes.json();
+      this.#state.messages.push({ role: 'user', content });
+      // 2. Run the thread: POST /v1/threads/{thread_id}/runs
+      const runRes = await fetch(`${endpoint}/v1/threads/${this.#state.threadId}/runs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.#config.apiKey,
+          'X-Request-ID': `merit-${Date.now()}`
+        },
+        body: JSON.stringify({ assistant_id: this.#config.assistantId })
+      });
+      if (!runRes.ok) throw new Error(`Run API error: ${runRes.status}`);
+      // Wait for run to complete (polling for MVP, no streaming)
+      let runCompleted = false;
+      let assistantMessage = null;
+      for (let i = 0; i < 30 && !runCompleted; i++) {
+        await new Promise(r => setTimeout(r, 1000));
+        // Fetch messages for the thread
+        const messagesRes = await fetch(`${endpoint}/v1/threads/${this.#state.threadId}/messages`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.#config.apiKey
+          }
+        });
+        if (!messagesRes.ok) continue;
+        const messagesData = await messagesRes.json();
+        const assistantMsg = messagesData.data?.find(m => m.role === 'assistant');
+        if (assistantMsg) {
+          assistantMessage = assistantMsg.content?.[0] || '';
+          runCompleted = true;
+        }
       }
-
-      const data = await response.json();
-      this.#state.messages.push({
-        role: 'user',
-        content: content
-      });
-
-      this.#state.retryCount = 0; // Reset retry count on success
+      this.#state.retryCount = 0;
       return {
         role: 'assistant',
-        content: data.response
+        content: assistantMessage || 'No assistant response received.'
       };
-
     } catch (error) {
       console.error('[OpenAI Client] Message send failed:', error);
-      
-      // Attempt retry if under limit
       if (this.#state.retryCount < this.#config.retryAttempts) {
         this.#state.retryCount++;
         console.log(`[OpenAI Client] Retrying message send (${this.#state.retryCount}/${this.#config.retryAttempts})`);
         return await this.sendMessage(content);
       }
-
       return {
         role: 'assistant',
         content: 'I apologize, but I\'m having trouble connecting to the server. Please try again in a moment.'
