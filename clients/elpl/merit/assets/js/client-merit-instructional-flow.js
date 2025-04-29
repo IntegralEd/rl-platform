@@ -1,8 +1,6 @@
 /**
  * Merit Instructional Flow Handler
  * Controls the flow of instruction, navigation, and state management for Merit pages.
- * Integrates admin and client functionality in a unified controller.
- * 
  * @version 1.0.22
  * @module client-merit-instructional-flow
  */
@@ -16,19 +14,11 @@ export class MeritInstructionalFlow {
         sections: ["welcome", "chat"],
         defaultSection: "welcome",
         apiEndpoint: window.env.RL_API_GATEWAY_ENDPOINT,
-        apiFallback: window.env.RL_API_FALLBACK_ENDPOINT,
         assistant: {
             id: window.env.MERIT_ASSISTANT_ID,
             project: window.env.OPENAI_PROJECT_ID,
             org: window.env.MERIT_ORG_ID
-        },
-        cors: {
-            origin: window.env.CORS_ORIGIN,
-            methods: window.env.CORS_METHODS,
-            headers: window.env.CORS_HEADERS
-        },
-        retryAttempts: window.env.RL_API_RETRY_ATTEMPTS || 3,
-        timeout: window.env.RL_API_TIMEOUT || 30000
+        }
     };
 
     #state = {
@@ -38,43 +28,32 @@ export class MeritInstructionalFlow {
         initialized: false,
         chatReady: false,
         contextLoaded: false,
-        isAdmin: false,
         hasError: false,
         errorMessage: null,
         openAIConfigured: false,
         threadId: null,
         context: {},
-        mockMode: window.env?.ENABLE_MOCK_MODE || false,
-        connectionAttempts: 0,
-        lastEndpoint: null
+        mockMode: window.env?.ENABLE_MOCK_MODE || false
     };
 
     #elements = {
         sections: [],
-        navLinks: null,
-        footer: null,
-        playbar: null,
-        chatbar: null,
         form: null,
         nextButton: null,
         sendButton: null,
         chatInput: null,
         chatWindow: null,
-        adminControls: null,
         gradeSelect: null
     };
 
     #openAIClient = null;
-    assistant = null;
 
-    constructor(isAdmin = false) {
+    constructor() {
         console.log('[Merit Flow] Initializing flow controller:', {
             version: this.#config.version,
             endpoint: this.#config.apiEndpoint,
             timestamp: new Date().toISOString()
         });
-        
-        this.#state.isAdmin = isAdmin;
         
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.#initialize());
@@ -107,22 +86,6 @@ export class MeritInstructionalFlow {
                 throw new Error('OpenAI client configuration failed: ' + clientState.errorMessage);
             }
             
-            // Initialize based on role
-            if (this.#state.isAdmin) {
-                await this.#initializeAdminFeatures();
-            }
-            
-            const welcomeSection = document.querySelector('[data-section="welcome"]');
-            if (welcomeSection) {
-                welcomeSection.classList.add('active');
-                welcomeSection.removeAttribute('hidden');
-            }
-
-            const welcomeForm = document.getElementById('welcome-form');
-            if (welcomeForm) {
-                welcomeForm.style.display = 'block';
-            }
-
             this.#setupEventListeners();
             this.#state.chatReady = true;
             
@@ -137,77 +100,15 @@ export class MeritInstructionalFlow {
         }
     };
 
-    async #initializeAdminFeatures() {
-        // Admin-specific initialization
-        const adminControls = document.querySelector('.admin-controls');
-        if (adminControls) {
-            this.#elements.adminControls = adminControls;
-            adminControls.removeAttribute('hidden');
-        }
-        
-        // Add admin event listeners
-        this.#setupAdminEventListeners();
-    }
-
-    #setupAdminEventListeners() {
-        if (!this.#state.isAdmin) return;
-        
-        const adminControls = this.#elements.adminControls;
-        if (!adminControls) return;
-
-        // Admin-specific event listeners
-        adminControls.querySelectorAll('[data-admin-action]').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const action = e.target.dataset.adminAction;
-                this.#handleAdminAction(action);
-            });
-        });
-    }
-
-    async #handleAdminAction(action) {
-        try {
-            switch (action) {
-                case 'reset-context':
-                    await this.#openAIClient.resetContext();
-                    this.#logState('Admin: Context reset');
-                    break;
-                case 'view-logs':
-                    this.#displayAdminLogs();
-                    break;
-                default:
-                    console.warn('[Merit Flow] Unknown admin action:', action);
-            }
-        } catch (error) {
-            this.#handleError(error);
-        }
-    }
-
-    #displayAdminLogs() {
-        if (!this.#state.isAdmin) return;
-        
-        const logs = {
-            state: this.#state,
-            redis: this.#state.redisConnected,
-            thread: this.#openAIClient?.threadId,
-            errors: this.#state.errorMessage
-        };
-        
-        console.table(logs);
-    }
-
     #initializeElements() {
         const elements = {
             sections: document.querySelectorAll('.section'),
-            navLinks: document.querySelectorAll('.nav-link'),
-            footer: document.querySelector('.client-footer'),
-            playbar: document.getElementById('playbar'),
-            chatbar: document.getElementById('chatbar'),
             form: document.getElementById('welcome-form'),
             nextButton: document.getElementById('next-button'),
             sendButton: document.getElementById('send-button'),
             chatInput: document.getElementById('chat-input'),
             chatWindow: document.getElementById('chat-window'),
-            gradeSelect: document.getElementById('grade-select')
+            gradeSelect: document.getElementById('grade-level')
         };
 
         // Verify all elements exist
@@ -221,72 +122,80 @@ export class MeritInstructionalFlow {
         }
 
         this.#elements = elements;
-        
-        // Log element initialization
         console.log('[Merit Flow] Elements initialized:', Object.keys(elements));
         return true;
     }
 
     #setupEventListeners() {
-        // Grade selection (individual buttons)
-        const gradeOptions = document.querySelectorAll('.client-grade__option');
-        const nextButton = document.querySelector('.client-welcome__next-button');
-        let selectedGrade = null;
-        gradeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedGrade = option.getAttribute('data-grade');
-                this.#state.gradeLevel = selectedGrade;
-                nextButton.disabled = !selectedGrade;
+        // Grade selection
+        const gradeSelect = this.#elements.gradeSelect;
+        const nextButton = this.#elements.nextButton;
+        
+        if (gradeSelect) {
+            gradeSelect.addEventListener('change', () => {
+                this.#state.gradeLevel = gradeSelect.value;
+                this.#state.formValid = Boolean(gradeSelect.value);
+                nextButton.disabled = !this.#state.formValid;
             });
-        });
+        }
+
         // Launch Chat button
-        nextButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (!selectedGrade) return;
-            try {
-                // Create thread using new API
-                const thread = await this.#openAIClient.createThread();
-                this.#state.threadId = thread.id;
-                // Send preflight context message
-                const contextMsg = `New user is an English Language Arts user of ${selectedGrade} curriculum. Say: 'Hi, I'm Merit. How can I help with ${selectedGrade} ELA curriculum questions?'`;
-                await this.#openAIClient.sendMessage(contextMsg);
-                // Switch to chat section
-                this.#handleNavigation('chat');
-            } catch (err) {
-                this.#showError('Failed to start chat. Please try again.');
-            }
-        });
-        // Chat input
-        this.#elements.chatInput?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+        if (nextButton) {
+            nextButton.addEventListener('click', async (e) => {
                 e.preventDefault();
-                this.#sendMessage();
-            }
-        });
+                if (!this.#state.formValid) return;
+                
+                try {
+                    const thread = await this.#openAIClient.createThread();
+                    this.#state.threadId = thread.id;
+                    
+                    await this.#openAIClient.preloadContext({
+                        grade_level: this.#state.gradeLevel,
+                        curriculum: 'ela'
+                    });
+                    
+                    this.#handleNavigation('chat');
+                } catch (err) {
+                    this.#handleError('Failed to start chat. Please try again.');
+                }
+            });
+        }
+
+        // Chat input
+        if (this.#elements.chatInput) {
+            this.#elements.chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.#sendMessage();
+                }
+            });
+        }
+
         // Send button
-        this.#elements.sendButton?.addEventListener('click', () => {
-            this.#sendMessage();
-        });
+        if (this.#elements.sendButton) {
+            this.#elements.sendButton.addEventListener('click', () => {
+                this.#sendMessage();
+            });
+        }
     }
 
     async #sendMessage() {
         const content = this.#elements.chatInput?.value.trim();
         if (!content) return;
+        
         this.#elements.chatInput.value = '';
         this.#elements.chatInput.disabled = true;
         this.#elements.sendButton.disabled = true;
+        
         try {
             this.#addMessage('user', content);
             this.#showLoading();
-            // Use new sendMessage API (thread/message/run)
             const response = await this.#openAIClient.sendMessage(content);
             this.#hideLoading();
             this.#addMessage('assistant', response.content);
         } catch (error) {
             this.#hideLoading();
-            this.#showError('Failed to send message. Please try again.');
+            this.#handleError('Failed to send message. Please try again.');
         } finally {
             this.#elements.chatInput.disabled = false;
             this.#elements.sendButton.disabled = false;
@@ -296,168 +205,41 @@ export class MeritInstructionalFlow {
 
     #addMessage(type, content) {
         const messageBlock = document.createElement('div');
-        messageBlock.className = `message-block ${type}`;
-
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-
-        const messageContainer = document.createElement('div');
-        
-        const message = document.createElement('div');
-        message.className = `message ${type}`;
-        message.textContent = content;
-
-        const timestamp = document.createElement('div');
-        timestamp.className = 'timestamp';
-        timestamp.textContent = new Date().toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        }).toLowerCase();
-
-        messageContainer.appendChild(message);
-        messageContainer.appendChild(timestamp);
-
-        if (type === 'user') {
-            messageBlock.appendChild(messageContainer);
-            messageBlock.appendChild(avatar);
-        } else {
-            messageBlock.appendChild(avatar);
-            messageBlock.appendChild(messageContainer);
-        }
-
+        messageBlock.className = `message ${type}`;
+        messageBlock.textContent = content;
         this.#elements.chatWindow?.appendChild(messageBlock);
         messageBlock.scrollIntoView({ behavior: 'smooth' });
     }
 
     #showLoading() {
-        const messageBlock = document.createElement('div');
-        messageBlock.className = 'message-block assistant loading';
-
-        const avatar = document.createElement('div');
-        avatar.className = 'avatar';
-
-        const messageContainer = document.createElement('div');
-        
-        const message = document.createElement('div');
-        message.className = 'message assistant';
-        message.textContent = 'Assistant is thinking...';
-
-        const timestamp = document.createElement('div');
-        timestamp.className = 'timestamp';
-        timestamp.textContent = 'now';
-
-        messageContainer.appendChild(message);
-        messageContainer.appendChild(timestamp);
-
-        messageBlock.appendChild(avatar);
-        messageBlock.appendChild(messageContainer);
-
-        this.#elements.chatWindow?.appendChild(messageBlock);
-        messageBlock.scrollIntoView({ behavior: 'smooth' });
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'message assistant loading';
+        loadingMessage.textContent = 'Assistant is thinking...';
+        this.#elements.chatWindow?.appendChild(loadingMessage);
+        loadingMessage.scrollIntoView({ behavior: 'smooth' });
     }
 
     #hideLoading() {
-        const loadingMessage = this.#elements.chatWindow?.querySelector('.message-block.loading');
+        const loadingMessage = this.#elements.chatWindow?.querySelector('.message.loading');
         loadingMessage?.remove();
     }
 
-    #showError(message, isHtml = false) {
-        const messageBlock = document.createElement('div');
-        messageBlock.className = 'message-block system';
-
-        const messageContainer = document.createElement('div');
-        
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'message system error';
-        
-        if (isHtml) {
-            errorMessage.innerHTML = message;
-        } else {
-            errorMessage.textContent = message;
-        }
-
-        const timestamp = document.createElement('div');
-        timestamp.className = 'timestamp';
-        timestamp.textContent = 'now';
-
-        messageContainer.appendChild(errorMessage);
-        messageContainer.appendChild(timestamp);
-        messageBlock.appendChild(messageContainer);
-
-        this.#elements.chatWindow?.appendChild(messageBlock);
-        messageBlock.scrollIntoView({ behavior: 'smooth' });
-
-        // Log error for monitoring
-        console.error('[Merit Flow] Error displayed:', {
-            message: message,
-            timestamp: new Date().toISOString(),
-            endpoint: this.#state.lastEndpoint
-        });
-
-        // Update error state
+    #handleError(message) {
         this.#state.hasError = true;
         this.#state.errorMessage = message;
+        console.error('[Merit Flow] Error:', message);
     }
 
-    #updateActionState() {
-        if (this.#elements.nextButton) {
-            const shouldBeEnabled = this.#state.formValid;
-            this.#elements.nextButton.disabled = !shouldBeEnabled;
-            
-            // Update button visibility and active state
-            if (shouldBeEnabled) {
-                this.#elements.nextButton.style.opacity = '1';
-                this.#elements.nextButton.dataset.active = 'true';
-            } else {
-                this.#elements.nextButton.style.opacity = '0.7';
-                this.#elements.nextButton.dataset.active = 'false';
-            }
-            
-            console.log('[Merit Flow] Next button updated:', {
-                disabled: !shouldBeEnabled,
-                active: shouldBeEnabled,
-                formValid: this.#state.formValid
-            });
-        }
-        
-        if (this.#elements.sendButton) {
-            this.#elements.sendButton.disabled = !this.#state.chatReady;
-        }
-        if (this.#elements.chatInput) {
-            this.#elements.chatInput.disabled = !this.#state.chatReady;
-        }
-        
-        console.log('[Merit Flow] Action state updated:', {
-            nextButton: this.#elements.nextButton?.disabled,
-            sendButton: this.#elements.sendButton?.disabled,
-            chatInput: this.#elements.chatInput?.disabled,
-            chatReady: this.#state.chatReady,
-            formValid: this.#state.formValid,
-            currentSection: this.#state.currentSection
+    #handleNavigation(section) {
+        this.#elements.sections?.forEach(s => {
+            const isTarget = s.dataset.section === section;
+            s.hidden = !isTarget;
+            s.classList.toggle('active', isTarget);
         });
-    }
-
-    #initializeActiveSection() {
-        const hash = window.location.hash.slice(1);
-        const section = this.#config.sections.includes(hash) ? hash : this.#config.defaultSection;
-        this.#handleNavigation(section);
-    }
-
-    #logState(action) {
-        const state = {
-            section: this.#state.currentSection,
-            formValid: this.#state.formValid,
-            gradeLevel: this.#state.gradeLevel,
-            chatReady: this.#state.chatReady,
-            isAdmin: this.#state.isAdmin,
-            redisConnected: this.#state.redisConnected
-        };
         
-        console.log('[Merit Flow]', action, state);
-        
-        if (this.#state.isAdmin) {
-            this.#displayAdminLogs();
+        if (section === 'chat') {
+            const chatbar = document.getElementById('chatbar');
+            if (chatbar) chatbar.hidden = false;
         }
     }
 
@@ -473,8 +255,6 @@ export class MeritInstructionalFlow {
             initialized: false,
             chatReady: false,
             contextLoaded: false,
-            isAdmin: this.#state.isAdmin,
-            redisConnected: false,
             hasError: false,
             errorMessage: null,
             openAIConfigured: false,
@@ -487,90 +267,12 @@ export class MeritInstructionalFlow {
         this.#openAIClient = new MeritOpenAIClient();
         this.#initialize();
     }
-
-    #handleError(error) {
-        this.#state.hasError = true;
-        this.#state.errorMessage = error.message;
-        console.error('[Merit Flow] Error:', error);
-        
-        const errorMessage = this.#state.isAdmin 
-            ? `Error: ${error.message}\nCheck console for details.`
-            : 'An error occurred. Please try again.';
-            
-        this.#elements.chatWindow.innerHTML = `
-            <div class="error-message" role="alert">
-                <p>${errorMessage}</p>
-                <button onclick="window.location.reload()">Refresh Page</button>
-            </div>
-        `;
-    }
-
-    #logError(error) {
-        console.error('[Merit Flow] Error:', {
-            message: error.message,
-            stack: error.stack,
-            timestamp: new Date().toISOString()
-        });
-    }
-
-    // Add debug methods
-    debug = {
-        getState: () => this.getState(),
-        getConfig: () => this.#config,
-        testNavigation: (section) => {
-            console.log('[Merit Flow Debug] Testing navigation:', {
-                target: section,
-                current: this.#state.currentSection,
-                timestamp: new Date().toISOString()
-            });
-            return this.#handleNavigation(section);
-        }
-    };
-
-    async #initializeAssistant() {
-        // Mock successful initialization in development mode
-        this.#state.chatReady = true;
-        this.#state.openAIConfigured = true;
-        console.log('[Merit Flow] Assistant mock-initialized for development');
-        return true;
-    }
-
-    // Restore #handleNavigation method for navigation
-    async #handleNavigation(sectionOrEvent) {
-        let targetSection;
-        if (typeof sectionOrEvent === 'string') {
-            targetSection = sectionOrEvent;
-        } else if (sectionOrEvent?.preventDefault) {
-            sectionOrEvent.preventDefault();
-            targetSection = sectionOrEvent.target.getAttribute('href')?.substring(1);
-        }
-        if (!targetSection) {
-            console.error('[Merit Flow] Invalid navigation target');
-            return;
-        }
-        try {
-            this.#elements.sections?.forEach(section => {
-                section.hidden = section.dataset.section !== targetSection;
-                section.classList.toggle('active', !section.hidden);
-            });
-            this.#elements.navLinks?.forEach(link => {
-                const isActive = link.dataset.section === targetSection;
-                link.classList.toggle('active', isActive);
-                link.setAttribute('aria-current', isActive ? 'page' : 'false');
-            });
-        } catch (error) {
-            console.error('[Merit Flow] Navigation error:', error);
-            this.#logError(error);
-        }
-    }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     try {
-        // Check for admin role
-        const isAdmin = document.body.hasAttribute('data-admin-view');
-        window.meritFlow = new MeritInstructionalFlow(isAdmin);
+        window.meritFlow = new MeritInstructionalFlow();
     } catch (error) {
         console.error('[Merit Flow] Error initializing:', error);
     }

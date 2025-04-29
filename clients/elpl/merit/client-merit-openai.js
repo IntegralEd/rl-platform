@@ -93,7 +93,10 @@ class MeritOpenAIClient {
             'X-Source-URL': window.location.origin,
             'X-Entry-Point': 'merit'
           },
-          body: JSON.stringify({ metadata: {} }),
+          body: JSON.stringify({
+            action: 'create_thread',
+            schema_version: this.#config.schemaVersion
+          }),
           signal: controller.signal
         });
 
@@ -153,9 +156,10 @@ class MeritOpenAIClient {
           'X-Source-Token': 'merit-chat',
           'X-User-ID': 'usr_temp_123',
           'X-Source-URL': window.location.origin,
-          'X-Entry-Point': 'merit'
+          'X-Entry-Point': 'merit',
+          'X-Thread-ID': this.#state.threadId
         },
-        body: JSON.stringify({ role: 'user', content: [content] })
+        body: JSON.stringify({ message: content })
       });
       if (!msgRes.ok) throw new Error(`Message API error: ${msgRes.status}`);
       const msgData = await msgRes.json();
@@ -170,7 +174,8 @@ class MeritOpenAIClient {
           'X-Source-Token': 'merit-chat',
           'X-User-ID': 'usr_temp_123',
           'X-Source-URL': window.location.origin,
-          'X-Entry-Point': 'merit'
+          'X-Entry-Point': 'merit',
+          'X-Thread-ID': this.#state.threadId
         },
         body: JSON.stringify({ assistant_id: this.#config.assistantId })
       });

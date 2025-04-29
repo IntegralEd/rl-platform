@@ -329,6 +329,29 @@
         .dropdown-item:hover {
             background-color: var(--admin-bg);
         }
+
+        .logout-button {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: auto;
+            transition: all 0.2s ease;
+        }
+
+        .logout-button:hover {
+            background: white;
+            color: var(--admin-primary);
+        }
+
+        .user-display {
+            color: white;
+            margin-right: 16px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -621,6 +644,52 @@ Console shows: v1.0.17</pre>
             
             logWithUI('Dashboard initialization complete', 'info');
         });
+    </script>
+
+    <script>
+        // Check authentication on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const authToken = sessionStorage.getItem('rl_admin_auth');
+            if (!authToken) {
+                window.location.href = '/admin/index.html';
+                return;
+            }
+
+            try {
+                const auth = JSON.parse(atob(authToken));
+                // Check if token is expired
+                if (auth.exp < Date.now()) {
+                    handleLogout();
+                    return;
+                }
+                
+                // Display user email
+                const userEmail = sessionStorage.getItem('rl_admin_email');
+                if (userEmail) {
+                    const userDisplay = document.createElement('div');
+                    userDisplay.className = 'user-display';
+                    userDisplay.textContent = userEmail;
+                    document.querySelector('.admin-header').appendChild(userDisplay);
+                }
+            } catch (error) {
+                console.error('Auth validation error:', error);
+                handleLogout();
+            }
+        });
+
+        // Add logout button to header
+        const header = document.querySelector('.admin-header');
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'logout-button';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.onclick = handleLogout;
+        header.appendChild(logoutBtn);
+
+        function handleLogout() {
+            sessionStorage.removeItem('rl_admin_auth');
+            sessionStorage.removeItem('rl_admin_email');
+            window.location.href = '/admin/index.html';
+        }
     </script>
 </body>
 </html> 

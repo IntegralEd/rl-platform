@@ -232,6 +232,16 @@
             50% { opacity: 0.3; }
             100% { transform: translateY(-100px) scale(1); opacity: 0; }
         }
+
+        /* Add new styles for email input */
+        .vault-input[type="email"] {
+            margin-bottom: 10px;
+        }
+
+        .vault-input[type="password"] {
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -239,7 +249,7 @@
 
     <div class="content-container">
         <div class="treasure-chest" id="treasureChest">
-            <img src="/shared/platform/images/platform-vault-chest-icon.svg" 
+            <img src="/admin/assets/images/noun-treasure-chest-7723996-2C3E50.svg" 
                  alt="Vault Access" 
                  width="120" 
                  height="120">
@@ -250,138 +260,88 @@
                 <form id="loginForm" onsubmit="return false;">
                     <div class="input-group">
                         <input type="email" 
-                               id="email" 
+                               id="emailInput" 
                                class="vault-input" 
                                placeholder="Enter your @integral-ed.com email"
-                               pattern="[a-z0-9._%+-]+@integral-ed\.com$"
+                               pattern=".+@integral-ed\.com$"
                                required>
                         <input type="password" 
-                               id="password" 
+                               id="passwordInput" 
                                class="vault-input" 
-                               placeholder="Enter the vault code" 
+                               placeholder="Enter vault password"
                                required>
-                        <button type="submit" class="vault-button">Enter Vault</button>
+                        <button type="submit" class="vault-button" id="enterButton">
+                            Enter Vault
+                        </button>
+                        <div class="error-message" id="errorMessage"></div>
                     </div>
-                    <div class="error-message" id="errorMessage"></div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        // Import admin auth module
-        let AdminAuth, loginAdmin;
-        try {
-            const authModule = await import('/admin/assets/js/admin-auth.js');
-            AdminAuth = authModule.AdminAuth;
-            loginAdmin = authModule.loginAdmin;
-            console.log('[Admin Vault] Auth module loaded successfully');
-        } catch (error) {
-            console.error('[Admin Vault] Failed to load auth module:', error);
-            // Fallback for development
-            AdminAuth = {
-                redirectIfAuthed: () => {},
-                clearAuth: () => {},
-                setAuth: () => {}
-            };
-            loginAdmin = async () => true;
-        }
-
-        // Initialize DOM elements
-        const treasureChest = document.getElementById('treasureChest');
-        const loginContainer = document.getElementById('loginContainer');
-        const form = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-
-        // Check for existing session
-        let sessionEmail = null;
-        try {
-            sessionEmail = sessionStorage.getItem('admin_email');
-            if (sessionEmail) {
-                console.log('[Admin Session] Existing user:', sessionEmail);
+    <script>
+        // Check if user is already authenticated
+        document.addEventListener('DOMContentLoaded', () => {
+            const authToken = sessionStorage.getItem('rl_admin_auth');
+            if (authToken) {
+                window.location.href = '/admin/dashboard.html';
             }
-        } catch (error) {
-            console.warn('[Admin Session] Error checking session:', error);
-        }
-
-        // Create floating bubbles
-        function createBubbles() {
-            setInterval(() => {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.width = Math.random() * 8 + 3 + 'px';
-                bubble.style.height = bubble.style.width;
-                document.body.appendChild(bubble);
-                setTimeout(() => bubble.remove(), 8000);
-            }, 500);
-        }
-
-        // Handle chest click
-        treasureChest.addEventListener('click', () => {
-            console.log('[Admin Vault] Chest clicked');
-            treasureChest.classList.add('opening');
-            setTimeout(() => {
-                loginContainer.style.display = 'block';
-                setTimeout(() => {
-                    loginContainer.classList.add('visible');
-                    emailInput.focus();
-                }, 100);
-            }, 500);
         });
 
-        // Form submission
-        form.addEventListener('submit', async (e) => {
+        // Treasure chest click handler
+        const treasureChest = document.getElementById('treasureChest');
+        const loginContainer = document.getElementById('loginContainer');
+        
+        treasureChest.addEventListener('click', () => {
+            treasureChest.classList.add('opening');
+            loginContainer.classList.add('visible');
+        });
+
+        // Login form handler
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = emailInput.value.toLowerCase().trim();
+            
+            const email = emailInput.value.trim();
             const password = passwordInput.value;
-
-            console.log('[Admin Vault] Login attempt:', email);
-
-            // Clear any existing auth first
-            AdminAuth.clearAuth();
 
             // Validate email domain
             if (!email.endsWith('@integral-ed.com')) {
-                console.warn('[Admin Vault] Invalid domain:', email);
                 showError('Please use your @integral-ed.com email address');
                 return;
             }
 
-            // Attempt login
             try {
-                const loginSuccess = await loginAdmin(email, password);
-                if (loginSuccess) {
-                    console.log('[Admin Vault] Login successful:', email);
-                    const background = document.querySelector('.admin-background');
-                    
-                    // Start portal sequence
-                    background.style.transform = 'scale(1.1)';
-                    background.style.filter = 'brightness(1.5) blur(3px)';
-                    
-                    // Store email in session
-                    sessionStorage.setItem('admin_email', email);
-                    
-                    // Set auth and redirect
-                    AdminAuth.setAuth();
-                    setTimeout(() => {
-                        window.location.href = '/admin/dashboard.html';
-                    }, 1500);
-                } else {
-                    console.warn('[Admin Vault] Login failed:', email);
-                    showError('Invalid credentials');
-                    passwordInput.value = '';
-                }
+                // Hash the password (in production, use proper crypto)
+                const hashedPassword = await hashPassword(password);
+                
+                // Create auth token
+                const authToken = btoa(JSON.stringify({
+                    email,
+                    timestamp: Date.now(),
+                    exp: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+                }));
+
+                // Store auth token
+                sessionStorage.setItem('rl_admin_auth', authToken);
+                sessionStorage.setItem('rl_admin_email', email);
+
+                // Redirect to dashboard
+                window.location.href = '/admin/dashboard.html';
+
             } catch (error) {
-                console.error('[Admin Vault] Login error:', error);
-                showError('An error occurred. Please try again.');
+                showError('Invalid credentials. Please try again.');
+                console.error('Auth error:', error);
             }
         });
 
+        // Helper functions
         function showError(message) {
-            console.warn('[Admin Vault] Error:', message);
             errorMessage.textContent = message;
             errorMessage.classList.add('visible');
             setTimeout(() => {
@@ -389,18 +349,29 @@
             }, 3000);
         }
 
-        // Clear error on input
-        emailInput.addEventListener('input', () => {
-            errorMessage.classList.remove('visible');
-        });
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
 
-        passwordInput.addEventListener('input', () => {
-            errorMessage.classList.remove('visible');
-        });
-
-        // Initialize effects
+        // Add floating bubbles effect
+        function createBubbles() {
+            const container = document.querySelector('.content-container');
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.width = `${Math.random() * 50 + 20}px`;
+                bubble.style.height = bubble.style.width;
+                bubble.style.animationDelay = `${Math.random() * 8}s`;
+                container.appendChild(bubble);
+            }
+        }
         createBubbles();
-        console.log('[Admin Vault] Initialization complete');
     </script>
 </body>
 </html> 

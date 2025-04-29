@@ -1,81 +1,83 @@
-.sidebar {
+/* Merit-specific styles extending ELPL base */
+.merit-sidebar {
     position: fixed;
     left: 0;
     top: var(--header-height);
     bottom: var(--footer-height);
     width: 250px;
     background: var(--background-color);
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid var(--elpl-border);
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     z-index: 100;
-    padding: 1rem;
+    padding: var(--client-spacing-medium);
 }
 
-.sidebar.expanded {
+.merit-sidebar.expanded {
     transform: translateX(0);
 }
 
-.sidebar-toggle {
+.merit-sidebar-toggle {
     position: fixed;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--primary-color);
-    color: white;
+    background: var(--elpl-primary);
+    color: var(--cta-text-color);
     border: none;
-    border-radius: 0 4px 4px 0;
-    padding: 0.75rem;
+    border-radius: 0 var(--elpl-border-radius) var(--elpl-border-radius) 0;
+    padding: var(--client-spacing-small);
     cursor: pointer;
     z-index: 101;
     transition: left 0.3s ease;
 }
 
-.sidebar.expanded + .sidebar-toggle {
+.merit-sidebar.expanded + .merit-sidebar-toggle {
     left: 250px;
 }
 
-.sidebar-toggle:hover,
-.sidebar-toggle:focus {
-    background: var(--accent-color);
+.merit-sidebar-toggle:hover,
+.merit-sidebar-toggle:focus {
+    background: var(--elpl-secondary);
     outline: none;
 }
 
-.sidebar-toggle:focus-visible {
-    outline: 2px solid var(--accent-color);
+.merit-sidebar-toggle:focus-visible {
+    outline: 2px solid var(--elpl-primary);
     outline-offset: 2px;
 }
 
-.sidebar nav {
+.merit-sidebar nav {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--client-spacing-small);
 }
 
-.sidebar a {
+.merit-sidebar a {
     color: var(--text-color);
     text-decoration: none;
-    padding: 0.5rem;
-    border-radius: 4px;
+    padding: var(--client-spacing-small);
+    border-radius: var(--elpl-border-radius);
     transition: background-color 0.2s ease;
 }
 
-.sidebar a:hover,
-.sidebar a:focus {
-    background-color: var(--border-color);
+.merit-sidebar a:hover,
+.merit-sidebar a:focus {
+    background-color: var(--elpl-secondary);
+    color: var(--cta-text-color);
 }
 
-.sidebar a.active {
-    background-color: var(--primary-color);
-    color: white;
+.merit-sidebar a.active {
+    background-color: var(--elpl-primary);
+    color: var(--cta-text-color);
 }
 
 @media (max-width: 768px) {
-    .sidebar {
+    .merit-sidebar {
         width: 200px;
     }
     
-    .sidebar.expanded + .sidebar-toggle {
+    .merit-sidebar.expanded + .merit-sidebar-toggle {
         left: 200px;
     }
-} 
+}

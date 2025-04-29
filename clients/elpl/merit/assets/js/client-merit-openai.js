@@ -17,7 +17,13 @@ export class MeritOpenAIClient {
         this.baseUrl = `${window.env.RL_API_GATEWAY_ENDPOINT}/api/v1`;
         this.headers = {
             'Content-Type': 'application/json',
-            'x-api-key': window.env.RL_API_KEY
+            'x-api-key': window.env.RL_API_KEY,
+            'X-Organization-ID': this.org_id,
+            'X-Project-ID': this.project_id,
+            'X-Assistant-ID': this.assistant_id,
+            'X-Source-Token': 'merit-chat',
+            'X-Entry-Point': 'merit',
+            'X-Source-URL': window.location.origin
         };
         
         // Error tracking
@@ -34,12 +40,7 @@ export class MeritOpenAIClient {
             org_id: this.org_id,
             assistant_id: this.assistant_id,
             project_id: this.project_id,
-            schema_version: window.env.SCHEMA_VERSION,
-            ttl: {
-                session: 3600,
-                cache: 3600,
-                temp: 3600
-            }
+            schema_version: window.env.SCHEMA_VERSION
         };
 
         // Context fields structure
@@ -95,19 +96,13 @@ export class MeritOpenAIClient {
     async createThread(retryCount = 3) {
         try {
             console.log('[Merit Flow] Creating new thread');
-            console.log('[Merit Flow] Using production endpoint:', this.baseUrl);
             
-            const response = await fetch(this.baseUrl, {
+            const response = await fetch(`${this.baseUrl}/threads`, {
                 method: 'POST',
                 headers: this.headers,
-                mode: 'cors',
-                credentials: 'same-origin',
                 body: JSON.stringify({
                     action: 'create_thread',
-                    org_id: this.config.org_id,
-                    assistant_id: this.config.assistant_id,
-                    schema_version: this.config.schema_version,
-                    project_id: this.config.project_id
+                    schema_version: this.config.schema_version
                 })
             });
 
@@ -120,7 +115,7 @@ export class MeritOpenAIClient {
             }
 
             const data = await response.json();
-            this.threadId = `${this.config.org_id}:${data.thread_id}`;
+            this.threadId = data.thread_id;
             this.contextFields.system.thread_id = this.threadId;
             this.state.projectPaired = true;
             console.log('[Merit Flow] Thread created:', this.threadId);
@@ -128,20 +123,12 @@ export class MeritOpenAIClient {
 
         } catch (error) {
             console.error('[Merit Flow] Thread creation error:', error);
-            console.error('[Merit Flow] Error details:', {
-                endpoint: this.baseUrl,
-                headers: { ...this.headers, 'Authorization': '[REDACTED]' },
-                error: error.message
-            });
 
-            // Enhanced retry logic with exponential backoff
             if (retryCount > 0) {
-                if (error.message === 'Failed to fetch' || error.message.includes('CORS')) {
-                    const delay = Math.pow(2, 4 - retryCount) * 1000; // Exponential backoff
-                    console.log(`[Merit Flow] CORS/Network error, retrying in ${delay}ms... (${retryCount} attempts remaining)`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return this.createThread(retryCount - 1);
-                }
+                const delay = Math.pow(2, 4 - retryCount) * 1000;
+                console.log(`[Merit Flow] Retrying in ${delay}ms... (${retryCount} attempts remaining)`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.createThread(retryCount - 1);
             }
 
             this.state.hasError = true;
@@ -187,10 +174,6 @@ export class MeritOpenAIClient {
             console.error('[Merit Flow] Context preload error:', error);
             this.state.hasError = true;
             this.state.errorMessage = error.message;
-            this.errors.cache.push({
-                timestamp: new Date().toISOString(),
-                error: error.message
-            });
             throw error;
         }
     }
@@ -207,17 +190,11 @@ export class MeritOpenAIClient {
         }
 
         try {
-            const response = await fetch(this.baseUrl, {
+            const response = await fetch(`${this.baseUrl}/threads/${this.threadId}/messages`, {
                 method: 'POST',
                 headers: this.headers,
                 body: JSON.stringify({
-                    action: 'send_message',
                     message,
-                    thread_id: this.threadId,
-                    org_id: this.config.org_id,
-                    assistant_id: this.config.assistant_id,
-                    schema_version: this.config.schema_version,
-                    project_id: this.config.project_id,
                     context: this.contextFields,
                     ...options
                 })
@@ -241,10 +218,6 @@ export class MeritOpenAIClient {
             console.error('[Merit Flow] Message sending error:', error);
             this.state.hasError = true;
             this.state.errorMessage = error.message;
-            this.errors.validation.push({
-                timestamp: new Date().toISOString(),
-                error: error.message
-            });
             throw error;
         }
     }
@@ -256,8 +229,7 @@ export class MeritOpenAIClient {
     getState() {
         return {
             ...this.state,
-            context: this.contextFields,
-            errors: this.errors
+            context: this.contextFields
         };
     }
 
@@ -276,11 +248,6 @@ export class MeritOpenAIClient {
             isPreloaded: false,
             context: null,
             projectPaired: false
-        };
-        this.errors = {
-            validation: [],
-            cache: [],
-            schema: []
         };
         console.log('[Merit Flow] Client destroyed');
     }
