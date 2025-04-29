@@ -87,7 +87,11 @@ class MeritOpenAIClient {
             'X-Project-ID': this.#config.projectId,
             'X-Assistant-ID': this.#config.assistantId,
             'X-Organization-ID': this.#config.orgId,
-            'X-Request-ID': `merit-${Date.now()}`
+            'X-Request-ID': `merit-${Date.now()}`,
+            'X-Source-Token': 'merit-chat',
+            'X-User-ID': 'usr_temp_123',
+            'X-Source-URL': window.location.origin,
+            'X-Entry-Point': 'merit'
           },
           body: JSON.stringify({ metadata: {} }),
           signal: controller.signal
@@ -145,7 +149,11 @@ class MeritOpenAIClient {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.#config.apiKey,
-          'X-Request-ID': `merit-${Date.now()}`
+          'X-Request-ID': `merit-${Date.now()}`,
+          'X-Source-Token': 'merit-chat',
+          'X-User-ID': 'usr_temp_123',
+          'X-Source-URL': window.location.origin,
+          'X-Entry-Point': 'merit'
         },
         body: JSON.stringify({ role: 'user', content: [content] })
       });
@@ -158,7 +166,11 @@ class MeritOpenAIClient {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.#config.apiKey,
-          'X-Request-ID': `merit-${Date.now()}`
+          'X-Request-ID': `merit-${Date.now()}`,
+          'X-Source-Token': 'merit-chat',
+          'X-User-ID': 'usr_temp_123',
+          'X-Source-URL': window.location.origin,
+          'X-Entry-Point': 'merit'
         },
         body: JSON.stringify({ assistant_id: this.#config.assistantId })
       });
