@@ -11,87 +11,93 @@
   <div class="client-layout">
     <header class="client-header">
       <div class="header-content">
-        <h1>Multiple Timesheets - Today's Summary</h1>
-        <div class="summary-overview">
-          <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
-          <span class="time-label">4 h 36 m / 8 h</span>
+        <div class="header-top">
+          <h1>Multiple Timesheets - Today's Summary</h1>
+          <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
         </div>
-        <div class="summary-chart" id="summaryChart" role="region" aria-label="Time distribution">
-          <div class="bar-segment" style="background: var(--primary-color); width: 53%">
-            <span class="bar-tooltip">ELPL – 2 h 26 m</span>
+        
+        <div class="time-summary">
+          <div class="summary-overview">
+            <div class="progress-container">
+              <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
+              <span class="time-label">4 h 36 m / 8 h</span>
+            </div>
           </div>
-          <div class="bar-segment" style="background: var(--secondary-color); width: 25%">
-            <span class="bar-tooltip">ST – 1 h 10 m</span>
-          </div>
-          <div class="bar-segment" style="background: var(--tertiary-color); width: 22%">
-            <span class="bar-tooltip">KIPP – 0 h 43 m</span>
+          <div class="summary-chart" id="summaryChart" role="region" aria-label="Time distribution">
+            <div class="bar-segment" style="background: var(--primary-color); width: 53%">
+              <span class="bar-tooltip">ELPL – 2 h 26 m</span>
+            </div>
+            <div class="bar-segment" style="background: var(--secondary-color); width: 25%">
+              <span class="bar-tooltip">ST – 1 h 10 m</span>
+            </div>
+            <div class="bar-segment" style="background: var(--tertiary-color); width: 22%">
+              <span class="bar-tooltip">KIPP – 0 h 43 m</span>
+            </div>
           </div>
         </div>
-        <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
       </div>
     </header>
 
     <main class="client-content">
       <div class="content-wrapper">
-        <div class="timesheet-tree" role="tree">
-          <!-- Initial 5 rows -->
-          <div class="timesheet-row" data-row="1">
-            <div class="entry-fields">
-              <div class="field-group">
-                <select class="client-select" aria-label="Select client">
-                  <option value="">Select Client</option>
-                </select>
-                <button class="add-client" aria-label="Add client">+</button>
+        <div class="timesheet-container">
+          <div class="timesheet-tree" role="tree">
+            <div class="timesheet-row" data-row="1">
+              <div class="entry-fields">
+                <div class="field-group">
+                  <label for="client-1">Client</label>
+                  <div class="select-with-button">
+                    <select id="client-1" class="client-select" aria-label="Select client">
+                      <option value="">Select Client</option>
+                    </select>
+                    <button class="add-button" aria-label="Add client">+</button>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label for="project-1">Project</label>
+                  <div class="select-with-button">
+                    <select id="project-1" class="project-select" aria-label="Select project" disabled>
+                      <option value="">Select Project</option>
+                    </select>
+                    <button class="add-button" aria-label="Add project">+</button>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label for="code-1">Billing Code</label>
+                  <div class="select-with-button">
+                    <select id="code-1" class="billing-code" aria-label="Select billing code" disabled>
+                      <option value="">Select Code</option>
+                    </select>
+                    <button class="add-button" aria-label="Add billing code">+</button>
+                  </div>
+                </div>
+                <div class="field-group time-group">
+                  <label for="time-1">Time</label>
+                  <input id="time-1" type="text" class="time-input" placeholder="0 h 00 m" 
+                         pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
+                </div>
               </div>
-              <div class="field-group">
-                <select class="project-select" aria-label="Select project" disabled>
-                  <option value="">Select Project</option>
-                </select>
-                <button class="add-project" aria-label="Add project">+</button>
-              </div>
-              <div class="field-group">
-                <select class="billing-code" aria-label="Select billing code" disabled>
-                  <option value="">Select Code</option>
-                </select>
-                <button class="add-code" aria-label="Add billing code">+</button>
-              </div>
-              <input type="text" class="time-input" placeholder="0 h 00 m" pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
             </div>
+            <!-- Repeat for rows 2-5 with incremented IDs -->
+            
+            <button class="add-row-button" type="button">
+              <svg class="plus-icon" viewBox="0 0 24 24" width="24" height="24">
+                <path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" fill="none"/>
+              </svg>
+              Add More Rows
+            </button>
           </div>
-          <!-- Repeat for rows 2-5 -->
-          <div class="timesheet-row" data-row="2">
-            <!-- Same structure as row 1 -->
-          </div>
-          <div class="timesheet-row" data-row="3">
-            <!-- Same structure as row 1 -->
-          </div>
-          <div class="timesheet-row" data-row="4">
-            <!-- Same structure as row 1 -->
-          </div>
-          <div class="timesheet-row" data-row="5">
-            <!-- Same structure as row 1 -->
-          </div>
-          
-          <button class="add-row-button" type="button">
-            <span class="plus-icon">+</span> Add More Rows
-          </button>
         </div>
 
         <aside class="sidebar">
           <section class="active-projects">
             <h2>Active Projects</h2>
             <div class="project-tags" role="list">
-              <div class="project-tag" draggable="true" role="listitem">ED → Exact Path CSM Q4</div>
-              <div class="project-tag" draggable="true" role="listitem">IE→Business Development</div>
-              <div class="project-tag" draggable="true" role="listitem">DSL→Alien Zoo for Non-Majors</div>
-              <div class="project-tag" draggable="true" role="listitem">IE→Team Development</div>
-              <div class="project-tag" draggable="true" role="listitem">DSL→Chemistry</div>
-              <div class="project-tag" draggable="true" role="listitem">EIF→HS Q4 2024- Q12025</div>
-              <div class="project-tag" draggable="true" role="listitem">EIF→Platform 2025</div>
-              <div class="project-tag" draggable="true" role="listitem">ST 2025→Innovation Fund</div>
-              <div class="project-tag" draggable="true" role="listitem">IE→Operations</div>
-              <div class="project-tag" draggable="true" role="listitem">BHB→Public Health PDFs</div>
-              <div class="project-tag" draggable="true" role="listitem">RLP→platform-frontend</div>
+              <div class="project-tag" draggable="true" role="listitem">
+                <span class="project-icon">📋</span>
+                <span class="project-text">ED → Exact Path CSM Q4</span>
+              </div>
+              <!-- Repeat for other projects -->
             </div>
           </section>
           <section class="recent-projects">
@@ -110,46 +116,53 @@
       <div class="version-display">v1.0.0 (live)</div>
       <div class="status-indicator" role="status"></div>
     </footer>
-        </div>
-
-  <div class="modals" aria-hidden="true">
-    <dialog id="submitModal" class="modal">
-      <div class="modal-content">
-        <h2>Submit Time Entries</h2>
-        <form method="dialog">
-          <label>
-            <input type="checkbox" id="affirm" required> 
-            I affirm these entries are accurate
-          </label>
-          <div class="modal-actions">
-            <button type="submit" class="confirm-submit" id="confirmSubmit" disabled>Confirm</button>
-            <button type="button" class="close-modal">Cancel</button>
-        </div>
-        </form>
-      </div>
-    </dialog>
-
-    <dialog id="entryModal" class="modal">
-      <div class="modal-content">
-        <h2>Edit Time Entry</h2>
-        <form method="dialog">
-          <div class="form-group">
-            <label for="modalTime">Time</label>
-            <input type="text" id="modalTime" class="modal-time-input" 
-                   pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
-          </div>
-          <div class="form-group">
-            <label for="modalDesc">Description</label>
-            <textarea id="modalDesc" class="modal-description"></textarea>
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="save-entry">Save</button>
-            <button type="button" class="close-modal">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </dialog>
   </div>
+
+  <dialog id="submitModal" class="modal">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>Submit Time Entries</h2>
+        <button class="close-button" aria-label="Close modal">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="affirmation-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="affirm" required>
+            <span class="checkbox-text">I affirm these entries are accurate</span>
+          </label>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="button secondary close-modal">Cancel</button>
+        <button type="submit" class="button primary confirm-submit" id="confirmSubmit" disabled>Confirm</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog id="entryModal" class="modal">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2>Edit Time Entry</h2>
+        <button class="close-button" aria-label="Close modal">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modalTime">Time</label>
+          <input type="text" id="modalTime" class="modal-time-input" 
+                 pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
+          <span class="input-hint">Format: 2h 30m</span>
+        </div>
+        <div class="form-group">
+          <label for="modalDesc">Description</label>
+          <textarea id="modalDesc" class="modal-description"></textarea>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="button secondary close-modal">Cancel</button>
+        <button type="submit" class="button primary save-entry">Save</button>
+      </footer>
+    </div>
+  </dialog>
 
   <script type="module" src="timesheet.js"></script>
 </body>

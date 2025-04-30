@@ -557,4 +557,259 @@ textarea {
 select[disabled] {
   background: #f8f9fa;
   cursor: not-allowed;
+}
+
+/* Header Layout */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.time-summary {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.time-progress {
+  flex: 1;
+  height: 8px;
+  border: none;
+  border-radius: 4px;
+  background: #e9ecef;
+}
+
+.time-progress::-webkit-progress-value {
+  background: var(--primary-color);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.time-progress::-webkit-progress-bar {
+  background: #e9ecef;
+  border-radius: 4px;
+}
+
+/* Timesheet Layout */
+.timesheet-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  min-width: 900px;
+}
+
+.timesheet-row {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.timesheet-row:hover {
+  background-color: #f8f9fa;
+}
+
+.entry-fields {
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.select-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.select-with-button select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  font-size: 0.875rem;
+}
+
+.add-button {
+  padding: 0.5rem;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.add-button:hover {
+  opacity: 0.9;
+}
+
+.time-input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.add-row-button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 2px dashed var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.add-row-button:hover {
+  background: #f1f3f5;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Project Tags */
+.project-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.project-tag:hover {
+  background: #f1f3f5;
+  transform: translateX(4px);
+}
+
+.project-icon {
+  font-size: 1.25rem;
+}
+
+/* Modal Styles */
+.modal {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.button.primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.button.secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
 } 
