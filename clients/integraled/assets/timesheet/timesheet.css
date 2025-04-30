@@ -46,12 +46,12 @@ body {
 
 .summary-chart {
   width: 900px;
-  margin: 15px 0;
-  display: flex;
   height: 24px;
   background: #e9ecef;
   border-radius: 4px;
   overflow: hidden;
+  display: flex;
+  margin: 15px 0;
 }
 
 .summary-header {
@@ -243,6 +243,7 @@ body {
   transition: opacity 0.2s;
   pointer-events: none;
   white-space: nowrap;
+  z-index: 10;
 }
 
 .bar-segment:hover .bar-tooltip {
