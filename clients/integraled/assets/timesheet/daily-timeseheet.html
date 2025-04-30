@@ -8,156 +8,195 @@
   <link rel="stylesheet" href="timesheet.css">
 </head>
 <body>
-  <header class="summary-header">
-    <div class="summary-container">
-      <h1>Today's Summary</h1>
-      <div class="time-block">
-        <div class="time-indicator">
-          <div class="time-bar">
-            <div class="time-progress"></div>
+  <div class="page-container">
+    <header class="summary-header">
+      <div class="summary-container">
+        <h1>Today's Summary</h1>
+        <div class="time-block">
+          <div class="time-indicator">
+            <div class="time-bar">
+              <div class="time-progress"></div>
+            </div>
+            <span class="time-label">4h 36m / 8h</span>
           </div>
-          <span class="time-label">4h 36m / 8h</span>
+          <div class="summary-chart">
+            <div class="bar-container" id="summaryChart">
+              <div class="bar-segment" data-client="ELPL" style="background-color:#457b9d; width:53%">
+                <div class="bar-tooltip">ELPL: 2h 26m</div>
+              </div>
+              <div class="bar-segment" data-client="ST" style="background-color:#2a9d8f; width:25%">
+                <div class="bar-tooltip">ST: 1h 10m</div>
+              </div>
+              <div class="bar-segment" data-client="KIPP" style="background-color:#f4a261; width:22%">
+                <div class="bar-tooltip">KIPP: 0h 43m</div>
+              </div>
+            </div>
+          </div>
+          <div class="summary-actions">
+            <button class="submit-button" id="submitBtn">Submit Time</button>
+          </div>
         </div>
-        <div class="summary-chart">
-          <div class="bar-container" id="summaryChart">
-            <div class="bar-segment" data-client="ELPL" style="background-color:#457b9d; width:53%">
-              <div class="bar-tooltip">ELPL: 2h 26m</div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+      <main class="timesheet-content">
+        <div class="timesheet-tree">
+          <!-- Client Level -->
+          <div class="tree-level client-level" data-level="client">
+            <div class="tree-item" data-client="ELPL">
+              <div class="tree-header">
+                <h2>ELPL</h2>
+                <button class="add-entry">+</button>
+              </div>
+              <!-- Project Level -->
+              <div class="tree-level project-level" data-level="project">
+                <div class="tree-item" data-project="Recursive Learning">
+                  <div class="tree-header">
+                    <h3>Recursive Learning</h3>
+                    <button class="add-entry">+</button>
+                  </div>
+                  <!-- Billing Code Level -->
+                  <div class="tree-level billing-level" data-level="billing">
+                    <div class="tree-item" data-billing="DEV-001">
+                      <div class="billing-entry">
+                        <select class="billing-code">
+                          <option value="DEV-001">DEV-001 - Frontend Development</option>
+                        </select>
+                        <input type="text" class="time-input" value="2h 26m" />
+                        <button class="edit-entry">Edit Details</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="bar-segment" data-client="ST" style="background-color:#2a9d8f; width:25%">
-              <div class="bar-tooltip">ST: 1h 10m</div>
+
+            <div class="tree-item" data-client="ST">
+              <div class="tree-header">
+                <h2>ST</h2>
+                <button class="add-entry">+</button>
+              </div>
+              <div class="tree-level project-level" data-level="project">
+                <div class="tree-item" data-project="Policy 101">
+                  <div class="tree-header">
+                    <h3>Policy 101</h3>
+                    <button class="add-entry">+</button>
+                  </div>
+                  <div class="tree-level billing-level" data-level="billing">
+                    <div class="tree-item" data-billing="GD-001">
+                      <div class="billing-entry">
+                        <select class="billing-code">
+                          <option value="GD-001">GD-001 - Graphic Design</option>
+                        </select>
+                        <input type="text" class="time-input" value="1h 10m" />
+                        <button class="edit-entry">Edit Details</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="bar-segment" data-client="KIPP" style="background-color:#f4a261; width:22%">
-              <div class="bar-tooltip">KIPP: 0h 43m</div>
+
+            <div class="tree-item" data-client="KIPP">
+              <div class="tree-header">
+                <h2>KIPP</h2>
+                <button class="add-entry">+</button>
+              </div>
+              <div class="tree-level project-level" data-level="project">
+                <div class="tree-item" data-project="NCI_2025">
+                  <div class="tree-header">
+                    <h3>NCI_2025</h3>
+                    <button class="add-entry">+</button>
+                  </div>
+                  <div class="tree-level billing-level" data-level="billing">
+                    <div class="tree-item" data-billing="PM-001">
+                      <div class="billing-entry">
+                        <select class="billing-code">
+                          <option value="PM-001">PM-001 - Project Management</option>
+                        </select>
+                        <input type="text" class="time-input" value="0h 43m" />
+                        <button class="edit-entry">Edit Details</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="summary-actions">
-          <label class="affirmation">
-            <input type="checkbox" id="affirm" class="checkbox">
-            I affirm these entries are accurate
-          </label>
-          <button class="submit-button" id="submitBtn" disabled>Submit Time</button>
+      </main>
+
+      <aside class="project-bank">
+        <h2>Active Projects</h2>
+        <div class="project-tags">
+          <div class="project-tag" draggable="true">ED→Exact Path CSM Q4</div>
+          <div class="project-tag" draggable="true">IE→Business Development</div>
+          <div class="project-tag" draggable="true">DSL→Alien Zoo for Non-Majors</div>
+          <div class="project-tag" draggable="true">IE→Team Development</div>
+          <div class="project-tag" draggable="true">DSL→Chemistry</div>
+          <div class="project-tag" draggable="true">EIF→HS Q4 2024- Q12025</div>
+          <div class="project-tag" draggable="true">EIF→Platform 2025</div>
+          <div class="project-tag" draggable="true">ST 2025→Innovation Fund</div>
+          <div class="project-tag" draggable="true">IE→Operations</div>
+          <div class="project-tag" draggable="true">BHB→Public Health PDFs</div>
+          <div class="project-tag" draggable="true">RLP→platform-frontend</div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Submit Confirmation Modal -->
+    <div id="submitModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Submit Time Entries</h2>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="affirmation">
+            <label>
+              <input type="checkbox" id="affirm" class="checkbox">
+              I affirm these entries are accurate
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="confirm-submit" id="confirmSubmit" disabled>Confirm Submit</button>
+          <button class="cancel-submit">Cancel</button>
         </div>
       </div>
     </div>
-  </header>
 
-  <main class="timesheet-content">
-    <div class="timesheet-tree">
-      <!-- Client Level -->
-      <div class="tree-level client-level" data-level="client">
-        <div class="tree-item" data-client="ELPL">
-          <div class="tree-header">
-            <h2>ELPL</h2>
-            <button class="add-entry">+</button>
-          </div>
-          <!-- Project Level -->
-          <div class="tree-level project-level" data-level="project">
-            <div class="tree-item" data-project="Recursive Learning">
-              <div class="tree-header">
-                <h3>Recursive Learning</h3>
-                <button class="add-entry">+</button>
+    <!-- Entry Edit Modal -->
+    <div id="entryModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Time Entry</h2>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="entry-details">
+            <div class="time-input-group">
+              <label>Time</label>
+              <input type="text" class="modal-time-input" />
+            </div>
+            <div class="description-group">
+              <label>Description</label>
+              <textarea class="modal-description"></textarea>
+            </div>
+            <div class="tasks-group">
+              <label>Tasks</label>
+              <div class="tasks-container" id="tasksDragContainer">
+                <!-- Tasks will be dragged here -->
               </div>
-              <!-- Billing Code Level -->
-              <div class="tree-level billing-level" data-level="billing">
-                <div class="tree-item" data-billing="DEV-001">
-                  <div class="billing-entry">
-                    <select class="billing-code">
-                      <option value="DEV-001">DEV-001 - Frontend Development</option>
-                    </select>
-                    <input type="text" class="time-input" value="2h 26m" />
-                    <button class="edit-entry">Edit Details</button>
-                  </div>
-                </div>
-              </div>
+              <button class="add-task">+ Add Task</button>
             </div>
           </div>
         </div>
-
-        <div class="tree-item" data-client="ST">
-          <div class="tree-header">
-            <h2>ST</h2>
-            <button class="add-entry">+</button>
-          </div>
-          <div class="tree-level project-level" data-level="project">
-            <div class="tree-item" data-project="Policy 101">
-              <div class="tree-header">
-                <h3>Policy 101</h3>
-                <button class="add-entry">+</button>
-              </div>
-              <div class="tree-level billing-level" data-level="billing">
-                <div class="tree-item" data-billing="GD-001">
-                  <div class="billing-entry">
-                    <select class="billing-code">
-                      <option value="GD-001">GD-001 - Graphic Design</option>
-                    </select>
-                    <input type="text" class="time-input" value="1h 10m" />
-                    <button class="edit-entry">Edit Details</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="modal-footer">
+          <button class="save-entry">Save</button>
+          <button class="cancel-entry">Cancel</button>
         </div>
-
-        <div class="tree-item" data-client="KIPP">
-          <div class="tree-header">
-            <h2>KIPP</h2>
-            <button class="add-entry">+</button>
-          </div>
-          <div class="tree-level project-level" data-level="project">
-            <div class="tree-item" data-project="NCI_2025">
-              <div class="tree-header">
-                <h3>NCI_2025</h3>
-                <button class="add-entry">+</button>
-              </div>
-              <div class="tree-level billing-level" data-level="billing">
-                <div class="tree-item" data-billing="PM-001">
-                  <div class="billing-entry">
-                    <select class="billing-code">
-                      <option value="PM-001">PM-001 - Project Management</option>
-                    </select>
-                    <input type="text" class="time-input" value="0h 43m" />
-                    <button class="edit-entry">Edit Details</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal for editing entry details -->
-  <div id="entryModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit Time Entry</h2>
-        <button class="close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="entry-details">
-          <div class="time-input-group">
-            <label>Time</label>
-            <input type="text" class="modal-time-input" />
-          </div>
-          <div class="description-group">
-            <label>Description</label>
-            <textarea class="modal-description"></textarea>
-          </div>
-          <div class="tasks-group">
-            <label>Tasks</label>
-            <div class="tasks-container" id="tasksDragContainer">
-              <!-- Tasks will be dragged here -->
-            </div>
-            <button class="add-task">+ Add Task</button>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="save-entry">Save</button>
-        <button class="cancel-entry">Cancel</button>
       </div>
     </div>
   </div>
