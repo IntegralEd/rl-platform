@@ -3,181 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Today's Summary</title>
+  <title>Daily Timesheet Summary</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="timesheet.css">
 </head>
 <body>
   <div class="page-container">
+    <!-- Header -->
     <header class="summary-header">
-      <div class="header-row">
-        <h1>Multiple Timesheets - Today's Summary</h1>
-        <button type="button" class="submit-button" id="submitBtn">
-          <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
-            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
-          </svg>
+      <h1>Today's Summary</h1>
+      <div class="header-controls">
+        <div class="time-display">
+          <progress class="time-progress" value="276" max="480"></progress>
+          <span class="time-label">4 h 36 m / 8 h</span>
+        </div>
+        <button type="button" id="submitBtn" class="button primary">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
           Submit Time
         </button>
       </div>
-
-      <div class="summary-container">
-        <div class="progress-section">
-          <div class="progress-bar">
-            <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
-            <span class="time-label">4 h 36 m / 8 h</span>
-          </div>
-          <div class="summary-chart" id="summaryChart" role="region" aria-label="Time distribution">
-            <div class="bar-segment" style="background: var(--primary-color); width: 53%">
-              <div class="segment-divider"></div>
-              <span class="bar-tooltip">ELPL – 2 h 26 m</span>
-            </div>
-            <div class="bar-segment" style="background: var(--secondary-color); width: 25%">
-              <div class="segment-divider"></div>
-              <span class="bar-tooltip">ST – 1 h 10 m</span>
-            </div>
-            <div class="bar-segment" style="background: var(--tertiary-color); width: 22%">
-              <div class="segment-divider"></div>
-              <span class="bar-tooltip">KIPP – 0 h 43 m</span>
-            </div>
-          </div>
+      <div class="summary-chart" id="summaryChart">
+        <div class="bar-segment" data-client="ELPL" data-width="53%">
+          <span class="tooltip">ELPL – 2 h 26 m</span>
+        </div>
+        <div class="bar-segment" data-client="ST" data-width="25%">
+          <span class="tooltip">ST – 1 h 10 m</span>
+        </div>
+        <div class="bar-segment" data-client="KIPP" data-width="22%">
+          <span class="tooltip">KIPP – 0 h 43 m</span>
         </div>
       </div>
     </header>
 
-    <div class="content-wrapper">
-      <main class="timesheet-content">
-        <div class="timesheet-tree" role="tree">
-          <div class="add-entry-row">
-            <button class="add-first-entry">
-              <svg class="icon" viewBox="0 0 24 24" width="24" height="24">
-                <path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" fill="none"/>
-              </svg>
-              Add Time Entry
-            </button>
-          </div>
-
-          <div class="entry-row" data-row="1">
-            <div class="entry-fields">
-              <div class="field-group">
-                <select class="client-select" aria-label="Select client">
-                  <option value="">Select Client</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <select class="project-select" aria-label="Select project" disabled>
-                  <option value="">Select Project</option>
-                </select>
-              </div>
-              <div class="field-group">
-                <select class="billing-select" aria-label="Select billing code" disabled>
-                  <option value="">Select Code</option>
-                </select>
-              </div>
-              <div class="field-group time-group">
-                <input type="text" class="time-input" placeholder="0 h 00 m" 
-                       pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
-                <button class="edit-entry" aria-label="Edit entry">
-                  <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
+    <!-- Main content -->
+    <main class="timesheet-main">
+      <!-- Entry area -->
+      <section class="entry-area">
+        <button type="button" id="addRowBtn" class="button secondary">+ Add Row</button>
+        
+        <div id="entryList" class="entry-list">
+          <!-- Template for new entries -->
+          <template id="tpl-entry-row">
+            <div class="entry-row">
+              <select class="client-select">
+                <option value="">Client</option>
+              </select>
+              <select class="project-select" disabled>
+                <option value="">Project</option>
+              </select>
+              <select class="billing-select" disabled>
+                <option value="">Billing Code</option>
+              </select>
+              <input type="text" class="time-input" placeholder="0 h 00 m" pattern="^(\d+\s*h)?\s*(\d+\s*m)?$">
+              <button type="button" class="edit-entry">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
             </div>
+          </template>
+        </div>
+      </section>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section" data-collapsed="false">
+          <button type="button" class="collapse-btn">Active Projects</button>
+          <div class="section-content">
+            <div class="project-tag" draggable="true">📋 ED → Exact Path CSM Q4</div>
+            <!-- More tags will be added by JS -->
           </div>
         </div>
-      </main>
 
-      <aside class="sidebar">
-        <div class="sidebar-sections">
-          <section class="sidebar-section" data-section="active">
-            <button class="section-toggle" aria-expanded="true">
-              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
-              </svg>
-              Active Projects
-            </button>
-            <div class="section-content">
-              <div class="project-tags" role="list">
-                <div class="project-tag" draggable="true" role="listitem">
-                  <span class="tag-icon">📋</span>
-                  <span class="tag-text">ED → Exact Path CSM Q4</span>
-                </div>
-                <!-- Additional project tags -->
-              </div>
-            </div>
-          </section>
+        <div class="sidebar-section" data-collapsed="true">
+          <button type="button" class="collapse-btn">Recent Projects</button>
+          <div class="section-content">
+            <!-- Will be populated by JS -->
+          </div>
+        </div>
 
-          <section class="sidebar-section" data-section="recent">
-            <button class="section-toggle" aria-expanded="false">
-              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
-              </svg>
-              Recent Projects
-            </button>
-            <div class="section-content" hidden>
-              <div class="recent-list" role="list"></div>
-            </div>
-          </section>
-
-          <section class="sidebar-section" data-section="billing">
-            <button class="section-toggle" aria-expanded="false">
-              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
-              </svg>
-              Recent Billing Codes
-            </button>
-            <div class="section-content" hidden>
-              <div class="recent-list" role="list"></div>
-            </div>
-          </section>
+        <div class="sidebar-section" data-collapsed="true">
+          <button type="button" class="collapse-btn">Recent Billing Codes</button>
+          <div class="section-content">
+            <!-- Will be populated by JS -->
+          </div>
         </div>
       </aside>
-    </div>
+    </main>
   </div>
 
+  <!-- Modals -->
   <dialog id="submitModal" class="modal">
     <div class="modal-content">
-      <header class="modal-header">
-        <h2>Submit Time Entries</h2>
-        <button class="close-button" aria-label="Close modal">×</button>
-      </header>
-      <div class="modal-body">
-        <div class="affirmation-group">
-          <label class="checkbox-label">
-            <input type="checkbox" id="affirm" required>
-            <span class="checkbox-text">I affirm these entries are accurate</span>
-          </label>
-        </div>
-      </div>
-      <footer class="modal-footer">
+      <h2>Submit Time Entries</h2>
+      <label>
+        <input type="checkbox" id="affirm">
+        <span>I affirm these entries are accurate</span>
+      </label>
+      <div class="modal-actions">
         <button type="button" class="button secondary close-modal">Cancel</button>
-        <button type="submit" class="button primary confirm-submit" id="confirmSubmit" disabled>Confirm</button>
-      </footer>
+        <button type="submit" class="button primary confirm-submit" disabled>Confirm</button>
+      </div>
     </div>
   </dialog>
 
   <dialog id="entryModal" class="modal">
     <div class="modal-content">
-      <header class="modal-header">
-        <h2>Edit Time Entry</h2>
-        <button class="close-button" aria-label="Close modal">×</button>
-      </header>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="modalTime">Time</label>
-          <input type="text" id="modalTime" class="modal-time-input" 
-                 pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
-          <span class="input-hint">Format: 2h 30m</span>
-        </div>
-        <div class="form-group">
-          <label for="modalDesc">Description</label>
-          <textarea id="modalDesc" class="modal-description"></textarea>
-        </div>
-      </div>
-      <footer class="modal-footer">
+      <h2>Edit Time Entry</h2>
+      <label>
+        Time
+        <input type="text" id="modalTime" class="modal-time-input" placeholder="2h 30m">
+      </label>
+      <label>
+        Description
+        <textarea id="modalDesc"></textarea>
+      </label>
+      <div class="modal-actions">
         <button type="button" class="button secondary close-modal">Cancel</button>
-        <button type="submit" class="button primary save-entry">Save</button>
-      </footer>
+        <button type="button" class="button primary save-entry">Save</button>
+      </div>
     </div>
   </dialog>
 
