@@ -5,8 +5,9 @@
   --background-color: #f8f9fa;
   --border-color: #e1e4e8;
   --text-color: #2c3e50;
-  --header-height: 180px;
+  --header-height: 140px;
   --tree-indent: 20px;
+  --project-bank-width: 20%;
 }
 
 body {
@@ -15,6 +16,13 @@ body {
   padding: 0;
   background-color: var(--background-color);
   color: var(--text-color);
+  min-height: 100vh;
+}
+
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header Styles */
@@ -67,6 +75,69 @@ body {
   white-space: nowrap;
 }
 
+/* Content Layout */
+.content-wrapper {
+  display: flex;
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  padding: 20px;
+  gap: 20px;
+}
+
+/* Main Content */
+.timesheet-content {
+  flex: 1;
+  min-width: 0; /* Prevent flex item from overflowing */
+}
+
+.timesheet-tree {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  min-height: calc((100vw - var(--project-bank-width) - 60px) * 9/16); /* 16:9 ratio */
+  transition: min-height 0.3s ease;
+}
+
+/* Project Bank */
+.project-bank {
+  width: var(--project-bank-width);
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.project-bank h2 {
+  margin: 0 0 16px 0;
+  font-size: 1.1em;
+  color: var(--text-color);
+}
+
+.project-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-tag {
+  background: var(--background-color);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  cursor: grab;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.project-tag:hover {
+  background: #f1f3f5;
+  transform: translateX(-4px);
+}
+
+.project-tag:active {
+  cursor: grabbing;
+}
+
 /* Chart Styles */
 .summary-chart {
   margin: 15px 0;
@@ -113,20 +184,6 @@ body {
 }
 
 /* Tree Structure Styles */
-.timesheet-content {
-  margin-top: calc(var(--header-height) + 20px);
-  padding: 20px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.timesheet-tree {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
 .tree-level {
   margin-left: var(--tree-indent);
 }
@@ -178,16 +235,30 @@ body {
   border-radius: 4px;
 }
 
-.edit-entry {
+/* Buttons */
+.submit-button, .edit-entry, .add-entry {
   padding: 8px 16px;
-  background: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-.edit-entry:hover {
+.submit-button {
+  background: var(--primary-color);
+}
+
+.edit-entry {
+  background: var(--primary-color);
+}
+
+.add-entry {
+  padding: 4px 8px;
+  background: var(--secondary-color);
+}
+
+button:hover {
   opacity: 0.9;
 }
 
@@ -238,6 +309,28 @@ body {
   gap: 10px;
 }
 
+/* Form Elements */
+.time-input-group,
+.description-group,
+.tasks-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  resize: vertical;
+}
+
 .tasks-container {
   min-height: 100px;
   border: 2px dashed var(--border-color);
@@ -246,52 +339,22 @@ body {
   padding: 10px;
 }
 
-/* Buttons */
-.add-entry {
-  padding: 4px 8px;
-  background: var(--secondary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-task {
-  padding: 8px 16px;
-  background: var(--secondary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-}
-
-/* Summary Actions */
-.summary-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
-
+/* Confirmation Modal */
 .affirmation {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 20px 0;
 }
 
-.submit-button {
-  padding: 8px 24px;
+.confirm-submit {
   background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   opacity: 0.5;
 }
 
-.submit-button:not([disabled]) {
+.confirm-submit:not([disabled]) {
   opacity: 1;
+}
+
+.cancel-submit {
+  background: #6c757d;
 }
 
 /* Logo */

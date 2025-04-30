@@ -60,19 +60,37 @@ document.addEventListener('DOMContentLoaded', () => {
     currentView: 'client', // client, project, or billing
     selectedClient: null,
     selectedProject: null,
-    selectedBillingCode: null
+    selectedBillingCode: null,
+    draggedProject: null
   };
 
   // DOM Elements
   const summaryChart = document.getElementById('summaryChart');
   const timesheet = document.querySelector('.timesheet-tree');
-  const modal = document.getElementById('entryModal');
-  const affirm = document.getElementById('affirm');
+  const entryModal = document.getElementById('entryModal');
+  const submitModal = document.getElementById('submitModal');
   const submitBtn = document.getElementById('submitBtn');
+  const confirmSubmitBtn = document.getElementById('confirmSubmit');
+  const affirm = document.getElementById('affirm');
 
-  // Event Listeners
+  // Event Listeners for Submit Flow
+  submitBtn.addEventListener('click', () => {
+    submitModal.classList.add('active');
+  });
+
   affirm.addEventListener('change', (e) => {
-    submitBtn.disabled = !e.target.checked;
+    confirmSubmitBtn.disabled = !e.target.checked;
+  });
+
+  confirmSubmitBtn.addEventListener('click', async () => {
+    await submitEntries();
+    submitModal.classList.remove('active');
+  });
+
+  document.querySelector('.cancel-submit').addEventListener('click', () => {
+    submitModal.classList.remove('active');
+    affirm.checked = false;
+    confirmSubmitBtn.disabled = true;
   });
 
   // Tree Navigation
@@ -85,6 +103,44 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nextLevel) {
         nextLevel.style.display = nextLevel.style.display === 'none' ? 'block' : 'none';
         updateChart(level, item.dataset[level]);
+      }
+    });
+  });
+
+  // Project Bank Drag and Drop
+  const projectTags = document.querySelectorAll('.project-tag');
+  const dropZones = document.querySelectorAll('.tree-level[data-level="project"]');
+
+  projectTags.forEach(tag => {
+    tag.addEventListener('dragstart', (e) => {
+      state.draggedProject = tag.textContent;
+      tag.classList.add('dragging');
+    });
+
+    tag.addEventListener('dragend', () => {
+      tag.classList.remove('dragging');
+      state.draggedProject = null;
+    });
+  });
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      
+      if (state.draggedProject) {
+        const [client, project] = state.draggedProject.split('→');
+        // Handle project creation logic
+        console.log(`Creating project ${project} for client ${client}`);
       }
     });
   });
@@ -116,9 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Modal Controls
-  document.querySelector('.close-modal').addEventListener('click', closeModal);
-  document.querySelector('.cancel-entry').addEventListener('click', closeModal);
+  document.querySelectorAll('.close-modal').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.target.closest('.modal').classList.remove('active');
+    });
+  });
+
   document.querySelector('.save-entry').addEventListener('click', saveEntry);
+  document.querySelectorAll('.cancel-entry').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.target.closest('.modal').classList.remove('active');
+    });
+  });
 
   // Chart Interaction
   summaryChart.querySelectorAll('.bar-segment').forEach(segment => {
@@ -187,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function openAddEntryModal(level, item) {
-    modal.classList.add('active');
+    entryModal.classList.add('active');
     // Implement add entry logic
   }
 
@@ -207,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tasksContainer.appendChild(taskElement);
     });
 
-    modal.classList.add('active');
+    entryModal.classList.add('active');
   }
 
   function createTaskElement(task) {
@@ -218,13 +283,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return div;
   }
 
-  function closeModal() {
-    modal.classList.remove('active');
+  async function submitEntries() {
+    try {
+      // Implement submission logic here
+      console.log('Submitting entries:', state.entries);
+      // Show success message
+    } catch (error) {
+      console.error('Error submitting entries:', error);
+      // Show error message
+    }
   }
 
   function saveEntry() {
     // Implement save entry logic
-    closeModal();
+    entryModal.classList.remove('active');
   }
 
   // Initialize
