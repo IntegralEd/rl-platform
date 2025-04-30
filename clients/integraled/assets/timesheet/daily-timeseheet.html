@@ -11,7 +11,7 @@
   <div class="page-container">
     <header class="summary-header">
       <div class="summary-container">
-        <h1>Today's Summary</h1>
+        <h1>Multiple Timesheets - Today's Summary</h1>
         <div class="time-block">
           <div class="time-indicator">
             <div class="time-bar">
@@ -42,6 +42,8 @@
     <div class="content-wrapper">
       <main class="timesheet-content">
         <div class="timesheet-tree">
+          <h2>Recent Projects</h2>
+          <p class="helper-text">(click to add new timesheet row with client/project filled)</p>
           <!-- Client Level -->
           <div class="tree-level client-level" data-level="client">
             <div class="tree-item" data-client="ELPL">
@@ -127,21 +129,39 @@
         </div>
       </main>
 
-      <aside class="project-bank">
-        <h2>Active Projects</h2>
-        <div class="project-tags">
-          <div class="project-tag" draggable="true">ED→Exact Path CSM Q4</div>
-          <div class="project-tag" draggable="true">IE→Business Development</div>
-          <div class="project-tag" draggable="true">DSL→Alien Zoo for Non-Majors</div>
-          <div class="project-tag" draggable="true">IE→Team Development</div>
-          <div class="project-tag" draggable="true">DSL→Chemistry</div>
-          <div class="project-tag" draggable="true">EIF→HS Q4 2024- Q12025</div>
-          <div class="project-tag" draggable="true">EIF→Platform 2025</div>
-          <div class="project-tag" draggable="true">ST 2025→Innovation Fund</div>
-          <div class="project-tag" draggable="true">IE→Operations</div>
-          <div class="project-tag" draggable="true">BHB→Public Health PDFs</div>
-          <div class="project-tag" draggable="true">RLP→platform-frontend</div>
-        </div>
+      <aside class="sidebar">
+        <section class="recent-projects">
+          <h2>Recent Projects</h2>
+          <p class="helper-text">(click to add new timesheet row with client/project filled)</p>
+          <div class="recent-list">
+            <!-- Recent projects will be populated here -->
+          </div>
+        </section>
+
+        <section class="recent-billing-codes">
+          <h2>Recent Billing Codes</h2>
+          <p class="helper-text">(click to add new timesheet row with client/project/billingcode filled)</p>
+          <div class="recent-list">
+            <!-- Recent billing codes will be populated here -->
+          </div>
+        </section>
+
+        <section class="active-projects">
+          <h2>Active Projects</h2>
+          <div class="project-tags">
+            <div class="project-tag" draggable="true">ED→Exact Path CSM Q4</div>
+            <div class="project-tag" draggable="true">IE→Business Development</div>
+            <div class="project-tag" draggable="true">DSL→Alien Zoo for Non-Majors</div>
+            <div class="project-tag" draggable="true">IE→Team Development</div>
+            <div class="project-tag" draggable="true">DSL→Chemistry</div>
+            <div class="project-tag" draggable="true">EIF→HS Q4 2024- Q12025</div>
+            <div class="project-tag" draggable="true">EIF→Platform 2025</div>
+            <div class="project-tag" draggable="true">ST 2025→Innovation Fund</div>
+            <div class="project-tag" draggable="true">IE→Operations</div>
+            <div class="project-tag" draggable="true">BHB→Public Health PDFs</div>
+            <div class="project-tag" draggable="true">RLP→platform-frontend</div>
+          </div>
+        </section>
       </aside>
     </div>
 
