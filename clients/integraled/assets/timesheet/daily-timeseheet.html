@@ -8,29 +8,35 @@
   <link rel="stylesheet" href="timesheet.css">
 </head>
 <body>
-  <div class="client-layout">
-    <header class="client-header">
-      <div class="header-content">
-        <div class="header-top">
-          <h1>Multiple Timesheets - Today's Summary</h1>
-          <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
-        </div>
-        
-        <div class="time-summary">
-          <div class="summary-overview">
-            <div class="progress-container">
-              <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
-              <span class="time-label">4 h 36 m / 8 h</span>
-            </div>
+  <div class="page-container">
+    <header class="summary-header">
+      <div class="header-row">
+        <h1>Multiple Timesheets - Today's Summary</h1>
+        <button type="button" class="submit-button" id="submitBtn">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
+          </svg>
+          Submit Time
+        </button>
+      </div>
+
+      <div class="summary-container">
+        <div class="progress-section">
+          <div class="progress-bar">
+            <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
+            <span class="time-label">4 h 36 m / 8 h</span>
           </div>
           <div class="summary-chart" id="summaryChart" role="region" aria-label="Time distribution">
             <div class="bar-segment" style="background: var(--primary-color); width: 53%">
+              <div class="segment-divider"></div>
               <span class="bar-tooltip">ELPL – 2 h 26 m</span>
             </div>
             <div class="bar-segment" style="background: var(--secondary-color); width: 25%">
+              <div class="segment-divider"></div>
               <span class="bar-tooltip">ST – 1 h 10 m</span>
             </div>
             <div class="bar-segment" style="background: var(--tertiary-color); width: 22%">
+              <div class="segment-divider"></div>
               <span class="bar-tooltip">KIPP – 0 h 43 m</span>
             </div>
           </div>
@@ -38,84 +44,95 @@
       </div>
     </header>
 
-    <main class="client-content">
-      <div class="content-wrapper">
-        <div class="timesheet-container">
-          <div class="timesheet-tree" role="tree">
-            <div class="timesheet-row" data-row="1">
-              <div class="entry-fields">
-                <div class="field-group">
-                  <label for="client-1">Client</label>
-                  <div class="select-with-button">
-                    <select id="client-1" class="client-select" aria-label="Select client">
-                      <option value="">Select Client</option>
-                    </select>
-                    <button class="add-button" aria-label="Add client">+</button>
-                  </div>
-                </div>
-                <div class="field-group">
-                  <label for="project-1">Project</label>
-                  <div class="select-with-button">
-                    <select id="project-1" class="project-select" aria-label="Select project" disabled>
-                      <option value="">Select Project</option>
-                    </select>
-                    <button class="add-button" aria-label="Add project">+</button>
-                  </div>
-                </div>
-                <div class="field-group">
-                  <label for="code-1">Billing Code</label>
-                  <div class="select-with-button">
-                    <select id="code-1" class="billing-code" aria-label="Select billing code" disabled>
-                      <option value="">Select Code</option>
-                    </select>
-                    <button class="add-button" aria-label="Add billing code">+</button>
-                  </div>
-                </div>
-                <div class="field-group time-group">
-                  <label for="time-1">Time</label>
-                  <input id="time-1" type="text" class="time-input" placeholder="0 h 00 m" 
-                         pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
-                </div>
-              </div>
-            </div>
-            <!-- Repeat for rows 2-5 with incremented IDs -->
-            
-            <button class="add-row-button" type="button">
-              <svg class="plus-icon" viewBox="0 0 24 24" width="24" height="24">
+    <div class="content-wrapper">
+      <main class="timesheet-content">
+        <div class="timesheet-tree" role="tree">
+          <div class="add-entry-row">
+            <button class="add-first-entry">
+              <svg class="icon" viewBox="0 0 24 24" width="24" height="24">
                 <path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" fill="none"/>
               </svg>
-              Add More Rows
+              Add Time Entry
             </button>
           </div>
-        </div>
 
-        <aside class="sidebar">
-          <section class="active-projects">
-            <h2>Active Projects</h2>
-            <div class="project-tags" role="list">
-              <div class="project-tag" draggable="true" role="listitem">
-                <span class="project-icon">📋</span>
-                <span class="project-text">ED → Exact Path CSM Q4</span>
+          <div class="entry-row" data-row="1">
+            <div class="entry-fields">
+              <div class="field-group">
+                <select class="client-select" aria-label="Select client">
+                  <option value="">Select Client</option>
+                </select>
               </div>
-              <!-- Repeat for other projects -->
+              <div class="field-group">
+                <select class="project-select" aria-label="Select project" disabled>
+                  <option value="">Select Project</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <select class="billing-select" aria-label="Select billing code" disabled>
+                  <option value="">Select Code</option>
+                </select>
+              </div>
+              <div class="field-group time-group">
+                <input type="text" class="time-input" placeholder="0 h 00 m" 
+                       pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
+                <button class="edit-entry" aria-label="Edit entry">
+                  <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <div class="sidebar-sections">
+          <section class="sidebar-section" data-section="active">
+            <button class="section-toggle" aria-expanded="true">
+              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
+              </svg>
+              Active Projects
+            </button>
+            <div class="section-content">
+              <div class="project-tags" role="list">
+                <div class="project-tag" draggable="true" role="listitem">
+                  <span class="tag-icon">📋</span>
+                  <span class="tag-text">ED → Exact Path CSM Q4</span>
+                </div>
+                <!-- Additional project tags -->
+              </div>
             </div>
           </section>
-          <section class="recent-projects">
-            <h2>Recent Projects</h2>
-            <div class="recent-list" role="list"></div>
-          </section>
-          <section class="recent-billing-codes">
-            <h2>Recent Billing Codes</h2>
-            <div class="recent-list" role="list"></div>
-          </section>
-        </aside>
-      </div>
-    </main>
 
-    <footer class="client-footer">
-      <div class="version-display">v1.0.0 (live)</div>
-      <div class="status-indicator" role="status"></div>
-    </footer>
+          <section class="sidebar-section" data-section="recent">
+            <button class="section-toggle" aria-expanded="false">
+              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
+              </svg>
+              Recent Projects
+            </button>
+            <div class="section-content" hidden>
+              <div class="recent-list" role="list"></div>
+            </div>
+          </section>
+
+          <section class="sidebar-section" data-section="billing">
+            <button class="section-toggle" aria-expanded="false">
+              <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
+              </svg>
+              Recent Billing Codes
+            </button>
+            <div class="section-content" hidden>
+              <div class="recent-list" role="list"></div>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </div>
   </div>
 
   <dialog id="submitModal" class="modal">
