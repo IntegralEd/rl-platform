@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Today's Summary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="timesheet.css">
+</head>
+<body>
+  <div class="client-layout">
+    <header class="client-header">
+      <div class="summary-overview">
+        <progress class="time-progress" value="276" max="480"></progress>
+        <span class="time-label">4 h 36 m / 8 h</span>
+      </div>
+      <div class="summary-chart" id="summaryChart">
+        <div class="bar-segment" data-client="ELPL" data-width="53%" style="--width:53%">
+          <span class="bar-tooltip">ELPL – 2 h 26 m</span>
+        </div>
+        <div class="bar-segment" data-client="ST" data-width="25%" style="--width:25%">
+          <span class="bar-tooltip">ST – 1 h 10 m</span>
+        </div>
+        <div class="bar-segment" data-client="KIPP" data-width="22%" style="--width:22%">
+          <span class="bar-tooltip">KIPP – 0 h 43 m</span>
+        </div>
+      </div>
+      <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
+    </header>
+
+    <div class="content-wrapper">
+      <main class="client-content">
+        <div class="timesheet-tree">
+          <!-- Client template -->
+          <template id="tpl-client">
+            <div class="client">
+              <div class="client-header">
+                <h2 class="client-name"></h2>
+                <button type="button" class="add-entry">+</button>
+              </div>
+              <div class="project-list"></div>
+            </div>
+          </template>
+
+          <!-- Project template -->
+          <template id="tpl-project">
+            <div class="project">
+              <div class="project-header">
+                <h3 class="project-name"></h3>
+                <button type="button" class="add-entry">+</button>
+              </div>
+              <div class="billing-list"></div>
+            </div>
+          </template>
+
+          <!-- Billing template -->
+          <template id="tpl-billing">
+            <div class="billing">
+              <select class="billing-code"></select>
+              <input type="text" class="time-input" placeholder="0 h 00 m">
+              <button type="button" class="edit-entry">Edit</button>
+            </div>
+          </template>
+
+          <!-- Example static entry (will be replaced by JS) -->
+          <div class="client" data-client="ELPL">
+            <div class="client-header">
+              <h2>ELPL</h2>
+              <button type="button" class="add-entry">+</button>
+            </div>
+            <div class="project-list">
+              <div class="project" data-project="Recursive Learning">
+                <div class="project-header">
+                  <h3>Recursive Learning</h3>
+                  <button type="button" class="add-entry">+</button>
+                </div>
+                <div class="billing-list">
+                  <div class="billing" data-billing="DEV-001">
+                    <select class="billing-code">
+                      <option>DEV-001 – Frontend Development</option>
+                    </select>
+                    <input type="text" class="time-input" value="2 h 26 m">
+                    <button type="button" class="edit-entry">Edit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <section class="active-projects">
+          <h2>Active Projects</h2>
+          <div class="project-tags">
+            <div class="project-tag" draggable="true">ED → Exact Path CSM Q4</div>
+          </div>
+        </section>
+        <section class="recent-projects">
+          <h2>Recent Projects</h2>
+          <div class="recent-list"></div>
+        </section>
+        <section class="recent-billing-codes">
+          <h2>Recent Billing Codes</h2>
+          <div class="recent-list"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <dialog id="submitModal" class="modal">
+    <div class="modal-content">
+      <h2>Submit Time Entries</h2>
+      <label><input type="checkbox" id="affirm"> I affirm accuracy</label>
+      <div class="modal-actions">
+        <button type="button" class="confirm-submit" id="confirmSubmit" disabled>Confirm</button>
+        <button type="button" class="close-modal">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="entryModal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Time Entry</h2>
+      <label>Time: <input type="text" class="modal-time-input"></label>
+      <label>Description: <textarea class="modal-description"></textarea></label>
+      <div class="modal-actions">
+        <button type="button" class="save-entry">Save</button>
+        <button type="button" class="close-modal">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="timesheet.js"></script>
+</body>
+</html>
