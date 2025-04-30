@@ -28,6 +28,32 @@ body {
 }
 
 /* Header Styles */
+.header-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 900px;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.summary-overview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 900px;
+}
+
+.summary-chart {
+  width: 900px;
+  margin: 15px 0;
+  display: flex;
+  height: 24px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
 .summary-header {
   background: white;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -81,11 +107,9 @@ body {
 .content-wrapper {
   display: flex;
   max-width: var(--content-max-width);
-  min-width: var(--min-main-width);
   margin: 0 auto;
   gap: 2rem;
   padding: 1rem;
-  width: 100%;
 }
 
 /* Main Content */
@@ -106,8 +130,11 @@ body {
 
 /* Sidebar */
 .sidebar {
-  flex: 0 0 20%; /* Set to exactly 20% width */
+  flex: 0 0 20%;
   min-width: 240px;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
   background: var(--client-bg);
   padding: 1rem;
   border-left: 1px solid var(--client-border);
@@ -182,10 +209,6 @@ body {
 }
 
 /* Chart Styles */
-.summary-chart {
-  margin: 15px 0;
-}
-
 .bar-container {
   height: 24px;
   background: #e9ecef;
