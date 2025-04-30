@@ -16,18 +16,21 @@
         "schemaVersion": "04102025.B01",
         "buildId": "merit-20250423-1349"
     }'>
-    <title>Merit | Recursive Learning</title>
+    <title>Merit | EL Education</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/images/client-elpl-favicon.ico">
+    <link rel="icon" type="image/x-icon" href="../../assets/images/client-elpl-favicon.ico">
     
     <!-- Client level styles -->
-    <link rel="stylesheet" href="/rl-restapi-lambda/clients/elpl/assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="/rl-restapi-lambda/clients/elpl/assets/css/client-elpl.css">
+    <link rel="stylesheet" href="../../assets/css/client-elpl-variables.css">
+    <link rel="stylesheet" href="../../assets/css/client-elpl.css">
     
     <!-- Project level styles -->
     <link rel="stylesheet" href="assets/css/client-merit-chat.css">
     <link rel="stylesheet" href="assets/css/client-merit.css">
+    
+    <!-- Qipu Integration -->
+    <link rel="import" href="../../assets/js/qipu_comment_bar.html">
     
     <!-- Environment Configuration -->
     <script>
@@ -39,10 +42,10 @@
         
         window.env = {
             // API Configuration
-            RL_API_GATEWAY_ENDPOINT: apiConfig.apiEndpoint,
-            RL_API_FALLBACK_ENDPOINT: apiConfig.fallbackEndpoint,
-            SCHEMA_VERSION: apiConfig.schemaVersion,
-            BUILD_ID: apiConfig.buildId,
+            RL_API_GATEWAY_ENDPOINT: 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+            RL_API_FALLBACK_ENDPOINT: 'https://3ba2utz7y2.execute-api.us-east-2.amazonaws.com/dev',
+            SCHEMA_VERSION: '04102025.B01',
+            BUILD_ID: 'merit-20250423-1349',
             
             // Feature Flags
             ENABLE_MOCK_MODE: false,
@@ -51,10 +54,10 @@
             // Required Headers Configuration
             API_HEADERS: {
                 'Content-Type': 'application/json',
-                'x-api-key': apiConfig.apiKey,
-                'X-Organization-ID': apiConfig.orgId,
-                'X-Project-ID': apiConfig.projectId,
-                'X-Assistant-ID': apiConfig.assistantId,
+                'x-api-key': '0z6mNoPYRz5Z2rzU9FdJc2FFT4onoEOf1gxWUGL1',
+                'X-Organization-ID': 'recdg5Hlm3VVaBA2u',
+                'X-Project-ID': 'proj_V4lrL1OSfydWCFW0zjgwrFRT',
+                'X-Assistant-ID': 'asst_QoAA395ibbyMImFJERbG2hKT',
                 'X-Source-Token': 'merit-chat',
                 'X-Entry-Point': 'merit',
                 'X-Source-URL': window.location.origin
@@ -70,6 +73,11 @@
     </script>
 
     <!-- Core Dependencies -->
+    <script type="module" src="../../assets/js/client-component-loader.js"></script>
+    <script type="module" src="../../assets/js/client-auth.js"></script>
+    <script type="module" src="../../assets/js/client-router.js"></script>
+
+    <!-- Merit-specific Scripts -->
     <script type="module" src="assets/js/client-merit-openai.js"></script>
     <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
 </head>
