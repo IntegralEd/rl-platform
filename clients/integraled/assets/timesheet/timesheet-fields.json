@@ -1,0 +1,54 @@
+{
+  "time_entry": {
+    "fields": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for the time entry",
+        "required": true
+      },
+      "user_id": {
+        "type": "string",
+        "description": "ID of the user submitting the entry",
+        "required": true
+      },
+      "client_project_billing": {
+        "type": "string",
+        "description": "Combined key for client-project-billingcode (e.g., 'ELPL-RL-DEV001')",
+        "required": true
+      },
+      "date": {
+        "type": "string",
+        "format": "YYYY-MM-DD",
+        "description": "Date of the time entry",
+        "required": true
+      },
+      "start_time": {
+        "type": "string",
+        "format": "HH:mm",
+        "description": "Start time of the entry",
+        "required": true
+      },
+      "duration": {
+        "type": "number",
+        "description": "Duration in minutes",
+        "required": true
+      },
+      "notes": {
+        "type": "string",
+        "description": "Description of work done",
+        "required": false
+      },
+      "validated_at": {
+        "type": "string",
+        "format": "ISO8601",
+        "description": "Timestamp when the entry was validated",
+        "required": false
+      },
+      "validated_by": {
+        "type": "string",
+        "description": "ID of the user who validated the entry",
+        "required": false
+      }
+    }
+  }
+} 

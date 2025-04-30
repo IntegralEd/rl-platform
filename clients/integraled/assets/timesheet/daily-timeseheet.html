@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today's Summary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="timesheet.css">
+</head>
+<body>
+  <div class="sidebar">
+    <h1>Today's Summary</h1>
+    <div class="time-block">
+      <div class="time-indicator">
+        <div class="time-bar">
+          <div class="time-progress"></div>
+        </div>
+        <span class="time-label">4h 36m / 8h</span>
+      </div>
+      <div class="review-section">
+        <div class="summary">
+          <strong>Allocated Time:</strong> 4h 36m
+        </div>
+
+        <div class="bar-container">
+          <div class="bar-segment" style="background-color:#457b9d; width:53%"></div>
+          <div class="bar-segment" style="background-color:#2a9d8f; width:25%"></div>
+          <div class="bar-segment" style="background-color:#f4a261; width:22%"></div>
+        </div>
+
+        <ul style="list-style: none; padding-left: 0; font-size: 0.95em;">
+          <li><strong>ELPL</strong> – 2h 26m</li>
+          <li><strong>ST</strong> – 1h 10m</li>
+          <li><strong>KIPP</strong> – 0h 43m</li>
+        </ul>
+
+        <div class="affirmation">
+          <label>
+            <input type="checkbox" id="affirm" class="checkbox">
+            I affirm these entries are accurate
+          </label>
+        </div>
+
+        <button class="submit-button" id="submitBtn" disabled>Submit Time</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="entry-section">
+      <!-- Client Level -->
+      <div class="group">
+        <h2>ELPL</h2>
+        <div class="group">
+          <h2>Recursive Learning</h2>
+          <div class="row">
+            <select>
+              <option>Select Billing Code</option>
+              <option>DEV-001 - Frontend Development</option>
+              <option>DEV-002 - Backend Integration</option>
+              <option>DEV-003 - Testing & QA</option>
+            </select>
+            <input type="text" placeholder="2h 26m" />
+            <input type="text" placeholder="Frontend development" />
+            <span class="task-tag">+ Add Task</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>ST</h2>
+        <div class="group">
+          <h2>Policy 101</h2>
+          <div class="row">
+            <select>
+              <option>Select Billing Code</option>
+              <option>GD-001 - Graphic Design</option>
+            </select>
+            <input type="text" placeholder="1h 10m" />
+            <input type="text" placeholder="Graphic Design" />
+            <span class="task-tag">+ Add Task</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>KIPP</h2>
+        <div class="group">
+          <h2>NCI_2025</h2>
+          <div class="row">
+            <select>
+              <option>Select Billing Code</option>
+              <option>PM-001 - Project Management</option>
+            </select>
+            <input type="text" placeholder="0h 43m" />
+            <input type="text" placeholder="Project Management" />
+            <span class="task-tag">+ Add Task</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="logo-container">
+    <div class="status-dot"></div>
+    <img src="../images/logo.png" alt="Integral Ed Logo" class="logo">
+  </div>
+
+  <script src="timesheet.js"></script>
+</body>
+</html>
