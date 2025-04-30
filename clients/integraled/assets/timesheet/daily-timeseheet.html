@@ -2,230 +2,145 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Today's Summary</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="timesheet.css">
 </head>
 <body>
-  <div class="page-container">
-    <header class="summary-header">
-      <div class="summary-container">
-        <div class="header-content">
-          <div class="header-main">
-            <h1>Multiple Timesheets - Today's Summary</h1>
-            <div class="time-block">
-              <div class="time-indicator">
-                <div class="time-bar">
-                  <div class="time-progress"></div>
-                </div>
-                <span class="time-label">4h 36m / 8h</span>
-              </div>
-              <div class="summary-chart">
-                <div class="bar-container" id="summaryChart">
-                  <div class="bar-segment" data-client="ELPL" style="background-color:#457b9d; width:53%">
-                    <div class="bar-tooltip">ELPL: 2h 26m</div>
-                  </div>
-                  <div class="bar-segment" data-client="ST" style="background-color:#2a9d8f; width:25%">
-                    <div class="bar-tooltip">ST: 1h 10m</div>
-                  </div>
-                  <div class="bar-segment" data-client="KIPP" style="background-color:#f4a261; width:22%">
-                    <div class="bar-tooltip">KIPP: 0h 43m</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="submit-button" id="submitBtn">Submit Time</button>
+  <div class="client-layout">
+    <header class="client-header">
+      <div class="header-content">
+        <h1>Multiple Timesheets - Today's Summary</h1>
+        <div class="summary-overview">
+          <progress class="time-progress" value="276" max="480" aria-label="Daily progress"></progress>
+          <span class="time-label">4 h 36 m / 8 h</span>
         </div>
+        <div class="summary-chart" id="summaryChart" role="region" aria-label="Time distribution">
+          <div class="bar-segment" data-client="ELPL" data-width="53%" style="--width:53%">
+            <span class="bar-tooltip">ELPL – 2 h 26 m</span>
+          </div>
+          <div class="bar-segment" data-client="ST" data-width="25%" style="--width:25%">
+            <span class="bar-tooltip">ST – 1 h 10 m</span>
+          </div>
+          <div class="bar-segment" data-client="KIPP" data-width="22%" style="--width:22%">
+            <span class="bar-tooltip">KIPP – 0 h 43 m</span>
+          </div>
+        </div>
+        <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
       </div>
     </header>
 
-    <div class="content-wrapper">
-      <main class="timesheet-content">
-        <div class="timesheet-tree">
-          <!-- Client Level -->
-          <div class="tree-level client-level" data-level="client">
-            <div class="tree-item" data-client="ELPL">
-              <div class="tree-header">
-                <h2>ELPL</h2>
-                <button class="add-entry">+</button>
+    <main class="client-content">
+      <div class="content-wrapper">
+        <div class="timesheet-tree" role="tree">
+          <template id="tpl-client">
+            <div class="client" role="treeitem">
+              <div class="client-header">
+                <h2 class="client-name"></h2>
+                <button type="button" class="add-entry" aria-label="Add entry">+</button>
               </div>
-              <!-- Project Level -->
-              <div class="tree-level project-level" data-level="project">
-                <div class="tree-item" data-project="Recursive Learning">
-                  <div class="tree-header">
-                    <h3>Recursive Learning</h3>
-                    <button class="add-entry">+</button>
-                  </div>
-                  <!-- Billing Code Level -->
-                  <div class="tree-level billing-level" data-level="billing">
-                    <div class="tree-item" data-billing="DEV-001">
-                      <div class="billing-entry">
-                        <select class="billing-code">
-                          <option value="DEV-001">DEV-001 - Frontend Development</option>
-                        </select>
-                        <input type="text" class="time-input" value="2h 26m" />
-                        <button class="edit-entry">Edit Details</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="project-list" role="group"></div>
             </div>
+          </template>
 
-            <div class="tree-item" data-client="ST">
-              <div class="tree-header">
-                <h2>ST</h2>
-                <button class="add-entry">+</button>
+          <template id="tpl-project">
+            <div class="project" role="treeitem">
+              <div class="project-header">
+                <h3 class="project-name"></h3>
+                <button type="button" class="add-entry" aria-label="Add entry">+</button>
               </div>
-              <div class="tree-level project-level" data-level="project">
-                <div class="tree-item" data-project="Policy 101">
-                  <div class="tree-header">
-                    <h3>Policy 101</h3>
-                    <button class="add-entry">+</button>
-                  </div>
-                  <div class="tree-level billing-level" data-level="billing">
-                    <div class="tree-item" data-billing="GD-001">
-                      <div class="billing-entry">
-                        <select class="billing-code">
-                          <option value="GD-001">GD-001 - Graphic Design</option>
-                        </select>
-                        <input type="text" class="time-input" value="1h 10m" />
-                        <button class="edit-entry">Edit Details</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="billing-list" role="group"></div>
             </div>
+          </template>
 
-            <div class="tree-item" data-client="KIPP">
-              <div class="tree-header">
-                <h2>KIPP</h2>
-                <button class="add-entry">+</button>
-              </div>
-              <div class="tree-level project-level" data-level="project">
-                <div class="tree-item" data-project="NCI_2025">
-                  <div class="tree-header">
-                    <h3>NCI_2025</h3>
-                    <button class="add-entry">+</button>
-                  </div>
-                  <div class="tree-level billing-level" data-level="billing">
-                    <div class="tree-item" data-billing="PM-001">
-                      <div class="billing-entry">
-                        <select class="billing-code">
-                          <option value="PM-001">PM-001 - Project Management</option>
-                        </select>
-                        <input type="text" class="time-input" value="0h 43m" />
-                        <button class="edit-entry">Edit Details</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <template id="tpl-billing">
+            <div class="billing" role="treeitem">
+              <select class="billing-code" aria-label="Select billing code"></select>
+              <input type="text" class="time-input" placeholder="0 h 00 m" 
+                     pattern="^(\d+\s*h\s*)?(\d+\s*m)?$" 
+                     aria-label="Time input">
+              <button type="button" class="edit-entry">Edit</button>
             </div>
-          </div>
-        </div>
-      </main>
+          </template>
 
-      <aside class="sidebar">
-        <section class="active-projects">
-          <h2>Active Projects</h2>
-          <div class="project-tags">
-            <div class="project-tag" draggable="true">ED→Exact Path CSM Q4</div>
-            <div class="project-tag" draggable="true">IE→Business Development</div>
-            <div class="project-tag" draggable="true">DSL→Alien Zoo for Non-Majors</div>
-            <div class="project-tag" draggable="true">IE→Team Development</div>
-            <div class="project-tag" draggable="true">DSL→Chemistry</div>
-            <div class="project-tag" draggable="true">EIF→HS Q4 2024- Q12025</div>
-            <div class="project-tag" draggable="true">EIF→Platform 2025</div>
-            <div class="project-tag" draggable="true">ST 2025→Innovation Fund</div>
-            <div class="project-tag" draggable="true">IE→Operations</div>
-            <div class="project-tag" draggable="true">BHB→Public Health PDFs</div>
-            <div class="project-tag" draggable="true">RLP→platform-frontend</div>
-          </div>
-        </section>
-
-        <section class="recent-projects">
-          <h2>Recent Projects</h2>
-          <p class="helper-text">(click to add new timesheet row with client/project filled)</p>
-          <div class="recent-list">
-            <!-- Recent projects will be populated here -->
-          </div>
-        </section>
-
-        <section class="recent-billing-codes">
-          <h2>Recent Billing Codes</h2>
-          <p class="helper-text">(click to add new timesheet row with client/project/billingcode filled)</p>
-          <div class="recent-list">
-            <!-- Recent billing codes will be populated here -->
-          </div>
-        </section>
-      </aside>
-    </div>
-
-    <!-- Submit Confirmation Modal -->
-    <div id="submitModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Submit Time Entries</h2>
-          <button class="close-modal">&times;</button>
+          <!-- Dynamic content will be inserted here -->
         </div>
-        <div class="modal-body">
-          <div class="affirmation">
-            <label>
-              <input type="checkbox" id="affirm" class="checkbox">
-              I affirm these entries are accurate
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="confirm-submit" id="confirmSubmit" disabled>Confirm Submit</button>
-          <button class="cancel-submit">Cancel</button>
-        </div>
+
+        <aside class="sidebar">
+          <section class="active-projects">
+            <h2>Active Projects</h2>
+            <div class="project-tags" role="list">
+              <div class="project-tag" draggable="true" role="listitem">ED → Exact Path CSM Q4</div>
+              <div class="project-tag" draggable="true" role="listitem">IE→Business Development</div>
+              <div class="project-tag" draggable="true" role="listitem">DSL→Alien Zoo for Non-Majors</div>
+              <div class="project-tag" draggable="true" role="listitem">IE→Team Development</div>
+              <div class="project-tag" draggable="true" role="listitem">DSL→Chemistry</div>
+              <div class="project-tag" draggable="true" role="listitem">EIF→HS Q4 2024- Q12025</div>
+              <div class="project-tag" draggable="true" role="listitem">EIF→Platform 2025</div>
+              <div class="project-tag" draggable="true" role="listitem">ST 2025→Innovation Fund</div>
+              <div class="project-tag" draggable="true" role="listitem">IE→Operations</div>
+              <div class="project-tag" draggable="true" role="listitem">BHB→Public Health PDFs</div>
+              <div class="project-tag" draggable="true" role="listitem">RLP→platform-frontend</div>
+            </div>
+          </section>
+          <section class="recent-projects">
+            <h2>Recent Projects</h2>
+            <div class="recent-list" role="list"></div>
+          </section>
+          <section class="recent-billing-codes">
+            <h2>Recent Billing Codes</h2>
+            <div class="recent-list" role="list"></div>
+          </section>
+        </aside>
       </div>
-    </div>
+    </main>
 
-    <!-- Entry Edit Modal -->
-    <div id="entryModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Edit Time Entry</h2>
-          <button class="close-modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="entry-details">
-            <div class="time-input-group">
-              <label>Time</label>
-              <input type="text" class="modal-time-input" />
-            </div>
-            <div class="description-group">
-              <label>Description</label>
-              <textarea class="modal-description"></textarea>
-            </div>
-            <div class="tasks-group">
-              <label>Tasks</label>
-              <div class="tasks-container" id="tasksDragContainer">
-                <!-- Tasks will be dragged here -->
-              </div>
-              <button class="add-task">+ Add Task</button>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="save-entry">Save</button>
-          <button class="cancel-entry">Cancel</button>
-        </div>
-      </div>
-    </div>
+    <footer class="client-footer">
+      <div class="version-display">v1.0.0 (live)</div>
+      <div class="status-indicator" role="status"></div>
+    </footer>
   </div>
 
-  <div class="logo-container">
-    <div class="status-dot"></div>
-    <img src="../images/logo.png" alt="Integral Ed Logo" class="logo">
+  <div class="modals" aria-hidden="true">
+    <dialog id="submitModal" class="modal">
+      <div class="modal-content">
+        <h2>Submit Time Entries</h2>
+        <form method="dialog">
+          <label>
+            <input type="checkbox" id="affirm" required> 
+            I affirm these entries are accurate
+          </label>
+          <div class="modal-actions">
+            <button type="submit" class="confirm-submit" id="confirmSubmit" disabled>Confirm</button>
+            <button type="button" class="close-modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog id="entryModal" class="modal">
+      <div class="modal-content">
+        <h2>Edit Time Entry</h2>
+        <form method="dialog">
+          <div class="form-group">
+            <label for="modalTime">Time</label>
+            <input type="text" id="modalTime" class="modal-time-input" 
+                   pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
+          </div>
+          <div class="form-group">
+            <label for="modalDesc">Description</label>
+            <textarea id="modalDesc" class="modal-description"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="save-entry">Save</button>
+            <button type="button" class="close-modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
   </div>
 
-  <script src="timesheet.js"></script>
+  <script type="module" src="timesheet.js"></script>
 </body>
 </html>
