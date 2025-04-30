@@ -7,8 +7,7 @@ Due to CORS configuration issues with the dev endpoint, we are temporarily swapp
 ```javascript
 // UPDATED API Configuration
 window.env = {
-    // Swapped endpoints - prod is now primary
-    RL_API_GATEWAY_ENDPOINT: 'https://29wtfiieig.execute-api.us-east-2.amazonaws.com/prod',
+   
     RL_API_FALLBACK_ENDPOINT: 'https://3ba2utz7y2.execute-api.us-east-2.amazonaws.com/dev',
     SCHEMA_VERSION: '04102025.B01',
     BUILD_ID: 'merit-20250423-1349',
