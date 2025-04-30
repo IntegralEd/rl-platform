@@ -5,9 +5,11 @@
   --background-color: #f8f9fa;
   --border-color: #e1e4e8;
   --text-color: #2c3e50;
-  --header-height: 140px;
+  --header-height: 60px;
   --tree-indent: 20px;
-  --sidebar-width: 300px;
+  --sidebar-width: 20%;
+  --min-main-width: 900px;
+  --content-max-width: 1200px;
 }
 
 body {
@@ -78,19 +80,16 @@ body {
 /* Content Layout */
 .content-wrapper {
   display: flex;
-  margin-top: var(--header-height);
-  min-height: calc(100vh - var(--header-height));
-  padding: 20px;
-  gap: 20px;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  gap: 2rem;
+  padding: 1rem;
 }
 
 /* Main Content */
 .timesheet-content {
   flex: 1;
-  min-width: 0; /* Prevent flex item from overflowing */
+  min-width: var(--min-main-width);
 }
 
 .timesheet-tree {
@@ -105,9 +104,11 @@ body {
 /* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  min-width: 240px; /* Minimum readable width */
+  background: var(--client-bg);
+  padding: 1rem;
+  border-left: 1px solid var(--client-border);
+  overflow-y: auto;
 }
 
 .sidebar section {
@@ -416,4 +417,43 @@ textarea {
 .logo {
   height: 40px;
   width: auto;
+}
+
+/* Responsive Layout */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--client-border);
+  }
+
+  .timesheet-content {
+    width: 100%;
+  }
+
+  /* Convert project tags to horizontal scrollable list */
+  .project-tags {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    gap: 0.5rem;
+    scrollbar-width: thin;
+  }
+
+  .project-tag {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* Ensure minimum width */
+@media (max-width: 900px) {
+  .client-layout {
+    min-width: var(--min-main-width);
+    overflow-x: auto;
+  }
 } 
