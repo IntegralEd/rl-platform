@@ -88,7 +88,7 @@ body {
 
 /* Main Content */
 .timesheet-content {
-  flex: 1;
+  flex: 0 0 80%; /* Set to exactly 80% width */
   min-width: var(--min-main-width);
 }
 
@@ -96,15 +96,14 @@ body {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  min-height: calc((100vw - var(--sidebar-width) - 60px) * 9/16); /* 16:9 ratio */
-  transition: min-height 0.3s ease;
   padding: 20px;
+  height: 100%; /* Fill available height */
 }
 
 /* Sidebar */
 .sidebar {
-  width: var(--sidebar-width);
-  min-width: 240px; /* Minimum readable width */
+  flex: 0 0 20%; /* Set to exactly 20% width */
+  min-width: 240px;
   background: var(--client-bg);
   padding: 1rem;
   border-left: 1px solid var(--client-border);
@@ -425,14 +424,15 @@ textarea {
     flex-direction: column;
   }
 
+  .timesheet-content,
   .sidebar {
+    flex: 1 0 100%;
     width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--client-border);
   }
 
-  .timesheet-content {
-    width: 100%;
+  .sidebar {
+    border-left: none;
+    border-top: 1px solid var(--client-border);
   }
 
   /* Convert project tags to horizontal scrollable list */
