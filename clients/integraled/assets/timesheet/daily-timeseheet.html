@@ -3,104 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>Daily Timesheet Summary</title>
+  <title>Today's Summary</title>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="timesheet.css">
 </head>
 <body>
-  <div class="page-container">
-    <!-- Header -->
-    <header class="summary-header">
-      <h1>Today's Summary</h1>
-      <div class="header-controls">
-        <div class="time-display">
-          <progress class="time-progress" value="276" max="480"></progress>
-          <span class="time-label">4 h 36 m / 8 h</span>
-        </div>
-        <button type="button" id="submitBtn" class="button primary">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-          Submit Time
-        </button>
+  <div class="client-layout">
+    <header class="client-header">
+      <div class="summary-overview">
+        <progress class="time-progress" value="276" max="480"></progress>
+        <span class="time-label">4 h 36 m / 8 h</span>
       </div>
       <div class="summary-chart" id="summaryChart">
-        <div class="bar-segment" data-client="ELPL" data-width="53%">
-          <span class="tooltip">ELPL – 2 h 26 m</span>
+        <div class="bar-segment" data-client="ELPL" data-width="53%" style="--width:53%">
+          <span class="bar-tooltip">ELPL – 2 h 26 m</span>
         </div>
-        <div class="bar-segment" data-client="ST" data-width="25%">
-          <span class="tooltip">ST – 1 h 10 m</span>
+        <div class="bar-segment" data-client="ST" data-width="25%" style="--width:25%">
+          <span class="bar-tooltip">ST – 1 h 10 m</span>
         </div>
-        <div class="bar-segment" data-client="KIPP" data-width="22%">
-          <span class="tooltip">KIPP – 0 h 43 m</span>
+        <div class="bar-segment" data-client="KIPP" data-width="22%" style="--width:22%">
+          <span class="bar-tooltip">KIPP – 0 h 43 m</span>
         </div>
       </div>
+      <button type="button" class="submit-button" id="submitBtn">Submit Time</button>
     </header>
 
-    <!-- Main content -->
-    <main class="timesheet-main">
-      <!-- Entry area -->
-      <section class="entry-area">
-        <button type="button" id="addRowBtn" class="button secondary">+ Add Row</button>
-        
-        <div id="entryList" class="entry-list">
-          <!-- Template for new entries -->
-          <template id="tpl-entry-row">
-            <div class="entry-row">
-              <select class="client-select">
-                <option value="">Client</option>
-              </select>
-              <select class="project-select" disabled>
-                <option value="">Project</option>
-              </select>
-              <select class="billing-select" disabled>
-                <option value="">Billing Code</option>
-              </select>
-              <input type="text" class="time-input" placeholder="0 h 00 m" pattern="^(\d+\s*h)?\s*(\d+\s*m)?$">
-              <button type="button" class="edit-entry">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-              </button>
+    <div class="content-wrapper">
+      <main class="client-content">
+        <div class="timesheet-tree">
+          <!-- Client template -->
+          <template id="tpl-client">
+            <div class="client">
+              <div class="client-header">
+                <h2 class="client-name"></h2>
+                <button type="button" class="add-entry">+</button>
+              </div>
+              <div class="project-list"></div>
             </div>
           </template>
-        </div>
-      </section>
 
-      <!-- Sidebar -->
+          <!-- Project template -->
+          <template id="tpl-project">
+            <div class="project">
+              <div class="project-header">
+                <h3 class="project-name"></h3>
+                <button type="button" class="add-entry">+</button>
+              </div>
+              <div class="billing-list"></div>
+            </div>
+          </template>
+
+          <!-- Billing template -->
+          <template id="tpl-billing">
+            <div class="billing">
+              <select class="billing-code"></select>
+              <input type="text" class="time-input" placeholder="0 h 00 m">
+              <button type="button" class="edit-entry">Edit</button>
+            </div>
+          </template>
+
+          <!-- Example static entry (will be replaced by JS) -->
+          <div class="client" data-client="ELPL">
+            <div class="client-header">
+              <h2>ELPL</h2>
+              <button type="button" class="add-entry">+</button>
+            </div>
+            <div class="project-list">
+              <div class="project" data-project="Recursive Learning">
+                <div class="project-header">
+                  <h3>Recursive Learning</h3>
+                  <button type="button" class="add-entry">+</button>
+                </div>
+                <div class="billing-list">
+                  <div class="billing" data-billing="DEV-001">
+                    <select class="billing-code">
+                      <option>DEV-001 – Frontend Development</option>
+                    </select>
+                    <input type="text" class="time-input" value="2 h 26 m">
+                    <button type="button" class="edit-entry">Edit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
       <aside class="sidebar">
-        <div class="sidebar-section" data-collapsed="false">
-          <button type="button" class="collapse-btn">Active Projects</button>
-          <div class="section-content">
-            <div class="project-tag" draggable="true">📋 ED → Exact Path CSM Q4</div>
-            <!-- More tags will be added by JS -->
+        <section class="active-projects">
+          <h2>Active Projects</h2>
+          <div class="project-tags">
+            <div class="project-tag" draggable="true">ED → Exact Path CSM Q4</div>
           </div>
-        </div>
-
-        <div class="sidebar-section" data-collapsed="true">
-          <button type="button" class="collapse-btn">Recent Projects</button>
-          <div class="section-content">
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
-
-        <div class="sidebar-section" data-collapsed="true">
-          <button type="button" class="collapse-btn">Recent Billing Codes</button>
-          <div class="section-content">
-            <!-- Will be populated by JS -->
-          </div>
-        </div>
+        </section>
+        <section class="recent-projects">
+          <h2>Recent Projects</h2>
+          <div class="recent-list"></div>
+        </section>
+        <section class="recent-billing-codes">
+          <h2>Recent Billing Codes</h2>
+          <div class="recent-list"></div>
+        </section>
       </aside>
-    </main>
+    </div>
   </div>
 
-  <!-- Modals -->
   <dialog id="submitModal" class="modal">
     <div class="modal-content">
       <h2>Submit Time Entries</h2>
-      <label>
-        <input type="checkbox" id="affirm">
-        <span>I affirm these entries are accurate</span>
-      </label>
+      <label><input type="checkbox" id="affirm"> I affirm accuracy</label>
       <div class="modal-actions">
-        <button type="button" class="button secondary close-modal">Cancel</button>
-        <button type="submit" class="button primary confirm-submit" disabled>Confirm</button>
+        <button type="button" class="confirm-submit" id="confirmSubmit" disabled>Confirm</button>
+        <button type="button" class="close-modal">Cancel</button>
       </div>
     </div>
   </dialog>
@@ -108,17 +122,11 @@
   <dialog id="entryModal" class="modal">
     <div class="modal-content">
       <h2>Edit Time Entry</h2>
-      <label>
-        Time
-        <input type="text" id="modalTime" class="modal-time-input" placeholder="2h 30m">
-      </label>
-      <label>
-        Description
-        <textarea id="modalDesc"></textarea>
-      </label>
+      <label>Time: <input type="text" class="modal-time-input"></label>
+      <label>Description: <textarea class="modal-description"></textarea></label>
       <div class="modal-actions">
-        <button type="button" class="button secondary close-modal">Cancel</button>
-        <button type="button" class="button primary save-entry">Save</button>
+        <button type="button" class="save-entry">Save</button>
+        <button type="button" class="close-modal">Cancel</button>
       </div>
     </div>
   </dialog>

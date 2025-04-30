@@ -11,14 +11,18 @@
   --min-main-width: 900px;
   --content-max-width: 1200px;
   --spacing-unit: 8px;
+  --client-bg: #ffffff;
+  --client-text: #2c3e50;
+  --client-border: #e1e4e8;
+  --content-width: 1200px;
 }
 
 body {
   font-family: 'Open Sans', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background: var(--client-bg);
+  color: var(--client-text);
   min-height: 100vh;
 }
 
@@ -600,4 +604,331 @@ textarea {
 /* Utility Classes */
 .icon {
   flex-shrink: 0;
+}
+
+.client-layout {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.client-header {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.client-header h1 {
+  font-size: 24px;
+  margin: 0 0 20px 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.header-actions button {
+  padding: 8px 12px;
+  border: 1px solid var(--client-border);
+  background: var(--client-bg);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.submit-button svg {
+  fill: currentColor;
+}
+
+.time-total {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.client-summary {
+  margin-top: 20px;
+  line-height: 1.6;
+}
+
+.client-content {
+  max-width: 900px;
+  margin: 20px auto 0;
+}
+
+.client-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.client-header {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.summary-overview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 900px;
+  margin: 0 auto 20px;
+}
+
+.time-progress {
+  flex: 1;
+  height: 8px;
+  border: none;
+  border-radius: 4px;
+}
+
+.time-progress::-webkit-progress-bar {
+  background: var(--client-border);
+}
+
+.time-progress::-webkit-progress-value {
+  background: var(--primary-color);
+}
+
+.time-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Summary Chart */
+.summary-chart {
+  max-width: 900px;
+  height: 24px;
+  margin: 0 auto 20px;
+  background: var(--client-border);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+
+.bar-segment {
+  height: 100%;
+  width: calc(var(--width) * 1%);
+  position: relative;
+}
+
+.bar-segment[data-client="ELPL"] { background: var(--primary-color); }
+.bar-segment[data-client="ST"] { background: var(--secondary-color); }
+.bar-segment[data-client="KIPP"] { background: var(--tertiary-color); }
+
+.bar-tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.bar-segment:hover .bar-tooltip {
+  opacity: 1;
+}
+
+.submit-button {
+  display: block;
+  margin: 0 auto;
+  padding: 8px 16px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Content Layout */
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+.client-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timesheet-tree {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Client/Project Structure */
+.client, .project {
+  border-bottom: 1px solid var(--client-border);
+}
+
+.client-header, .project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #f8f9fa;
+}
+
+.client-header h2, .project-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.project-list {
+  margin-left: 20px;
+}
+
+/* Billing Entry */
+.billing {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  padding: 10px 20px;
+  align-items: center;
+}
+
+.billing-code {
+  padding: 8px;
+  border: 1px solid var(--client-border);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.time-input {
+  width: 100px;
+  padding: 8px;
+  border: 1px solid var(--client-border);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Buttons */
+.add-entry, .edit-entry {
+  padding: 4px 8px;
+  border: 1px solid var(--client-border);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.sidebar section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.sidebar h2 {
+  margin: 0;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-bottom: 1px solid var(--client-border);
+}
+
+.project-tags, .recent-list {
+  padding: 15px 20px;
+}
+
+.project-tag {
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  cursor: grab;
+  font-size: 14px;
+}
+
+/* Modal */
+.modal {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal::backdrop {
+  background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.modal h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.modal input[type="text"],
+.modal textarea {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  border: 1px solid var(--client-border);
+  border-radius: 4px;
+}
+
+.modal textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .billing {
+    grid-template-columns: 1fr;
+  }
+  
+  .time-input {
+    width: 100%;
+  }
 } 
