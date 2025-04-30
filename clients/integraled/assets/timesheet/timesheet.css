@@ -81,9 +81,11 @@ body {
 .content-wrapper {
   display: flex;
   max-width: var(--content-max-width);
+  min-width: var(--min-main-width);
   margin: 0 auto;
   gap: 2rem;
   padding: 1rem;
+  width: 100%;
 }
 
 /* Main Content */
@@ -93,11 +95,13 @@ body {
 }
 
 .timesheet-tree {
+  flex: 1;
+  min-width: 900px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   padding: 20px;
-  height: 100%; /* Fill available height */
+  height: 100%;
 }
 
 /* Sidebar */
@@ -456,4 +460,77 @@ textarea {
     min-width: var(--min-main-width);
     overflow-x: auto;
   }
+}
+
+/* Timesheet Row Styles */
+.timesheet-row {
+  display: flex;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.entry-fields {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  align-items: center;
+}
+
+.field-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.field-group select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+}
+
+.field-group button {
+  padding: 4px 8px;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.add-row-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--background-color);
+  border: 2px dashed var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.add-row-button:hover {
+  background: #f1f3f5;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.plus-icon {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Disabled state for selects */
+select[disabled] {
+  background: #f8f9fa;
+  cursor: not-allowed;
 } 

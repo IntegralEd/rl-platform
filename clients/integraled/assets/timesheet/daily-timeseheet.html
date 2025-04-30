@@ -34,37 +34,47 @@
     <main class="client-content">
       <div class="content-wrapper">
         <div class="timesheet-tree" role="tree">
-          <template id="tpl-client">
-            <div class="client" role="treeitem">
-              <div class="client-header">
-                <h2 class="client-name"></h2>
-                <button type="button" class="add-entry" aria-label="Add entry">+</button>
+          <!-- Initial 5 rows -->
+          <div class="timesheet-row" data-row="1">
+            <div class="entry-fields">
+              <div class="field-group">
+                <select class="client-select" aria-label="Select client">
+                  <option value="">Select Client</option>
+                </select>
+                <button class="add-client" aria-label="Add client">+</button>
               </div>
-              <div class="project-list" role="group"></div>
-            </div>
-          </template>
-
-          <template id="tpl-project">
-            <div class="project" role="treeitem">
-              <div class="project-header">
-                <h3 class="project-name"></h3>
-                <button type="button" class="add-entry" aria-label="Add entry">+</button>
+              <div class="field-group">
+                <select class="project-select" aria-label="Select project" disabled>
+                  <option value="">Select Project</option>
+                </select>
+                <button class="add-project" aria-label="Add project">+</button>
               </div>
-              <div class="billing-list" role="group"></div>
+              <div class="field-group">
+                <select class="billing-code" aria-label="Select billing code" disabled>
+                  <option value="">Select Code</option>
+                </select>
+                <button class="add-code" aria-label="Add billing code">+</button>
+              </div>
+              <input type="text" class="time-input" placeholder="0 h 00 m" pattern="^(\d+\s*h\s*)?(\d+\s*m)?$">
             </div>
-          </template>
-
-          <template id="tpl-billing">
-            <div class="billing" role="treeitem">
-              <select class="billing-code" aria-label="Select billing code"></select>
-              <input type="text" class="time-input" placeholder="0 h 00 m" 
-                     pattern="^(\d+\s*h\s*)?(\d+\s*m)?$" 
-                     aria-label="Time input">
-              <button type="button" class="edit-entry">Edit</button>
-            </div>
-          </template>
-
-          <!-- Dynamic content will be inserted here -->
+          </div>
+          <!-- Repeat for rows 2-5 -->
+          <div class="timesheet-row" data-row="2">
+            <!-- Same structure as row 1 -->
+          </div>
+          <div class="timesheet-row" data-row="3">
+            <!-- Same structure as row 1 -->
+          </div>
+          <div class="timesheet-row" data-row="4">
+            <!-- Same structure as row 1 -->
+          </div>
+          <div class="timesheet-row" data-row="5">
+            <!-- Same structure as row 1 -->
+          </div>
+          
+          <button class="add-row-button" type="button">
+            <span class="plus-icon">+</span> Add More Rows
+          </button>
         </div>
 
         <aside class="sidebar">
@@ -100,7 +110,7 @@
       <div class="version-display">v1.0.0 (live)</div>
       <div class="status-indicator" role="status"></div>
     </footer>
-  </div>
+        </div>
 
   <div class="modals" aria-hidden="true">
     <dialog id="submitModal" class="modal">
@@ -114,7 +124,7 @@
           <div class="modal-actions">
             <button type="submit" class="confirm-submit" id="confirmSubmit" disabled>Confirm</button>
             <button type="button" class="close-modal">Cancel</button>
-          </div>
+        </div>
         </form>
       </div>
     </dialog>
