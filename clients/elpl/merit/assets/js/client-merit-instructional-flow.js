@@ -43,7 +43,8 @@ export class MeritInstructionalFlow {
         sendButton: null,
         chatInput: null,
         chatWindow: null,
-        gradeSelect: null
+        gradeSelect: null,
+        chatbar: null
     };
 
     #openAIClient = null;
@@ -108,13 +109,13 @@ export class MeritInstructionalFlow {
             sendButton: document.getElementById('send-button'),
             chatInput: document.getElementById('chat-input'),
             chatWindow: document.getElementById('chat-window'),
-            gradeSelect: document.getElementById('grade-level')
+            gradeSelect: document.getElementById('grade-level'),
+            chatbar: document.getElementById('chatbar')
         };
 
-        // Verify all elements exist
-        const missing = Object.entries(elements)
-            .filter(([key, el]) => !el)
-            .map(([key]) => key);
+        // Verify required elements exist
+        const required = ['form', 'nextButton', 'gradeSelect', 'chatWindow', 'chatInput', 'sendButton', 'chatbar'];
+        const missing = required.filter(key => !elements[key]);
 
         if (missing.length > 0) {
             console.error('[Merit Flow] Missing elements:', missing.join(', '));
