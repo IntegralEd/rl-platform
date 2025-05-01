@@ -580,14 +580,14 @@
 
 .client-sidebar__subtitle {
     font-family: var(--client-font-h2, 'Montserrat');
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--elpl-primary);
-    margin-top: 8px;
-    letter-spacing: 0.02em;
-    opacity: 0.9;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8B0D37;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
     display: block;
-    line-height: 1.4;
+    line-height: 1.2;
 }
 
 .client-sidebar__nav {
