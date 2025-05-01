@@ -38,7 +38,7 @@
             --header-height: 52px;
             --footer-height: 50px;
             --sidebar-width: 200px;
-            --layout-gap: 20px;
+            --layout-gap: clamp(8px, 2vw, 20px);
             --border-radius: 12px;
             --background-color: #E6F6FA;
             --client-bg: #ffffff;
@@ -71,7 +71,8 @@
             grid-template-columns: var(--sidebar-width) 1fr;
             grid-template-rows: auto 1fr auto;
             gap: var(--layout-gap);
-            height: 100vh;
+            min-height: 100vh;
+            height: 100%;
             padding: var(--layout-gap);
             box-sizing: border-box;
         }
@@ -85,7 +86,7 @@
             padding: 24px 0;
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            height: 645px;
+            min-height: calc(100vh - 2 * var(--layout-gap));
             display: flex;
             flex-direction: column;
         }
@@ -260,10 +261,11 @@
             grid-row: 2;
             background: white;
             border-radius: 10px;
-            padding: 20px;
+            padding: clamp(12px, 2vw, 20px);
             overflow-y: auto;
             margin-top: 0;
-            height: 573px;
+            height: auto;
+            min-height: calc(100vh - var(--header-height) - var(--footer-height) - 2 * var(--layout-gap));
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
@@ -288,122 +290,6 @@
         }
 
         /* Chat Section */
-        #chat-section {
-            display: none;
-            height: 100%;
-        }
-
-        #chat-section.active {
-            display: block;
-        }
-
-        /* Welcome Section Styles */
-        .welcome-section {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .welcome-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .welcome-title {
-            font-size: 32px;
-            margin: 0 0 12px;
-            color: var(--elpl-primary);
-            font-weight: 600;
-        }
-
-        .welcome-subtitle {
-            font-size: 18px;
-            color: #666;
-            margin: 0;
-        }
-
-        .client-welcome__grade-selection,
-        .client-welcome__curriculum-selection {
-            margin-bottom: 32px;
-        }
-
-        .client-welcome__grade-selection h2,
-        .client-welcome__curriculum-selection h2 {
-            font-size: 20px;
-            margin: 0 0 20px;
-            color: var(--text-color);
-            font-weight: 500;
-        }
-
-        .client-welcome__grade-options,
-        .client-welcome__curriculum-options {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-
-        .client-grade__option,
-        .client-curriculum__option {
-            padding: 16px;
-            text-align: center;
-            background: #ffffff;
-            border: 2px solid #e1e4e8;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 48px;
-        }
-
-        .client-grade__option:hover,
-        .client-curriculum__option:hover {
-            border-color: var(--elpl-primary);
-            background: rgba(139, 13, 55, 0.05);
-        }
-
-        .client-grade__option.selected,
-        .client-curriculum__option.selected {
-            background: var(--elpl-primary);
-            color: white;
-            border-color: var(--elpl-primary);
-        }
-
-        .client-welcome__actions {
-            display: flex;
-            justify-content: center;
-            margin-top: 48px;
-        }
-
-        .client-welcome__next-button {
-            padding: 0 32px;
-            height: 48px;
-            background: var(--elpl-primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .client-welcome__next-button:hover {
-            background: var(--elpl-primary-hover);
-        }
-
-        .client-welcome__next-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Chat Section */
         .chat-section {
             height: 100%;
             display: flex;
@@ -413,99 +299,50 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: clamp(16px, 3vw, 24px);
             display: flex;
             flex-direction: column;
-            gap: 16px;
-        }
-
-        .client-chat__day-divider {
-            text-align: center;
-            font-size: 14px;
-            color: #999;
-            margin: 20px 0 10px;
-            position: relative;
-        }
-
-        .client-chat__day-divider::before,
-        .client-chat__day-divider::after {
-            content: "";
-            display: inline-block;
-            width: 40%;
-            height: 1px;
-            background-color: #ccc;
-            vertical-align: middle;
-            margin: 0 8px;
+            gap: clamp(12px, 2vw, 16px);
         }
 
         .client-chat__message {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-        }
-
-        .client-chat__avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #ccc;
-            flex-shrink: 0;
-        }
-
-        .client-chat__content {
-            flex: 1;
-        }
-
-        .client-chat__bubble {
-            padding: 14px;
-            border-radius: 16px;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-
-        .client-chat__bubble.user {
-            background: #E6F6FA;
-            color: var(--text-color, #2b2b2b);
+            gap: clamp(8px, 2vw, 12px);
             max-width: 90%;
         }
 
-        .client-chat__bubble.assistant {
-            background: #ffffff;
-            color: var(--text-color, #2b2b2b);
-            border: 1px solid #E6F6FA;
-            max-width: 80%;
+        .client-chat__message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
         }
 
-        .client-chat__timestamp {
-            font-size: 12px;
-            color: #888;
-            margin-top: 4px;
-        }
-
-        .client-chat__message.assistant .client-chat__timestamp {
-            text-align: left;
-        }
-
-        .client-chat__message.user .client-chat__timestamp {
-            text-align: right;
+        .client-chat__bubble {
+            padding: clamp(12px, 2vw, 14px);
+            border-radius: 16px;
+            font-size: clamp(14px, 2vw, 16px);
+            line-height: 1.5;
+            max-width: min(600px, 100%);
+            word-wrap: break-word;
         }
 
         .client-chat__input-container {
-            padding: 12px 18px;
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 2vw, 18px);
             background: #ffffff;
             border-top: 1px solid #e1e4e8;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: clamp(8px, 2vw, 12px);
         }
 
         .client-chat__input {
             flex: 1;
-            height: 36px;
+            min-height: 36px;
+            max-height: 120px;
             padding: 8px 12px;
             border: 1px solid #e1e4e8;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: clamp(14px, 2vw, 16px);
             resize: none;
             background: #f9f9f9;
         }
@@ -584,17 +421,118 @@
             color: var(--elpl-primary-hover);
         }
 
-        @media (max-width: 600px) {
-            .rl-footer {
-                flex-direction: column;
-                gap: 12px;
-                text-align: center;
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 100%;
+                --layout-gap: 8px;
             }
 
-            .rl-footer__left,
-            .rl-footer__center,
-            .rl-footer__right {
+            .rl-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr auto;
+                padding: var(--layout-gap);
+            }
+
+            .client-sidebar {
+                grid-column: 1;
+                grid-row: 2;
+                height: auto;
+                min-height: auto;
+                border-radius: var(--border-radius);
+            }
+
+            .rl-header {
+                grid-column: 1;
+                grid-row: 1;
+            }
+
+            .client-main {
+                grid-column: 1;
+                grid-row: 3;
+                height: auto;
+                min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--sidebar-width) - 4 * var(--layout-gap));
+            }
+
+            .rl-footer {
+                grid-column: 1;
+                grid-row: 4;
+            }
+
+            .rl-nav__username {
+                display: none;
+            }
+
+            .client-sidebar__nav {
+                flex-direction: row;
                 justify-content: center;
+                gap: 16px;
+            }
+
+            .client-sidebar__header {
+                text-align: center;
+                margin-bottom: 16px;
+            }
+
+            .client-welcome__grade-options,
+            .client-welcome__curriculum-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .client-welcome__actions {
+                padding: 0 clamp(12px, 4vw, 24px);
+            }
+
+            .client-chat__message {
+                max-width: 100%;
+            }
+
+            .client-chat__bubble {
+                max-width: min(400px, 85%);
+            }
+
+            .client-chat__actions {
+                gap: 4px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-section {
+                padding: 16px 12px;
+            }
+
+            .client-welcome__grade-options,
+            .client-welcome__curriculum-options {
+                grid-template-columns: 1fr;
+            }
+
+            .client-grade__option,
+            .client-curriculum__option {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .chat-messages {
+                padding: 12px;
+            }
+
+            .client-chat__bubble {
+                max-width: min(300px, 80%);
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .client-chat__input-container {
+                padding: 8px;
+            }
+
+            .client-chat__input {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            .client-chat__avatar {
+                width: 32px;
+                height: 32px;
             }
         }
 
@@ -795,7 +733,6 @@
                 <span class="section-name">Welcome</span>
             </div>
             <nav class="rl-header__nav">
-                <button class="rl-button--primary">New Chat</button>
                 <div class="rl-nav__profile">
                     <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
                     <span class="rl-nav__username">John Doe</span>
@@ -819,14 +756,39 @@
                         <p class="welcome-subtitle">Your AI-powered professional learning assistant</p>
                     </div>
                     <div class="client-welcome__grade-selection">
-                        <h2>Select Your Grade Level</h2>
+                        <h2>Select all that apply</h2>
+                        <h3 class="grade-selection-subtitle">Grade Level(s)</h3>
                         <div class="client-welcome__grade-options">
-                            <div class="client-grade__option" data-grade="K">K</div>
-                            <div class="client-grade__option" data-grade="1">1</div>
-                            <div class="client-grade__option" data-grade="2">2</div>
-                            <div class="client-grade__option" data-grade="3">3</div>
-                            <div class="client-grade__option" data-grade="4">4</div>
-                            <div class="client-grade__option" data-grade="5">5</div>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="K" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Kindergarten</span>
+                            </label>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="1" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Grade 1</span>
+                            </label>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="2" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Grade 2</span>
+                            </label>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="3" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Grade 3</span>
+                            </label>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="4" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Grade 4</span>
+                            </label>
+                            <label class="grade-option">
+                                <input type="checkbox" name="grade" value="5" class="grade-checkbox">
+                                <span class="star-icon">☆</span>
+                                <span class="grade-text">Grade 5</span>
+                            </label>
                         </div>
                     </div>
                     <div class="client-welcome__actions">
@@ -1339,6 +1301,45 @@
     <script>
         // Log commit datetime on load
         console.log('[Merit HTML] Commit: apr26 at 6:50am');
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gradeCheckboxes = document.querySelectorAll('.grade-checkbox');
+            const launchButton = document.querySelector('.client-welcome__next-button');
+            
+            // Function to update launch button state
+            function updateLaunchButton() {
+                const anyChecked = Array.from(gradeCheckboxes).some(checkbox => checkbox.checked);
+                launchButton.disabled = !anyChecked;
+                if (anyChecked) {
+                    launchButton.classList.add('enabled');
+                } else {
+                    launchButton.classList.remove('enabled');
+                }
+            }
+
+            // Function to update star icon
+            function updateStarIcon(checkbox) {
+                const starIcon = checkbox.nextElementSibling;
+                if (checkbox.checked) {
+                    starIcon.textContent = '★';
+                } else {
+                    starIcon.textContent = '☆';
+                }
+            }
+
+            // Add event listeners to checkboxes
+            gradeCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    updateStarIcon(checkbox);
+                    updateLaunchButton();
+                });
+            });
+
+            // Initial button state
+            updateLaunchButton();
+        });
     </script>
 </body>
 </html> 

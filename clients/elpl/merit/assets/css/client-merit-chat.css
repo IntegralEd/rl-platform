@@ -370,4 +370,181 @@
         animation: none;
         opacity: 1;
     }
+}
+
+/* Welcome Section */
+.welcome-section {
+    padding: var(--client-spacing-large);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.welcome-header {
+    text-align: center;
+    margin-bottom: var(--client-spacing-large);
+}
+
+.welcome-title {
+    font-family: var(--client-font-h1);
+    font-size: var(--client-font-size-h1);
+    line-height: var(--client-line-height-heading);
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: var(--client-spacing-small);
+}
+
+.welcome-subtitle {
+    font-family: var(--client-font-h2);
+    font-size: var(--client-font-size-h2);
+    line-height: var(--client-line-height-heading);
+    color: var(--secondary-color);
+    margin-bottom: var(--client-spacing-medium);
+}
+
+/* Sidebar Styles */
+.client-sidebar {
+    background: white;
+    border-right: 1px solid var(--client-border);
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.client-sidebar__header {
+    padding: var(--client-spacing-medium);
+    border-bottom: 1px solid var(--client-border);
+}
+
+.client-sidebar__logo {
+    height: 40px;
+    margin-bottom: var(--client-spacing-small);
+}
+
+.client-sidebar__subtitle {
+    font-family: var(--client-font-h2);
+    font-size: var(--client-font-size-small);
+    color: var(--secondary-color);
+    font-weight: 600;
+    display: block;
+}
+
+.client-sidebar__nav {
+    padding: var(--client-spacing-medium);
+    flex: 1;
+}
+
+.client-sidebar__nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.client-sidebar__nav li {
+    margin-bottom: var(--client-spacing-small);
+}
+
+.client-nav__item {
+    display: flex;
+    align-items: center;
+    gap: var(--client-spacing-small);
+    padding: var(--client-spacing-small);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: var(--client-button-radius);
+    transition: all 0.2s ease;
+    font-family: var(--client-font-body);
+    font-size: var(--client-font-size-body);
+}
+
+.client-nav__item:hover {
+    background: var(--background-color);
+    color: var(--primary-color);
+}
+
+.client-nav__item.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.client-nav__item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Grade Selection Styles */
+.client-welcome__grade-selection {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: var(--client-spacing-medium);
+    background: white;
+    border-radius: var(--client-card-border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.client-welcome__grade-selection h2 {
+    font-family: var(--client-font-h2);
+    font-size: var(--client-font-size-h2);
+    color: var(--text-color);
+    margin-bottom: var(--client-spacing-small);
+}
+
+.grade-selection-subtitle {
+    font-family: var(--client-font-h2);
+    font-size: var(--client-font-size-body);
+    color: var(--text-color);
+    margin-bottom: var(--client-spacing-medium);
+    font-weight: 600;
+}
+
+.client-welcome__grade-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--client-spacing-small);
+}
+
+.grade-option {
+    display: flex;
+    align-items: center;
+    gap: var(--client-spacing-small);
+    padding: var(--client-spacing-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: var(--client-button-radius);
+}
+
+.grade-option:hover {
+    background: var(--background-color);
+}
+
+.grade-checkbox {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.star-icon {
+    font-size: 1.2em;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+}
+
+.grade-text {
+    font-family: var(--client-font-body);
+    font-size: var(--client-font-size-body);
+    color: var(--text-color);
+}
+
+.grade-checkbox:checked + .star-icon {
+    color: var(--primary-color);
+    content: "★";
+}
+
+.grade-option:hover .star-icon {
+    color: var(--primary-color);
 } 
