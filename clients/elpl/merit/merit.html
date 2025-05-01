@@ -38,7 +38,7 @@
             --header-height: 52px;
             --footer-height: 50px;
             --sidebar-width: 200px;
-            --layout-gap: clamp(8px, 2vw, 20px);
+            --layout-gap: 24px;
             --border-radius: 12px;
             --background-color: #E6F6FA;
             --client-bg: #ffffff;
@@ -75,6 +75,8 @@
             height: 100%;
             padding: var(--layout-gap);
             box-sizing: border-box;
+            max-width: 1440px;
+            margin: 0 auto;
         }
 
         /* Sidebar */
@@ -82,13 +84,16 @@
             grid-column: 1;
             grid-row: 1 / span 3;
             background: white;
-            border-bottom-right-radius: 10px;
+            border-radius: var(--border-radius);
             padding: 24px 0;
             box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             min-height: calc(100vh - 2 * var(--layout-gap));
             display: flex;
             flex-direction: column;
+            position: sticky;
+            top: var(--layout-gap);
+            height: calc(100vh - 2 * var(--layout-gap));
         }
 
         .client-sidebar__header {
@@ -149,11 +154,11 @@
             height: var(--header-height);
             min-height: 52px;
             max-height: 52px;
-            background: #E6F6FA;
+            background: transparent;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0;
             width: 100%;
             box-sizing: border-box;
         }
@@ -256,17 +261,17 @@
         }
 
         /* Main Content */
-        .client-main {
+        .rl-main {
             grid-column: 2;
             grid-row: 2;
             background: white;
-            border-radius: 10px;
-            padding: clamp(12px, 2vw, 20px);
-            overflow-y: auto;
-            margin-top: 0;
-            height: auto;
-            min-height: calc(100vh - var(--header-height) - var(--footer-height) - 2 * var(--layout-gap));
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: var(--border-radius);
+            padding: var(--layout-gap);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: var(--layout-gap);
         }
 
         /* Section Styles */
@@ -367,17 +372,14 @@
 
         /* Footer */
         .rl-footer {
-            grid-column: 1 / span 2;
+            grid-column: 2;
             grid-row: 3;
             height: var(--footer-height);
-            background: #E6F6FA;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
-            font-family: var(--client-font-body, sans-serif);
-            font-size: 14px;
-            color: var(--text-color, #2b2b2b);
+            justify-content: space-between;
+            padding: 0;
+            background: transparent;
         }
 
         .rl-footer__left,
@@ -446,7 +448,7 @@
                 grid-row: 1;
             }
 
-            .client-main {
+            .rl-main {
                 grid-column: 1;
                 grid-row: 3;
                 height: auto;
@@ -747,7 +749,7 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="client-main">
+        <main class="rl-main">
             <!-- Welcome Section -->
             <section id="welcome-section" class="section" data-section="welcome">
                 <div class="welcome-section">
