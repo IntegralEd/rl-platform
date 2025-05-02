@@ -1289,5 +1289,17 @@
             updateLaunchButton();
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var nextButton = document.querySelector('.client-welcome__next-button');
+            if (nextButton) {
+                nextButton.addEventListener('click', function() {
+                    document.getElementById('welcome-section').classList.remove('active');
+                    document.getElementById('chat-section').classList.add('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html> 

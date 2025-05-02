@@ -651,4 +651,11 @@
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
 } 
