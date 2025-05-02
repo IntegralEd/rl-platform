@@ -957,9 +957,10 @@ button.client-welcome__next-button,
 .welcome-flex-row {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 40px;
-  margin-top: 40px;
+  margin-top: 0;
+  margin-left: 0;
 }
 
 .client-welcome__grade-options-card {
@@ -975,15 +976,20 @@ button.client-welcome__next-button,
   align-items: stretch;
 }
 
-.client-welcome__next-button {
+.client-welcome__next-button,
+button.client-welcome__next-button,
+.client-welcome__next-button:active,
+.client-welcome__next-button:focus,
+.client-welcome__next-button:hover,
+.client-welcome__next-button:disabled {
+  color: #fff !important;
+  background: var(--elpl-primary) !important;
   align-self: flex-start;
   margin-top: 32px;
   min-width: 220px;
   height: 56px;
   font-size: 18px;
   font-weight: 600;
-  color: #fff !important;
-  background: var(--elpl-primary) !important;
   border-radius: 8px;
   border: none;
   display: flex;
@@ -992,10 +998,16 @@ button.client-welcome__next-button,
   justify-content: center;
 }
 
+.grade-selection-subtitle {
+  font-size: 1.1rem;
+  color: #222;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 900px) {
   .welcome-flex-row {
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 24px;
   }
   .client-welcome__next-button {
@@ -1007,4 +1019,15 @@ button.client-welcome__next-button,
     width: 100%;
     max-width: 100%;
   }
+}
+
+.client-content, main, .welcome-section, .rl-main {
+  background: #e6f4fa !important;
+  box-shadow: none !important;
+}
+
+.welcome-header {
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 } 

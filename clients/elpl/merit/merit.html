@@ -698,107 +698,49 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="rl-main">
-            <!-- Welcome Section -->
-            <section id="welcome-section" class="section active" data-section="welcome">
-                <div class="welcome-section">
-                    <div class="welcome-header" style="text-align: left; margin-bottom: 8px; background: none !important; box-shadow: none !important; align-items: flex-start; justify-content: flex-start;">
-                        <h1 class="welcome-title" style="margin-bottom: 0;">Merit</h1>
-                        <p class="welcome-subtitle" style="margin-top: 0;">CURRICULUM SUPPORT ASSISTANT</p>
-                    </div>
-                    <div class="welcome-flex-row" style="display: flex; align-items: flex-start; justify-content: center; gap: 40px; margin-top: 40px;">
-                        <div class="client-welcome__grade-options-card">
-                            <div class="client-welcome__grade-options" id="gradeSelect">
-                                <div class="grade-option" data-grade="K" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Kindergarten</span>
-                                </div>
-                                <div class="grade-option" data-grade="1" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Grade 1</span>
-                                </div>
-                                <div class="grade-option" data-grade="2" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Grade 2</span>
-                                </div>
-                                <div class="grade-option" data-grade="3" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Grade 3</span>
-                                </div>
-                                <div class="grade-option" data-grade="4" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Grade 4</span>
-                                </div>
-                                <div class="grade-option" data-grade="5" tabindex="0">
-                                    <span class="star-icon">☆</span>
-                                    <span class="grade-text">Grade 5</span>
-                                </div>
-                            </div>
+        <main class="client-content" style="background: #e6f4fa; min-height: 100vh; padding: 40px 0 0 60px; display: flex; align-items: flex-start;">
+            <div class="welcome-header" style="text-align: left; margin-bottom: 8px; background: none !important; box-shadow: none !important; align-items: flex-start; justify-content: flex-start;">
+                <h1 class="welcome-title" style="margin-bottom: 0;">Merit</h1>
+                <p class="welcome-subtitle" style="margin-top: 0;">CURRICULUM SUPPORT ASSISTANT</p>
+            </div>
+            <div class="welcome-flex-row" style="display: flex; align-items: flex-start; gap: 40px; margin-top: 0;">
+                <div class="client-welcome__grade-options-card" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(44,62,80,0.08); padding: 32px 32px 24px 32px; min-width: 260px; max-width: 340px; width: 100%; display: flex; flex-direction: column; align-items: stretch;">
+                    <h2 style="margin-top: 0; margin-bottom: 12px; color: var(--elpl-primary); font-size: 1.3rem;">Customize your assistant:</h2>
+                    <h3 class="grade-selection-subtitle" style="margin-top: 0; margin-bottom: 16px; font-size: 1.1rem; color: #222;">Grade Level(s)</h3>
+                    <div class="client-welcome__grade-options" id="gradeSelect">
+                        <div class="grade-option" data-grade="K" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Kindergarten</span>
                         </div>
-                        <button class="client-welcome__next-button" id="nextButton">
-                            CREATE ASSISTANT
-                            <svg class="button-arrow" width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Chat Section -->
-            <section id="chat-section" class="section" data-section="chat">
-                <div class="chat-section">
-                    <div id="chat-window" 
-                         class="chat-messages" 
-                         role="log" 
-                         aria-live="polite"
-                         aria-label="Chat conversation"
-                         data-test-id="chat-window">
-                        <!-- Chat messages here -->
-                    </div>
-                    <div class="client-chat__input-container">
-                        <textarea id="chat-input"
-                            class="client-chat__input"
-                            aria-label="Type your message"
-                            placeholder="Type your message..." 
-                            rows="1"
-                            maxlength="1000"
-                            data-test-id="chat-input"></textarea>
-                        <div class="client-chat__actions">
-                            <button class="client-chat__action" title="Attach">
-                                <span class="icon icon--action">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                            </button>
-                            <button class="client-chat__action" title="Emoji">
-                                <span class="icon icon--action">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                        <circle cx="9" cy="9" r="1.5" fill="currentColor"/>
-                                        <circle cx="15" cy="9" r="1.5" fill="currentColor"/>
-                                    </svg>
-                                </span>
-                            </button>
-                            <button id="send-button" 
-                                    class="client-chat__action client-chat__action--send"
-                                    aria-label="Send message"
-                                    data-test-id="send-button"
-                                    title="Send">
-                                <svg width="22" height="22" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="m1200 600c0 214.36-114.36 412.44-300 519.62-185.64 107.18-414.36 107.18-600 0-185.64-107.18-300-305.26-300-519.62s114.36-412.44 300-519.62c185.64-107.18 414.36-107.18 600 0 185.64 107.18 300 305.26 300 519.62" fill="#c6123e"/>
-                                    <path d="m919.91 280.09c-10.332-10.332-25.832-13.551-39.469-8.1172l-554.66 198.11c-30.789 11.809-29.902 57.859 1.3281 68.574l227.24 82.359c7.4375-7.4102 210.86-210.89 225.92-225.92 6.8203-6.8203 17.801-6.8203 24.621 0 6.8203 6.8203 6.8203 17.801 0 24.621l-225.92 225.92 82.449 227.3c10.273 31.027 57.445 32.176 68.84 0.5625l197.66-553.53c5.4922-13.699 2.3906-29.285-8.0312-39.883z" fill="#fff"/>
-                                    <path d="m527.76 672.26c-6.7891-6.7891-17.801-6.7891-24.621 0l-91.305 91.305c-6.7891 6.7891-6.7891 17.801 0 24.621 6.7891 6.7891 17.801 6.7891 24.621 0l91.305-91.305c6.7891-6.7891 6.7891-17.801 0-24.621z" fill="#fff"/>
-                                    <path d="m375.62 617.71-101.14 101.14c-6.7891 6.7891-6.7891 17.801 0 24.621 6.7891 6.7891 17.801 6.7891 24.621 0l101.14-101.14c6.7891-6.7891 6.7891-17.801 0-24.621-6.7891-6.7891-17.801-6.7891-24.621 0z" fill="#fff"/>
-                                    <path d="m557.7 799.8-101.14 101.14c-6.7891 6.7891-6.7891 17.801 0 24.621 6.7891 6.7891 17.801 6.7891 24.621 0l101.14-101.14c6.7891-6.7891 6.7891-17.801 0-24.621-6.7891-6.7891-17.801-6.7891-24.621 0z" fill="#fff"/>
-                                </svg>
-                            </button>
+                        <div class="grade-option" data-grade="1" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 1</span>
+                        </div>
+                        <div class="grade-option" data-grade="2" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 2</span>
+                        </div>
+                        <div class="grade-option" data-grade="3" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 3</span>
+                        </div>
+                        <div class="grade-option" data-grade="4" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 4</span>
+                        </div>
+                        <div class="grade-option" data-grade="5" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 5</span>
                         </div>
                     </div>
                 </div>
-            </section>
+                <button class="client-welcome__next-button" id="nextButton">
+                    CREATE ASSISTANT
+                    <svg class="button-arrow" width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
         </main>
 
         <!-- Footer -->
@@ -1043,7 +985,7 @@
             // Grade selection functionality
             const gradeOptions = document.querySelectorAll('.grade-option');
             const nextButton = document.querySelector('.client-welcome__next-button');
-            let selectedGrade = null;
+            let selectedGrades = [];
 
             function checkSelections() {
                 const hasGrade = localStorage.getItem('merit_grade_level');
@@ -1058,11 +1000,19 @@
 
             gradeOptions.forEach(option => {
                 option.addEventListener('click', function() {
-                    gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    selectedGrade = option.getAttribute('data-grade');
-                    nextButton.disabled = false;
-                    nextButton.classList.add('enabled');
+                    option.classList.toggle('selected');
+                    const grade = option.getAttribute('data-grade');
+                    if (option.classList.contains('selected')) {
+                        if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
+                    } else {
+                        selectedGrades = selectedGrades.filter(g => g !== grade);
+                    }
+                    nextButton.disabled = selectedGrades.length === 0;
+                    if (selectedGrades.length > 0) {
+                        nextButton.classList.add('enabled');
+                    } else {
+                        nextButton.classList.remove('enabled');
+                    }
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -1072,11 +1022,9 @@
             });
 
             nextButton.addEventListener('click', function() {
-                if (!selectedGrade) return;
+                if (selectedGrades.length === 0) return;
+                localStorage.setItem('merit_grade_level', JSON.stringify(selectedGrades));
                 // Proceed to chat or next step
-                localStorage.setItem('merit_grade_level', selectedGrade);
-                // Example: document.getElementById('welcome-section').classList.remove('active');
-                // Example: document.getElementById('chat-section').classList.add('active');
             });
 
             // Initial check
