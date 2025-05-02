@@ -719,7 +719,9 @@
     display: none;
 }
 .section.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .chat-section {
