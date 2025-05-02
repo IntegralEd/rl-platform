@@ -942,4 +942,69 @@
 }
 .grade-text, .client-welcome__grade-selection, .client-welcome__grade-options, .client-welcome__actions, .client-welcome__next-button {
     color: var(--client-text) !important;
+}
+
+button.client-welcome__next-button,
+.client-welcome__next-button,
+.client-welcome__next-button:active,
+.client-welcome__next-button:focus,
+.client-welcome__next-button:hover,
+.client-welcome__next-button:disabled {
+  color: #fff !important;
+  background: var(--elpl-primary) !important;
+}
+
+.welcome-flex-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.client-welcome__grade-options-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+  padding: 32px 32px 24px 32px;
+  min-width: 260px;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.client-welcome__next-button {
+  align-self: flex-start;
+  margin-top: 32px;
+  min-width: 220px;
+  height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff !important;
+  background: var(--elpl-primary) !important;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .welcome-flex-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .client-welcome__next-button {
+    margin-top: 0;
+    min-width: 180px;
+    width: 100%;
+  }
+  .client-welcome__grade-options-card {
+    width: 100%;
+    max-width: 100%;
+  }
 } 
