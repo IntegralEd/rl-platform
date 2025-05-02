@@ -478,8 +478,12 @@
         }
 
         .welcome-header {
-            text-align: center;
-            margin-bottom: 40px;
+            text-align: left;
+            margin-bottom: 8px;
+            background: none !important;
+            box-shadow: none !important;
+            align-items: flex-start;
+            justify-content: flex-start;
         }
 
         .welcome-title {
@@ -487,7 +491,7 @@
             font-size: 48px;
             font-weight: 700;
             color: var(--elpl-primary);
-            margin-bottom: 8px;
+            margin-bottom: 0;
             line-height: 1.1;
         }
 
@@ -498,6 +502,7 @@
             letter-spacing: 0.05em;
             color: var(--elpl-primary);
             text-transform: uppercase;
+            margin-top: 0;
         }
 
         .client-welcome__grade-selection h2 {
@@ -697,50 +702,44 @@
             <!-- Welcome Section -->
             <section id="welcome-section" class="section active" data-section="welcome">
                 <div class="welcome-section">
-                    <div class="welcome-header">
-                        <h1 class="welcome-title">Merit</h1>
-                        <p class="welcome-subtitle">CURRICULUM SUPPORT ASSISTANT</p>
-                </div>
+                    <div class="welcome-header" style="text-align: left; margin-bottom: 8px; background: none !important; box-shadow: none !important; align-items: flex-start; justify-content: flex-start;">
+                        <h1 class="welcome-title" style="margin-bottom: 0;">Merit</h1>
+                        <p class="welcome-subtitle" style="margin-top: 0;">CURRICULUM SUPPORT ASSISTANT</p>
+                    </div>
                     <div class="client-welcome__grade-selection">
                         <h2>Customize your assistant:</h2>
                         <h3 class="grade-selection-subtitle">Grade Level(s)</h3>
-                        <div class="client-welcome__grade-options">
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="K" class="grade-checkbox">
+                        <div class="client-welcome__grade-options" id="gradeSelect">
+                            <div class="grade-option" data-grade="K" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Kindergarten</span>
-                            </label>
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="1" class="grade-checkbox">
+                            </div>
+                            <div class="grade-option" data-grade="1" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Grade 1</span>
-                            </label>
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="2" class="grade-checkbox">
+                            </div>
+                            <div class="grade-option" data-grade="2" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Grade 2</span>
-                            </label>
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="3" class="grade-checkbox">
+                            </div>
+                            <div class="grade-option" data-grade="3" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Grade 3</span>
-                            </label>
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="4" class="grade-checkbox">
+                            </div>
+                            <div class="grade-option" data-grade="4" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Grade 4</span>
-                            </label>
-                            <label class="grade-option">
-                                <input type="checkbox" name="grade" value="5" class="grade-checkbox">
+                            </div>
+                            <div class="grade-option" data-grade="5" tabindex="0">
                                 <span class="star-icon">☆</span>
                                 <span class="grade-text">Grade 5</span>
-                            </label>
+                            </div>
                         </div>
                     </div>
                     <div class="client-welcome__actions">
-                        <button class="client-welcome__next-button" disabled>
+                        <button class="client-welcome__next-button" id="nextButton">
                             CREATE ASSISTANT
-                            <svg class="button-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="button-arrow" width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </button>
