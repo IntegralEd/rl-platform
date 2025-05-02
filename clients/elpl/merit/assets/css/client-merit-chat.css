@@ -394,7 +394,7 @@
     font-family: var(--client-font-h1, 'Lora');
     font-size: 48px;
     font-weight: 700;
-    color: #C6123F;  /* EL Education red */
+    color: var(--primary-color); /* EL Education red */
     margin-bottom: 8px;
     line-height: 1.1;
 }
@@ -404,7 +404,7 @@
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: #c81f40;
+    color: var(--primary-color);
     text-transform: uppercase;
 }
 
@@ -418,7 +418,7 @@
 .client-welcome__grade-selection h2 {
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 24px;
-    color: #c81f40;
+    color: var(--primary-color);
     margin-bottom: 24px;
 }
 
@@ -451,7 +451,7 @@
     align-items: center;
     gap: 12px;
     padding: 14px 28px;
-    background: #C6123F;  /* EL Education red */
+    background: var(--primary-color); /* EL Education red */
     color: white;
     border: none;
     border-radius: 8px;
@@ -489,7 +489,7 @@
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 12px;
     font-weight: 600;
-    color: #c81f40;
+    color: var(--primary-color);
     margin-top: 4px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -658,4 +658,85 @@
 }
 .section.active {
     display: block;
+}
+
+.client-chat__input-container {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
+
+.client-chat__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border-radius: 20px;
+    background: #f5f6fa;
+    resize: none;
+    margin-right: 8px;
+    min-height: 40px;
+    max-height: 80px;
+    color: #222;
+}
+
+.client-chat__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.client-chat__action {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    transition: background 0.2s, color 0.2s;
+    font-size: 1.2rem;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.client-chat__action:hover,
+.client-chat__action:focus {
+    background: #f0f0f0;
+    color: var(--primary-color, #C6123F);
+}
+
+.client-chat__action--send {
+    background: var(--primary-color, #C6123F);
+    color: #fff;
+    transition: background 0.2s, color 0.2s;
+}
+
+.client-chat__action--send:hover,
+.client-chat__action--send:focus {
+    background: #a50e2c;
+    color: #fff;
+}
+
+@media (max-width: 600px) {
+    .client-chat__input-container {
+        padding: 8px 8px;
+    }
+    .client-chat__input {
+        font-size: 0.95rem;
+        padding: 8px 10px;
+    }
+    .client-chat__action {
+        min-width: 28px;
+        min-height: 28px;
+        font-size: 1rem;
+    }
 } 
