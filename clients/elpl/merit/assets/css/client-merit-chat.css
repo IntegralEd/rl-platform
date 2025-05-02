@@ -404,7 +404,7 @@
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: #C6123F;  /* EL Education red */
+    color: #c81f40;
     text-transform: uppercase;
 }
 
@@ -418,7 +418,7 @@
 .client-welcome__grade-selection h2 {
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 24px;
-    color: #C6123F;  /* EL Education red */
+    color: #c81f40;
     margin-bottom: 24px;
 }
 
@@ -489,7 +489,7 @@
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 12px;
     font-weight: 600;
-    color: #C6123F;  /* EL Education red */
+    color: #c81f40;
     margin-top: 4px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -616,4 +616,39 @@
     border-top: 1px solid #eee;
     text-align: center;
     margin-top: auto;
+}
+
+.rl-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-height);
+    min-height: 52px;
+    max-height: 52px;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: var(--layout-gap);
+}
+
+.rl-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+}
+
+.rl-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--layout-gap);
+}
+
+.rl-footer__right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 } 
