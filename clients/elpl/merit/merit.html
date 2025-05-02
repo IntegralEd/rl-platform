@@ -1063,7 +1063,8 @@
                     gradeOptions.forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
                     selectedGrade = option.getAttribute('data-grade');
-                    checkSelections();
+                    nextButton.disabled = false;
+                    nextButton.classList.add('enabled');
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {

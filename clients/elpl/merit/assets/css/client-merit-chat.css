@@ -440,6 +440,16 @@
     transition: all 0.2s ease;
 }
 
+.grade-option.selected .star-icon {
+    color: var(--elpl-primary) !important;
+    font-weight: bold;
+}
+
+.grade-option.selected .grade-text {
+    font-weight: bold;
+    color: var(--elpl-primary) !important;
+}
+
 .client-welcome__actions {
     display: flex;
     align-items: center;
@@ -456,7 +466,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     border-radius: 8px;
-    background: var(--elpl-primary);
+    background: var(--elpl-primary) !important;
     color: #fff !important;
     box-shadow: 0 2px 8px rgba(198,18,63,0.08);
 }
