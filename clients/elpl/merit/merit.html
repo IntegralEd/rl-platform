@@ -1043,32 +1043,41 @@
             }
 
             // Grade selection functionality
-            const gradeOptions = document.querySelectorAll('.client-grade__option');
+            const gradeOptions = document.querySelectorAll('.grade-option');
             const nextButton = document.querySelector('.client-welcome__next-button');
-            const chatNav = document.querySelector('[data-section="chat"]');
+            let selectedGrade = null;
 
             function checkSelections() {
                 const hasGrade = localStorage.getItem('merit_grade_level');
                 nextButton.disabled = !hasGrade;
                 
                 if (hasGrade) {
-                    chatNav?.classList.remove('disabled');
+                    nextButton.classList.add('enabled');
                 } else {
-                    chatNav?.classList.add('disabled');
+                    nextButton.classList.remove('enabled');
                 }
             }
 
             gradeOptions.forEach(option => {
-                option.addEventListener('click', () => {
+                option.addEventListener('click', function() {
                     gradeOptions.forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
-                    localStorage.setItem('merit_grade_level', option.getAttribute('data-grade'));
+                    selectedGrade = option.getAttribute('data-grade');
                     checkSelections();
+                });
+                option.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        option.click();
+                    }
                 });
             });
 
-            nextButton.addEventListener('click', () => {
-                window.location.hash = 'chat';
+            nextButton.addEventListener('click', function() {
+                if (!selectedGrade) return;
+                // Proceed to chat or next step
+                localStorage.setItem('merit_grade_level', selectedGrade);
+                // Example: document.getElementById('welcome-section').classList.remove('active');
+                // Example: document.getElementById('chat-section').classList.add('active');
             });
 
             // Initial check
