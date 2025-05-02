@@ -489,7 +489,7 @@
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 12px;
     font-weight: 600;
-    color: var(--primary-color);
+    color: #C6123F !important;
     margin-top: 4px;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -635,8 +635,56 @@
 .rl-header__nav {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
     height: 100%;
+}
+
+.rl-nav__profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 48px;
+    padding: 0 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.rl-nav__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.rl-nav__username {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--client-text);
+}
+
+.rl-nav__settings {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--client-text);
+    transition: background-color 0.2s;
+}
+
+.rl-nav__settings svg {
+    width: 28px;
+    height: 28px;
+}
+
+.welcome-subtitle {
+    color: #C6123F !important;
 }
 
 .rl-footer {
@@ -679,7 +727,7 @@
 
 .client-chat__message {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 12px;
     margin-bottom: 0;
 }
@@ -721,6 +769,9 @@
     border-bottom-left-radius: 16px;
     border-top-right-radius: 16px;
     border-top-left-radius: 16px;
+    align-self: flex-end;
+    margin-right: 0;
+    max-width: 90%;
 }
 
 .client-chat__bubble.assistant {
@@ -799,7 +850,25 @@
 .client-chat__action--send {
     background: var(--primary-color, #C6123F);
     color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    font-size: 1.2rem;
+    border: none;
+    padding: 0;
     transition: background 0.2s, color 0.2s;
+}
+
+.client-chat__action--send svg {
+    width: 20px;
+    height: 20px;
+    display: block;
 }
 
 .client-chat__action--send:hover,
