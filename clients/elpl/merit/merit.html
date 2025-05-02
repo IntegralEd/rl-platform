@@ -674,16 +674,16 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="client-content" style="background: transparent; min-height: 100vh; padding: 10px 0 0 40px; display: flex; align-items: flex-start;">
-            <div class="welcome-header" style="text-align: left; margin-bottom: 8px; background: none !important; box-shadow: none !important; align-items: flex-start; justify-content: flex-start;">
-                <h1 class="welcome-title" style="margin-bottom: 0;">Merit</h1>
-                <p class="welcome-subtitle" style="margin-top: 0;">CURRICULUM SUPPORT ASSISTANT</p>
+        <main class="client-content" style="background: transparent; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0;">
+            <div class="welcome-header" style="text-align: center; margin-bottom: 0; background: none !important; box-shadow: none !important; align-items: center; justify-content: center; width: 100%;">
+                <h1 class="welcome-title" style="margin-bottom: 0; font-size: 72px; font-weight: 800; color: var(--elpl-primary);">Merit</h1>
+                <p class="welcome-subtitle" style="margin-top: 0; font-size: 28px; color: var(--elpl-primary); font-weight: 600; letter-spacing: 0.04em;">CURRICULUM SUPPORT ASSISTANT</p>
             </div>
-            <div class="welcome-flex-row" style="display: flex; align-items: flex-start; gap: 40px; margin-top: 0;">
-                <div class="client-welcome__grade-options-card" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(44,62,80,0.08); padding: 32px 32px 24px 32px; min-width: 260px; max-width: 340px; width: 100%; display: flex; flex-direction: column; align-items: stretch;">
-                    <h2 style="margin-top: 0; margin-bottom: 12px; color: var(--elpl-primary); font-size: 1.3rem;">Customize your assistant:</h2>
-                    <h3 class="grade-selection-subtitle" style="margin-top: 0; margin-bottom: 16px; font-size: 1.1rem; color: #222;">Grade Level(s)</h3>
-                    <div class="client-welcome__grade-options" id="gradeSelect" style="max-height: 350px; overflow-y: auto;">
+            <div class="welcome-flex-row" style="display: flex; align-items: flex-start; justify-content: center; gap: 64px; margin-top: 0; background: none; box-shadow: none; width: 100%; max-width: 1100px;">
+                <div class="client-welcome__grade-options-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(44,62,80,0.10); padding: 40px 40px 32px 40px; min-width: 340px; max-width: 420px; width: 100%; display: flex; flex-direction: column; align-items: stretch;">
+                    <h2 style="margin-top: 0; margin-bottom: 18px; color: var(--elpl-primary); font-size: 2rem; font-weight: 700; text-align: left;">Customize your assistant:</h2>
+                    <h3 class="grade-selection-subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; color: #222; font-weight: 500; text-align: left;">Select all that apply<br>Grade Level(s)</h3>
+                    <div class="client-welcome__grade-options" id="gradeSelect" style="max-height: 400px; overflow-y: auto;">
                         <div class="grade-option" data-grade="K" tabindex="0">
                             <span class="star-icon">☆</span>
                             <span class="grade-text">Kindergarten</span>
@@ -710,9 +710,9 @@
                         </div>
                     </div>
                 </div>
-                <button class="client-welcome__next-button" id="nextButton">
+                <button class="client-welcome__next-button" id="nextButton" style="height: 64px; font-size: 1.3rem; padding: 0 40px; border-radius: 12px; margin-top: 60px; align-self: flex-start;">
                     CREATE ASSISTANT
-                    <svg class="button-arrow" width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="button-arrow" width="32" height="32" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
