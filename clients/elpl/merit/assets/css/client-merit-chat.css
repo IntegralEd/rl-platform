@@ -375,9 +375,9 @@
 /* Welcome Section Styles */
 .welcome-section {
     padding: var(--layout-gap);
-    background: white;
+    background: transparent !important;
     border-radius: var(--border-radius);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: none !important;
     max-width: 800px;
     margin: 0 auto;
     height: 100%;
@@ -394,7 +394,7 @@
     font-family: var(--client-font-h1, 'Lora');
     font-size: 48px;
     font-weight: 700;
-    color: var(--primary-color); /* EL Education red */
+    color: var(--elpl-primary) !important;
     margin-bottom: 8px;
     line-height: 1.1;
 }
@@ -404,7 +404,7 @@
     font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: var(--primary-color);
+    color: var(--elpl-primary) !important;
     text-transform: uppercase;
 }
 
@@ -418,7 +418,7 @@
 .client-welcome__grade-selection h2 {
     font-family: var(--client-font-h2, 'Montserrat');
     font-size: 24px;
-    color: var(--primary-color);
+    color: var(--elpl-primary) !important;
     margin-bottom: 24px;
 }
 
@@ -442,26 +442,23 @@
 
 .client-welcome__actions {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    padding: 24px 0;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    min-height: 56px;
 }
 
 .client-welcome__next-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 28px;
-    background: var(--primary-color); /* EL Education red */
-    color: white;
-    border: none;
+    margin-left: 2rem;
+    padding: 18px 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
     border-radius: 8px;
-    font-family: var(--client-font-h2, 'Montserrat');
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    background: var(--elpl-primary);
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(198,18,63,0.08);
 }
 
 .client-welcome__next-button:hover {
@@ -624,9 +621,9 @@
     justify-content: space-between;
     padding: 0 2.5rem;
     height: 80px;
-    background: #fff;
+    background: transparent;
     box-shadow: none;
-    border-bottom: 1px solid #F2F2F2;
+    border-bottom: none;
 }
 
 .rl-header__nav {
@@ -658,38 +655,29 @@
 }
 
 .rl-nav__avatar {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #F2F2F2;
 }
 
 .rl-nav__username {
-    font-family: var(--font-heading, 'Montserrat', sans-serif);
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 700;
-    color: #222;
-    letter-spacing: 0.01em;
-}
-
-.rl-header__left {
-    flex: 1;
+    color: var(--client-text);
 }
 
 .rl-nav__settings {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    margin-left: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: none;
+    border: none;
     color: var(--client-text);
-    transition: background-color 0.2s;
 }
 
 .rl-nav__settings svg {
@@ -924,7 +912,7 @@
 .welcome-subtitle,
 .client-welcome__grade-selection h2,
 .client-sidebar__subtitle {
-    color: var(--primary-color);
+    color: var(--elpl-primary);
 }
 
 /* 2. Sidebar Chat icon and text bold/red when selected */
@@ -936,4 +924,12 @@
 .client-nav__item.active[data-section="chat"] svg {
     color: #C6123F !important;
     stroke: #C6123F !important;
+}
+
+/* 3. Font colors from variables */
+.welcome-title, .welcome-subtitle, .client-welcome__grade-selection h2, .client-welcome__next-button {
+    color: var(--elpl-primary) !important;
+}
+.grade-text, .client-welcome__grade-selection, .client-welcome__grade-options, .client-welcome__actions, .client-welcome__next-button {
+    color: var(--client-text) !important;
 } 
