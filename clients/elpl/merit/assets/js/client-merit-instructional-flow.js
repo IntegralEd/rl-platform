@@ -211,16 +211,16 @@ export class MeritInstructionalFlow {
             gradeSelect: document.getElementById('gradeSelect')
         };
 
-        // Only require elements that are present in the new HTML
-        const required = ['sections', 'navLinks', 'footer', 'nextButton', 'sendButton', 'chatInput', 'chatWindow', 'gradeSelect'];
-        const missing = required.filter(key => !elements[key]);
-        if (missing.length > 0) {
-            console.error('[Merit Flow] Missing elements:', missing.join(', '));
-            return false;
-        }
+        // Null checks for all required elements
+        let allGood = true;
+        Object.entries(elements).forEach(([key, el]) => {
+            if (el === null && ['playbar','chatbar','form','adminControls'].indexOf(key) === -1) {
+                console.warn(`[Merit Flow] (Dev Mode) Missing element: ${key}`);
+                allGood = false;
+            }
+        });
         this.#elements = elements;
-        console.log('[Merit Flow] Elements initialized:', Object.keys(elements));
-        return true;
+        return allGood;
     }
 
     #setupEventListeners() {
@@ -498,6 +498,12 @@ export class MeritInstructionalFlow {
     }
 
     #handleError(error) {
+        // Suppress error notification in mock/developer mode
+        if (this.#config.mockMode) {
+            console.warn('[Merit Flow] (Mock Mode) Error suppressed:', error);
+            // Optionally, you could display a subtle dev-only banner or nothing at all
+            return;
+        }
         this.#state.hasError = true;
         this.#state.errorMessage = error.message;
         console.error('[Merit Flow] Error:', error);
