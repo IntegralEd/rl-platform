@@ -67,7 +67,7 @@ function logoutUser() {
     currentUserToken = null;
     currentUserData = null;
     localStorage.removeItem(AUTH_CONFIG.tokenStorageKey);
-    window.location.href = '/login.html';
+    // window.location.href = '/login.html'; // Bypassed for development
 }
 
 // Get current user data
