@@ -651,11 +651,17 @@
         </aside>
 
         <!-- Header -->
-        <header class="rl-header">
+        <header class="rl-header" style="background: #E6F6FA;">
             <div class="rl-header__left"></div>
             <nav class="rl-header__nav">
                 <button class="rl-nav__notification" aria-label="Notifications">
                     <!-- Notification bell SVG here -->
+                </button>
+                <button class="rl-nav__settings" aria-label="Settings">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 13.3333C11.841 13.3333 13.3333 11.841 13.3333 10C13.3333 8.15905 11.841 6.66667 10 6.66667C8.15905 6.66667 6.66667 8.15905 6.66667 10C6.66667 11.841 8.15905 13.3333 10 13.3333Z" stroke="#2c3e50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17.5 10C17.5 10.6167 17.4417 11.225 17.325 11.8167C17.2417 12.2417 17.3167 12.6917 17.5333 13.0667C17.75 13.4417 18.0917 13.7167 18.5 13.8333C18.9083 13.95 19.3583 13.8833 19.7333 13.6667C20.1083 13.45 20.3833 13.1083 20.5 12.7C20.6167 12.2917 20.55 11.8417 20.3333 11.4667C20.1167 11.0917 19.775 10.8167 19.3667 10.7C18.9583 10.5833 18.5083 10.65 18.1333 10.8667C17.7583 11.0833 17.4833 11.425 17.3667 11.8333C17.25 12.2417 17.3167 12.6917 17.5333 13.0667" stroke="#2c3e50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </button>
                 <div class="rl-nav__profile">
                     <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
@@ -690,6 +696,14 @@
                         <div class="grade-option" data-grade="3" tabindex="0">
                             <span class="star-icon">☆</span>
                             <span class="grade-text">Grade 3</span>
+                        </div>
+                        <div class="grade-option" data-grade="4" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 4</span>
+                        </div>
+                        <div class="grade-option" data-grade="5" tabindex="0">
+                            <span class="star-icon">☆</span>
+                            <span class="grade-text">Grade 5</span>
                         </div>
                     </div>
                 </div>
@@ -924,43 +938,18 @@
     <!-- <iframe id="qipu-comment-bar" src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; display: none;"></iframe> -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Version switching system
-            const currentVersion = localStorage.getItem('merit_system_status') || 'dev';
-            if (currentVersion === 'prod' && window.location.pathname.includes('merit_temp.html')) {
-                window.location.href = 'merit.html';
-            }
-
-            // Menu dropdown functionality
-            const menuTrigger = document.querySelector('.menu-trigger');
-            const menuContent = document.querySelector('.menu-content');
-            
-            if (menuTrigger && menuContent) {
-                menuTrigger.addEventListener('click', (e) => {
-                    const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
-                    menuTrigger.setAttribute('aria-expanded', !isExpanded);
-                    menuContent.classList.toggle('show');
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!menuTrigger.contains(e.target)) {
-                        menuTrigger.setAttribute('aria-expanded', 'false');
-                        menuContent.classList.remove('show');
-                    }
-                });
-            }
-
-            // Grade selection functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Grade selection logic
             const gradeOptions = document.querySelectorAll('.grade-option');
-            const nextButton = document.querySelector('.client-welcome__next-button');
+            const nextButton = document.getElementById('nextButton');
+            const chatSection = document.getElementById('chat-section');
+            const welcomeHeader = document.querySelector('.welcome-header');
+            const welcomeFlexRow = document.querySelector('.welcome-flex-row');
             let selectedGrades = [];
 
-            function checkSelections() {
-                const hasGrade = localStorage.getItem('merit_grade_level');
-                nextButton.disabled = !hasGrade;
-                
-                if (hasGrade) {
+            function updateButtonState() {
+                nextButton.disabled = selectedGrades.length === 0;
+                if (selectedGrades.length > 0) {
                     nextButton.classList.add('enabled');
                 } else {
                     nextButton.classList.remove('enabled');
@@ -970,18 +959,18 @@
             gradeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     option.classList.toggle('selected');
+                    const star = option.querySelector('.star-icon');
                     const grade = option.getAttribute('data-grade');
                     if (option.classList.contains('selected')) {
+                        star.textContent = '★';
+                        star.style.color = '#C6123F';
                         if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
                     } else {
+                        star.textContent = '☆';
+                        star.style.color = '';
                         selectedGrades = selectedGrades.filter(g => g !== grade);
                     }
-                    nextButton.disabled = selectedGrades.length === 0;
-                    if (selectedGrades.length > 0) {
-                        nextButton.classList.add('enabled');
-                    } else {
-                        nextButton.classList.remove('enabled');
-                    }
+                    updateButtonState();
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -992,12 +981,18 @@
 
             nextButton.addEventListener('click', function() {
                 if (selectedGrades.length === 0) return;
-                localStorage.setItem('merit_grade_level', JSON.stringify(selectedGrades));
-                // Proceed to chat or next step
+                // Hide welcome, show chat
+                if (welcomeHeader) welcomeHeader.style.display = 'none';
+                if (welcomeFlexRow) welcomeFlexRow.style.display = 'none';
+                if (chatSection) chatSection.style.display = 'block';
+                // Optionally, set focus to chat input
+                const chatInput = document.getElementById('chat-input');
+                if (chatInput) chatInput.focus();
             });
 
-            // Initial check
-            checkSelections();
+            // On load, ensure chat section is hidden
+            if (chatSection) chatSection.style.display = 'none';
+            updateButtonState();
         });
     </script>
 
