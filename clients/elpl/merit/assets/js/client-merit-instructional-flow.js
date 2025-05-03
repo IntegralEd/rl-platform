@@ -197,60 +197,69 @@ export class MeritInstructionalFlow {
 
     #initializeElements() {
         const elements = {
-            sections: document.querySelectorAll('.section'),
-            navLinks: document.querySelectorAll('.nav-link'),
-            footer: document.querySelector('.client-footer'),
-            playbar: document.getElementById('playbar'),
-            chatbar: document.getElementById('chatbar'),
-            form: document.getElementById('welcome-form'),
-            nextButton: document.getElementById('next-button'),
+            sections: document.querySelectorAll('[data-section]'),
+            navLinks: document.querySelectorAll('.client-nav__item'),
+            footer: document.querySelector('.rl-footer'),
+            playbar: null,
+            chatbar: null,
+            form: null,
+            nextButton: document.getElementById('nextButton'),
             sendButton: document.getElementById('send-button'),
             chatInput: document.getElementById('chat-input'),
             chatWindow: document.getElementById('chat-window'),
-            gradeSelect: document.getElementById('grade-select')
+            adminControls: null,
+            gradeSelect: document.getElementById('gradeSelect')
         };
 
-        // Verify all elements exist
-        const missing = Object.entries(elements)
-            .filter(([key, el]) => !el)
-            .map(([key]) => key);
-
+        // Only require elements that are present in the new HTML
+        const required = ['sections', 'navLinks', 'footer', 'nextButton', 'sendButton', 'chatInput', 'chatWindow', 'gradeSelect'];
+        const missing = required.filter(key => !elements[key]);
         if (missing.length > 0) {
             console.error('[Merit Flow] Missing elements:', missing.join(', '));
             return false;
         }
-
         this.#elements = elements;
-        
-        // Log element initialization
         console.log('[Merit Flow] Elements initialized:', Object.keys(elements));
         return true;
     }
 
     #setupEventListeners() {
-        // Grade selection (individual buttons)
-        const gradeOptions = document.querySelectorAll('.client-grade__option');
-        const nextButton = document.querySelector('.client-welcome__next-button');
-        let selectedGrade = null;
+        // Grade selection (multi-select)
+        const gradeOptions = document.querySelectorAll('.grade-option');
+        const nextButton = document.getElementById('nextButton');
+        let selectedGrades = [];
         gradeOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                gradeOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedGrade = option.getAttribute('data-grade');
-                this.#state.gradeLevel = selectedGrade;
-                nextButton.disabled = !selectedGrade;
+            option.addEventListener('click', function() {
+                option.classList.toggle('selected');
+                const grade = option.getAttribute('data-grade');
+                if (option.classList.contains('selected')) {
+                    if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
+                } else {
+                    selectedGrades = selectedGrades.filter(g => g !== grade);
+                }
+                nextButton.disabled = selectedGrades.length === 0;
+                if (selectedGrades.length > 0) {
+                    nextButton.classList.add('enabled');
+                } else {
+                    nextButton.classList.remove('enabled');
+                }
+                this.#state.gradeLevel = selectedGrades;
+            }.bind(this));
+            option.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    option.click();
+                }
             });
         });
-        // Launch Chat button
         nextButton.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!selectedGrade) return;
+            if (selectedGrades.length === 0) return;
             try {
                 // Create thread using new API
                 const thread = await this.#openAIClient.createThread();
                 this.#state.threadId = thread.id;
                 // Send preflight context message
-                const contextMsg = `New user is an English Language Arts user of ${selectedGrade} curriculum. Say: 'Hi, I'm Merit. How can I help with ${selectedGrade} ELA curriculum questions?'`;
+                const contextMsg = `New user is an English Language Arts user of ${selectedGrades.join(', ')} curriculum. Say: 'Hi, I'm Merit. How can I help with ${selectedGrades.join(', ')} ELA curriculum questions?'`;
                 await this.#openAIClient.sendMessage(contextMsg);
                 // Switch to chat section
                 this.#handleNavigation('chat');
