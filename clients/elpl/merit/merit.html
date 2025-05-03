@@ -16,7 +16,7 @@
         data-access-level=""
         data-last-login="">
     </span>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
     
@@ -39,6 +39,7 @@
             min-height: 0;
             margin: 0;
             padding: 0;
+<<<<<<< HEAD
             background-color: #E6F6FA;
             font-family: var(--client-font-body, sans-serif);
         }
@@ -46,9 +47,18 @@
         .layout-wrapper {
             height: 100vh;
             min-height: 0;
+=======
+            height: 100%;
+            background-color: var(--background-color);
+            font-family: var(--client-font-body, sans-serif);
+        }
+
+        .rl-layout {
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
             display: grid;
-            grid-template-columns: 200px 1fr;
+            grid-template-columns: var(--sidebar-width) 1fr;
             grid-template-rows: auto 1fr auto;
+<<<<<<< HEAD
             gap: 0;
             box-sizing: border-box;
             background: #E6F6FA;
@@ -118,6 +128,30 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
+=======
+            gap: var(--layout-gap);
+            min-height: 100vh;
+            height: 100%;
+            padding: var(--layout-gap);
+            box-sizing: border-box;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .client-sidebar {
+            grid-column: 1;
+            grid-row: 1 / 3;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            height: calc(100vh - var(--layout-gap) * 2 - var(--footer-height));
+            position: sticky;
+            top: var(--layout-gap);
+            margin-right: var(--layout-gap);
+            width: var(--sidebar-width);
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         }
 
         .client-sidebar__header {
@@ -221,6 +255,21 @@
             background: var(--elpl-primary-hover);
         }
 
+        .rl-nav__profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 36px;
+            padding: 0 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .rl-nav__profile:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
         .rl-nav__avatar {
             width: 32px;
             height: 32px;
@@ -235,12 +284,27 @@
         }
 
         .rl-nav__settings {
+            width: 36px;
+            height: 36px;
+            padding: 0;
             background: none;
             border: none;
+            border-radius: 6px;
             cursor: pointer;
-            padding: 0;
             display: flex;
             align-items: center;
+            justify-content: center;
+            color: var(--client-text);
+            transition: background-color 0.2s;
+        }
+
+        .rl-nav__settings:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .rl-nav__settings svg {
+            width: 20px;
+            height: 20px;
         }
 
         .rl-main {
@@ -487,17 +551,26 @@
         }
 
         .welcome-title {
+            font-family: var(--client-font-h1, 'Lora');
+            font-size: 48px;
+            font-weight: 700;
             color: var(--elpl-primary);
+<<<<<<< HEAD
             font-size: 96px;
             font-weight: 800;
             margin-top: 0;
+=======
+            margin-bottom: 0;
+            line-height: 1.1;
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         }
 
         .welcome-subtitle {
-            color: var(--elpl-primary);
-            font-size: 24px;
+            font-family: var(--client-font-h2, 'Montserrat');
+            font-size: 16px;
             font-weight: 600;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.05em;
+            color: var(--elpl-primary);
             text-transform: uppercase;
             margin-top: 0;
         }
@@ -512,6 +585,7 @@
         .client-welcome__grade-options {
             display: flex;
             flex-direction: column;
+<<<<<<< HEAD
             gap: 0;
             margin-bottom: 0;
             padding: 0;
@@ -618,10 +692,18 @@
             width: 100%;
             display: flex;
             flex-direction: column;
+=======
+            gap: 4px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 16px;
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         }
-        .client-chat__input-container {
+
+        .grade-option {
             display: flex;
             align-items: center;
+<<<<<<< HEAD
             background: #f7f8fa;
             border-radius: 0 0 16px 16px;
             padding: 10px 20px;
@@ -733,6 +815,13 @@
             color: var(--client-text);
             border-bottom-left-radius: 4px;
             border-bottom-right-radius: 16px;
+=======
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         }
         .chat-day-divider {
             display: flex;
@@ -839,25 +928,62 @@
         });
     </script>
 
-    <!-- <script type="module" src="/shared/assets/js/client-component-loader.js"></script> -->
-    <script type="module" src="/clients/elpl/assets/js/client-auth.js"></script>
-    <!-- <script type="module" src="/shared/assets/js/client-router.js"></script> -->
+    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
+    <script type="module" src="/shared/assets/js/client-auth.js"></script>
+    <script type="module" src="/shared/assets/js/client-router.js"></script>
 </head>
 <body>
-    <div class="layout-wrapper">
+    <!-- Review Banner -->
+    <div class="review-banner" id="review-banner" style="display: none;">Review Environment | ELPL Merit System</div>
+    
+    <!-- Connection Status -->
+    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite" style="display: none;">
+        <span id="connection-message">Connecting to Merit...</span>
+    </div>
+    
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner hidden" role="alert" aria-live="assertive">
+        <span class="error-icon">⚠️</span>
+        <span id="error-details">An error occurred</span>
+        <button onclick="this.parentElement.classList.add('hidden')" aria-label="Dismiss error">
+            Dismiss
+        </button>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
+        <div class="loading-progress">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="rl-layout" data-client-component="merit-page" data-test-id="page-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="client-sidebar" role="navigation" aria-label="Main navigation" data-test-id="sidebar">
             <div class="client-sidebar__header">
                 <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education Logo" class="client-sidebar__logo">
-                <span class="client-sidebar__subtitle" style="color: #C6123F;">PROFESSIONAL LEARNING</span>
+                <span class="client-sidebar__subtitle">Professional Learning</span>
             </div>
             <nav class="client-sidebar__nav">
                 <ul>
                     <li>
-                        <a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a>
+                        <a href="#welcome" class="client-nav__item" data-section="welcome">
+                            <span class="client-nav__icon">
+                                <!-- Welcome icon SVG -->
+                            </span>
+                            Welcome
+                        </a>
                     </li>
                     <li>
-                        <a href="#chat" class="client-nav__item" data-section="chat">Chat</a>
+                        <a href="#chat" class="client-nav__item active" data-section="chat">
+                            <span class="client-nav__icon">
+                                <!-- Chat icon SVG -->
+                            </span>
+                            Chat
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -865,26 +991,39 @@
         </aside>
 
         <!-- Header -->
-        <header class="header">
-            <div class="header__profile-group">
-                <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
-                <span class="rl-nav__username">Leslie Alexander</span>
-                <button class="rl-nav__settings" aria-label="Settings">
-                    <img src="/clients/elpl/assets/images/settings.svg" alt="Settings" style="width: 24px; height: 24px;" />
+        <header class="rl-header">
+            <div class="rl-header__left"></div>
+            <nav class="rl-header__nav">
+                <button class="rl-nav__notification" aria-label="Notifications">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 16V11C18 7.68629 15.3137 5 12 5C8.68629 5 6 7.68629 6 11V16L4 18V19H20V18L18 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13.73 21C13.5544 21.3031 13.3041 21.5544 13.001 21.73C12.6979 21.9056 12.3536 22 12 22C11.6464 22 11.3021 21.9056 10.999 21.73C10.6959 21.5544 10.4456 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </button>
-            </div>
+                <div class="rl-nav__profile">
+                    <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
+                    <span class="rl-nav__username">Leslie Alexander</span>
+                    <button class="rl-nav__settings" aria-label="Settings">
+                        <svg width="28" height="28" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8.14667 1.33333H7.85333C7.49971 1.33333 7.16057 1.4738 6.91053 1.72385C6.66048 1.9739 6.52 2.31304 6.52 2.66666V2.78666C6.51976 3.02048 6.45804 3.25012 6.34103 3.45255C6.22401 3.65498 6.05583 3.82309 5.85333 3.93999L5.56667 4.10666C5.36398 4.22369 5.13405 4.28529 4.9 4.28529C4.66595 4.28529 4.43603 4.22369 4.23333 4.10666L4.13333 4.05333C3.82738 3.87684 3.46389 3.82896 3.12267 3.9202C2.78145 4.01144 2.49037 4.23435 2.31333 4.53999L2.16667 4.79333C1.99018 5.09929 1.9423 5.46277 2.03354 5.80399C2.12478 6.14522 2.34769 6.43629 2.65333 6.61333L2.75333 6.68C2.95485 6.79634 3.12241 6.96339 3.23937 7.16455C3.35632 7.36571 3.4186 7.59398 3.42 7.82666V8.16666C3.42093 8.40161 3.35977 8.63263 3.2427 8.83633C3.12563 9.04004 2.95681 9.20919 2.75333 9.32666L2.65333 9.38666C2.34769 9.5637 2.12478 9.85477 2.03354 10.196C1.9423 10.5372 1.99018 10.9007 2.16667 11.2067L2.31333 11.46C2.49037 11.7656 2.78145 11.9885 3.12267 12.0798C3.46389 12.171 3.82738 12.1232 4.13333 11.9467L4.23333 11.8933C4.43603 11.7763 4.66595 11.7147 4.9 11.7147C5.13405 11.7147 5.36398 11.7763 5.56667 11.8933L5.85333 12.06C6.05583 12.1769 6.22401 12.345 6.34103 12.5474C6.45804 12.7499 6.51976 12.9795 6.52 13.2133V13.3333C6.52 13.687 6.66048 14.0261 6.91053 14.2761C7.16057 14.5262 7.49971 14.6667 7.85333 14.6667H8.14667C8.50029 14.6667 8.83943 14.5262 9.08948 14.2761C9.33952 14.0261 9.48 13.687 9.48 13.3333V13.2133C9.48024 12.9795 9.54196 12.7499 9.65898 12.5474C9.77599 12.345 9.94418 12.1769 10.1467 12.06L10.4333 11.8933C10.636 11.7763 10.866 11.7147 11.1 11.7147C11.334 11.7147 11.564 11.7763 11.7667 11.8933L11.8667 11.9467C12.1726 12.1232 12.5361 12.171 12.8773 12.0798C13.2186 11.9885 13.5096 11.7656 13.6867 11.46L13.8333 11.2C14.0098 10.894 14.0577 10.5306 13.9665 10.1893C13.8752 9.84811 13.6523 9.55703 13.3467 9.37999L13.2467 9.32666C13.0432 9.20919 12.8744 9.04004 12.7573 8.83633C12.6402 8.63263 12.5791 8.40161 12.58 8.16666V7.83333C12.5791 7.59838 12.6402 7.36736 12.7573 7.16366C12.8744 6.95995 13.0432 6.7908 13.2467 6.67333L13.3467 6.61333C13.6523 6.43629 13.8752 6.14522 13.9665 5.80399C14.0577 5.46277 14.0098 5.09929 13.8333 4.79333L13.6867 4.53999C13.5096 4.23435 13.2186 4.01144 12.8773 3.9202C12.5361 3.82896 12.1726 3.87684 11.8667 4.05333L11.7667 4.10666C11.564 4.22369 11.334 4.28529 11.1 4.28529C10.866 4.28529 10.636 4.22369 10.4333 4.10666L10.1467 3.93999C9.94418 3.82309 9.77599 3.65498 9.65898 3.45255C9.54196 3.25012 9.48024 3.02048 9.48 2.78666V2.66666C9.48 2.31304 9.33952 1.9739 9.08948 1.72385C8.83943 1.4738 8.50029 1.33333 8.14667 1.33333V1.33333Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
         </header>
-
-        <!-- Main Content -->
-        <main class="main">
-            <div class="welcome-header">
-                <h1 class="welcome-title">Merit</h1>
-                <p class="welcome-subtitle">CURRICULUM SUPPORT ASSISTANT</p>
+        
+        <!-- Main Content Area -->
+        <main class="client-content" style="background: transparent; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0;">
+            <div class="welcome-header" style="text-align: center; margin-bottom: 0; background: none !important; box-shadow: none !important; align-items: center; justify-content: center; width: 100%;">
+                <h1 class="welcome-title" style="margin-bottom: 0; font-size: 72px; font-weight: 800; color: var(--elpl-primary);">Merit</h1>
+                <p class="welcome-subtitle" style="margin-top: 0; font-size: 28px; color: var(--elpl-primary); font-weight: 600; letter-spacing: 0.04em;">CURRICULUM SUPPORT ASSISTANT</p>
             </div>
-            <div class="welcome-flex-row">
-                <div class="client-welcome__grade-options-card">
+            <div class="welcome-flex-row" style="display: flex; align-items: flex-start; justify-content: center; gap: 64px; margin-top: 0; background: none; box-shadow: none; width: 100%; max-width: 1100px;">
+                <div class="client-welcome__grade-options-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(44,62,80,0.10); padding: 40px 40px 32px 40px; min-width: 340px; max-width: 420px; width: 100%; display: flex; flex-direction: column; align-items: stretch;">
+                    <h2 style="margin-top: 0; margin-bottom: 18px; color: var(--elpl-primary); font-size: 2rem; font-weight: 700; text-align: left;">Customize your assistant:</h2>
                     <h3 class="grade-selection-subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; color: #222; font-weight: 500; text-align: left;">Select all that apply<br>Grade Level(s)</h3>
-                    <div class="client-welcome__grade-options" id="gradeSelect">
+                    <div class="client-welcome__grade-options" id="gradeSelect" style="max-height: 400px; overflow-y: auto;">
                         <div class="grade-option" data-grade="K" tabindex="0">
                             <span class="star-icon">☆</span>
                             <span class="grade-text">Kindergarten</span>
@@ -908,16 +1047,17 @@
                         <div class="grade-option" data-grade="5" tabindex="0">
                             <span class="star-icon">☆</span>
                             <span class="grade-text">Grade 5</span>
-                        </div>
+                    </div>
                     </div>
                 </div>
-                <button class="client-welcome__next-button" id="nextButton">
+                <button class="client-welcome__next-button" id="nextButton" style="height: 64px; font-size: 1.3rem; padding: 0 40px; border-radius: 12px; margin-top: 60px; align-self: flex-start;">
                     CREATE ASSISTANT
                     <svg class="button-arrow" width="32" height="32" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
             </div>
+<<<<<<< HEAD
             <section data-section="chat" id="chat-section" class="section">
                 <div class="chat-frame">
                     <div id="chat-window" class="chat-messages" role="log" aria-live="polite"></div>
@@ -935,10 +1075,12 @@
                     </div>
                 </div>
             </section>
+=======
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         </main>
 
         <!-- Footer -->
-        <footer class="footer">
+        <footer class="rl-footer">
             <div class="rl-footer__left">
                 <img src="/shared/platform/images/admin-logo.png" alt="Platform Logo" class="rl-footer__logo">
             </div>
@@ -1069,13 +1211,13 @@
     <!-- Debugging script added for console logging -->
     <script>
       console.log('[Merit HTML] Loaded.');
-      const nextButton = document.getElementById('nextButton');
+      const nextButton = document.getElementById('next-button');
       if (nextButton) {
         console.log('[Merit HTML] Next button initial state:', nextButton.disabled);
       } else {
         console.log('[Merit HTML] Next button not found.');
       }
-      const gradeSelect = document.getElementById('gradeSelect');
+      const gradeSelect = document.getElementById('grade-level');
       if (gradeSelect) {
         gradeSelect.addEventListener('change', function() {
           console.log('[Merit HTML] Grade level changed to:', this.value);
@@ -1146,10 +1288,11 @@
     <div class="status-notification" id="statusNotification"></div>
 
     <!-- Qipu Comment Bar -->
-    <!-- <iframe id="qipu-comment-bar" src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; display: none;"></iframe> -->
+    <iframe id="qipu-comment-bar" src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; display: none;"></iframe>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+<<<<<<< HEAD
             // Hide chat section by default
             const chatSection = document.getElementById('chat-section');
             const welcomeHeader = document.querySelector('.welcome-header');
@@ -1168,6 +1311,44 @@
             function updateButtonState() {
                 nextButton.disabled = selectedGrades.length === 0;
                 if (selectedGrades.length > 0) {
+=======
+            // Version switching system
+            const currentVersion = localStorage.getItem('merit_system_status') || 'dev';
+            if (currentVersion === 'prod' && window.location.pathname.includes('merit_temp.html')) {
+                window.location.href = 'merit.html';
+            }
+
+            // Menu dropdown functionality
+            const menuTrigger = document.querySelector('.menu-trigger');
+            const menuContent = document.querySelector('.menu-content');
+            
+            if (menuTrigger && menuContent) {
+                menuTrigger.addEventListener('click', (e) => {
+                    const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
+                    menuTrigger.setAttribute('aria-expanded', !isExpanded);
+                    menuContent.classList.toggle('show');
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!menuTrigger.contains(e.target)) {
+                        menuTrigger.setAttribute('aria-expanded', 'false');
+                        menuContent.classList.remove('show');
+                    }
+                });
+            }
+
+            // Grade selection functionality
+            const gradeOptions = document.querySelectorAll('.grade-option');
+            const nextButton = document.querySelector('.client-welcome__next-button');
+            let selectedGrades = [];
+
+            function checkSelections() {
+                const hasGrade = localStorage.getItem('merit_grade_level');
+                nextButton.disabled = !hasGrade;
+                
+                if (hasGrade) {
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
                     nextButton.classList.add('enabled');
                 } else {
                     nextButton.classList.remove('enabled');
@@ -1176,18 +1357,18 @@
             gradeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     option.classList.toggle('selected');
-                    const star = option.querySelector('.star-icon');
                     const grade = option.getAttribute('data-grade');
                     if (option.classList.contains('selected')) {
-                        star.textContent = '★';
-                        star.style.color = 'var(--elpl-primary)';
                         if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
                     } else {
-                        star.textContent = '☆';
-                        star.style.color = '';
                         selectedGrades = selectedGrades.filter(g => g !== grade);
                     }
-                    updateButtonState();
+                    nextButton.disabled = selectedGrades.length === 0;
+                    if (selectedGrades.length > 0) {
+                        nextButton.classList.add('enabled');
+                    } else {
+                        nextButton.classList.remove('enabled');
+                    }
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -1200,6 +1381,7 @@
             // Next button logic
             nextButton.addEventListener('click', function() {
                 if (selectedGrades.length === 0) return;
+<<<<<<< HEAD
                 welcomeComplete = true;
                 // Hide welcome, show chat
                 if (welcomeHeader) welcomeHeader.style.display = 'none';
@@ -1232,6 +1414,14 @@
                     }
                 });
             });
+=======
+                localStorage.setItem('merit_grade_level', JSON.stringify(selectedGrades));
+                // Proceed to chat or next step
+            });
+
+            // Initial check
+            checkSelections();
+>>>>>>> a064e4d4b1be9b4b5c534439652b5b5ae714d0ab
         });
     </script>
 
@@ -1360,7 +1550,6 @@
                     // Message
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `client-chat__message ${msg.isUser ? 'user' : 'assistant'}`;
-                    messageDiv.style.width = '100%';
 
                     const avatar = document.createElement('div');
                     avatar.className = 'client-chat__avatar';
@@ -1376,6 +1565,7 @@
 
                     const bubble = document.createElement('div');
                     bubble.className = `client-chat__bubble ${msg.isUser ? 'user' : 'assistant'}`;
+                    // CamelCase for user messages
                     bubble.textContent = msg.isUser ? toCamelCase(msg.text) : msg.text;
 
                     const timestamp = document.createElement('div');
