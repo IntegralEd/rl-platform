@@ -35,33 +35,42 @@
 
     <style>
         html, body {
+            height: 100%;
+            min-height: 0;
             margin: 0;
             padding: 0;
-            height: 100%;
             background-color: #E6F6FA;
             font-family: var(--client-font-body, sans-serif);
         }
 
         .layout-wrapper {
+            height: 100vh;
+            min-height: 0;
             display: grid;
             grid-template-columns: 200px 1fr;
             grid-template-rows: auto 1fr auto;
-            gap: 20px;
-            height: 100vh;
-            padding: 20px;
+            gap: 0;
             box-sizing: border-box;
             background: #E6F6FA;
+            padding-top: 0;
         }
 
         .sidebar {
             grid-row: 1 / span 3;
             background: #fff;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
             border-bottom-right-radius: 12px;
+            margin-top: 0;
+            padding-top: 0;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             min-width: 200px;
             max-width: 200px;
+            height: 100%;
+            /* height: 100vh; */
+            justify-content: space-between;
         }
 
         .header {
@@ -73,7 +82,7 @@
             align-items: center;
             justify-content: flex-end;
             padding: 0 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); */ /* Removed drop shadow */
         }
 
         .header__profile-group {
@@ -83,11 +92,21 @@
         }
 
         .main {
-            grid-column: 2;
+            display: block;
+            padding-left: 20px;
             background: #E6F6FA;
             border-radius: 12px;
-            padding: 20px;
-            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .main.main--chat {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            padding-left: 20px;
+            background: #E6F6FA;
+            border-radius: 12px;
         }
 
         .footer {
@@ -102,8 +121,7 @@
         }
 
         .client-sidebar__header {
-            padding: 0 24px;
-            margin-bottom: 32px;
+            padding-top: 24px;
         }
 
         .client-sidebar__logo {
@@ -455,19 +473,24 @@
         }
 
         .welcome-header {
-            text-align: left;
+            margin-top: 8px;
             margin-bottom: 8px;
+            text-align: left;
             background: none !important;
             box-shadow: none !important;
             align-items: flex-start;
             justify-content: flex-start;
         }
 
+        .welcome-title, .welcome-subtitle {
+            text-align: left;
+        }
+
         .welcome-title {
             color: var(--elpl-primary);
             font-size: 96px;
             font-weight: 800;
-            margin-bottom: 0;
+            margin-top: 0;
         }
 
         .welcome-subtitle {
@@ -489,119 +512,23 @@
         .client-welcome__grade-options {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            padding-right: 16px;
-            margin-bottom: 32px;
-        }
-
-        .grade-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            font-size: 18px;
-            background: #fff;
-            border: 2px solid transparent;
-        }
-
-        .grade-option:hover,
-        .grade-option.selected {
-            background: rgba(198, 18, 63, 0.08);
-            border: 2px solid var(--elpl-primary);
-        }
-
-        .grade-option .star-icon {
-            font-size: 22px;
-            transition: color 0.2s;
-        }
-
-        .grade-option.selected .star-icon {
-            color: var(--elpl-primary);
-        }
-
-        .client-welcome__next-button {
-            height: 64px;
-            font-size: 1.3rem;
-            padding: 0 40px;
-            border-radius: 12px;
-            margin-top: 60px;
-            align-self: flex-start;
-            background: var(--elpl-primary);
-            color: #fff;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: none;
-            transition: background 0.2s;
-        }
-
-        .client-welcome__next-button:disabled {
-            background: #eee;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-
-        .welcome-flex-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 48px;
-            margin-top: 32px;
-            width: 100%;
-            max-width: 900px;
-        }
-        .client-welcome__grade-options-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
-            padding: 32px 32px 24px 32px;
-            min-width: 320px;
-            max-width: 400px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .client-welcome__grade-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            gap: 0;
             margin-bottom: 0;
             padding: 0;
         }
+
         .grade-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 18px;
-            transition: background 0.2s, color 0.2s;
+            padding: 4px 10px;
+            font-size: 16px;
         }
-        .grade-option:hover,
-        .grade-option.selected {
-            background: rgba(198, 18, 63, 0.08);
-        }
-        .grade-option .star-icon {
-            font-size: 22px;
-            transition: color 0.2s;
-        }
-        .grade-option.selected .star-icon {
-            color: var(--elpl-primary);
-        }
+
         .client-welcome__next-button {
             height: 56px;
             font-size: 1.1rem;
             padding: 0 36px;
             border-radius: 12px;
             background: var(--elpl-primary);
+            color: #FFFFFF;
             color: #fff;
             font-weight: 700;
             display: flex;
@@ -611,6 +538,41 @@
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
             transition: background 0.2s;
             white-space: nowrap;
+            margin-top: 0;
+            align-self: flex-start;
+        }
+
+        .welcome-flex-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 32px;
+            margin-top: 16px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .client-welcome__grade-options-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
+            padding: 24px 24px 16px 24px;
+            min-width: 320px;
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .grade-option:hover,
+        .grade-option.selected {
+            background: rgba(198, 18, 63, 0.08);
+        }
+        .grade-option .star-icon {
+            font-size: 22px;
+            transition: color 0.2s;
+        }
+        .grade-option.selected .star-icon {
+            color: var(--elpl-primary);
         }
         .client-welcome__next-button:disabled {
             background: #eee;
@@ -630,52 +592,63 @@
             }
         }
         .chat-frame {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-height: 0;
+            height: 100%;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 2px 16px rgba(44,62,80,0.10);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            height: 80vh;
-            min-height: 500px;
-            max-width: 1100px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0;
-            position: relative;
         }
         .chat-messages {
-            flex: 1 1 auto;
+            flex: 1 1 0;
+            min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 40px 48px 20px 48px;
             border-radius: 16px 16px 0 0;
             box-sizing: border-box;
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
         }
         .client-chat__input-container {
             display: flex;
             align-items: center;
             background: #f7f8fa;
             border-radius: 0 0 16px 16px;
-            padding: 20px 32px;
-            gap: 16px;
+            padding: 10px 20px;
+            gap: 10px;
             box-shadow: none;
             border-top: 1px solid #f0f0f0;
             width: 100%;
             margin: 0;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            overflow: visible;
+            height: auto;
         }
         #chat-input.client-chat__input {
             flex: 1 1 auto;
             border: none;
             background: transparent;
             font-size: 16px;
-            padding: 0;
+            padding: 8px 0 8px 0;
             outline: none;
             resize: none;
             color: var(--client-text);
+            min-width: 0;
+            line-height: 1.5;
+            vertical-align: middle;
+            max-height: 80px;
+            overflow-y: auto;
         }
         #send-button.client-chat__action {
             background: var(--elpl-primary);
@@ -690,6 +663,7 @@
             cursor: pointer;
             transition: background 0.2s;
             box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            flex-shrink: 0;
         }
         #send-button.client-chat__action:disabled {
             background: #eee;
@@ -697,51 +671,45 @@
             cursor: not-allowed;
         }
         #send-button .send-icon {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             display: block;
         }
         /* Chat message bubbles */
-        .client-chat__message {
-            display: flex;
-            align-items: flex-end;
-            margin-bottom: 18px;
+        .client-chat__message,
+        .client-chat__message.user,
+        .client-chat__message.assistant {
+            width: auto !important;
             max-width: 100%;
-            width: 100%;
         }
         .client-chat__message.user {
-            flex-direction: row;
-            justify-content: flex-end;
-            margin-left: auto;
+            margin-left: auto !important;
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+            align-items: flex-end;
         }
         .client-chat__message.assistant {
+            margin-right: auto !important;
             flex-direction: row;
             justify-content: flex-start;
-            margin-right: auto;
+            align-items: flex-end;
         }
-        .client-chat__avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #f7f8fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 0 0 16px;
+        .client-chat__message.user .client-chat__bubble {
+            margin-right: 0;
+            margin-left: 12px;
         }
         .client-chat__message.user .client-chat__avatar {
-            margin: 0 0 0 16px;
-            order: 2;
-        }
-        .client-chat__message.user .client-chat__content {
-            order: 1;
+            margin-left: 0;
+            margin-right: 0;
         }
         .client-chat__message.assistant .client-chat__avatar {
             margin: 0 16px 0 0;
             order: 1;
+            align-self: flex-end;
         }
         .client-chat__message.assistant .client-chat__content {
             order: 2;
+            align-self: flex-end;
         }
         .client-chat__bubble {
             background: #f7f8fa;
@@ -752,6 +720,7 @@
             box-shadow: 0 1px 4px rgba(44,62,80,0.06);
             max-width: 420px;
             word-break: break-word;
+            align-self: flex-end;
         }
         .client-chat__message.user .client-chat__bubble {
             background: #fbe9ef;
@@ -764,6 +733,29 @@
             color: var(--client-text);
             border-bottom-left-radius: 4px;
             border-bottom-right-radius: 16px;
+        }
+        .chat-day-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 24px 0 16px 0;
+        }
+        .chat-day-divider span {
+            color: #b0b0b0;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 0 16px;
+            background: #fff;
+            z-index: 1;
+        }
+        .chat-day-divider::before,
+        .chat-day-divider::after {
+            content: '';
+            flex: 1 1 0;
+            height: 1px;
+            background: #e0e0e0;
+            z-index: 0;
         }
     </style>
     
@@ -931,11 +923,14 @@
                     <div id="chat-window" class="chat-messages" role="log" aria-live="polite"></div>
                     <div class="client-chat__input-container">
                         <textarea id="chat-input" class="client-chat__input" aria-label="Type your message" placeholder="Type your message..." rows="1" maxlength="1000"></textarea>
-                        <button id="send-button" class="client-chat__action client-chat__action--send" aria-label="Send message">
-                            <svg class="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="12" fill="var(--elpl-primary)"/>
-                                <path d="M8 12L16 12M16 12L13 9M16 12L13 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+                        <button id="emoji-button" class="client-chat__action client-chat__action--emoji" aria-label="Insert emoji" type="button" style="background: none; border: none; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;">
+                            😊
+                        </button>
+                        <button id="attach-button" class="client-chat__action client-chat__action--attach" aria-label="Attach file" type="button" style="background: none; border: none; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;">
+                            📎
+                        </button>
+                        <button id="send-button" class="client-chat__action client-chat__action--send" aria-label="Send message" type="button">
+                            <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" alt="Send" class="send-icon" width="20" height="20" />
                         </button>
                     </div>
                 </div>
@@ -1154,15 +1149,22 @@
     <!-- <iframe id="qipu-comment-bar" src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; display: none;"></iframe> -->
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Grade selection logic
-            const gradeOptions = document.querySelectorAll('.grade-option');
-            const nextButton = document.getElementById('nextButton');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide chat section by default
             const chatSection = document.getElementById('chat-section');
             const welcomeHeader = document.querySelector('.welcome-header');
             const welcomeFlexRow = document.querySelector('.welcome-flex-row');
-            let selectedGrades = [];
+            const nextButton = document.getElementById('nextButton');
+            let welcomeComplete = false;
 
+            // Hide chat, show welcome on load
+            if (chatSection) chatSection.style.display = 'none';
+            if (welcomeHeader) welcomeHeader.style.display = '';
+            if (welcomeFlexRow) welcomeFlexRow.style.display = '';
+
+            // Grade selection logic
+            const gradeOptions = document.querySelectorAll('.grade-option');
+            let selectedGrades = [];
             function updateButtonState() {
                 nextButton.disabled = selectedGrades.length === 0;
                 if (selectedGrades.length > 0) {
@@ -1171,7 +1173,6 @@
                     nextButton.classList.remove('enabled');
                 }
             }
-
             gradeOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     option.classList.toggle('selected');
@@ -1194,9 +1195,12 @@
                     }
                 });
             });
+            updateButtonState();
 
+            // Next button logic
             nextButton.addEventListener('click', function() {
                 if (selectedGrades.length === 0) return;
+                welcomeComplete = true;
                 // Hide welcome, show chat
                 if (welcomeHeader) welcomeHeader.style.display = 'none';
                 if (welcomeFlexRow) welcomeFlexRow.style.display = 'none';
@@ -1206,9 +1210,28 @@
                 if (chatInput) chatInput.focus();
             });
 
-            // On load, ensure chat section is hidden
-            if (chatSection) chatSection.style.display = 'none';
-            updateButtonState();
+            // Prevent direct access to chat via hash or nav
+            const navItems = document.querySelectorAll('.client-nav__item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const sectionId = item.getAttribute('data-section');
+                    if (sectionId === 'chat' && !welcomeComplete) {
+                        e.preventDefault();
+                        // Optionally, show a message to the user
+                        alert('Please complete the welcome page before accessing the chat.');
+                        return false;
+                    }
+                    if (sectionId === 'welcome') {
+                        if (chatSection) chatSection.style.display = 'none';
+                        if (welcomeHeader) welcomeHeader.style.display = '';
+                        if (welcomeFlexRow) welcomeFlexRow.style.display = '';
+                    } else if (sectionId === 'chat' && welcomeComplete) {
+                        if (welcomeHeader) welcomeHeader.style.display = 'none';
+                        if (welcomeFlexRow) welcomeFlexRow.style.display = 'none';
+                        if (chatSection) chatSection.style.display = 'block';
+                    }
+                });
+            });
         });
     </script>
 
@@ -1361,13 +1384,9 @@
 
                     content.appendChild(bubble);
                     content.appendChild(timestamp);
-                    if (msg.isUser) {
-                        messageDiv.appendChild(content);
-                        messageDiv.appendChild(avatar);
-                    } else {
-                        messageDiv.appendChild(avatar);
-                        messageDiv.appendChild(content);
-                    }
+                    // Always [avatar][content] order, let CSS handle direction
+                    messageDiv.appendChild(avatar);
+                    messageDiv.appendChild(content);
                     chatWindow.appendChild(messageDiv);
                 });
                 chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -1472,6 +1491,25 @@
                     });
                 });
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.client-nav__item');
+            const main = document.querySelector('.main');
+            function updateMainClass() {
+                if (window.location.hash === '#chat') {
+                    main.classList.add('main--chat');
+                } else {
+                    main.classList.remove('main--chat');
+                }
+            }
+            navItems.forEach(item => {
+                item.addEventListener('click', updateMainClass);
+            });
+            window.addEventListener('hashchange', updateMainClass);
+            updateMainClass();
         });
     </script>
 </body>
