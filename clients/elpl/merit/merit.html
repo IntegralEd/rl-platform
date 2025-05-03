@@ -20,12 +20,6 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
     
-    <!-- Platform level styles -->
-    <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
-    
     <!-- Client level styles -->
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
     <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
@@ -548,9 +542,10 @@
         console.log('[Merit Flow] Development mode enabled - API calls disabled');
     </script>
 
-    <!-- Core Dependencies -->
-    <script type="module" src="assets/js/client-merit-openai.js"></script>
-    <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+    <!-- Required Client Scripts -->
+    <script type="module" src="/clients/elpl/assets/js/client-auth.js"></script>
+    <script type="module" src="/clients/elpl/merit/client-merit-openai.js"></script>
+    <script type="module" src="/clients/elpl/merit/assets/js/client-merit-instructional-flow.js"></script>
     
     <!-- Version Display Initialization -->
     <script>
@@ -589,7 +584,6 @@
     </script>
 
     <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-auth.js"></script>
     <script type="module" src="/shared/assets/js/client-router.js"></script>
 </head>
 <body>
