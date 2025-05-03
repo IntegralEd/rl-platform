@@ -543,7 +543,7 @@
     </script>
 
     <!-- Required Client Scripts -->
-    <script type="module" src="/clients/elpl/assets/js/client-auth.js"></script>
+    
     <script type="module" src="/clients/elpl/merit/client-merit-openai.js"></script>
     <script type="module" src="/clients/elpl/merit/assets/js/client-merit-instructional-flow.js"></script>
     
@@ -583,8 +583,8 @@
         });
     </script>
 
-    <script type="module" src="/shared/assets/js/client-component-loader.js"></script>
-    <script type="module" src="/shared/assets/js/client-router.js"></script>
+    
+    
 </head>
 <body>
     <!-- Review Banner -->
@@ -875,54 +875,38 @@
     <!-- End Debugging Script -->
 
     <!-- Development Mode Connection Manager -->
+    <!--
+    TODO: Replace this stub with real API connection logic when integrating with api.recursivelearning.app/prod
     <script>
-        class APIConnectionManager {
-            constructor() {
-                // Immediately hide loading overlay in development mode
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
-                
-                const connectionStatus = document.getElementById('connection-status');
-                if (connectionStatus) connectionStatus.style.display = 'none';
-            }
-
-            async testConnection() {
-                return true; // Always return success in development mode
-            }
-
-            updateConnectionStatus() {} // No-op in development mode
-            showErrorBanner() {} // No-op in development mode
-        }
-
-        // Initialize API Connection Manager
-        document.addEventListener('DOMContentLoaded', async () => {
-            new APIConnectionManager();
-            
-            // Auto-initialize Merit Flow
-            if (window.MeritInstructionalFlow) {
-                try {
-                    window.meritFlow = new MeritInstructionalFlow({
-                        gradeSelect: document.getElementById('grade-level'),
-                        curriculumSelect: document.getElementById('curriculum')
-                    });
-                } catch (error) {
-                    console.log('[Development] Flow initialization error:', error);
-                }
-            }
-        });
+    // class APIConnectionManager {
+    //     constructor() {
+    //         // Immediately hide loading overlay in development mode
+    //         const loadingOverlay = document.getElementById('loading-overlay');
+    //         if (loadingOverlay) loadingOverlay.style.display = 'none';
+    //         const connectionStatus = document.getElementById('connection-status');
+    //         if (connectionStatus) connectionStatus.style.display = 'none';
+    //     }
+    //     async testConnection() {
+    //         return true; // Always return success in development mode
+    //     }
+    //     updateConnectionStatus() {} // No-op in development mode
+    //     showErrorBanner() {} // No-op in development mode
+    // }
+    // document.addEventListener('DOMContentLoaded', async () => {
+    //     new APIConnectionManager();
+    // });
     </script>
+    -->
 
     <!-- Development Timestamp -->
     <div class="dev-timestamp" id="dev-timestamp"></div>
 
-    <!-- Qipu Toggle Button -->
-    <div id="qipu-toggle" style="display: none;">🖌️</div>
     
     <!-- Status Notification -->
     <div class="status-notification" id="statusNotification"></div>
 
     <!-- Qipu Comment Bar -->
-    <iframe id="qipu-comment-bar" src="/shared/assets/js/qipu_comment_bar.html" style="position:fixed; bottom:0; left:0; width:100%; height:60px; border:none; display: none;"></iframe>
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
