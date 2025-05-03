@@ -1,16 +1,19 @@
 /**
- * ELPL Client Authentication Module
+ * ELPL Client Authentication Module (Unified)
  * Handles authentication, token management, and security functions
- * @version 1.0.16
+ * All traffic allowed, all within recursivelearning.app
+ * @version 1.0.17
  */
 
 // Authentication Configuration
 export const AUTH_CONFIG = {
-    clientId: 'elpl',
-    authEndpoint: window.env.LAMBDA_ENDPOINT + '/auth',
+    clientId: 'elpl-client',
+    authEndpoint: '/api/auth',
     loginEndpoint: '#bypass-login', // Bypass login for development
     redirectUri: window.location.origin + '/clients/elpl/',
-    tokenStorageKey: 'elpl_auth_token',
+    tokenStorageKey: 'elpl_user_token',
+    adminTokenStorageKey: 'elpl_admin_token',
+    tokenExpiryBuffer: 300000, // 5 minutes in ms
     tokenRefreshThreshold: 300 // 5 minutes in seconds
 };
 
@@ -23,12 +26,18 @@ export function getAuthHeaders(token = null) {
     };
 }
 
-// Validate token expiration
+// Validate token expiry and structure (JWT)
 export function isTokenValid(token) {
     try {
-        const decoded = parseToken(token);
-        const currentTime = Math.floor(Date.now() / 1000);
-        return decoded.exp > currentTime;
+        if (!token || typeof token !== 'string') return false;
+        const [header, payload, signature] = token.split('.');
+        if (!header || !payload || !signature) return false;
+        const decodedPayload = JSON.parse(atob(payload));
+        if (!decodedPayload.exp) return false;
+        const expiryTime = decodedPayload.exp * 1000;
+        const currentTime = Date.now();
+        // Return true if token is not expired (considering buffer time)
+        return expiryTime > (currentTime + AUTH_CONFIG.tokenExpiryBuffer);
     } catch (error) {
         console.error('Token validation error:', error);
         return false;
@@ -38,12 +47,12 @@ export function isTokenValid(token) {
 // Parse JWT token
 export function parseToken(token) {
     try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
-            '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join(''));
-        return JSON.parse(jsonPayload);
+        const [header, payload, signature] = token.split('.');
+        return {
+            header: JSON.parse(atob(header)),
+            payload: JSON.parse(atob(payload)),
+            signature
+        };
     } catch (error) {
         console.error('Token parsing error:', error);
         throw new Error('Invalid token format');
@@ -55,34 +64,34 @@ export function handleAuthError(error) {
     console.error('Authentication error:', error);
     if (error.status === 401) {
         localStorage.removeItem(AUTH_CONFIG.tokenStorageKey);
-        // window.location.href = '/login.html'; // Bypassed for development
+        // No redirect in dev mode
     }
-    throw error;
+    return {
+        success: false,
+        message: error.message || 'Authentication failed'
+    };
 }
 
-// Check and refresh token if needed
-export async function refreshTokenIfNeeded() {
-    const currentToken = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
-    if (!currentToken) return null;
-
+// Refresh token if needed
+export async function refreshTokenIfNeeded(token = null) {
     try {
-        const decoded = parseToken(currentToken);
-        const currentTime = Math.floor(Date.now() / 1000);
-        
-        // Check if token needs refresh
-        if (decoded.exp - currentTime < AUTH_CONFIG.tokenRefreshThreshold) {
+        const currentToken = token || localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
+        if (!currentToken) return null;
+        const tokenData = parseToken(currentToken);
+        if (!tokenData) return null;
+        const expiryTime = tokenData.payload.exp * 1000;
+        const currentTime = Date.now();
+        // If token is close to expiry, refresh it
+        if (expiryTime - currentTime < AUTH_CONFIG.tokenExpiryBuffer) {
             const response = await fetch(`${AUTH_CONFIG.authEndpoint}/refresh`, {
                 method: 'POST',
                 headers: getAuthHeaders(currentToken)
             });
-            
             if (!response.ok) throw new Error('Token refresh failed');
-            
-            const { token } = await response.json();
-            localStorage.setItem(AUTH_CONFIG.tokenStorageKey, token);
-            return token;
+            const { token: newToken } = await response.json();
+            localStorage.setItem(AUTH_CONFIG.tokenStorageKey, newToken);
+            return newToken;
         }
-        
         return currentToken;
     } catch (error) {
         console.error('Token refresh error:', error);
@@ -90,12 +99,10 @@ export async function refreshTokenIfNeeded() {
     }
 }
 
-// Initialize auth on page load
+// Initialize auth on page load (dev mode: no redirect)
 document.addEventListener('DOMContentLoaded', () => {
     const session = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
     if (!session || !isTokenValid(session)) {
-        // Redirect to login page with return URL
-        const returnUrl = encodeURIComponent(window.location.href);
-        // window.location.href = `${AUTH_CONFIG.loginEndpoint}?return_url=${returnUrl}`;
+        console.warn('[Auth] No valid session token found. (Dev mode: not redirecting)');
     }
 }); 
