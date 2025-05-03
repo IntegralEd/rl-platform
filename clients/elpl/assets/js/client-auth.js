@@ -8,7 +8,7 @@
 export const AUTH_CONFIG = {
     clientId: 'elpl',
     authEndpoint: window.env.LAMBDA_ENDPOINT + '/auth',
-    loginEndpoint: '/login.html',
+    loginEndpoint: '#bypass-login', // Bypass login for development
     redirectUri: window.location.origin + '/clients/elpl/',
     tokenStorageKey: 'elpl_auth_token',
     tokenRefreshThreshold: 300 // 5 minutes in seconds
@@ -55,7 +55,7 @@ export function handleAuthError(error) {
     console.error('Authentication error:', error);
     if (error.status === 401) {
         localStorage.removeItem(AUTH_CONFIG.tokenStorageKey);
-        window.location.href = '/login.html';
+        // window.location.href = '/login.html'; // Bypassed for development
     }
     throw error;
 }
@@ -96,6 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!session || !isTokenValid(session)) {
         // Redirect to login page with return URL
         const returnUrl = encodeURIComponent(window.location.href);
-        window.location.href = `${AUTH_CONFIG.loginEndpoint}?return_url=${returnUrl}`;
+        // window.location.href = `${AUTH_CONFIG.loginEndpoint}?return_url=${returnUrl}`;
     }
 }); 
