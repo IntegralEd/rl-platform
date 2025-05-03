@@ -38,36 +38,67 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: var(--background-color);
+            background-color: #E6F6FA;
             font-family: var(--client-font-body, sans-serif);
         }
 
-        .rl-layout {
+        .layout-wrapper {
             display: grid;
-            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-columns: 200px 1fr;
             grid-template-rows: auto 1fr auto;
-            gap: var(--layout-gap);
-            min-height: 100vh;
-            height: 100%;
-            padding: var(--layout-gap);
+            gap: 20px;
+            height: 100vh;
+            padding: 20px;
             box-sizing: border-box;
-            max-width: 1440px;
-            margin: 0 auto;
+            background: #E6F6FA;
         }
 
-        .client-sidebar {
-            grid-column: 1;
-            grid-row: 1 / 3;
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 24px 0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        .sidebar {
+            grid-row: 1 / span 3;
+            background: #fff;
+            border-bottom-right-radius: 12px;
             overflow: hidden;
-            height: calc(100vh - var(--layout-gap) * 2 - var(--footer-height));
-            position: sticky;
-            top: var(--layout-gap);
-            margin-right: var(--layout-gap);
-            width: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+            max-width: 200px;
+        }
+
+        .header {
+            grid-column: 2;
+            height: 52px;
+            border-radius: 12px;
+            background: #E6F6FA;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header__profile-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .main {
+            grid-column: 2;
+            background: #E6F6FA;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .footer {
+            grid-column: 1 / span 2;
+            height: 50px;
+            border-radius: 12px;
+            background: #E6F6FA;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
         }
 
         .client-sidebar__header {
@@ -172,21 +203,6 @@
             background: var(--elpl-primary-hover);
         }
 
-        .rl-nav__profile {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            height: 36px;
-            padding: 0 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .rl-nav__profile:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
         .rl-nav__avatar {
             width: 32px;
             height: 32px;
@@ -201,27 +217,12 @@
         }
 
         .rl-nav__settings {
-            width: 36px;
-            height: 36px;
-            padding: 0;
             background: none;
             border: none;
-            border-radius: 6px;
             cursor: pointer;
+            padding: 0;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: var(--client-text);
-            transition: background-color 0.2s;
-        }
-
-        .rl-nav__settings:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .rl-nav__settings svg {
-            width: 20px;
-            height: 20px;
         }
 
         .rl-main {
@@ -463,20 +464,17 @@
         }
 
         .welcome-title {
-            font-family: var(--client-font-h1, 'Lora');
-            font-size: 48px;
-            font-weight: 700;
             color: var(--elpl-primary);
+            font-size: 96px;
+            font-weight: 800;
             margin-bottom: 0;
-            line-height: 1.1;
         }
 
         .welcome-subtitle {
-            font-family: var(--client-font-h2, 'Montserrat');
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
             color: var(--elpl-primary);
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             margin-top: 0;
         }
@@ -491,20 +489,281 @@
         .client-welcome__grade-options {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            max-height: 280px;
-            overflow-y: auto;
+            gap: 8px;
             padding-right: 16px;
+            margin-bottom: 32px;
         }
 
         .grade-option {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 12px;
+            padding: 12px 18px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.2s, color 0.2s;
+            font-size: 18px;
+            background: #fff;
+            border: 2px solid transparent;
+        }
+
+        .grade-option:hover,
+        .grade-option.selected {
+            background: rgba(198, 18, 63, 0.08);
+            border: 2px solid var(--elpl-primary);
+        }
+
+        .grade-option .star-icon {
+            font-size: 22px;
+            transition: color 0.2s;
+        }
+
+        .grade-option.selected .star-icon {
+            color: var(--elpl-primary);
+        }
+
+        .client-welcome__next-button {
+            height: 64px;
+            font-size: 1.3rem;
+            padding: 0 40px;
+            border-radius: 12px;
+            margin-top: 60px;
+            align-self: flex-start;
+            background: var(--elpl-primary);
+            color: #fff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .client-welcome__next-button:disabled {
+            background: #eee;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        .welcome-flex-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 32px;
+            width: 100%;
+            max-width: 900px;
+        }
+        .client-welcome__grade-options-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
+            padding: 32px 32px 24px 32px;
+            min-width: 320px;
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .client-welcome__grade-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 0;
+            padding: 0;
+        }
+        .grade-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 18px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .grade-option:hover,
+        .grade-option.selected {
+            background: rgba(198, 18, 63, 0.08);
+        }
+        .grade-option .star-icon {
+            font-size: 22px;
+            transition: color 0.2s;
+        }
+        .grade-option.selected .star-icon {
+            color: var(--elpl-primary);
+        }
+        .client-welcome__next-button {
+            height: 56px;
+            font-size: 1.1rem;
+            padding: 0 36px;
+            border-radius: 12px;
+            background: var(--elpl-primary);
+            color: #fff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .client-welcome__next-button:disabled {
+            background: #eee;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        @media (max-width: 900px) {
+            .welcome-flex-row {
+                flex-direction: column;
+                gap: 24px;
+                align-items: stretch;
+            }
+            .client-welcome__next-button {
+                align-self: stretch;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        .chat-frame {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 80vh;
+            min-height: 500px;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+        }
+        .chat-messages {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 40px 48px 20px 48px;
+            border-radius: 16px 16px 0 0;
+            box-sizing: border-box;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .client-chat__input-container {
+            display: flex;
+            align-items: center;
+            background: #f7f8fa;
+            border-radius: 0 0 16px 16px;
+            padding: 20px 32px;
+            gap: 16px;
+            box-shadow: none;
+            border-top: 1px solid #f0f0f0;
+            width: 100%;
+            margin: 0;
+        }
+        #chat-input.client-chat__input {
+            flex: 1 1 auto;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            padding: 0;
+            outline: none;
+            resize: none;
+            color: var(--client-text);
+        }
+        #send-button.client-chat__action {
+            background: var(--elpl-primary);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        #send-button.client-chat__action:disabled {
+            background: #eee;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        #send-button .send-icon {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+        /* Chat message bubbles */
+        .client-chat__message {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 18px;
+            max-width: 100%;
+            width: 100%;
+        }
+        .client-chat__message.user {
+            flex-direction: row;
+            justify-content: flex-end;
+            margin-left: auto;
+        }
+        .client-chat__message.assistant {
+            flex-direction: row;
+            justify-content: flex-start;
+            margin-right: auto;
+        }
+        .client-chat__avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f7f8fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0 0 16px;
+        }
+        .client-chat__message.user .client-chat__avatar {
+            margin: 0 0 0 16px;
+            order: 2;
+        }
+        .client-chat__message.user .client-chat__content {
+            order: 1;
+        }
+        .client-chat__message.assistant .client-chat__avatar {
+            margin: 0 16px 0 0;
+            order: 1;
+        }
+        .client-chat__message.assistant .client-chat__content {
+            order: 2;
+        }
+        .client-chat__bubble {
+            background: #f7f8fa;
+            border-radius: 16px;
+            padding: 16px 24px;
+            font-size: 16px;
+            color: var(--client-text);
+            box-shadow: 0 1px 4px rgba(44,62,80,0.06);
+            max-width: 420px;
+            word-break: break-word;
+        }
+        .client-chat__message.user .client-chat__bubble {
+            background: #fbe9ef;
+            color: var(--elpl-primary);
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 16px;
+        }
+        .client-chat__message.assistant .client-chat__bubble {
+            background: #f7f8fa;
+            color: var(--client-text);
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 16px;
         }
     </style>
     
@@ -593,57 +852,20 @@
     <!-- <script type="module" src="/shared/assets/js/client-router.js"></script> -->
 </head>
 <body>
-    <!-- Review Banner -->
-    <div class="review-banner" id="review-banner" style="display: none;">Review Environment | ELPL Merit System</div>
-    
-    <!-- Connection Status -->
-    <div id="connection-status" class="status-indicator connecting" role="alert" aria-live="polite" style="display: none;">
-        <span id="connection-message">Connecting to Merit...</span>
-    </div>
-    
-    <!-- Error Banner -->
-    <div id="error-banner" class="error-banner hidden" role="alert" aria-live="assertive">
-        <span class="error-icon">⚠️</span>
-        <span id="error-details">An error occurred</span>
-        <button onclick="this.parentElement.classList.add('hidden')" aria-label="Dismiss error">
-            Dismiss
-        </button>
-    </div>
-    
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay" aria-hidden="true" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p id="loading-message" class="loading-message">Connecting to your assistant...</p>
-        <div class="loading-progress">
-            <div class="progress-bar"></div>
-        </div>
-    </div>
-
-    <!-- Main Layout -->
-    <div class="rl-layout" data-client-component="merit-page" data-test-id="page-container">
+    <div class="layout-wrapper">
         <!-- Sidebar -->
-        <aside class="client-sidebar" role="navigation" aria-label="Main navigation" data-test-id="sidebar">
+        <aside class="sidebar">
             <div class="client-sidebar__header">
                 <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education Logo" class="client-sidebar__logo">
-                <span class="client-sidebar__subtitle" style="color: #C6123F;">Professional Learning</span>
+                <span class="client-sidebar__subtitle" style="color: #C6123F;">PROFESSIONAL LEARNING</span>
             </div>
             <nav class="client-sidebar__nav">
                 <ul>
                     <li>
-                        <a href="#welcome" class="client-nav__item" data-section="welcome">
-                            <span class="client-nav__icon">
-                                <!-- Welcome icon SVG here -->
-                            </span>
-                            Welcome
-                        </a>
+                        <a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a>
                     </li>
                     <li>
-                        <a href="#chat" class="client-nav__item" data-section="chat">
-                            <span class="client-nav__icon">
-                                <!-- Chat icon SVG here -->
-                            </span>
-                            Chat
-                        </a>
+                        <a href="#chat" class="client-nav__item" data-section="chat">Chat</a>
                     </li>
                 </ul>
             </nav>
@@ -651,36 +873,26 @@
         </aside>
 
         <!-- Header -->
-        <header class="rl-header" style="background: #E6F6FA;">
-            <div class="rl-header__left"></div>
-            <nav class="rl-header__nav">
-                <button class="rl-nav__notification" aria-label="Notifications">
-                    <!-- Notification bell SVG here -->
-                </button>
+        <header class="header">
+            <div class="header__profile-group">
+                <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
+                <span class="rl-nav__username">Leslie Alexander</span>
                 <button class="rl-nav__settings" aria-label="Settings">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 13.3333C11.841 13.3333 13.3333 11.841 13.3333 10C13.3333 8.15905 11.841 6.66667 10 6.66667C8.15905 6.66667 6.66667 8.15905 6.66667 10C6.66667 11.841 8.15905 13.3333 10 13.3333Z" stroke="#2c3e50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M17.5 10C17.5 10.6167 17.4417 11.225 17.325 11.8167C17.2417 12.2417 17.3167 12.6917 17.5333 13.0667C17.75 13.4417 18.0917 13.7167 18.5 13.8333C18.9083 13.95 19.3583 13.8833 19.7333 13.6667C20.1083 13.45 20.3833 13.1083 20.5 12.7C20.6167 12.2917 20.55 11.8417 20.3333 11.4667C20.1167 11.0917 19.775 10.8167 19.3667 10.7C18.9583 10.5833 18.5083 10.65 18.1333 10.8667C17.7583 11.0833 17.4833 11.425 17.3667 11.8333C17.25 12.2417 17.3167 12.6917 17.5333 13.0667" stroke="#2c3e50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <img src="/clients/elpl/assets/images/settings.svg" alt="Settings" style="width: 24px; height: 24px;" />
                 </button>
-                <div class="rl-nav__profile">
-                    <img src="/clients/elpl/assets/images/leslie-avatar.svg" alt="Profile" class="rl-nav__avatar">
-                    <span class="rl-nav__username">Leslie Alexander</span>
-                </div>
-            </nav>
+            </div>
         </header>
 
-        <!-- Main Content Area -->
-        <main class="client-content" style="background: #E6F6FA; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0;">
-            <div class="welcome-header" style="text-align: left; margin-bottom: 0; background: none !important; box-shadow: none !important; align-items: flex-start; justify-content: flex-start; width: 100%;">
-                <h1 class="welcome-title" style="margin-bottom: 0; font-size: 96px; font-weight: 800; color: #C6123F;">Merit</h1>
-                <p class="welcome-subtitle" style="margin-top: 0; font-size: 24px; color: #C6123F; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;">CURRICULUM SUPPORT ASSISTANT</p>
+        <!-- Main Content -->
+        <main class="main">
+            <div class="welcome-header">
+                <h1 class="welcome-title">Merit</h1>
+                <p class="welcome-subtitle">CURRICULUM SUPPORT ASSISTANT</p>
             </div>
-            <div class="welcome-flex-row" style="display: flex; align-items: flex-start; justify-content: center; gap: 64px; margin-top: 0; background: none; box-shadow: none; width: 100%; max-width: 1100px;">
-                <div class="client-welcome__grade-options-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(44,62,80,0.10); padding: 32px 32px 24px 32px; min-width: 320px; max-width: 400px; width: 100%; display: flex; flex-direction: column; align-items: stretch;">
-                    <h2 style="margin-top: 0; margin-bottom: 18px; color: #C6123F; font-size: 2rem; font-weight: 700; text-align: left;">Customize your assistant:</h2>
+            <div class="welcome-flex-row">
+                <div class="client-welcome__grade-options-card">
                     <h3 class="grade-selection-subtitle" style="margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; color: #222; font-weight: 500; text-align: left;">Select all that apply<br>Grade Level(s)</h3>
-                    <div class="client-welcome__grade-options" id="gradeSelect" style="max-height: 400px; overflow-y: auto;">
+                    <div class="client-welcome__grade-options" id="gradeSelect">
                         <div class="grade-option" data-grade="K" tabindex="0">
                             <span class="star-icon">☆</span>
                             <span class="grade-text">Kindergarten</span>
@@ -707,27 +919,31 @@
                         </div>
                     </div>
                 </div>
-                <button class="client-welcome__next-button" id="nextButton" style="height: 64px; font-size: 1.3rem; padding: 0 40px; border-radius: 12px; margin-top: 60px; align-self: flex-start; background: #C6123F; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 12px;">
+                <button class="client-welcome__next-button" id="nextButton">
                     CREATE ASSISTANT
                     <svg class="button-arrow" width="32" height="32" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </button>
             </div>
-            <!-- Chat Section -->
             <section data-section="chat" id="chat-section" class="section">
-              <div id="chat-window" class="chat-messages" role="log" aria-live="polite"></div>
-              <div class="client-chat__input-container">
-                <textarea id="chat-input" class="client-chat__input" aria-label="Type your message" placeholder="Type your message..." rows="1" maxlength="1000"></textarea>
-                <button id="send-button" class="client-chat__action client-chat__action--send" aria-label="Send message">
-                  <img src="/clients/elpl/assets/images/client-elpl-send-icon-white.svg" alt="Send" width="20" height="20" style="width:20px; height:20px;" />
-                </button>
-              </div>
+                <div class="chat-frame">
+                    <div id="chat-window" class="chat-messages" role="log" aria-live="polite"></div>
+                    <div class="client-chat__input-container">
+                        <textarea id="chat-input" class="client-chat__input" aria-label="Type your message" placeholder="Type your message..." rows="1" maxlength="1000"></textarea>
+                        <button id="send-button" class="client-chat__action client-chat__action--send" aria-label="Send message">
+                            <svg class="send-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="12" fill="var(--elpl-primary)"/>
+                                <path d="M8 12L16 12M16 12L13 9M16 12L13 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </section>
         </main>
 
         <!-- Footer -->
-        <footer class="rl-footer">
+        <footer class="footer">
             <div class="rl-footer__left">
                 <img src="/shared/platform/images/admin-logo.png" alt="Platform Logo" class="rl-footer__logo">
             </div>
@@ -963,7 +1179,7 @@
                     const grade = option.getAttribute('data-grade');
                     if (option.classList.contains('selected')) {
                         star.textContent = '★';
-                        star.style.color = '#C6123F';
+                        star.style.color = 'var(--elpl-primary)';
                         if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
                     } else {
                         star.textContent = '☆';
@@ -1121,6 +1337,7 @@
                     // Message
                     const messageDiv = document.createElement('div');
                     messageDiv.className = `client-chat__message ${msg.isUser ? 'user' : 'assistant'}`;
+                    messageDiv.style.width = '100%';
 
                     const avatar = document.createElement('div');
                     avatar.className = 'client-chat__avatar';
@@ -1136,7 +1353,6 @@
 
                     const bubble = document.createElement('div');
                     bubble.className = `client-chat__bubble ${msg.isUser ? 'user' : 'assistant'}`;
-                    // CamelCase for user messages
                     bubble.textContent = msg.isUser ? toCamelCase(msg.text) : msg.text;
 
                     const timestamp = document.createElement('div');
