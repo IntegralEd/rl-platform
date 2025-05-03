@@ -851,13 +851,13 @@
     <!-- Debugging script added for console logging -->
     <script>
       console.log('[Merit HTML] Loaded.');
-      const nextButton = document.getElementById('next-button');
+      const nextButton = document.getElementById('nextButton');
       if (nextButton) {
         console.log('[Merit HTML] Next button initial state:', nextButton.disabled);
       } else {
         console.log('[Merit HTML] Next button not found.');
       }
-      const gradeSelect = document.getElementById('grade-level');
+      const gradeSelect = document.getElementById('gradeSelect');
       if (gradeSelect) {
         gradeSelect.addEventListener('change', function() {
           console.log('[Merit HTML] Grade level changed to:', this.value);
