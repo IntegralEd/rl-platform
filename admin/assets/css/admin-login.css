@@ -1,0 +1,61 @@
+:root {
+  --deep-teal: #082838;
+  --ocean-blue: #113f56;
+  --atlantic-teal: #1f5970;
+  --muted-seafoam: #3e7286;
+  --misty-blue: #65909d;
+  --clouded-turquoise: #94b4bd;
+  --pale-sky: #cae5ed;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, var(--deep-teal), var(--misty-blue));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.login-container {
+  background-color: var(--pale-sky);
+  border: 2px solid var(--clouded-turquoise);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 320px;
+}
+
+.login-container h2 {
+  color: var(--deep-teal);
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--clouded-turquoise);
+  border-radius: 6px;
+  background-color: var(--clouded-turquoise);
+  color: var(--deep-teal);
+}
+
+input[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--atlantic-teal);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  background-color: var(--ocean-blue);
+} 

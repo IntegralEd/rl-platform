@@ -1,0 +1,147 @@
+<div class="page" style="position:relative;min-height:100vh;">
+    <header class="header">
+      <h1 id="timesheetHeader">Timesheet Entry</h1>
+    </header>
+  
+    <!-- Chart container -->
+    <div id="chartContainer" style="display:flex;align-items:flex-end;width:100%;gap:8px;">
+      <div style="flex:1;">
+        <!-- Top bar chart -->
+        <div id="topBarChart" style="display:flex;height:60px;width:100%;background:#eee;border-radius:4px;overflow:hidden;"></div>
+        <!-- Scale below bars -->
+        <div id="barScale" style="display:flex;justify-content:space-between;margin-top:4px;font-size:12px;color:#333;">
+          <span>0m</span><span>120m</span><span>240m</span><span>360m</span><span>480m</span>
+        </div>
+      </div>
+      <!-- Total display -->
+      <div id="totalTime" style="width:100px;height:60px;display:flex;align-items:center;justify-content:center;font-weight:bold;">0h 0m</div>
+    </div>
+  
+    <div style="height:10px"></div>
+    <h2>Add Timesheets for <span id="timesheetDateHeader">Date</span></h2>
+  
+    <div id="rowContainer"></div>
+  
+    <!-- Action buttons aligned -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <button type="button" id="addRowBtn">Add Row</button>
+      <button type="button" id="submitEntriesBtn" disabled>Submit Entries</button>
+    </div>
+  
+    <!-- Row template -->
+    <template id="rowTemplate">
+      <div class="timesheet-row" style="border:2px solid #7e97ac;border-radius:2px;padding:8px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+        <!-- Color swatch full height -->
+        <div class="color-swatch" style="width:20px;align-self:stretch;border-radius:4px;background:#ccc;"></div>
+  
+        <select class="billing-code">
+          <option value="">-- Select billing code --</option>
+          <option value="KIPP_FY25_TTT_design">KIPP FY25 TTT → design</option>
+          <option value="EL_2025_Curriculum">EL 2025 → 2025 Curriculum</option>
+          <option value="ST_2025_DCI_0702">ST 2025 → DCI Mini-Course (0702)</option>
+          <option value="add-new">+ Add new billing code</option>
+        </select>
+  
+        <textarea class="notes" style="flex:1" placeholder="Enter notes"></textarea>
+  
+        <!-- Time controls -->
+        <input type="range" class="time-slider" min="0" max="480" />
+        <input type="number" class="minutes-input" min="0" max="480" placeholder="# minutes" />
+        <span class="time-display">0h 0m</span>
+  
+        <input type="checkbox" class="row-done" /> Done
+      </div>
+    </template>
+  
+    <!-- Submit Confirmation Modal -->
+    <div id="submitModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:16px;border-radius:4px;max-width:320px;width:100%;">
+        <h3>Confirm Submission</h3>
+        <p>Do you affirm these entries are correct and accurate?</p>
+        <label><input type="checkbox" id="affirmCheckbox"> I affirm</label>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button type="button" id="confirmSubmitBtn" disabled>Confirm Submit</button>
+          <button type="button" id="cancelSubmitBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal for not logged in -->
+    <div id="loginModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:24px;border-radius:8px;max-width:340px;width:100%;text-align:center;">
+        <h2>Login Required</h2>
+        <p>You need to login before you log time.</p>
+        <button id="loginRedirectBtn" style="margin-top:16px;">Go to Admin Login</button>
+      </div>
+    </div>
+  
+    <script src="../../auth.js"></script>
+    <script src="assets/js/daily-timesheet.js"></script>
+    <script src="assets/js/timesheet-redis-write.js"></script>
+  
+    <script>
+    // Helper: Capitalize first letter
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Check login and update header
+    function updateHeaderWithUser() {
+      const session = JSON.parse(localStorage.getItem('auth_session') || '{}');
+      if (!session.email) {
+        // Not logged in: show modal
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('loginRedirectBtn').onclick = () => {
+          window.location.href = '/admin/index.html';
+        };
+        return;
+      }
+      // Fetch user info from Redis 'team' cache (simulate with localStorage/team for now)
+      // In production, replace with API call to fetch user info by email
+      let firstName = '';
+      if (window.localStorage.team) {
+        try {
+          const team = JSON.parse(window.localStorage.team);
+          const user = team.find(u => u.email === session.email);
+          if (user && user.firstName) firstName = user.firstName;
+        } catch {}
+      }
+      // Fallback: use email prefix if no firstName
+      if (!firstName) firstName = session.email.split('@')[0];
+      document.getElementById('timesheetHeader').textContent = `Daily Timesheet for ${capitalize(firstName)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', updateHeaderWithUser);
+
+    // Inside the confirmSubmitBtn event listener
+    confirmSubmitBtn.addEventListener('click', () => {
+      submitModal.style.display = 'none';
+      alert('Entries submitted!');
+
+      // Collect data to store in Redis
+      const orgId = 'your-org-id'; // Replace with actual org ID
+      const threadId = 'your-thread-id'; // Replace with actual thread ID
+      const fieldAtId = 'your-field-at-id'; // Replace with actual field AT ID
+      const data = collectTimesheetData(); // Implement this function to gather data from the form
+
+      // Store data in Redis
+      storeTimesheetData(orgId, threadId, fieldAtId, data);
+    });
+
+    // Function to collect timesheet data
+    function collectTimesheetData() {
+      const timesheetData = [];
+      document.querySelectorAll('.timesheet-row').forEach(row => {
+        const billingCode = row.querySelector('.billing-code').value;
+        const notes = row.querySelector('.notes').value;
+        const minutes = row.querySelector('.minutes-input').value;
+        const done = row.querySelector('.row-done').checked;
+        timesheetData.push({ billingCode, notes, minutes, done });
+      });
+      return timesheetData;
+    }
+    </script>
+  </div>
+  
+  <link rel="stylesheet" href="assets/css/timesheet.css">
+  

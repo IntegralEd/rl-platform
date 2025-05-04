@@ -1,0 +1,125 @@
+/*
+  timesheet.css
+  -------------------
+  This file contains ONLY timesheet-specific UI/UX and layout overrides.
+  Do NOT define brand identity (colors, fonts, logos, backgrounds) here.
+  Brand identity is set in clients/integraled/assets/css/client-inegraled.css
+
+  Bar and swatch color palette: rainbow, harmonious, accessible
+*/
+
+:root {
+  --ts-red: #e57373;
+  --ts-orange: #ffb74d;
+  --ts-yellow: #fff176;
+  --ts-green: #81c784;
+  --ts-blue: #64b5f6;
+  --ts-indigo: #7986cb;
+  --ts-violet: #ba68c8;
+}
+
+/* Example mapping for up to 7 billing codes */
+.color-swatch[data-code="KIPP_FY25_TTT_design"] { background: var(--ts-red); }
+.color-swatch[data-code="EL_2025_Curriculum"] { background: var(--ts-orange); }
+.color-swatch[data-code="ST_2025_DCI_0702"] { background: var(--ts-yellow); }
+.color-swatch[data-code="CODE4"] { background: var(--ts-green); }
+.color-swatch[data-code="CODE5"] { background: var(--ts-blue); }
+.color-swatch[data-code="CODE6"] { background: var(--ts-indigo); }
+.color-swatch[data-code="CODE7"] { background: var(--ts-violet); }
+
+/* Fallback for any swatch */
+.color-swatch { background: #ccc; }
+
+/* Bar segment coloring (if using bar-segment classes) */
+.bar-segment[data-code="KIPP_FY25_TTT_design"] { background: var(--ts-red); }
+.bar-segment[data-code="EL_2025_Curriculum"] { background: var(--ts-orange); }
+.bar-segment[data-code="ST_2025_DCI_0702"] { background: var(--ts-yellow); }
+.bar-segment[data-code="CODE4"] { background: var(--ts-green); }
+.bar-segment[data-code="CODE5"] { background: var(--ts-blue); }
+.bar-segment[data-code="CODE6"] { background: var(--ts-indigo); }
+.bar-segment[data-code="CODE7"] { background: var(--ts-violet); }
+
+/* Fallback for any bar segment */
+.bar-segment { background: #7e97ac; }
+
+.page-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+#chartContainer {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  gap: 8px;
+}
+
+#topBarChart {
+  display: flex;
+  height: 60px;
+  width: 100%;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#barScale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #333;
+}
+
+#totalTime {
+  width: 100px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.timesheet-row {
+  border: 2px solid #7e97ac;
+  border-radius: 2px;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes {
+  flex: 1;
+}
+
+#submitModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#submitModal > div {
+  background: #fff;
+  padding: 16px;
+  border-radius: 4px;
+  max-width: 320px;
+  width: 100%;
+} 

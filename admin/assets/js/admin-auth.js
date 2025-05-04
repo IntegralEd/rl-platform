@@ -81,8 +81,8 @@ export class AdminAuth {
      * Validate admin password
      */
     static validatePassword(password) {
-        // Temporary password validation for @integral-ed.com emails
-        return password === 'temp_vault_2024!';
+        // Updated password validation for @integral-ed.com emails
+        return password === 'r3curs!v3';
     }
 
     /**
