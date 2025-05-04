@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Page Directory | Recursive Learning</title>
+  <link rel="stylesheet" href="/admin/assets/css/admin-core.css">
+  <style>
+    .page-index-container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 32px 24px;
+    }
+    .page-index-container h1 {
+      color: var(--admin-primary, #211651);
+      font-size: 2rem;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .admin-page-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .admin-page-list li {
+      background: var(--admin-bg, #f4f5f7);
+      border-radius: 8px;
+      padding: 20px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .admin-page-list a {
+      color: var(--admin-primary, #211651);
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .admin-page-list a:hover {
+      text-decoration: underline;
+    }
+    .admin-page-note {
+      color: #555;
+      font-size: 0.98rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-index-container">
+    <h1>Admin Page Directory</h1>
+    <ul class="admin-page-list">
+      <li>
+        <a href="/clients/st/goalsetter/goalsetter.html" target="_blank">StriveTogether Goalsetter</a>
+        <div class="admin-page-note">ST: Goal setting and progress tracking for StriveTogether partners.</div>
+      </li>
+      <li>
+        <a href="/clients/elpl/merit/merit.html" target="_blank">EL Education Merit</a>
+        <div class="admin-page-note">EL: Merit chat and feedback for EL Education professional learning.</div>
+      </li>
+      <li>
+        <a href="/clients/bhb/bmore/bmore.html" target="_blank">Bright Healthy Babies (BHB) B'More</a>
+        <div class="admin-page-note">BHB: Baltimore's early childhood engagement and resource platform.</div>
+      </li>
+      <li>
+        <a href="/clients/integraled/daily-timesheets/daily-timesheet.html" target="_blank">Daily Timesheets</a>
+        <div class="admin-page-note">Timesheet: Central team and partner timesheet entry and review.</div>
+      </li>
+    </ul>
+  </div>
+</body>
+</html> 
