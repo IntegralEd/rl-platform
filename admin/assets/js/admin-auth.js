@@ -149,7 +149,7 @@ export class AdminAuth {
         if (this.isAuthenticated()) {
             const authData = JSON.parse(localStorage.getItem(this.#VAULT_KEY));
             console.log('[Admin Auth] Redirecting authenticated user:', authData.email);
-            window.location.href = '/admin/dashboard.html';
+            window.location.href = '/admin/page-index.html';
         }
     }
 
