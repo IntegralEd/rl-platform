@@ -177,6 +177,12 @@ export class AdminAuth {
         this.clearAuth();
         window.location.href = '/admin/index.html';
     }
+
+    static requireAuth() {
+        if (!this.isAuthenticated()) {
+            window.location.href = '/admin/index.html';
+        }
+    }
 }
 
 // Auto-check auth on protected pages
