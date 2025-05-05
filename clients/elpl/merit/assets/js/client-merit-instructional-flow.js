@@ -281,7 +281,7 @@ export class MeritInstructionalFlow {
             this.#sendMessage();
         });
 
-        // Example: Add event listener for the grade select
+        // Ensure grade level selection is the only focus
         const gradeSelect = document.getElementById('gradeSelect');
         if (gradeSelect) {
             gradeSelect.addEventListener('change', (e) => {
