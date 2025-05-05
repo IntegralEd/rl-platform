@@ -1,3 +1,7 @@
+/* Section visibility for tabbed layout */
+.section { display: none; }
+.section.active { display: block; }
+
 .sidebar {
     position: fixed;
     left: 0;
