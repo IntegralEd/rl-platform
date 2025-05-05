@@ -54,12 +54,20 @@ export class MeritInstructionalFlow {
         g.classList.contains('selected') ? sel.add(g.dataset.grade) : sel.delete(g.dataset.grade);
         star.textContent = g.classList.contains('selected') ? '★' : '☆';
         upd();
-            });
-        });
+      });
+      g.addEventListener('keypress', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          g.click();
+        }
+      });
+    });
 
     this.#el.next.addEventListener('click', (e) => {
-            e.preventDefault();
-      if (sel.size) this.#show('chat');
+      e.preventDefault();
+      if (sel.size) {
+        console.log('[Merit] Launching chat with grades:', Array.from(sel));
+        this.#show('chat');
+      }
     });
   }
 
