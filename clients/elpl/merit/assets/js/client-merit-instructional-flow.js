@@ -204,9 +204,9 @@ export class MeritInstructionalFlow {
             chatbar: null,
             form: null,
             nextButton: document.getElementById('nextButton'),
-            sendButton: document.getElementById('send-button'),
-            chatInput: document.getElementById('chat-input'),
-            chatWindow: document.getElementById('chat-window'),
+            sendButton: document.getElementById('sendButton'),
+            chatInput: document.getElementById('chatInput'),
+            chatWindow: document.getElementById('chatWindow'),
             adminControls: null,
             gradeSelect: document.getElementById('gradeSelect')
         };

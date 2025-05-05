@@ -944,83 +944,61 @@
     <div class="status-notification" id="statusNotification"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Version switching system
-            const currentVersion = localStorage.getItem('merit_system_status') || 'dev';
-            if (currentVersion === 'prod' && window.location.pathname.includes('merit_temp.html')) {
-                window.location.href = 'merit.html';
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[Merit HTML] DOM fully loaded and parsed.');
+            var nextButton = document.getElementById('nextButton');
+            if (nextButton) {
+                console.log('[Merit HTML] Next button found.');
+                nextButton.addEventListener('click', function() {
+                    document.getElementById('welcome-section').classList.remove('active');
+                    document.getElementById('chat-section').classList.add('active');
+                    // Highlight Chat in sidebar
+                    var navItems = document.querySelectorAll('.client-nav__item');
+                    navItems.forEach(function(item) {
+                        item.classList.remove('active');
+                        if (item.getAttribute('data-section') === 'chat') {
+                            item.classList.add('active');
+                        }
+                    });
+                });
+            } else {
+                console.log('[Merit HTML] Next button not found.');
             }
 
-            // Menu dropdown functionality
-            const menuTrigger = document.querySelector('.menu-trigger');
-            const menuContent = document.querySelector('.menu-content');
-            
-            if (menuTrigger && menuContent) {
-                menuTrigger.addEventListener('click', (e) => {
-                    const isExpanded = menuTrigger.getAttribute('aria-expanded') === 'true';
-                    menuTrigger.setAttribute('aria-expanded', !isExpanded);
-                    menuContent.classList.toggle('show');
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!menuTrigger.contains(e.target)) {
-                        menuTrigger.setAttribute('aria-expanded', 'false');
-                        menuContent.classList.remove('show');
-                    }
-                });
+            var gradeSelect = document.getElementById('gradeSelect');
+            if (gradeSelect) {
+                console.log('[Merit HTML] Grade select found.');
+            } else {
+                console.log('[Merit HTML] Grade select not found.');
             }
 
-            // Grade selection functionality
-            const gradeOptions = document.querySelectorAll('.grade-option');
-            const nextButton = document.querySelector('.client-welcome__next-button');
-            let selectedGrades = [];
-
-            function checkSelections() {
-                const hasGrade = localStorage.getItem('merit_grade_level');
-                nextButton.disabled = !hasGrade;
-                
-                if (hasGrade) {
-                    nextButton.classList.add('enabled');
-                } else {
-                    nextButton.classList.remove('enabled');
-                }
+            var sendButton = document.getElementById('sendButton');
+            if (sendButton) {
+                console.log('[Merit HTML] Send button found.');
+            } else {
+                console.log('[Merit HTML] Send button not found.');
             }
-            gradeOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    option.classList.toggle('selected');
-                    const grade = option.getAttribute('data-grade');
-                    if (option.classList.contains('selected')) {
-                        if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
-                    } else {
-                        selectedGrades = selectedGrades.filter(g => g !== grade);
-                    }
-                    nextButton.disabled = selectedGrades.length === 0;
-                    if (selectedGrades.length > 0) {
-                        nextButton.classList.add('enabled');
-                    } else {
-                        nextButton.classList.remove('enabled');
-                    }
-                    updateButtonState();
-                });
-                option.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        option.click();
-                    }
-                });
-            });
 
-            // Next button logic
-            nextButton.addEventListener('click', function() {
-                if (selectedGrades.length > 0) {
-                    // Trigger the appropriate actions
-                    console.log('Next button clicked with selected grades:', selectedGrades);
-                    // Add your logic here
-                }
-            });
+            var chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                console.log('[Merit HTML] Chat input found.');
+            } else {
+                console.log('[Merit HTML] Chat input not found.');
+            }
 
-            // Initial check
-            checkSelections();
+            var chatWindow = document.getElementById('chatWindow');
+            if (chatWindow) {
+                console.log('[Merit HTML] Chat window found.');
+            } else {
+                console.log('[Merit HTML] Chat window not found.');
+            }
+
+            var footer = document.getElementById('footer');
+            if (footer) {
+                console.log('[Merit HTML] Footer found.');
+            } else {
+                console.log('[Merit HTML] Footer not found.');
+            }
         });
     </script>
 
@@ -1305,6 +1283,8 @@
     <!-- Build Log: May 5, 12:40pm -->
 </head>
 <body>
+    <div id="footer" class="rl-footer"></div>
+
     <div id="welcome-section" class="section active" data-section="welcome">
         <!-- Welcome section content -->
         <button id="nextButton" class="client-welcome__next-button" disabled>Next</button>
