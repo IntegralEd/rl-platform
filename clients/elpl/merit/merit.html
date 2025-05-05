@@ -864,7 +864,7 @@
     <!-- Debugging script added for console logging -->
     <script>
       console.log('[Merit HTML] Loaded.');
-      const nextButton = document.getElementById('next-button');
+      const nextButton = document.getElementById('nextButton');
       if (nextButton) {
         console.log('[Merit HTML] Next button initial state:', nextButton.disabled);
       } else {
@@ -1303,5 +1303,11 @@
     </script>
 
     <!-- Build Log: May 5, 12:40pm -->
+</head>
+<body>
+    <button id="nextButton" class="client-welcome__next-button">Next</button>
+    <select id="gradeSelect" class="grade-level">
+        <!-- Options here -->
+    </select>
 </body>
 </html> 
