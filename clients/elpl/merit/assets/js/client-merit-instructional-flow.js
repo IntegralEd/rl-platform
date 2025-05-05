@@ -244,6 +244,8 @@ export class MeritInstructionalFlow {
                     nextButton.classList.remove('enabled');
                 }
                 this.#state.gradeLevel = selectedGrades;
+                this.updateButtonState();
+                this.updateLaunchButton();
             }.bind(this));
             option.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -576,6 +578,21 @@ export class MeritInstructionalFlow {
         } catch (error) {
             console.error('[Merit Flow] Navigation error:', error);
             this.#logError(error);
+        }
+    }
+
+    updateButtonState() {
+        this.#updateActionState();
+    }
+
+    updateLaunchButton() {
+        const launchButton = document.querySelector('.client-welcome__next-button');
+        const anyChecked = Array.from(document.querySelectorAll('.grade-checkbox')).some(checkbox => checkbox.checked);
+        launchButton.disabled = !anyChecked;
+        if (anyChecked) {
+            launchButton.classList.add('enabled');
+        } else {
+            launchButton.classList.remove('enabled');
         }
     }
 }
