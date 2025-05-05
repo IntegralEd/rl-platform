@@ -64,6 +64,8 @@ export class MeritInstructionalFlow {
         sel.clear();
         sel.add(g.dataset.grade);
         upd();
+        // Log selection
+        console.log('Selected grade:', g.dataset.grade);
       });
       // Keyboard accessibility: Enter/Space selects
       g.addEventListener('keypress', e => {
