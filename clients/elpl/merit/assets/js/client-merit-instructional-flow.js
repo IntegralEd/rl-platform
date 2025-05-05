@@ -80,6 +80,8 @@ export class MeritInstructionalFlow {
       s.classList.toggle('active', on);
     });
     this.#el.nav.forEach(n => n.classList.toggle('active', n.dataset.section === id));
+    // Toggle chat-active class on body for CSS
+    document.body.classList.toggle('is-chat-active', id === 'chat');
     if (id === 'chat') this.#hydrateChat();
   }
 
