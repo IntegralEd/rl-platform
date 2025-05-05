@@ -6,13 +6,13 @@ import { MeritOpenAIClient } from './client-merit-openai.js';
 export class MeritInstructionalFlow {
   #cfg = {
     sections: ['welcome', 'chat'],
-    assistant: {
-      id: window.env.MERIT_ASSISTANT_ID,
-      project: window.env.OPENAI_PROJECT_ID,
-      org: window.env.MERIT_ORG_ID
-    },
+        assistant: {
+            id: window.env.MERIT_ASSISTANT_ID,
+            project: window.env.OPENAI_PROJECT_ID,
+            org: window.env.MERIT_ORG_ID
+        },
     api: window.env.RL_API_GATEWAY_ENDPOINT
-  };
+    };
 
   #el = {};
   #state = { sec: 'welcome' };
@@ -54,11 +54,11 @@ export class MeritInstructionalFlow {
         g.classList.contains('selected') ? sel.add(g.dataset.grade) : sel.delete(g.dataset.grade);
         star.textContent = g.classList.contains('selected') ? '★' : '☆';
         upd();
-      });
-    });
+            });
+        });
 
     this.#el.next.addEventListener('click', (e) => {
-      e.preventDefault();
+            e.preventDefault();
       if (sel.size) this.#show('chat');
     });
   }
@@ -66,10 +66,10 @@ export class MeritInstructionalFlow {
   /* ---------- nav ---------- */
   #bindNav () {
     this.#el.nav.forEach(n => n.addEventListener('click', e => {
-      e.preventDefault();
+                e.preventDefault();
       this.#show(n.dataset.section);
     }));
-  }
+    }
 
   #show (id) {
     if (!this.#cfg.sections.includes(id)) return;
@@ -115,8 +115,8 @@ export class MeritInstructionalFlow {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
     this.#el.send.addEventListener('click', send);
-  }
-}
+        }
+    }
 
 window.addEventListener('DOMContentLoaded', () => {
   window.meritFlow = new MeritInstructionalFlow();

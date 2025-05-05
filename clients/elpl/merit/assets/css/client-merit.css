@@ -84,6 +84,39 @@
     }
 }
 
+/* Layout grid and variables from Asha's original UX */
+:root {
+  --sidebar-width: 250px;
+  --layout-gap: 24px;
+  --border-radius: 16px;
+  --footer-height: 64px;
+}
+
+.rl-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--layout-gap);
+  min-height: 100vh;
+  height: 100%;
+  padding: var(--layout-gap);
+  box-sizing: border-box;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100%;
+    --layout-gap: 12px;
+  }
+  .rl-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    padding: var(--layout-gap);
+  }
+}
+
 /* --- Begin merged Merit Chat Styles from client-merit-chat.css --- */
 .message {
     padding: 10px;
@@ -169,4 +202,21 @@
     }
 }
 /* ... (merge the rest of the relevant chat and welcome styles as needed) ... */
-/* --- End merged Merit Chat Styles --- */ 
+/* --- End merged Merit Chat Styles --- */
+
+.client-sidebar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  z-index: 2;
+}
+
+.rl-footer {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  z-index: 1;
+}
+
+.client-content {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+} 
