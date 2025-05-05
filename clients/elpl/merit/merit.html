@@ -1308,119 +1308,79 @@
         <button id="sendButton" class="send-button" disabled>Send</button>
     </div>
 
-    <!-- Ensure all scripts are placed at the end of the body -->
+    <!-- Only one script block for all DOM event listeners and initialization -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('[Merit HTML] DOM fully loaded and parsed.');
+      document.addEventListener('DOMContentLoaded', function() {
+        // Log DOM loaded
+        console.log('[Merit HTML] DOM fully loaded and parsed.');
 
-            const nextButton = document.getElementById('nextButton');
-            if (nextButton) {
-                console.log('[Merit HTML] Next button found.');
-                nextButton.addEventListener('click', function() {
-                    document.getElementById('welcome-section').classList.remove('active');
-                    document.getElementById('chat-section').classList.add('active');
-                    // Highlight Chat in sidebar
-                    const navItems = document.querySelectorAll('.client-nav__item');
-                    navItems.forEach(function(item) {
-                        item.classList.remove('active');
-                        if (item.getAttribute('data-section') === 'chat') {
-                            item.classList.add('active');
-                        }
-                    });
-                });
-            } else {
-                console.warn('[Merit HTML] Next button not found.');
-            }
+        // Element references (camelCase IDs)
+        const nextButton = document.getElementById('nextButton');
+        const gradeSelect = document.getElementById('gradeSelect');
+        const sendButton = document.getElementById('sendButton');
+        const chatInput = document.getElementById('chatInput');
+        const chatWindow = document.getElementById('chatWindow');
+        const footer = document.getElementById('footer');
 
-            const gradeSelect = document.getElementById('gradeSelect');
-            if (gradeSelect) {
-                console.log('[Merit HTML] Grade select found.');
-                gradeSelect.addEventListener('change', function() {
-                    console.log('[Merit HTML] Grade level changed to:', this.value);
-                    console.log('[Merit HTML] Next button state after grade change:', nextButton ? nextButton.disabled : 'not found');
-                });
-            } else {
-                console.warn('[Merit HTML] Grade select not found.');
-            }
+        // Log presence
+        console.log('[Merit HTML] Next button', nextButton ? 'found.' : 'not found.');
+        console.log('[Merit HTML] Grade select', gradeSelect ? 'found.' : 'not found.');
+        console.log('[Merit HTML] Send button', sendButton ? 'found.' : 'not found.');
+        console.log('[Merit HTML] Chat input', chatInput ? 'found.' : 'not found.');
+        console.log('[Merit HTML] Chat window', chatWindow ? 'found.' : 'not found.');
+        console.log('[Merit HTML] Footer', footer ? 'found.' : 'not found.');
 
-            const sendButton = document.getElementById('sendButton');
-            if (sendButton) {
-                console.log('[Merit HTML] Send button found.');
-            } else {
-                console.warn('[Merit HTML] Send button not found.');
-            }
-
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                console.log('[Merit HTML] Chat input found.');
-            } else {
-                console.warn('[Merit HTML] Chat input not found.');
-            }
-
-            const chatWindow = document.getElementById('chatWindow');
-            if (chatWindow) {
-                console.log('[Merit HTML] Chat window found.');
-            } else {
-                console.warn('[Merit HTML] Chat window not found.');
-            }
-
-            const footer = document.getElementById('footer');
-            if (footer) {
-                console.log('[Merit HTML] Footer found.');
-            } else {
-                console.warn('[Merit HTML] Footer not found.');
-            }
-
-            // Initialize API Connection Manager
-            new APIConnectionManager();
-
-            // Auto-initialize Merit Flow
-            if (window.MeritInstructionalFlow) {
-                try {
-                    window.meritFlow = new MeritInstructionalFlow({
-                        gradeSelect: document.getElementById('grade-level'),
-                        curriculumSelect: document.getElementById('curriculum')
-                    });
-                } catch (error) {
-                    console.error('[Development] Flow initialization error:', error);
-                }
-            }
-
-            // Set default tab to #welcome if no hash is present
-            if (!window.location.hash) {
-                window.location.hash = '#welcome';
-                console.log('[Merit HTML] No hash present - defaulting to #welcome');
-            }
-
-            // Navigation handling
+        // Next button event
+        if (nextButton) {
+          nextButton.addEventListener('click', function() {
+            document.getElementById('welcome-section').classList.remove('active');
+            document.getElementById('chat-section').classList.add('active');
+            // Highlight Chat in sidebar
             const navItems = document.querySelectorAll('.client-nav__item');
-            const sections = document.querySelectorAll('.section');
-
-            function showSection(sectionId) {
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.getAttribute('data-section') === sectionId) {
-                        section.classList.add('active');
-                    }
-                });
-
-                navItems.forEach(item => {
-                    item.classList.remove('active');
-                    if (item.getAttribute('data-section') === sectionId) {
-                        item.classList.add('active');
-                    }
-                });
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const sectionId = item.getAttribute('data-section');
-                    showSection(sectionId);
-                    window.location.hash = sectionId;
-                });
+            navItems.forEach(function(item) {
+              item.classList.remove('active');
+              if (item.getAttribute('data-section') === 'chat') {
+                item.classList.add('active');
+              }
             });
-        });
+          });
+        }
+        // Grade select event
+        if (gradeSelect) {
+          gradeSelect.addEventListener('change', function() {
+            console.log('[Merit HTML] Grade level changed to:', this.value);
+            console.log('[Merit HTML] Next button state after grade change:', nextButton ? nextButton.disabled : 'not found');
+          });
+        }
+        // Send button event
+        if (sendButton && chatInput && chatWindow) {
+          sendButton.addEventListener('click', function() {
+            const message = chatInput.value.trim();
+            if (message) {
+              const msgDiv = document.createElement('div');
+              msgDiv.className = 'client-chat__message user';
+              msgDiv.textContent = message;
+              chatWindow.appendChild(msgDiv);
+              chatInput.value = '';
+              chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+          });
+          chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              sendButton.click();
+            }
+          });
+        }
+        // Initialize main instructional flow after DOM is ready and elements exist
+        if (window.MeritInstructionalFlow && nextButton && gradeSelect && sendButton && chatInput && chatWindow) {
+          try {
+            window.meritFlow = new MeritInstructionalFlow();
+          } catch (error) {
+            console.error('[Merit HTML] Error initializing MeritInstructionalFlow:', error);
+          }
+        }
+      });
     </script>
 
     <script>
