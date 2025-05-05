@@ -51,12 +51,21 @@ export class MeritInstructionalFlow {
     this.#el.grades.forEach(g => {
       const star = g.querySelector('.star-icon');
       g.addEventListener('click', () => {
-        g.classList.toggle('selected');
-        g.classList.contains('selected') ? sel.add(g.dataset.grade) : sel.delete(g.dataset.grade);
-        star.textContent = g.classList.contains('selected') ? '★' : '☆';
+        // Single-select: clear all others
+        this.#el.grades.forEach(other => {
+          other.classList.remove('selected');
+          other.setAttribute('aria-selected', 'false');
+          const s = other.querySelector('.star-icon');
+          if (s) s.textContent = '☆';
+        });
+        g.classList.add('selected');
+        g.setAttribute('aria-selected', 'true');
+        if (star) star.textContent = '★';
+        sel.clear();
+        sel.add(g.dataset.grade);
         upd();
       });
-      // Keyboard accessibility: Enter/Space toggles selection
+      // Keyboard accessibility: Enter/Space selects
       g.addEventListener('keypress', e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();

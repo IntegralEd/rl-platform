@@ -74,20 +74,16 @@
       </div>
       <section id="welcome-section" class="section active" data-section="welcome">
         <form id="welcome-form">
-          <div class="welcome-flex-row">
-            <div class="client-welcome__grade-options-card">
-              <h2 style="margin:0 0 24px 0;color:var(--elpl-primary);font-size:1.75rem;font-weight:700">Select Grade Level(s)</h2>
-              <div class="client-welcome__grade-options" id="gradeSelect">
-                <div class="grade-option" data-grade="K" tabindex="0"><span class="star-icon">☆</span>Kindergarten</div>
-                <div class="grade-option" data-grade="1" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;1</div>
-                <div class="grade-option" data-grade="2" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;2</div>
-                <div class="grade-option" data-grade="3" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;3</div>
-                <div class="grade-option" data-grade="4" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;4</div>
-                <div class="grade-option" data-grade="5" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;5</div>
-              </div>
-            </div>
-            <button id="nextButton" class="client-welcome__next-button" disabled>Start Chatting</button>
+          <h3 class="client-welcome__grade-heading">Select Grade Level</h3>
+          <div class="client-welcome__grade-options" id="gradeSelect" role="listbox" aria-label="Grade Level" tabindex="0">
+            <div class="grade-option" data-grade="K" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Kindergarten</div>
+            <div class="grade-option" data-grade="1" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Grade&nbsp;1</div>
+            <div class="grade-option" data-grade="2" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Grade&nbsp;2</div>
+            <div class="grade-option" data-grade="3" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Grade&nbsp;3</div>
+            <div class="grade-option" data-grade="4" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Grade&nbsp;4</div>
+            <div class="grade-option" data-grade="5" tabindex="0" role="option" aria-selected="false"><span class="star-icon">☆</span>Grade&nbsp;5</div>
           </div>
+          <button id="nextButton" class="client-welcome__next-button" disabled>Start Chatting</button>
         </form>
       </section>
 
