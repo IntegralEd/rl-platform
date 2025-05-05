@@ -188,8 +188,6 @@ html, body {
 }
 
 .client-content {
-  grid-column: 2;
-  grid-row: 1 / span 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -288,105 +286,66 @@ html, body {
   min-height: 0;
   height: auto;
 }
+.client-welcome__form-row {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: block;
+}
 .client-welcome__grade-options-card {
-  padding: 20px 20px 16px 20px;
+  background: #fff !important;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(44,62,80,0.16), 0 2px 8px rgba(44,62,80,0.10);
+  border: 2px solid #e1e4e8;
   min-width: 220px;
-  max-width: 340px;
+  max-width: 100%;
   width: 100%;
   margin: 0 auto;
-}
-.client-welcome__grade-options-card h2 {
-  margin-top: 0;
-  margin-bottom: 18px;
-  color: var(--elpl-primary);
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: left;
-}
-.grade-selection-subtitle {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  color: #222;
-  font-weight: 500;
-  text-align: left;
-}
-.client-welcome__grade-options {
-  max-height: 400px;
-  overflow-y: auto;
+  padding: 32px 28px 24px 28px;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: stretch;
 }
-.client-welcome__grade-options.two-col {
+.client-welcome__grade-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px 24px;
 }
-.grade-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1.1rem;
-  margin-bottom: 4px;
+@media (min-width: 600px) {
+  .client-welcome__grade-options {
+    grid-template-columns: 1fr 1fr;
+  }
 }
-.grade-option.selected,
-.grade-option:hover {
-  background: rgba(198,18,63,0.08);
-}
-.grade-option .star-icon {
-  font-size: 22px;
-  transition: color 0.2s;
-}
-.grade-option.selected .star-icon {
-  color: var(--elpl-primary);
+@media (min-width: 900px) {
+  .client-welcome__grade-options {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }
 .client-welcome__next-button {
-  margin-top: 16px;
+  margin-top: 24px;
+  align-self: flex-end;
+  min-width: 180px;
+  height: 64px;
+  font-size: 1.2rem;
 }
 @media (max-width: 900px) {
-  .client-content {
+  .client-welcome__form-row {
     max-width: 98vw;
   }
-  .welcome-header {
-    max-width: 98vw;
+  .client-welcome__grade-options {
+    grid-template-columns: 1fr 1fr;
   }
-  .welcome-flex-row {
-    max-width: 98vw;
-    gap: 10px;
-  }
-  .client-welcome__grade-options-card {
-    min-width: 120px;
-    max-width: 100%;
-    padding: 12px 6px 8px 6px;
+  .client-welcome__next-button {
+    width: 100%;
+    min-width: 0;
+    margin-top: 12px;
+    align-self: stretch;
   }
 }
 @media (max-width: 600px) {
-  .client-content {
-    max-width: 100vw;
-    padding: 0 2vw;
-  }
-  .welcome-header {
-    max-width: 100vw;
-    padding: 0 2vw;
-  }
-  .welcome-flex-row {
-    max-width: 100vw;
-    gap: 6px;
-  }
-  .client-welcome__grade-options-card {
-    min-width: 0;
-    max-width: 100vw;
-    padding: 6px 2px 4px 2px;
-  }
   .client-welcome__grade-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 16px;
+    grid-template-columns: 1fr;
   }
 }
 
