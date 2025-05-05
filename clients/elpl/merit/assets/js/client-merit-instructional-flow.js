@@ -283,15 +283,9 @@ export class MeritInstructionalFlow {
             }
         });
         // Send button
-        const sendButton = document.getElementById('sendButton');
-        if (sendButton) {
-            sendButton.addEventListener('click', () => {
-                this.#sendMessage();
-            });
-        } else {
-            console.warn('Send button not found.');
-        }
-
+        this.#elements.sendButton?.addEventListener('click', () => {
+            this.#sendMessage();
+        });
         // Ensure grade level selection is the only focus
         const gradeSelect = document.getElementById('gradeSelect');
         if (gradeSelect) {
@@ -609,7 +603,7 @@ export class MeritInstructionalFlow {
     }
 
     updateLaunchButton() {
-        const launchButton = document.querySelector('.client-welcome__next-button');
+        const launchButton = document.getElementById('nextButton');
         const anyChecked = Array.from(document.querySelectorAll('.grade-checkbox')).some(checkbox => checkbox.checked);
         launchButton.disabled = !anyChecked;
         if (anyChecked) {
@@ -636,7 +630,7 @@ export function updateButtonState() {
 }
 
 export function updateLaunchButton() {
-    const launchButton = document.querySelector('.client-welcome__next-button');
+    const launchButton = document.getElementById('nextButton');
     const anyChecked = Array.from(document.querySelectorAll('.grade-checkbox')).some(checkbox => checkbox.checked);
     launchButton.disabled = !anyChecked;
     if (anyChecked) {
