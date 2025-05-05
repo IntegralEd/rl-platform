@@ -112,3 +112,42 @@ After this update to merit.html, you should see:
 - We are going to integrate the Merit UX changes step by step, ensuring no JavaScript or CSS issues arise, and no new files are added.
 - Focus on changes within `/elpl/` and `/merit/`, specifically CSS, HTML, and images.
 - Verify each change against Asha's specification to ensure alignment with the desired UX. 
+
+## Changes Needed to Match Desired UX
+
+1. **Image Paths**
+   - Ensure the paths to images are correct:
+     - Profile Image: `/clients/elpl/assets/images/leslie-avatar.svg`
+     - EL Education Logo: `/clients/elpl/assets/images/client-elpl-logo-crimson.png`
+
+2. **Responsiveness**
+   - Use CSS grid/flexbox for layout to ensure responsiveness.
+   - Add media queries to adjust layout for smaller screens:
+     - Sidebar should collapse or adjust width on smaller screens.
+     - Ensure the main content area adapts to screen size.
+     - Adjust padding and margins for mobile view.
+
+3. **Styling Adjustments**
+   - Set the main background color to light blue (`#E6F6FA`).
+   - Ensure typography matches the specification:
+     - "Merit" and "Customize your assistant:" should be larger, bolder, and in EL red.
+     - Adjust subtitle font and spacing.
+   - **Sidebar**:
+     - Match logo, subtitle, and nav styling (font, color, margin, selected state).
+   - **Grade Card**:
+     - Add box-shadow, border-radius, and padding.
+     - Style "Select all that apply" and "Grade Level(s)" as in the screenshot.
+     - Use correct star icons and spacing for grades.
+   - **Button**:
+     - Make "CREATE ASSISTANT" large, EL red, right-aligned, with arrow icon.
+     - Ensure button is in the correct div and does not break on resize.
+   - **User Profile**:
+     - Add bell icon, adjust avatar/name spacing.
+   - **Footer**:
+     - Add left-aligned logo, social icons, and copyright.
+
+4. **Next Steps**
+   - Apply these changes in `merit.html`.
+   - Verify each change against Asha's specification.
+   - Ensure no CSS conflicts or overrides.
+   - Confirm chat and welcome flows work as intended. 
