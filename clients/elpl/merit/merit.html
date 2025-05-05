@@ -1002,7 +1002,6 @@
                         nextButton.classList.remove('enabled');
                     }
                     updateButtonState();
-                    updateLaunchButton();
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -1013,9 +1012,11 @@
 
             // Next button logic
             nextButton.addEventListener('click', function() {
-                if (selectedGrades.length === 0) return;
-                localStorage.setItem('merit_grade_level', JSON.stringify(selectedGrades));
-                // Proceed to chat or next step
+                if (selectedGrades.length > 0) {
+                    // Trigger the appropriate actions
+                    console.log('Next button clicked with selected grades:', selectedGrades);
+                    // Add your logic here
+                }
             });
 
             // Initial check
