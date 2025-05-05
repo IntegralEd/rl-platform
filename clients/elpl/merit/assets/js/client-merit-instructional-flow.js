@@ -72,13 +72,13 @@ export class MeritInstructionalFlow {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           g.click();
-        }
-      });
-    });
+                }
+            });
+        });
 
     // Launch chat when button pressed and at least one grade is selected
     this.#el.next.addEventListener('click', (e) => {
-      e.preventDefault();
+            e.preventDefault();
       if (sel.size) this.#show('chat');
     });
     upd(); // Initial state
@@ -86,24 +86,11 @@ export class MeritInstructionalFlow {
 
   /* ---------- nav ---------- */
   #bindNav () {
-    const sections = document.querySelectorAll('.section');
-    const navItems = document.querySelectorAll('.client-nav__item');
-    navItems.forEach(item => {
-      item.addEventListener('click', e => {
-        e.preventDefault();
-        const target = item.getAttribute('data-section');
-        sections.forEach(sec => {
-          if (sec.getAttribute('data-section') === target) {
-            sec.classList.add('active');
-            sec.removeAttribute('hidden');
-          } else {
-            sec.classList.remove('active');
-            sec.setAttribute('hidden', '');
-          }
-        });
-      });
-    });
-  }
+    this.#el.nav.forEach(n => n.addEventListener('click', e => {
+                e.preventDefault();
+      this.#show(n.dataset.section);
+    }));
+    }
 
   #show (id) {
     if (!this.#cfg.sections.includes(id)) return;
@@ -151,8 +138,8 @@ export class MeritInstructionalFlow {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
     this.#el.send.addEventListener('click', send);
-  }
-}
+        }
+    }
 
 window.addEventListener('DOMContentLoaded', () => {
   window.meritFlow = new MeritInstructionalFlow();
