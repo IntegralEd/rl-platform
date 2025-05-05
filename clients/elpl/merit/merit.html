@@ -53,17 +53,26 @@
   <span id="header-span" style="display:none" data-user-email="" data-user-name="" data-user-id="" data-access-level="" data-last-login=""></span>
 
   <div class="rl-layout">
-    <aside class="client-sidebar">
-      <div class="client-sidebar__header"><img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="client-sidebar__logo"><div class="client-sidebar__subtitle">Professional Learning</div></div>
-      <nav class="client-sidebar__nav"><ul><li><a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a></li><li><a href="#chat" class="client-nav__item" data-section="chat">Chat</a></li></ul></nav>
+    <aside class="client-sidebar" role="navigation" aria-label="Main navigation">
+      <div class="client-sidebar__header">
+        <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="client-sidebar__logo">
+        <div class="client-sidebar__subtitle">Professional Learning</div>
+      </div>
+      <nav class="client-sidebar__nav">
+        <ul>
+          <li><a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a></li>
+          <li><a href="#chat" class="client-nav__item" data-section="chat">Chat</a></li>
+        </ul>
+      </nav>
+      <div class="client-sidebar__timestamp" id="update-timestamp"></div>
     </aside>
 
-    <header class="rl-header"></header>
-
-    <main class="client-content">
-      <!-- Welcome Section -->
+    <main class="client-content" role="main">
+      <div class="welcome-header">
+        <h1 class="welcome-title">Merit</h1>
+        <p class="welcome-subtitle">Curriculum Support Assistant</p>
+      </div>
       <section id="welcome-section" class="section active" data-section="welcome">
-        <div class="welcome-header"><h1 class="welcome-title">Merit</h1><p class="welcome-subtitle">Curriculum Support Assistant</p></div>
         <form id="welcome-form">
           <div class="welcome-flex-row">
             <div class="client-welcome__grade-options-card">
