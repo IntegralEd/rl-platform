@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#c6123f">
   <title>Merit – Teacher Support | EL Education</title>
 
-  <!-- ===== CSS & Fonts ===== -->
+  <!-- ===== Stylesheets ===== -->
   <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
   <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
   <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
@@ -17,93 +17,93 @@
   <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
   <link rel="stylesheet" href="assets/css/client-merit-chat.css">
 
+  <!-- ===== Inline (critical) CSS kept intact for brevity -->
   <style>
-    /* ----- Global & Layout ----- */
     html,body{height:100%;margin:0;padding:0;font-family:var(--client-font-body,sans-serif);background:#E6F6FA}
     :root{--sidebar-width:250px;--layout-gap:24px;--border-radius:16px;--footer-height:64px}
     .rl-layout{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:auto 1fr auto;gap:var(--layout-gap);min-height:100vh;padding:var(--layout-gap)}
     @media(max-width:768px){:root{--sidebar-width:100%;--layout-gap:12px}.rl-layout{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}}
-
-    /* ----- Sidebar ----- */
     .client-sidebar{background:#fff;border-radius:var(--border-radius);box-shadow:0 2px 6px rgba(0,0,0,.05);display:flex;flex-direction:column;height:100%}
     .client-sidebar__header{padding:24px;text-align:center}
     .client-sidebar__logo{width:120px}
-    .client-sidebar__nav ul{list-style:none;padding:0;margin:0}
+    .client-sidebar__nav ul{list-style:none;margin:0;padding:0}
     .client-nav__item{display:flex;align-items:center;gap:12px;padding:12px 24px;color:var(--client-text);text-decoration:none;transition:.2s}
     .client-nav__item:hover,.client-nav__item.active{background:rgba(139,13,55,.05);color:var(--elpl-primary)}
-
-    /* ----- Header ----- */
     .rl-header{grid-column:2;display:flex;justify-content:flex-end;align-items:center;height:56px}
-
-    /* ----- Main ----- */
     .client-content{grid-column:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
-
-    /* ----- Welcome ----- */
-    .welcome-header{text-align:center;margin-bottom:0}
+    .welcome-header{text-align:center}
     .welcome-title{font-family:var(--client-font-h1,'Lora');font-size:72px;font-weight:800;color:var(--elpl-primary);margin:0}
-    .welcome-subtitle{font-family:var(--client-font-h2,'Montserrat');font-size:24px;font-weight:600;color:var(--elpl-primary);margin:0;letter-spacing:.04em}
+    .welcome-subtitle{font-family:var(--client-font-h2,'Montserrat');font-size:24px;font-weight:600;color:var(--elpl-primary);margin:0}
     .welcome-flex-row{display:flex;gap:64px;margin-top:32px;flex-wrap:wrap;justify-content:center}
     .client-welcome__grade-options-card{background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(44,62,80,.1);padding:32px 40px;width:340px;max-width:420px}
     .grade-option{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:.2s}
     .grade-option:hover,.grade-option.selected{background:rgba(198,18,63,.08)}
     .star-icon{font-size:22px}
-    .client-welcome__next-button{background:var(--elpl-primary);color:#fff;font-weight:700;height:64px;border:none;border-radius:12px;padding:0 40px;font-size:1.3rem;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(44,62,80,.1);cursor:pointer;transition:.2s}
+    .client-welcome__next-button{background:var(--elpl-primary);color:#fff;font-weight:700;height:64px;border:none;border-radius:12px;padding:0 40px;font-size:1.3rem;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(44,62,80,.1);cursor:pointer}
     .client-welcome__next-button:disabled{background:#eee;color:#aaa;cursor:not-allowed}
-
-    /* ----- Chat ----- */
     .chat-frame{display:flex;flex-direction:column;height:100%;max-width:1100px;width:100%;background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(44,62,80,.1)}
     .chat-messages{flex:1;overflow-y:auto;padding:40px 48px 20px}
     .client-chat__input-container{display:flex;align-items:center;gap:8px;padding:12px 48px 40px}
     .client-chat__input{flex:1;border:none;background:transparent;font-size:16px;padding:8px 0;resize:none}
-    .client-chat__action{background:none;border:none;cursor:pointer}
     #sendButton{background:var(--elpl-primary);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff}
     #sendButton:disabled{background:#eee;color:#aaa;cursor:not-allowed}
-    .client-chat__message{display:flex;max-width:100%;margin-bottom:16px}
+    .client-chat__message{display:flex;margin-bottom:16px}
     .client-chat__message.user{margin-left:auto;flex-direction:row-reverse}
     .client-chat__bubble{background:#f7f8fa;border-radius:16px;padding:16px 24px;font-size:16px;max-width:420px;box-shadow:0 1px 4px rgba(44,62,80,.06)}
     .client-chat__message.user .client-chat__bubble{background:#fbe9ef;color:var(--elpl-primary)}
   </style>
 
-  <!-- ===== ENV CONFIG + MODULES ONLY ===== -->
+  <!-- ===== Environment Config: keep in head ===== -->
   <script>
     const BUILD_TIMESTAMP='20240422T172600Z';
-    window.env={SCHEMA_VERSION:'04212025.B01',BUILD_DATE:BUILD_TIMESTAMP.slice(0,8),BUILD_TIME:`${BUILD_TIMESTAMP.slice(9,11)}:${BUILD_TIMESTAMP.slice(11,13)}:${BUILD_TIMESTAMP.slice(13,15)}`,BUILD_VERSION:'1.16',BUILD_TIMESTAMP,ENABLE_MOCK_MODE:true,SKIP_API_VALIDATION:true,SKIP_AUTH:true,DEBUG_MODE:true};
+    window.env={
+      /* ---- core ---- */
+      SCHEMA_VERSION:'04212025.B01',
+      BUILD_DATE:BUILD_TIMESTAMP.slice(0,8),
+      BUILD_TIME:`${BUILD_TIMESTAMP.slice(9,11)}:${BUILD_TIMESTAMP.slice(11,13)}:${BUILD_TIMESTAMP.slice(13,15)}`,
+      BUILD_VERSION:'1.16',
+      BUILD_TIMESTAMP,
+      /* ---- dev flags ---- */
+      ENABLE_MOCK_MODE:true,
+      SKIP_API_VALIDATION:true,
+      SKIP_AUTH:true,
+      DEBUG_MODE:true,
+      /* ---- mock API ---- */
+      RL_API_GATEWAY_ENDPOINT:'https://mock.api',
+      RL_API_FALLBACK_ENDPOINT:null,
+      RL_API_KEY:'dev-key',
+      RL_API_TIMEOUT:1,
+      RL_API_RETRY_ATTEMPTS:0,
+      /* ---- assistant ids ---- */
+      MERIT_ASSISTANT_ID:'mock-assistant',
+      OPENAI_PROJECT_ID:'mock-project',
+      MERIT_ORG_ID:'mock-org',
+      /* ---- CORS ---- */
+      CORS_ORIGIN:'*',
+      CORS_METHODS:'*',
+      CORS_HEADERS:'*'
+    };
     console.log('[Merit] Dev mode');
   </script>
-  <script type="module" src="assets/js/client-merit-openai.js"></script>
-  <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+  <!-- ⬆️  No other scripts in <head>  -->
 </head>
 <body>
   <!-- Pre‑header span (needs to be in body) -->
   <span id="header-span" style="display:none" data-user-email="" data-user-name="" data-user-id="" data-access-level="" data-last-login=""></span>
 
   <div class="rl-layout">
-    <!-- ===== Sidebar ===== -->
     <aside class="client-sidebar">
-      <div class="client-sidebar__header">
-        <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="client-sidebar__logo">
-        <div class="client-sidebar__subtitle">Professional Learning</div>
-      </div>
-      <nav class="client-sidebar__nav">
-        <ul>
-          <li><a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a></li>
-          <li><a href="#chat" class="client-nav__item" data-section="chat">Chat</a></li>
-        </ul>
-      </nav>
+      <div class="client-sidebar__header"><img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="client-sidebar__logo"><div class="client-sidebar__subtitle">Professional Learning</div></div>
+      <nav class="client-sidebar__nav"><ul><li><a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a></li><li><a href="#chat" class="client-nav__item" data-section="chat">Chat</a></li></ul></nav>
     </aside>
 
-    <!-- ===== Header ===== -->
     <header class="rl-header"></header>
 
-    <!-- ===== Main ===== -->
     <main class="client-content">
       <!-- Welcome Section -->
       <section id="welcome-section" class="section" data-section="welcome">
-        <div class="welcome-header">
-          <h1 class="welcome-title">Merit</h1>
-          <p class="welcome-subtitle">Curriculum Support Assistant</p>
-        </div>
-        <form id="welcome-form" style="display:block;">
+        <div class="welcome-header"><h1 class="welcome-title">Merit</h1><p class="welcome-subtitle">Curriculum Support Assistant</p></div>
+        <form id="welcome-form">
           <div class="welcome-flex-row">
             <div class="client-welcome__grade-options-card">
               <h2 style="margin:0 0 24px 0;color:var(--elpl-primary);font-size:1.75rem;font-weight:700">Select Grade Level(s)</h2>
@@ -116,31 +116,25 @@
                 <div class="grade-option" data-grade="5" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;5</div>
               </div>
             </div>
-            <button id="nextButton" class="client-welcome__next-button" disabled>
-              Create Assistant
-              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.167 10h11.666M15.833 10L10 4.167M15.833 10L10 15.833" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
+            <button id="nextButton" class="client-welcome__next-button" disabled>Create Assistant</button>
           </div>
         </form>
       </section>
 
       <!-- Chat Section -->
       <section id="chat-section" class="section" data-section="chat" hidden>
-        <div class="chat-frame">
-          <div id="chatWindow" class="chat-messages" role="log" aria-live="polite"></div>
-          <div class="client-chat__input-container">
-            <textarea id="chatInput" class="client-chat__input" rows="1" placeholder="Type your message…"></textarea>
-            <button id="sendButton" class="client-chat__action" disabled>Send</button>
-          </div>
-        </div>
+        <div class="chat-frame"><div id="chatWindow" class="chat-messages" role="log" aria-live="polite"></div><div class="client-chat__input-container"><textarea id="chatInput" class="client-chat__input" rows="1" placeholder="Type your message…"></textarea><button id="sendButton" disabled>Send</button></div></div>
       </section>
     </main>
 
-    <!-- ===== Footer ===== -->
     <footer class="rl-footer"></footer>
   </div>
 
-  <!-- ===== SINGLE CONSOLIDATED SCRIPT ===== -->
+  <!-- ===== CORE MODULES (moved AFTER DOM) ===== -->
+  <script type="module" src="assets/js/client-merit-openai.js"></script>
+  <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
+
+  <!-- ===== Consolidated vanilla helpers for preview/dev ===== -->
   <script>
     document.addEventListener('DOMContentLoaded',()=>{
       const qs=id=>document.getElementById(id);
@@ -148,38 +142,25 @@
       const navLinks=[...document.querySelectorAll('.client-nav__item')];
       const gradeOpts=[...document.querySelectorAll('.grade-option')];
       const nextBtn=qs('nextButton');
-      const chatSection=qs('chat-section');
-      const welcomeSection=qs('welcome-section');
       const chatWindow=qs('chatWindow');
       const chatInput=qs('chatInput');
       const sendBtn=qs('sendButton');
-
-      /* ---- nav helpers ---- */
-      function showSection(id){sections.forEach(s=>{const match=s.dataset.section===id;s.toggleAttribute('hidden',!match)});navLinks.forEach(l=>l.classList.toggle('active',l.dataset.section===id));location.hash=id;}
-      if(!location.hash)location.hash='#welcome';
-      showSection(location.hash.substring(1));
-      window.addEventListener('hashchange',()=>showSection(location.hash.substring(1)));
-
-      /* ---- grade selection ---- */
-      const selectedGrades=new Set();
-      function updateNext(){nextBtn.disabled=!selectedGrades.size;}
-      gradeOpts.forEach(opt=>{
-        opt.addEventListener('click',()=>{
-          opt.classList.toggle('selected');
-          const g=opt.dataset.grade;
-          opt.classList.contains('selected')?selectedGrades.add(g):selectedGrades.delete(g);
-          opt.querySelector('.star-icon').textContent=opt.classList.contains('selected')?'★':'☆';
-          updateNext();
-        });
-      });
-      updateNext();
-
-      /* ---- proceed to chat ---- */
-      nextBtn.addEventListener('click',()=>showSection('chat'));
-
-      /* ---- chat ---- */
-      function addMsg(txt,isUser){const div=document.createElement('div');div.className=`client-chat__message ${isUser?'user':'assistant'}`;const bubble=document.createElement('div');bubble.className='client-chat__bubble';bubble.textContent=txt;div.appendChild(bubble);chatWindow.appendChild(div);chatWindow.scrollTop=chatWindow.scrollHeight;}
-      function send(){const txt=chatInput.value.trim();if(!txt)return;addMsg(txt,true);chatInput.value='';sendBtn.disabled=true;setTimeout(()=>addMsg('Dev‑mode reply.'),800);}
+      // Accessibility: update aria-selected on nav
+      function updateNavAria(selectedId) {
+        navLinks.forEach(l => l.setAttribute('aria-selected', l.dataset.section === selectedId ? 'true' : 'false'));
+      }
+      // nav helpers
+      function showSection(id){sections.forEach(s=>s.hidden=s.dataset.section!==id);navLinks.forEach(l=>l.classList.toggle('active',l.dataset.section===id));updateNavAria(id);location.hash=id;}
+      if(!location.hash)location.hash='#welcome';showSection(location.hash.substring(1));window.addEventListener('hashchange',()=>showSection(location.hash.substring(1)));
+      // welcome
+      const selected=new Set();const updateNext=()=>{nextBtn.disabled=!selected.size};gradeOpts.forEach(o=>o.addEventListener('click',()=>{o.classList.toggle('selected');o.querySelector('.star-icon').textContent=o.classList.contains('selected')?'★':'☆';o.classList.contains('selected')?selected.add(o.dataset.grade):selected.delete(o.dataset.grade);updateNext();}));nextBtn.addEventListener('click',()=>showSection('chat'));
+      // chat logic using MeritInstructionalFlow if available
+      let meritFlow=null;
+      if(window.MeritInstructionalFlow){
+        meritFlow=new window.MeritInstructionalFlow();
+      }
+      async function addMsg(txt,isUser){const wrap=document.createElement('div');wrap.className=`client-chat__message ${isUser?'user':'assistant'}`;const b=document.createElement('div');b.className='client-chat__bubble';b.textContent=txt;wrap.appendChild(b);chatWindow.appendChild(wrap);chatWindow.scrollTop=chatWindow.scrollHeight;}
+      async function send(){const txt=chatInput.value.trim();if(!txt)return;addMsg(txt,true);chatInput.value='';sendBtn.disabled=true;if(meritFlow&&typeof meritFlow.sendMessage==='function'){try{const response=await meritFlow.sendMessage(txt);addMsg(response.content,false);}catch(e){addMsg('Sorry, there was a problem contacting the assistant.',false);}}else{addMsg('Assistant not available.',false);}}
       chatInput.addEventListener('input',()=>sendBtn.disabled=!chatInput.value.trim());
       chatInput.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
       sendBtn.addEventListener('click',send);
