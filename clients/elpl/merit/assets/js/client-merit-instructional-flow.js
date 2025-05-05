@@ -594,7 +594,7 @@ export class MeritInstructionalFlow {
     }
 
     updateButtonState() {
-        this.#updateActionState();
+        updateActionState();
     }
 
     updateLaunchButton() {
@@ -620,33 +620,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/*
-Immediate Client Layout Punch List (to be addressed promptly):
-1. Tidy up the chat container div structure for a more organized layout.
-2. Align chat input and send button consistently within the chatbar.
-3. Standardize spacing and margins for chat components.
-4. Improve alignment of chat messages for better readability.
-5. Optimize responsive design for chat sections on mobile devices.
+export function updateButtonState() {
+    updateActionState();
+}
 
-UX & Accessibility Tickets for v19 (to work on overnight):
-1. Refactor chat container divs for a tidier, more organized layout.
-2. Improve focus management and tab order for chat input and send button.
-3. Enhance color contrast and font sizes for better readability.
-4. Add ARIA roles and labels to all interactive elements in the chat interface.
-5. Standardize spacing and margins across chat messages and action buttons.
-6. Incorporate better animation and feedback on button hovers.
-7. Tidy up the chat header and version display alignment.
-8. Streamline error message display for improved accessibility.
-9. Implement lazy loading for chat message history.
-10. Improve loading state indicators with accessible announcements.
-11. Optimize responsive design layout for mobile view.
-12. Enhance button size consistency across various screen sizes.
-13. Add tooltips for clarity on button functions.
-14. Improve keyboard navigation support within the chat interface.
-15. Ensure all interactive elements have proper focus outlines.
-16. Optimize the streaming message indicator for clarity.
-17. Refactor event handling to reduce latency.
-18. Improve error recovery messaging in the chat window.
-19. Enhance the visual hierarchy of chat sections.
-20. Standardize use of web fonts and icons across the chat interface.
-*/ 
+export function updateLaunchButton() {
+    const launchButton = document.querySelector('.client-welcome__next-button');
+    const anyChecked = Array.from(document.querySelectorAll('.grade-checkbox')).some(checkbox => checkbox.checked);
+    launchButton.disabled = !anyChecked;
+    if (anyChecked) {
+        launchButton.classList.add('enabled');
+    } else {
+        launchButton.classList.remove('enabled');
+    }
+} 

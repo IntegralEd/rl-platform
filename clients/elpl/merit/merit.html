@@ -1001,6 +1001,8 @@
                     } else {
                         nextButton.classList.remove('enabled');
                     }
+                    updateButtonState();
+                    updateLaunchButton();
                 });
                 option.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -1008,7 +1010,6 @@
                     }
                 });
             });
-            updateButtonState();
 
             // Next button logic
             nextButton.addEventListener('click', function() {

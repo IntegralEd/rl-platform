@@ -1,39 +1,11 @@
 ## Steps to Resolve Console Errors and Missing Elements
-
-1. **Ensure Elements Exist:**
-   - Verify that elements like `nextButton`, `sendButton`, `chatInput`, `chatWindow`, `gradeSelect`, and `footer` are present in the HTML.
-
-2. **Define Missing Functions:**
-   - Implement `updateButtonState` and `updateLaunchButton` functions if they are not defined.
-
-3. **Check Event Listeners:**
-   - Ensure all elements referenced in event listeners are correctly initialized and exist in the DOM.
-
-4. **Comment Out API Calls:**
-   - Ensure all API calls are commented out for testing purposes.
-
-5. **Verify File Paths:**
-   - Ensure all JavaScript files are correctly referenced and exist in the specified paths.
-
-6. **Fix Uncaught Errors:**
-   - Address `Uncaught ReferenceError` and `Uncaught TypeError` by ensuring all referenced elements and functions are defined and accessible.
-
-7. **Handle Missing Elements in Dev Mode:**
-   - Address warnings about missing elements in development mode by ensuring all required elements are present or conditionally handled in the code.
-
-## Needed Event Listeners and Function Integrations
-
-1. **Ensure `updateButtonState` is Called**:
-   - Make sure `updateButtonState` is called whenever the form state changes, such as when a grade is selected or deselected.
-
-2. **Define Missing Functions**:
-   - Ensure that `updateLaunchButton` is defined and correctly updates the launch button state based on the current selections.
-
-3. **Integrate Event Listeners**:
-   - Ensure that all event listeners are correctly set up in `client-merit-instructional-flow.js` and are tied to the elements in `merit.html`.
-
-4. **Verify Element IDs and Classes**:
-   - Double-check that the IDs and classes used in `merit.html` match those expected by the event listeners in `client-merit-instructional-flow.js`.
-
-5. **Document Changes**:
-   - Update this document to reflect the need for these event listeners and function integrations to ensure the functionality is correctly implemented.
+The merit.html file includes several sections that need to be connected to the event listeners and functions defined in client-merit-instructional-flow.js. Here are the key points to ensure proper integration:
+Import Functions: Ensure that updateButtonState and updateLaunchButton are exported from client-merit-instructional-flow.js and imported into merit.html.
+Event Listeners:
+Grade Options: Ensure that clicking on grade options toggles their selection and updates the button state using updateButtonState.
+Next Button: Ensure the next button's state is updated based on the selected grades and that it triggers the appropriate actions when clicked.
+Initial Setup:
+Call updateLaunchButton during the initial setup to ensure the button states are correctly initialized.
+Ensure Correct IDs and Classes: Verify that the IDs and classes used in merit.html match those expected by the event listeners in client-merit-instructional-flow.js.
+Script Integration: Ensure that the script tags in merit.html correctly reference the JavaScript files and that the functions are called in the appropriate places.
+If you need further assistance with specific code changes or have any questions, feel free to ask!
