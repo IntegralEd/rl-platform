@@ -1,843 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Merit – Teacher and Leader Support Chat for EL Education Language Arts Curriculum">
-    <meta name="theme-color" content="#c6123f">
-    <title>Merit – Teacher Support | EL Education</title>
-    
-    <!-- Preheader data span -->
-    <span id="header-span" style="display:none" 
-        data-user-email=""
-        data-user-name=""
-        data-user-id=""
-        data-access-level=""
-        data-last-login="">
-    </span>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
-    
-    <!-- Platform level styles -->
-    <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
-    <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
-    
-    <!-- Client level styles -->
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
-    <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
-    
-    <!-- Project level styles -->
-    <link rel="stylesheet" href="assets/css/client-merit-chat.css">
-
-    <style>
-        html, body {
-            height: 100%;
-            min-height: 0;
-            margin: 0;
-            padding: 0;
-            background-color: #E6F6FA;
-            font-family: var(--client-font-body, sans-serif);
-        }
-
-        .rl-layout {
-            display: grid;
-            grid-template-columns: var(--sidebar-width) 1fr;
-            grid-template-rows: auto 1fr auto;
-            gap: var(--layout-gap);
-            min-height: 100vh;
-            height: 100%;
-            padding: var(--layout-gap);
-            box-sizing: border-box;
-            max-width: 1440px;
-            margin: 0 auto;
-        }
-
-        .client-sidebar {
-            grid-column: 1;
-            grid-row: 1 / 3;
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 24px 0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            height: calc(100vh - var(--layout-gap) * 2 - var(--footer-height));
-            position: sticky;
-            top: var(--layout-gap);
-            margin-right: var(--layout-gap);
-            width: var(--sidebar-width);
-        }
-
-        .client-sidebar__header {
-            padding-top: 24px;
-        }
-
-        .client-sidebar__logo {
-            width: 120px;
-            height: auto;
-        }
-
-        .client-sidebar__subtitle {
-            font-size: 14px;
-            color: var(--elpl-primary);
-            margin-top: 4px;
-        }
-
-        .client-sidebar__nav {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 24px;
-            color: var(--client-text);
-            text-decoration: none;
-            gap: 12px;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(139, 13, 55, 0.05);
-            color: var(--elpl-primary);
-        }
-
-        .nav-link svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .client-sidebar__timestamp {
-            padding: 12px 24px;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-            text-align: center;
-        }
-
-        .rl-header {
-            grid-column: 2;
-            grid-row: 1;
-            margin-bottom: var(--layout-gap);
-        }
-
-        .rl-header__left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            height: 100%;
-        }
-
-        .section-name {
-            font-size: 18px;
-            font-weight: 500;
-            color: var(--client-text);
-            line-height: 52px;
-        }
-
-        .rl-header__logo {
-            height: 32px;
-            width: auto;
-        }
-
-        .rl-header__nav {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            height: 100%;
-        }
-
-        .rl-button--primary {
-            height: 36px;
-            padding: 0 16px;
-            background: var(--elpl-primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.2s;
-        }
-
-        .rl-button--primary:hover {
-            background: var(--elpl-primary-hover);
-        }
-
-        .rl-nav__profile {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            height: 36px;
-            padding: 0 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .rl-nav__profile:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .rl-nav__avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .rl-nav__username {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--client-text);
-        }
-
-        .rl-nav__settings {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            background: none;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--client-text);
-            transition: background-color 0.2s;
-        }
-
-        .rl-nav__settings:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .rl-nav__settings svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .rl-main {
-            grid-column: 2;
-            grid-row: 2;
-            background: white;
-            border-radius: var(--border-radius);
-            padding: var(--layout-gap);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--layout-gap) * 3);
-            margin-left: 0;
-        }
-
-        .rl-footer {
-            grid-column: 1 / -1;
-            grid-row: 3;
-            height: var(--footer-height);
-            margin-top: var(--layout-gap);
-            padding: 0 var(--layout-gap);
-        }
-
-        .rl-footer__left,
-        .rl-footer__center,
-        .rl-footer__right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rl-footer__center {
-            flex: 1;
-            justify-content: center;
-        }
-
-        .rl-footer__logo {
-            height: 24px;
-            width: auto;
-            filter: brightness(0);
-        }
-
-        .rl-footer__text {
-            font-size: 14px;
-        }
-
-        .rl-footer__right {
-            gap: 16px;
-        }
-
-        .rl-social-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            color: var(--elpl-primary);
-            transition: color 0.2s ease;
-        }
-
-        .rl-social-icon:hover {
-            color: var(--elpl-primary-hover);
-        }
-
-        @media (max-width: 768px) {
-            :root {
-                --sidebar-width: 100%;
-                --layout-gap: 8px;
-            }
-
-            .rl-layout {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr auto;
-                padding: var(--layout-gap);
-            }
-
-            .client-sidebar {
-                grid-column: 1;
-                grid-row: 2;
-            height: auto;
-                min-height: auto;
-                border-radius: var(--border-radius);
-            }
-
-            .rl-header {
-                grid-column: 1;
-                grid-row: 1;
-            }
-
-            .rl-main {
-                grid-column: 1;
-                grid-row: 3;
-                height: auto;
-                min-height: calc(100vh - var(--header-height) - var(--footer-height) - var(--sidebar-width) - 4 * var(--layout-gap));
-            }
-
-            .rl-footer {
-                grid-column: 1;
-                grid-row: 4;
-            }
-
-            .rl-nav__username {
-                display: none;
-            }
-
-            .client-sidebar__nav {
-                flex-direction: row;
-            justify-content: center;
-                gap: 16px;
-            }
-
-            .client-sidebar__header {
-                text-align: center;
-                margin-bottom: 16px;
-            }
-
-            .client-welcome__grade-options,
-            .client-welcome__curriculum-options {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .client-welcome__actions {
-                padding: 0 clamp(12px, 4vw, 24px);
-            }
-
-            .client-chat__message {
-                max-width: 100%;
-            }
-
-            .client-chat__bubble {
-                max-width: min(400px, 85%);
-            }
-
-            .client-chat__actions {
-                gap: 4px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .welcome-section {
-                padding: 16px 12px;
-            }
-
-            .client-welcome__grade-options,
-            .client-welcome__curriculum-options {
-                grid-template-columns: 1fr;
-            }
-
-            .client-grade__option,
-            .client-curriculum__option {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            .chat-messages {
-                padding: 12px;
-            }
-
-            .client-chat__bubble {
-                max-width: min(300px, 80%);
-                font-size: 14px;
-                padding: 10px;
-            }
-
-            .client-chat__input-container {
-                padding: 8px;
-            }
-
-            .client-chat__input {
-                font-size: 14px;
-                padding: 6px 10px;
-            }
-
-            .client-chat__avatar {
-                width: 32px;
-                height: 32px;
-            }
-        }
-
-        /* Remove the old timestamp elements */
-        #dev-timestamp, .dev-timestamp {
-            display: none;
-        }
-
-        /* Add SVG icon styles */
-        .icon {
-            width: 24px;
-            height: 24px;
-            display: inline-block;
-            vertical-align: middle;
-            fill: currentColor;
-            transition: all 0.2s ease;
-        }
-
-        .icon--sm {
-            width: 16px;
-            height: 16px;
-        }
-
-        .icon--lg {
-            width: 32px;
-            height: 32px;
-        }
-
-        .icon--social {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-            transition: all 0.2s ease;
-        }
-
-        .icon--social:hover {
-            fill: var(--elpl-primary-hover);
-        }
-
-        .icon--action {
-            width: 20px;
-            height: 20px;
-            fill: #666;
-            cursor: pointer;
-        }
-
-        .icon--action:hover {
-            fill: var(--elpl-primary);
-        }
-
-        .welcome-section {
-            padding: var(--layout-gap);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .welcome-header {
-            margin-top: 8px;
-            margin-bottom: 8px;
-            text-align: left;
-            background: none !important;
-            box-shadow: none !important;
-            align-items: flex-start;
-            justify-content: flex-start;
-        }
-
-        .welcome-title, .welcome-subtitle {
-            text-align: left;
-        }
-
-        .welcome-title {
-            font-family: var(--client-font-h1, 'Lora');
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--elpl-primary);
-            margin-bottom: 0;
-            line-height: 1.1;
-        }
-
-        .welcome-subtitle {
-            font-family: var(--client-font-h2, 'Montserrat');
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            color: var(--elpl-primary);
-            text-transform: uppercase;
-            margin-top: 0;
-        }
-
-        .client-welcome__grade-selection h2 {
-            font-family: var(--client-font-h2, 'Montserrat');
-            font-size: 24px;
-            color: var(--elpl-primary);
-            margin-bottom: 24px;
-        }
-
-        .client-welcome__grade-options {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            max-height: 280px;
-            overflow-y: auto;
-            padding-right: 16px;
-        }
-
-        .grade-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .grade-option:hover,
-        .grade-option.selected {
-            background: rgba(198, 18, 63, 0.08);
-        }
-        .grade-option .star-icon {
-            font-size: 22px;
-            transition: color 0.2s;
-        }
-        .grade-option.selected .star-icon {
-            color: var(--elpl-primary);
-        }
-        .client-welcome__next-button:disabled {
-            background: #eee;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-        @media (max-width: 900px) {
-            .welcome-flex-row {
-                flex-direction: column;
-                gap: 24px;
-                align-items: stretch;
-            }
-            .client-welcome__next-button {
-                align-self: stretch;
-                width: 100%;
-                justify-content: center;
-            }
-        }
-        .chat-frame {
-            display: flex;
-            flex-direction: column;
-            flex: 1 1 0;
-            min-height: 0;
-            height: 100%;
-            max-width: 1100px;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow: hidden;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(44,62,80,0.10);
-        }
-        .chat-messages {
-            flex: 1 1 0;
-            min-height: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 40px 48px 20px 48px;
-            border-radius: 16px 16px 0 0;
-            box-sizing: border-box;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #chat-input.client-chat__input {
-            flex: 1 1 auto;
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            padding: 8px 0 8px 0;
-            outline: none;
-            resize: none;
-            color: var(--client-text);
-            min-width: 0;
-            line-height: 1.5;
-            vertical-align: middle;
-            max-height: 80px;
-            overflow-y: auto;
-        }
-        #send-button.client-chat__action {
-            background: var(--elpl-primary);
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-            flex-shrink: 0;
-        }
-        #send-button.client-chat__action:disabled {
-            background: #eee;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-        #send-button .send-icon {
-            width: 20px;
-            height: 20px;
-            display: block;
-        }
-        /* Chat message bubbles */
-        .client-chat__message,
-        .client-chat__message.user,
-        .client-chat__message.assistant {
-            width: auto !important;
-            max-width: 100%;
-        }
-        .client-chat__message.user {
-            margin-left: auto !important;
-            flex-direction: row-reverse;
-            justify-content: flex-start;
-            align-items: flex-end;
-        }
-        .client-chat__message.assistant {
-            margin-right: auto !important;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: flex-end;
-        }
-        .client-chat__message.user .client-chat__bubble {
-            margin-right: 0;
-            margin-left: 12px;
-        }
-        .client-chat__message.user .client-chat__avatar {
-            margin-left: 0;
-            margin-right: 0;
-        }
-        .client-chat__message.assistant .client-chat__avatar {
-            margin: 0 16px 0 0;
-            order: 1;
-            align-self: flex-end;
-        }
-        .client-chat__message.assistant .client-chat__content {
-            order: 2;
-            align-self: flex-end;
-        }
-        .client-chat__bubble {
-            background: #f7f8fa;
-            border-radius: 16px;
-            padding: 16px 24px;
-            font-size: 16px;
-            color: var(--client-text);
-            box-shadow: 0 1px 4px rgba(44,62,80,0.06);
-            max-width: 420px;
-            word-break: break-word;
-            align-self: flex-end;
-        }
-        .client-chat__message.user .client-chat__bubble {
-            background: #fbe9ef;
-            color: var(--elpl-primary);
-            border-bottom-right-radius: 4px;
-            border-bottom-left-radius: 16px;
-        }
-        .client-chat__message.assistant .client-chat__bubble {
-            background: #f7f8fa;
-            color: var(--client-text);
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 16px;
-        }
-        .chat-day-divider {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin: 24px 0 16px 0;
-        }
-        .chat-day-divider span {
-            color: #b0b0b0;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 0 16px;
-            background: #fff;
-            z-index: 1;
-        }
-        .chat-day-divider::before,
-        .chat-day-divider::after {
-            content: '';
-            flex: 1 1 0;
-            height: 1px;
-            background: #e0e0e0;
-            z-index: 0;
-        }
-    </style>
-    
-    <!-- Environment Configuration -->
-    <script>
-        document.addEventListener('DOMContentLoaded',()=>{
-          const qs=id=>document.getElementById(id);
-          /* ---- elements ---- */
-          const gradeSel=qs('gradeSelect');
-          const nextBtn=qs('nextButton');
-          const chatInput=qs('chatInput');
-          const sendBtn=qs('sendButton');
-          const chatWin=qs('chatWindow');
-          const sections=[...document.querySelectorAll('.section')];
-          /* ---- helpers ---- */
-          const showSection=id=>{
-            sections.forEach(sec=>sec.classList.toggle('active',sec.dataset.section===id));
-            location.hash=id;
-          };
-          const addMsg=(txt,isUser=false)=>{
-            const div=document.createElement('div');
-            div.className=`client-chat__message ${isUser?'user':'assistant'}`;
-            div.textContent=txt;
-            chatWin.appendChild(div);
-            chatWin.scrollTop=chatWin.scrollHeight;
-          };
-          /* ---- timestamp ---- */
-          qs('dev-timestamp').textContent=`Last Updated: ${(new Date()).toLocaleString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit',hour12:true}).replace(',','')}`;
-          /* ---- welcome flow ---- */
-          const updateNext=()=>{nextBtn.disabled=!gradeSel.value};
-          gradeSel.addEventListener('change',updateNext);
-          nextBtn.addEventListener('click',()=>{showSection('chat');chatInput.focus();});
-          /* ---- chat flow ---- */
-          const updateSend=()=>{sendBtn.disabled=!chatInput.value.trim()};
-          chatInput.addEventListener('input',updateSend);
-          chatInput.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-          sendBtn.addEventListener('click',send);
-          function send(){const msg=chatInput.value.trim();if(!msg)return;addMsg(msg,true);chatInput.value='';updateSend();setTimeout(()=>addMsg('Dev‑mode reply.'),600);} 
-          /* ---- persistence prompt ---- */
-          document.querySelectorAll('#persistence-prompt button').forEach(btn=>btn.addEventListener('click',e=>e.target.closest('#persistence-prompt').hidden=true));
-          /* ---- initial hash ---- */
-          if(!location.hash)location.hash='#welcome';
-          showSection(location.hash.substring(1));
-        });
-      </script>
-
-    <!-- Build Log: May 5, 2:40pm -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Merit – Teacher and Leader Support Chat for EL Education Language Arts Curriculum">
+  <meta name="theme-color" content="#c6123f">
+  <title>Merit – Teacher Support | EL Education</title>
+
+  <!-- ===== CSS & Fonts ===== -->
+  <link rel="icon" type="image/x-icon" href="/clients/elpl/assets/images/client-elpl-favicon.ico">
+  <link rel="stylesheet" href="/shared/platform/css/platform-variables.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-core.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-loading-states.css">
+  <link rel="stylesheet" href="/shared/platform/css/platform-animations.css">
+  <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl-variables.css">
+  <link rel="stylesheet" href="/clients/elpl/assets/css/client-elpl.css">
+  <link rel="stylesheet" href="assets/css/client-merit-chat.css">
+
+  <style>
+    /* ----- Global & Layout ----- */
+    html,body{height:100%;margin:0;padding:0;font-family:var(--client-font-body,sans-serif);background:#E6F6FA}
+    :root{--sidebar-width:250px;--layout-gap:24px;--border-radius:16px;--footer-height:64px}
+    .rl-layout{display:grid;grid-template-columns:var(--sidebar-width) 1fr;grid-template-rows:auto 1fr auto;gap:var(--layout-gap);min-height:100vh;padding:var(--layout-gap)}
+    @media(max-width:768px){:root{--sidebar-width:100%;--layout-gap:12px}.rl-layout{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}}
+
+    /* ----- Sidebar ----- */
+    .client-sidebar{background:#fff;border-radius:var(--border-radius);box-shadow:0 2px 6px rgba(0,0,0,.05);display:flex;flex-direction:column;height:100%}
+    .client-sidebar__header{padding:24px;text-align:center}
+    .client-sidebar__logo{width:120px}
+    .client-sidebar__nav ul{list-style:none;padding:0;margin:0}
+    .client-nav__item{display:flex;align-items:center;gap:12px;padding:12px 24px;color:var(--client-text);text-decoration:none;transition:.2s}
+    .client-nav__item:hover,.client-nav__item.active{background:rgba(139,13,55,.05);color:var(--elpl-primary)}
+
+    /* ----- Header ----- */
+    .rl-header{grid-column:2;display:flex;justify-content:flex-end;align-items:center;height:56px}
+
+    /* ----- Main ----- */
+    .client-content{grid-column:2;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+    /* ----- Welcome ----- */
+    .welcome-header{text-align:center;margin-bottom:0}
+    .welcome-title{font-family:var(--client-font-h1,'Lora');font-size:72px;font-weight:800;color:var(--elpl-primary);margin:0}
+    .welcome-subtitle{font-family:var(--client-font-h2,'Montserrat');font-size:24px;font-weight:600;color:var(--elpl-primary);margin:0;letter-spacing:.04em}
+    .welcome-flex-row{display:flex;gap:64px;margin-top:32px;flex-wrap:wrap;justify-content:center}
+    .client-welcome__grade-options-card{background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(44,62,80,.1);padding:32px 40px;width:340px;max-width:420px}
+    .grade-option{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:.2s}
+    .grade-option:hover,.grade-option.selected{background:rgba(198,18,63,.08)}
+    .star-icon{font-size:22px}
+    .client-welcome__next-button{background:var(--elpl-primary);color:#fff;font-weight:700;height:64px;border:none;border-radius:12px;padding:0 40px;font-size:1.3rem;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(44,62,80,.1);cursor:pointer;transition:.2s}
+    .client-welcome__next-button:disabled{background:#eee;color:#aaa;cursor:not-allowed}
+
+    /* ----- Chat ----- */
+    .chat-frame{display:flex;flex-direction:column;height:100%;max-width:1100px;width:100%;background:#fff;border-radius:16px;box-shadow:0 2px 16px rgba(44,62,80,.1)}
+    .chat-messages{flex:1;overflow-y:auto;padding:40px 48px 20px}
+    .client-chat__input-container{display:flex;align-items:center;gap:8px;padding:12px 48px 40px}
+    .client-chat__input{flex:1;border:none;background:transparent;font-size:16px;padding:8px 0;resize:none}
+    .client-chat__action{background:none;border:none;cursor:pointer}
+    #sendButton{background:var(--elpl-primary);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff}
+    #sendButton:disabled{background:#eee;color:#aaa;cursor:not-allowed}
+    .client-chat__message{display:flex;max-width:100%;margin-bottom:16px}
+    .client-chat__message.user{margin-left:auto;flex-direction:row-reverse}
+    .client-chat__bubble{background:#f7f8fa;border-radius:16px;padding:16px 24px;font-size:16px;max-width:420px;box-shadow:0 1px 4px rgba(44,62,80,.06)}
+    .client-chat__message.user .client-chat__bubble{background:#fbe9ef;color:var(--elpl-primary)}
+  </style>
+
+  <!-- ===== ENV CONFIG + MODULES ONLY ===== -->
+  <script>
+    const BUILD_TIMESTAMP='20240422T172600Z';
+    window.env={SCHEMA_VERSION:'04212025.B01',BUILD_DATE:BUILD_TIMESTAMP.slice(0,8),BUILD_TIME:`${BUILD_TIMESTAMP.slice(9,11)}:${BUILD_TIMESTAMP.slice(11,13)}:${BUILD_TIMESTAMP.slice(13,15)}`,BUILD_VERSION:'1.16',BUILD_TIMESTAMP,ENABLE_MOCK_MODE:true,SKIP_API_VALIDATION:true,SKIP_AUTH:true,DEBUG_MODE:true};
+    console.log('[Merit] Dev mode');
+  </script>
+  <script type="module" src="assets/js/client-merit-openai.js"></script>
+  <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
 </head>
 <body>
-    <div id="footer" class="rl-footer"></div>
+  <!-- Pre‑header span (needs to be in body) -->
+  <span id="header-span" style="display:none" data-user-email="" data-user-name="" data-user-id="" data-access-level="" data-last-login=""></span>
 
-    <div id="welcome-section" class="section active" data-section="welcome">
-        <!-- Welcome section content -->
-        <button id="nextButton" class="client-welcome__next-button" disabled>Next</button>
-        <select id="gradeSelect" class="grade-level">
-            <!-- Options here -->
-        </select>
-    </div>
+  <div class="rl-layout">
+    <!-- ===== Sidebar ===== -->
+    <aside class="client-sidebar">
+      <div class="client-sidebar__header">
+        <img src="/clients/elpl/assets/images/client-elpl-logo-crimson.png" alt="EL Education" class="client-sidebar__logo">
+        <div class="client-sidebar__subtitle">Professional Learning</div>
+      </div>
+      <nav class="client-sidebar__nav">
+        <ul>
+          <li><a href="#welcome" class="client-nav__item" data-section="welcome">Welcome</a></li>
+          <li><a href="#chat" class="client-nav__item" data-section="chat">Chat</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-    <div id="chat-section" class="section active" data-section="chat">
-        <!-- Chat section content -->
-        <div id="chatWindow" class="chat-window"></div>
-        <input id="chatInput" class="chat-input" type="text" placeholder="Type a message...">
-        <button id="sendButton" class="send-button" disabled>Send</button>
-    </div>
+    <!-- ===== Header ===== -->
+    <header class="rl-header"></header>
 
-    <!-- Only one script block for all DOM event listeners and initialization -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Log DOM loaded
-        console.log('[Merit HTML] DOM fully loaded and parsed.');
+    <!-- ===== Main ===== -->
+    <main class="client-content">
+      <!-- Welcome Section -->
+      <section id="welcome-section" class="section" data-section="welcome">
+        <div class="welcome-header">
+          <h1 class="welcome-title">Merit</h1>
+          <p class="welcome-subtitle">Curriculum Support Assistant</p>
+        </div>
+        <form id="welcome-form" style="display:block;">
+          <div class="welcome-flex-row">
+            <div class="client-welcome__grade-options-card">
+              <h2 style="margin:0 0 24px 0;color:var(--elpl-primary);font-size:1.75rem;font-weight:700">Select Grade Level(s)</h2>
+              <div class="client-welcome__grade-options" id="gradeSelect">
+                <div class="grade-option" data-grade="K" tabindex="0"><span class="star-icon">☆</span>Kindergarten</div>
+                <div class="grade-option" data-grade="1" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;1</div>
+                <div class="grade-option" data-grade="2" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;2</div>
+                <div class="grade-option" data-grade="3" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;3</div>
+                <div class="grade-option" data-grade="4" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;4</div>
+                <div class="grade-option" data-grade="5" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;5</div>
+              </div>
+            </div>
+            <button id="nextButton" class="client-welcome__next-button" disabled>
+              Create Assistant
+              <svg width="28" height="28" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.167 10h11.666M15.833 10L10 4.167M15.833 10L10 15.833" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </form>
+      </section>
 
-        // Element references (camelCase IDs)
-        const nextButton = document.getElementById('nextButton');
-        const gradeSelect = document.getElementById('gradeSelect');
-        const sendButton = document.getElementById('sendButton');
-        const chatInput = document.getElementById('chatInput');
-        const chatWindow = document.getElementById('chatWindow');
-        const footer = document.getElementById('footer');
+      <!-- Chat Section -->
+      <section id="chat-section" class="section" data-section="chat" hidden>
+        <div class="chat-frame">
+          <div id="chatWindow" class="chat-messages" role="log" aria-live="polite"></div>
+          <div class="client-chat__input-container">
+            <textarea id="chatInput" class="client-chat__input" rows="1" placeholder="Type your message…"></textarea>
+            <button id="sendButton" class="client-chat__action" disabled>Send</button>
+          </div>
+        </div>
+      </section>
+    </main>
 
-        // Log presence
-        console.log('[Merit HTML] Next button', nextButton ? 'found.' : 'not found.');
-        console.log('[Merit HTML] Grade select', gradeSelect ? 'found.' : 'not found.');
-        console.log('[Merit HTML] Send button', sendButton ? 'found.' : 'not found.');
-        console.log('[Merit HTML] Chat input', chatInput ? 'found.' : 'not found.');
-        console.log('[Merit HTML] Chat window', chatWindow ? 'found.' : 'not found.');
-        console.log('[Merit HTML] Footer', footer ? 'found.' : 'not found.');
+    <!-- ===== Footer ===== -->
+    <footer class="rl-footer"></footer>
+  </div>
 
-        // Next button event
-        if (nextButton) {
-          nextButton.addEventListener('click', function() {
-            document.getElementById('welcome-section').classList.remove('active');
-            document.getElementById('chat-section').classList.add('active');
-            // Highlight Chat in sidebar
-            const navItems = document.querySelectorAll('.client-nav__item');
-            navItems.forEach(function(item) {
-              item.classList.remove('active');
-              if (item.getAttribute('data-section') === 'chat') {
-                item.classList.add('active');
-              }
-            });
-          });
-        }
-        // Grade select event
-        if (gradeSelect) {
-          gradeSelect.addEventListener('change', function() {
-            console.log('[Merit HTML] Grade level changed to:', this.value);
-            console.log('[Merit HTML] Next button state after grade change:', nextButton ? nextButton.disabled : 'not found');
-          });
-        }
-        // Send button event
-        if (sendButton && chatInput && chatWindow) {
-          sendButton.addEventListener('click', function() {
-            const message = chatInput.value.trim();
-            if (message) {
-              const msgDiv = document.createElement('div');
-              msgDiv.className = 'client-chat__message user';
-              msgDiv.textContent = message;
-              chatWindow.appendChild(msgDiv);
-              chatInput.value = '';
-              chatWindow.scrollTop = chatWindow.scrollHeight;
-            }
-          });
-          chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendButton.click();
-            }
-          });
-        }
-        // Initialize main instructional flow after DOM is ready and elements exist
-        if (window.MeritInstructionalFlow && nextButton && gradeSelect && sendButton && chatInput && chatWindow) {
-          try {
-            window.meritFlow = new MeritInstructionalFlow();
-          } catch (error) {
-            console.error('[Merit HTML] Error initializing MeritInstructionalFlow:', error);
-          }
-        }
+  <!-- ===== SINGLE CONSOLIDATED SCRIPT ===== -->
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const qs=id=>document.getElementById(id);
+      const sections=[...document.querySelectorAll('.section')];
+      const navLinks=[...document.querySelectorAll('.client-nav__item')];
+      const gradeOpts=[...document.querySelectorAll('.grade-option')];
+      const nextBtn=qs('nextButton');
+      const chatSection=qs('chat-section');
+      const welcomeSection=qs('welcome-section');
+      const chatWindow=qs('chatWindow');
+      const chatInput=qs('chatInput');
+      const sendBtn=qs('sendButton');
+
+      /* ---- nav helpers ---- */
+      function showSection(id){sections.forEach(s=>{const match=s.dataset.section===id;s.toggleAttribute('hidden',!match)});navLinks.forEach(l=>l.classList.toggle('active',l.dataset.section===id));location.hash=id;}
+      if(!location.hash)location.hash='#welcome';
+      showSection(location.hash.substring(1));
+      window.addEventListener('hashchange',()=>showSection(location.hash.substring(1)));
+
+      /* ---- grade selection ---- */
+      const selectedGrades=new Set();
+      function updateNext(){nextBtn.disabled=!selectedGrades.size;}
+      gradeOpts.forEach(opt=>{
+        opt.addEventListener('click',()=>{
+          opt.classList.toggle('selected');
+          const g=opt.dataset.grade;
+          opt.classList.contains('selected')?selectedGrades.add(g):selectedGrades.delete(g);
+          opt.querySelector('.star-icon').textContent=opt.classList.contains('selected')?'★':'☆';
+          updateNext();
+        });
       });
-    </script>
+      updateNext();
 
-    <script>
-        // Get the last update timestamp from the environment configuration
-        // const lastUpdateTime = new Date(BUILD_TIMESTAMP); // Removed duplicate
-        // const options = { // Removed duplicate
-        //     month: '2-digit',
-        //     day: '2-digit',
-        //     year: '2-digit',
-        // ... existing code ...
-    </script>
+      /* ---- proceed to chat ---- */
+      nextBtn.addEventListener('click',()=>showSection('chat'));
+
+      /* ---- chat ---- */
+      function addMsg(txt,isUser){const div=document.createElement('div');div.className=`client-chat__message ${isUser?'user':'assistant'}`;const bubble=document.createElement('div');bubble.className='client-chat__bubble';bubble.textContent=txt;div.appendChild(bubble);chatWindow.appendChild(div);chatWindow.scrollTop=chatWindow.scrollHeight;}
+      function send(){const txt=chatInput.value.trim();if(!txt)return;addMsg(txt,true);chatInput.value='';sendBtn.disabled=true;setTimeout(()=>addMsg('Dev‑mode reply.'),800);}
+      chatInput.addEventListener('input',()=>sendBtn.disabled=!chatInput.value.trim());
+      chatInput.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+      sendBtn.addEventListener('click',send);
+    });
+  </script>
 </body>
-</html> 
+</html>
