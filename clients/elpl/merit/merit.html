@@ -101,7 +101,7 @@
 
     <main class="client-content">
       <!-- Welcome Section -->
-      <section id="welcome-section" class="section" data-section="welcome">
+      <section id="welcome-section" class="section active" data-section="welcome">
         <div class="welcome-header"><h1 class="welcome-title">Merit</h1><p class="welcome-subtitle">Curriculum Support Assistant</p></div>
         <form id="welcome-form">
           <div class="welcome-flex-row">
@@ -116,7 +116,7 @@
                 <div class="grade-option" data-grade="5" tabindex="0"><span class="star-icon">☆</span>Grade&nbsp;5</div>
               </div>
             </div>
-            <button id="nextButton" class="client-welcome__next-button" disabled>Create Assistant</button>
+            <button id="nextButton" class="client-welcome__next-button" disabled>Start Chatting</button>
           </div>
         </form>
       </section>
@@ -130,41 +130,10 @@
     <footer class="rl-footer"></footer>
   </div>
 
-  <!-- ===== CORE MODULES (moved AFTER DOM) ===== -->
+  
+
+  <!-- ===== CORE MODULES (very last) ===== -->
   <script type="module" src="assets/js/client-merit-openai.js"></script>
   <script type="module" src="assets/js/client-merit-instructional-flow.js"></script>
-
-  <!-- ===== Consolidated vanilla helpers for preview/dev ===== -->
-  <script>
-    document.addEventListener('DOMContentLoaded',()=>{
-      const qs=id=>document.getElementById(id);
-      const sections=[...document.querySelectorAll('.section')];
-      const navLinks=[...document.querySelectorAll('.client-nav__item')];
-      const gradeOpts=[...document.querySelectorAll('.grade-option')];
-      const nextBtn=qs('nextButton');
-      const chatWindow=qs('chatWindow');
-      const chatInput=qs('chatInput');
-      const sendBtn=qs('sendButton');
-      // Accessibility: update aria-selected on nav
-      function updateNavAria(selectedId) {
-        navLinks.forEach(l => l.setAttribute('aria-selected', l.dataset.section === selectedId ? 'true' : 'false'));
-      }
-      // nav helpers
-      function showSection(id){sections.forEach(s=>s.hidden=s.dataset.section!==id);navLinks.forEach(l=>l.classList.toggle('active',l.dataset.section===id));updateNavAria(id);location.hash=id;}
-      if(!location.hash)location.hash='#welcome';showSection(location.hash.substring(1));window.addEventListener('hashchange',()=>showSection(location.hash.substring(1)));
-      // welcome
-      const selected=new Set();const updateNext=()=>{nextBtn.disabled=!selected.size};gradeOpts.forEach(o=>o.addEventListener('click',()=>{o.classList.toggle('selected');o.querySelector('.star-icon').textContent=o.classList.contains('selected')?'★':'☆';o.classList.contains('selected')?selected.add(o.dataset.grade):selected.delete(o.dataset.grade);updateNext();}));nextBtn.addEventListener('click',()=>showSection('chat'));
-      // chat logic using MeritInstructionalFlow if available
-      let meritFlow=null;
-      if(window.MeritInstructionalFlow){
-        meritFlow=new window.MeritInstructionalFlow();
-      }
-      async function addMsg(txt,isUser){const wrap=document.createElement('div');wrap.className=`client-chat__message ${isUser?'user':'assistant'}`;const b=document.createElement('div');b.className='client-chat__bubble';b.textContent=txt;wrap.appendChild(b);chatWindow.appendChild(wrap);chatWindow.scrollTop=chatWindow.scrollHeight;}
-      async function send(){const txt=chatInput.value.trim();if(!txt)return;addMsg(txt,true);chatInput.value='';sendBtn.disabled=true;if(meritFlow&&typeof meritFlow.sendMessage==='function'){try{const response=await meritFlow.sendMessage(txt);addMsg(response.content,false);}catch(e){addMsg('Sorry, there was a problem contacting the assistant.',false);}}else{addMsg('Assistant not available.',false);}}
-      chatInput.addEventListener('input',()=>sendBtn.disabled=!chatInput.value.trim());
-      chatInput.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-      sendBtn.addEventListener('click',send);
-    });
-  </script>
 </body>
 </html>
