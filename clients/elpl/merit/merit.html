@@ -1305,9 +1305,19 @@
     <!-- Build Log: May 5, 12:40pm -->
 </head>
 <body>
-    <button id="nextButton" class="client-welcome__next-button">Next</button>
-    <select id="gradeSelect" class="grade-level">
-        <!-- Options here -->
-    </select>
+    <div id="welcome-section" class="section active" data-section="welcome">
+        <!-- Welcome section content -->
+        <button id="nextButton" class="client-welcome__next-button" disabled>Next</button>
+        <select id="gradeSelect" class="grade-level">
+            <!-- Options here -->
+        </select>
+    </div>
+
+    <div id="chat-section" class="section" data-section="chat" hidden>
+        <!-- Chat section content -->
+        <div id="chatWindow" class="chat-window"></div>
+        <input id="chatInput" class="chat-input" type="text" placeholder="Type a message...">
+        <button id="sendButton" class="send-button">Send</button>
+    </div>
 </body>
 </html> 
