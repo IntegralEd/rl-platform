@@ -129,7 +129,7 @@ function collectTimesheetData() {
     const notes = row.querySelector('.notes').value;
     const minutes = row.querySelector('.minutes-input').value;
     const done = row.querySelector('.row-done').checked;
-    timesheetData.push({ billingCode, notes, minutes, done });
+      timesheetData.push({ billingCode, notes, minutes, done });
   });
   // Attach user identity to the payload
   return {

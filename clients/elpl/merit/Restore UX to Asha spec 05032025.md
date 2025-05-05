@@ -106,3 +106,9 @@ After this update to merit.html, you should see:
 - [ ] No duplicate or unnecessary divs
 - [ ] No inline event handlers (move to JS in next step)
 - [ ] No console errors related to missing elements (e.g., footer) 
+
+## Integration Note
+
+- We are going to integrate the Merit UX changes step by step, ensuring no JavaScript or CSS issues arise, and no new files are added.
+- Focus on changes within `/elpl/` and `/merit/`, specifically CSS, HTML, and images.
+- Verify each change against Asha's specification to ensure alignment with the desired UX. 
