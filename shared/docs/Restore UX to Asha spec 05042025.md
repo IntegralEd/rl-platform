@@ -22,3 +22,7 @@
 
 6. **Debug Missing Elements**:
    - Investigate why elements like `footer`, `nextButton`, `sendButton`, `chatInput`, `chatWindow`, and `gradeSelect` are reported as missing and ensure they are correctly rendered in the DOM.
+
+7. **Set All Sections to Active**:
+   - Update `merit.html` to set all sections to "active" by default.
+   - Ensure that only buttons are responsive to the instructional logic in the JavaScript, allowing sections to remain visible while buttons control navigation and actions.
