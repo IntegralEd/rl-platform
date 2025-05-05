@@ -43,6 +43,7 @@ export class MeritInstructionalFlow {
   #bindWelcome () {
     const sel = new Set();
     const upd = () => {
+      // Enable next button only if at least one grade is selected
       this.#el.next.disabled = !sel.size;
       this.#el.next.classList.toggle('enabled', !!sel.size);
     };
@@ -55,20 +56,21 @@ export class MeritInstructionalFlow {
         star.textContent = g.classList.contains('selected') ? '★' : '☆';
         upd();
       });
+      // Keyboard accessibility: Enter/Space toggles selection
       g.addEventListener('keypress', e => {
         if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
           g.click();
         }
       });
     });
 
+    // Launch chat when button pressed and at least one grade is selected
     this.#el.next.addEventListener('click', (e) => {
       e.preventDefault();
-      if (sel.size) {
-        console.log('[Merit] Launching chat with grades:', Array.from(sel));
-        this.#show('chat');
-      }
+      if (sel.size) this.#show('chat');
     });
+    upd(); // Initial state
   }
 
   /* ---------- nav ---------- */
