@@ -86,11 +86,24 @@ export class MeritInstructionalFlow {
 
   /* ---------- nav ---------- */
   #bindNav () {
-    this.#el.nav.forEach(n => n.addEventListener('click', e => {
-                e.preventDefault();
-      this.#show(n.dataset.section);
-    }));
-    }
+    const sections = document.querySelectorAll('.section');
+    const navItems = document.querySelectorAll('.client-nav__item');
+    navItems.forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        const target = item.getAttribute('data-section');
+        sections.forEach(sec => {
+          if (sec.getAttribute('data-section') === target) {
+            sec.classList.add('active');
+            sec.removeAttribute('hidden');
+          } else {
+            sec.classList.remove('active');
+            sec.setAttribute('hidden', '');
+          }
+        });
+      });
+    });
+  }
 
   #show (id) {
     if (!this.#cfg.sections.includes(id)) return;
@@ -138,8 +151,8 @@ export class MeritInstructionalFlow {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
     this.#el.send.addEventListener('click', send);
-        }
-    }
+  }
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   window.meritFlow = new MeritInstructionalFlow();
