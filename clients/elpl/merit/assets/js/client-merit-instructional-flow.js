@@ -280,6 +280,18 @@ export class MeritInstructionalFlow {
         this.#elements.sendButton?.addEventListener('click', () => {
             this.#sendMessage();
         });
+
+        // Example: Add event listener for the grade select
+        const gradeSelect = document.getElementById('gradeSelect');
+        if (gradeSelect) {
+            gradeSelect.addEventListener('change', (e) => {
+                console.log('[Merit Flow] Grade level changed to:', e.target.value);
+                this.#state.formValid = e.target.value !== '';
+                this.updateButtonState();
+            });
+        } else {
+            console.warn('[Merit Flow] Grade select not found');
+        }
     }
 
     async #sendMessage() {
