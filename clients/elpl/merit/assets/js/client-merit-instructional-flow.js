@@ -220,6 +220,12 @@ export class MeritInstructionalFlow {
             }
         });
         this.#elements = elements;
+
+        // Log element presence
+        console.log('Send Button:', this.#elements.sendButton ? 'Found' : 'Not Found');
+        console.log('Chat Input:', this.#elements.chatInput ? 'Found' : 'Not Found');
+        console.log('Chat Window:', this.#elements.chatWindow ? 'Found' : 'Not Found');
+
         return allGood;
     }
 
@@ -277,9 +283,14 @@ export class MeritInstructionalFlow {
             }
         });
         // Send button
-        this.#elements.sendButton?.addEventListener('click', () => {
-            this.#sendMessage();
-        });
+        const sendButton = document.getElementById('sendButton');
+        if (sendButton) {
+            sendButton.addEventListener('click', () => {
+                this.#sendMessage();
+            });
+        } else {
+            console.warn('Send button not found.');
+        }
 
         // Ensure grade level selection is the only focus
         const gradeSelect = document.getElementById('gradeSelect');

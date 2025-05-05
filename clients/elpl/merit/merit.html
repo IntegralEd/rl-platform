@@ -1267,12 +1267,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const navItems = document.querySelectorAll('.client-nav__item');
-            const main = document.querySelector('.main');
+            // Try to select an element with class 'main' and fallback to '.rl-main'
+            const main = document.querySelector('.main') || document.querySelector('.rl-main');
             function updateMainClass() {
-                if (window.location.hash === '#chat') {
-                    main.classList.add('main--chat');
+                if (main) {
+                    if (window.location.hash === '#chat') {
+                        main.classList.add('main--chat');
+                    } else {
+                        main.classList.remove('main--chat');
+                    }
                 } else {
-                    main.classList.remove('main--chat');
+                    console.warn('[Merit HTML] Main container not found for updateMainClass.');
                 }
             }
             navItems.forEach(item => {
@@ -1300,7 +1305,7 @@
         <!-- Chat section content -->
         <div id="chatWindow" class="chat-window"></div>
         <input id="chatInput" class="chat-input" type="text" placeholder="Type a message...">
-        <button id="sendButton" class="send-button">Send</button>
+        <button id="sendButton" class="send-button" disabled>Send</button>
     </div>
 
     <!-- Ensure all scripts are placed at the end of the body -->
